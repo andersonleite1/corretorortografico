@@ -76,6 +76,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main>{children}</main>
+        <Analytics />
         <SpeedInsights />
         <section className="px-6 py-8 max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
