@@ -1,4 +1,10 @@
-const Modal = ({ isOpen, onClose, message }) => {
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  message: string;
+}
+
+const Modal = ({ isOpen, onClose, message }: ModalProps) => {
   if (!isOpen) return null;
 
   return (

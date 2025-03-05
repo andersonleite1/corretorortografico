@@ -26,7 +26,7 @@ const Header = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = (message) => {
+  const showModal = (message: React.SetStateAction<string>) => {
     setModalMessage(message);
     setIsModalOpen(true);
   };
@@ -80,6 +80,11 @@ const Header = () => {
         while (position < canvas.height) {
           const pageCanvas = document.createElement("canvas");
           const pageCtx = pageCanvas.getContext("2d");
+
+          if (!pageCtx) {
+            console.error("Erro ao obter o contexto 2D do canvas.");
+            return;
+          }
 
           pageCanvas.width = canvas.width;
           pageCanvas.height = pdfHeight * (canvas.width / pdfWidth);

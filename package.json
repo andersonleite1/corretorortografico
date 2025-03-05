@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
+    "@types/file-saver": "^2.0.7",
     "@types/html-docx-js": "^0.3.4",
     "@types/node": "^20",
     "@types/react": "^18.2.8",
