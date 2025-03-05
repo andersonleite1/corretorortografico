@@ -1,7 +1,6 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
 import editorContent from "@/data/editorContent.json";
-import { Analytics } from '@vercel/analytics/react';
 
 const { title, intro, sections, finalNote } = editorContent;
 

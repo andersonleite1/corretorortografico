@@ -104,7 +104,7 @@ export default function EditForm() {
                 Copiar
               </td>
               <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono" className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">C</kbd>
+                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">C</kbd>
               </td>
               <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
                 <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">C</kbd>
