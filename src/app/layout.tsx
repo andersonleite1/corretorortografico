@@ -2,6 +2,7 @@ import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
 import editorContent from "@/data/editorContent.json";
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const { title, intro, sections, finalNote } = editorContent;
 
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main>{children}</main>
+        <SpeedInsights />
         <section className="px-6 py-8 max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
             {title}
