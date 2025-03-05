@@ -24,7 +24,10 @@ const ThemeSwitcher = () => {
 
   return (
     <button
-      onClick={() => setIsDarkMode(!isDarkMode)}
+      onClick={() => {
+        setIsDarkMode(!isDarkMode)
+        window.location.reload()
+      }}
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDarkMode ? <SunIcon width={20} /> : <MoonIcon width={22} />}
