@@ -1,10 +1,7 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
-import editorContent from "@/data/editorContent.json";
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-
-const { title, intro, sections, finalNote } = editorContent;
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -78,52 +75,12 @@ export default function RootLayout({
         <main>{children}</main>
         <Analytics />
         <SpeedInsights />
-        <section className="px-6 py-8 max-w-4xl mx-auto space-y-8">
-          <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
-            {title}
-          </h1>
-          <p
-            className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: intro.text }}
-          ></p>
-
-          {sections.map((section, index) => (
-            <div key={index}>
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                {section.title}
-              </h2>
-              {section.description && (
-                <p
-                  className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: section.description }}
-                ></p>
-              )}
-              {section.points && (
-                <ul className="space-y-4 list-disc pl-6 text-gray-700 dark:text-gray-300">
-                  {section.points.map((point, i) =>
-                    typeof point === "string" ? (
-                      <li key={i}>{point}</li>
-                    ) : (
-                      <li key={i}>
-                        <strong>{point.highlight}</strong> {point.text}
-                      </li>
-                    )
-                  )}
-                </ul>
-              )}
-            </div>
-          ))}
-
-          <p
-            className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: finalNote }}
-          ></p>
-        </section>
+        <Analytics />
         <footer className="bg-gray-900 text-white py-8 mt-8">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-lg">
-              Feito com <span className="text-red-500">❤️</span> por{" "}
-              <strong>geradordetexto</strong>
+              Feito com <span className="text-red-500">💚</span> por{" "}
+              <strong>editordetexto.online</strong>
             </p>
             <p className="text-sm mt-2 text-gray-400">
               &copy; {new Date().getFullYear()} Editor de Texto Online. Todos os
