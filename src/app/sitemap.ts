@@ -3,12 +3,12 @@ import type { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: `https://next-tiptap.vercel.app`,
+      url: `https://editordetexto.online`,
       lastModified: new Date(),
       priority: 1
     },
     {
-      url: `https://next-tiptap.vercel.app/post`,
+      url: `https://editordetexto.online/post`,
       lastModified: new Date(),
       priority: 0.8
     }
