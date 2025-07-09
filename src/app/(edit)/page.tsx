@@ -12,7 +12,7 @@ export default function EditPage() {
   return (
     <div className="max-w-[56rem] w-full mx-auto py-10 px-6">
       <EditForm />
-      <section className="px-6 py-8 max-w-4xl mx-auto space-y-8">
+      <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 pt-7">
           <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
             {title}
           </h1>

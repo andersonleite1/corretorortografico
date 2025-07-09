@@ -38,7 +38,7 @@ export default function EditForm() {
   if (isLoading) return;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8">
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">
           Título
@@ -82,9 +82,9 @@ export default function EditForm() {
         />
       </div>
 
-      <h3>Fundamentos de Comandos</h3>
+      <h3 className="mb-0 pb-0">Fundamentos de Comandos</h3>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md">
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
@@ -182,9 +182,9 @@ export default function EditForm() {
         </table>
       </div>
 
-      <h3>Formatação de texto</h3>
+      <h3 className="mb-0 pb-0">Formatação de texto</h3>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md">
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
