@@ -15,20 +15,21 @@ import "@/styles/globals.scss";
 import Head from "next/head";
 
 export const metadata: Metadata = {
-  title: "Editor de Texto Online",
+  title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
   description:
-    "A modern WYSIWYG rich text editor based on tiptap and shadcn ui for ReactJs/NextJs",
-  keywords: "Tiptap, WYSIWYG, Rich Text Editor, ReactJS, NextJS",
-  metadataBase: new URL(`https://editordetexto.online`),
+    "Use um editor de texto online gratuito, leve e sem anúncios. Escreva, edite e copie seus textos com facilidade, direto do navegador. Ideal para redatores, estudantes e profissionais.",
+  keywords:
+    "editor de texto online, editor de texto gratuito, escrever texto online, editor simples, produção de texto, editor leve, editor sem login",
+  metadataBase: new URL("https://editordetexto.online"),
   openGraph: {
     type: "website",
-    url: `https://editordetexto.online`,
-    title: "Editor de Texto Online",
+    url: "https://editordetexto.online",
+    title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
     description:
-      "A modern WYSIWYG rich text editor based on tiptap and shadcn ui for ReactJs/NextJs",
+      "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
     siteName: "Editor de Texto Online",
     locale: "pt_BR",
-    images: "/opengraph-image.jpg",
+    images: "/editor-de-texto.png",
   },
 };
 
