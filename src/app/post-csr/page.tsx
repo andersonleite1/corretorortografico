@@ -24,6 +24,18 @@ export default function PostPage() {
     getPost().then(setPost);
   }, []);
 
+  const formatDateToday = () => {
+    const today = new Date();
+
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    };
+
+    return new Intl.DateTimeFormat('pt-BR', options).format(today);
+  };
+
   if (!post) return null;
 
   return (
@@ -32,7 +44,7 @@ export default function PostPage() {
       <PostHeader
         title={post.title}
         author={post.author}
-        createdAt={post.createdAt}
+        createdAt={formatDateToday()}
         readingTime={readingTime}
         cover={post.cover}
       />
@@ -43,7 +55,7 @@ export default function PostPage() {
         </PostContent>
         <PostToc />
       </div>
-      <Image src={"/doraemon.png"} width={350} height={350} alt="" className="mx-auto mt-20" />
+      {/* <Image src={"/doraemon.png"} width={350} height={350} alt="" className="mx-auto mt-20" /> */}
     </article>
   );
 }

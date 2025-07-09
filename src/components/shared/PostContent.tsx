@@ -6,7 +6,7 @@ interface PostContentProps {
 
 const PostContent = ({ children }: PostContentProps) => {
   return (
-    <div className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content">
+    <div className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8">
       {children}
     </div>
   );
