@@ -14,6 +14,7 @@ import Header from "@/components/shared/Header";
 import "@/styles/globals.scss";
 import Head from "next/head";
 import Script from "next/script";
+import Footer from "@/components/Footer/footer";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -86,21 +87,9 @@ export default function RootLayout({
         />
         <Header />
         <main>{children}</main>
-        <Analytics />
         <SpeedInsights />
         <Analytics />
-        <footer className="bg-gray-900 text-white py-8 mt-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-lg">
-              Feito com <span className="text-red-500">💚</span> por{" "}
-              <strong>editordetexto.online</strong>
-            </p>
-            <p className="text-sm mt-2 text-gray-400">
-              &copy; {new Date().getFullYear()} Editor de Texto Online. Todos os
-              direitos reservados.
-            </p>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );
