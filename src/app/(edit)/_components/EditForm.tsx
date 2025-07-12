@@ -35,7 +35,72 @@ export default function EditForm() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  if (isLoading) return;
+  if (isLoading) return (
+    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+
+      {/* Título */}
+      <div>
+        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+        <div className="w-full h-10 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
+      </div>
+
+      {/* Editor */}
+      <div>
+        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+        <div className="w-full h-[320px] bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
+      </div>
+
+      {/* Título da tabela 1 */}
+      <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded" />
+
+      {/* Tabela 1 */}
+      <div className="overflow-x-auto">
+        <div className="w-full border border-gray-300 dark:border-gray-700 rounded-lg shadow-md text-sm">
+          <div className="grid grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-3 border-b border-gray-300 dark:border-gray-700">
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+          </div>
+
+          {[...Array(6)].map((_, idx) => (
+            <div
+              key={idx}
+              className="grid grid-cols-3 gap-4 px-4 py-3 border-b border-gray-300 dark:border-gray-700"
+            >
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Título da tabela 2 */}
+      <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded" />
+
+      {/* Tabela 2 */}
+      <div className="overflow-x-auto">
+        <div className="w-full border border-gray-300 dark:border-gray-700 rounded-lg shadow-md text-sm">
+          <div className="grid grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-3 border-b border-gray-300 dark:border-gray-700">
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+          </div>
+
+          {[...Array(6)].map((_, idx) => (
+            <div
+              key={idx}
+              className="grid grid-cols-3 gap-4 px-4 py-3 border-b border-gray-300 dark:border-gray-700"
+            >
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8">
@@ -82,9 +147,9 @@ export default function EditForm() {
         />
       </div>
 
-      <h3 className="mb-0 pb-0">Fundamentos de Comandos</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
+      <h3>Fundamentos de Comandos</h3>
+      <div className="">
+        <table className="min-w-full w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
@@ -183,8 +248,8 @@ export default function EditForm() {
       </div>
 
       <h3 className="mb-0 pb-0">Formatação de texto</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
+      <div className="">
+        <table className="min-w-full w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">

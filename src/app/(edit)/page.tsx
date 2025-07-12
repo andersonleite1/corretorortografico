@@ -51,7 +51,7 @@ export default function EditPage() {
             className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: finalNote }}
           ></p>
-        </section>
+      </section>
     </div>
   );
 }
