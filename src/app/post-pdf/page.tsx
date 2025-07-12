@@ -10,11 +10,6 @@ import { getPost } from "@/services/post";
 export default function PostPage() {
   const [post, setPost] = useState<any>(null);
 
-  const readingTime = useMemo(() => {
-    const wpm = 150;
-    return Math.ceil(post?.wordCount / wpm);
-  }, [post]);
-
   useEffect(() => {
     getPost().then(setPost);
   }, []);

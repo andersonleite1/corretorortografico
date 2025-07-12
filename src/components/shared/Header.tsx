@@ -7,7 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import htmlDocx from "html-docx-js/dist/html-docx";
 import { saveAs } from "file-saver";
 import Modal from "./Modal";
 
@@ -26,15 +25,19 @@ const Header = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = (message: React.SetStateAction<string>) => {
+  const showModal = (message: string) => {
     setModalMessage(message);
     setIsModalOpen(true);
+    // fecha automaticamente apos 4 segundos
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 4000);
   };
 
   const handleClear = () => {
     localStorage.removeItem("post");
     showModal("Conteúdo limpo!");
-    setTimeout(() => window.location.reload(), 1000); // Aguarda a modal antes de recarregar
+    setTimeout(() => window.location.reload(), 1000);
   };
 
   const handleSavePDF = async () => {
@@ -56,15 +59,13 @@ const Header = () => {
 
         printWindow.document.title = "Gerando PDF...";
 
-        const printableContent =
-          printWindow.document.getElementById("printable-content");
+        const printableContent = printWindow.document.getElementById("printable-content");
 
         if (!printableContent) {
           showModal("Conteúdo para imprimir não encontrado.");
           return;
         }
 
-        // Captura o conteúdo como canvas
         const canvas = await html2canvas(printableContent, { scale: 2 });
         const imgData = canvas.toDataURL("image/png");
 
@@ -111,11 +112,7 @@ const Header = () => {
           }
         }
 
-        pdf.save(
-          post.title != null
-            ? `${post.title}.pdf`
-            : "editor-de-texto-online.pdf"
-        );
+        pdf.save(post.title != null ? `${post.title}.pdf` : "editor-de-texto-online.pdf");
         printWindow.close();
         showModal("PDF exportado com sucesso!");
       } catch (error) {
@@ -131,10 +128,13 @@ const Header = () => {
       showModal("Nenhum conteúdo para Exportar.");
       return;
     }
+
     const post = JSON.parse(postData);
+
     const html = `
-      <!DOCTYPE html>
-      <html>
+      <html xmlns:o='urn:schemas-microsoft-com:office:office'
+            xmlns:w='urn:schemas-microsoft-com:office:word'
+            xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
           <meta charset="utf-8" />
           <title>${post.title}</title>
@@ -144,8 +144,12 @@ const Header = () => {
         </body>
       </html>
     `;
-    const converted = htmlDocx.asBlob(html);
-    saveAs(converted, `${post.title || "documento"}.docx`);
+
+    const blob = new Blob([html], {
+      type: "application/msword;charset=utf-8",
+    });
+
+    saveAs(blob, `${post.title || "documento"}.doc`);
     showModal("Documento exportado com sucesso!");
   };
 
@@ -174,16 +178,16 @@ const Header = () => {
             {isEditPage ? "Visualizar Post" : "Editar Post"}
           </Link>
           <button
-            onClick={handleSavePDF}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-          >
-            Exportar como PDF
-          </button>
-          <button
             onClick={handleSaveDOC}
             className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
-            Exportar como DOCX
+            Exportar como DOC
+          </button>
+          <button
+            disabled
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 cursor-not-allowed"
+          >
+            PDF (Em Breve)
           </button>
         </div>
         <div className="flex gap-5">
