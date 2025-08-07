@@ -11,6 +11,8 @@ import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 import Image from "next/image";
 
 import { getPost } from "@/services/post";
+import Link from "next/link";
+import { FaEdit, FaEye } from "react-icons/fa";
 
 export default function PostPage() {
   const [post, setPost] = useState<any>(null);
@@ -51,6 +53,13 @@ export default function PostPage() {
       <div className="grid grid-cols-1 w-full lg:w-auto lg:grid-cols-[minmax(auto,256px)_minmax(720px,1fr)_minmax(auto,256px)] gap-6 lg:gap-8">
         <PostSharing />
         <PostContent>
+          <Link
+            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            href="/"
+          >
+            <FaEdit className="w-4 h-4 mr-2" />
+            Editar Post
+          </Link>
           <TiptapRenderer>{post.content}</TiptapRenderer>
         </PostContent>
         <PostToc />
