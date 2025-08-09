@@ -19,7 +19,7 @@ const SubscriptButton = () => {
   return (
     <MenuButton
       icon="Subscript"
-      tooltip="Subscript"
+      tooltip="Subscrito"
       shortcuts={["Mod", ","]}
       onClick={() => editor.chain().focus().toggleSubscript().run()}
       {...state}

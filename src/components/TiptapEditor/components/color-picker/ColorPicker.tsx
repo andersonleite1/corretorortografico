@@ -72,8 +72,8 @@ const ColorPicker = (props: ColorPickerProps) => {
       <div className="rte-cp__main">
         {activeTab === "swatches" && (
           <div className="rte-cp-swatches">
-            {renderColorList(COLORS, "Default Colors")}
-            {renderColorList(MORE_COLORS, "More Colors")}
+            {renderColorList(COLORS, "Cores padrão")}
+            {renderColorList(MORE_COLORS, "Mais cores")}
           </div>
         )}
 
@@ -104,7 +104,7 @@ const ColorPicker = (props: ColorPickerProps) => {
             <Icon name="PaletteOff" />
           </Button>
           <Button style={{ width: "100%" }} onClick={handleApply}>
-            Apply
+            Aplicar
           </Button>
         </div>
       </PopoverClose>

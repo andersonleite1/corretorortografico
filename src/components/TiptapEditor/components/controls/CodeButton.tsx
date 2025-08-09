@@ -18,7 +18,7 @@ const CodeButton = () => {
   return (
     <MenuButton
       icon="CodeInline"
-      tooltip="Inline code"
+      tooltip="Código"
       shortcuts={["Mod", "E"]}
       onClick={() => editor.chain().focus().toggleCode().run()}
       {...state}

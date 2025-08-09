@@ -20,14 +20,14 @@ const InsertDropdown = () => {
   return (
     <MenuButton
       type="dropdown"
-      tooltip="Insert"
+      tooltip="Inserir"
       disabled={!editor.isEditable}
       icon="Plus"
       dropdownStyle={{ minWidth: "8rem" }}
     >
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Blockquote"
+          text="Citação"
           hideText={false}
           tooltip={false}
           icon="Quote"
@@ -36,7 +36,7 @@ const InsertDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Code block"
+          text="Bloco de código"
           hideText={false}
           tooltip={false}
           icon="CodeBlock"

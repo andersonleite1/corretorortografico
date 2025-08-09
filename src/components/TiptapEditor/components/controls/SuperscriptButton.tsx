@@ -19,7 +19,7 @@ const SuperscriptButton = () => {
   return (
     <MenuButton
       icon="Superscript"
-      tooltip="Superscript"
+      tooltip="Sobrescrito"
       shortcuts={["Mod", "."]}
       onClick={() => editor.chain().focus().toggleSuperscript().run()}
       {...state}
