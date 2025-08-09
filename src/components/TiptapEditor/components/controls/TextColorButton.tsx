@@ -41,7 +41,7 @@ const TextColorButton: React.FC = () => {
         type="popover"
         icon="TextColor"
         hideArrow
-        tooltip="Color"
+        tooltip="Cor do texto"
         disabled={state.disabled}
       >
         <ColorPicker

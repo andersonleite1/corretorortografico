@@ -28,23 +28,23 @@ const HeadingDropdown = () => {
     () => [
       {
         value: "p",
-        label: "Paragraph",
+        label: "Parágrafo",
       },
       {
         value: "h1",
-        label: "Heading 1",
+        label: "Título 1",
       },
       {
         value: "h2",
-        label: "Heading 2",
+        label: "Título 2",
       },
       {
         value: "h3",
-        label: "Heading 3",
+        label: "Título 3",
       },
       {
         value: "h4",
-        label: "Heading 4",
+        label: "Título 4",
       },
     ],
     []
@@ -65,7 +65,7 @@ const HeadingDropdown = () => {
     [editor]
   );
 
-  const currentLabel = options.find((item) => item.value === current)?.label || "Headings";
+  const currentLabel = options.find((item) => item.value === current)?.label || "Títulos";
 
   return (
     <MenuButton

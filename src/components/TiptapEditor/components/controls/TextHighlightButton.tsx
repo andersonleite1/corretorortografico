@@ -41,7 +41,7 @@ const TextHighlightButton: React.FC = () => {
         type="popover"
         icon="TextHighlight"
         hideArrow={true}
-        tooltip="Highlight"
+        tooltip="Cor de fundo"
         disabled={state.disabled}
       >
         <ColorPicker

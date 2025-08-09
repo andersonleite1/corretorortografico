@@ -38,26 +38,26 @@ const LinkEdit = ({ initialUrl, initialText, isCreate, onApply, onCancel }: Link
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         className="rte-link__input"
-        placeholder="Paste link"
+        placeholder="Colar URL do link"
         type="url"
         required
         autoFocus
       />
 
-      <Label className="rte-link__label">Display Text</Label>
+      <Label className="rte-link__label">Exibir texto</Label>
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}
         className="rte-link__input"
-        placeholder="Enter link text"
+        placeholder="Insira o texto do link"
       />
 
       <div className="rte-link__actions">
         <Button variant="secondary" onClick={onCancel}>
-          Cancel
+          Cancelar
         </Button>
         <Button type="submit" disabled={!canSubmit}>
-          Apply
+          Aplicar
         </Button>
       </div>
     </form>

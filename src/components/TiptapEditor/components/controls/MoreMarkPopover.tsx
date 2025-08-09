@@ -24,7 +24,7 @@ const MoreMarkPopover = () => {
   });
 
   return (
-    <MenuButton type="popover" icon="LetterCase" tooltip="More format" disabled={isDisabled}>
+    <MenuButton type="popover" icon="LetterCase" tooltip="Mais formato" disabled={isDisabled}>
       <PopoverClose asChild>
         <Toolbar dense={true}>
           <StrikeButton />

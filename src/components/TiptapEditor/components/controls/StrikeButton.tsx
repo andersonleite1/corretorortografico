@@ -19,7 +19,7 @@ const StrikeButton = () => {
   return (
     <MenuButton
       icon="Strike"
-      tooltip="Strikethrough"
+      tooltip="Tachado"
       shortcuts={["Mod", "Shift", "S"]}
       onClick={() => editor.chain().focus().toggleStrike().run()}
       {...state}

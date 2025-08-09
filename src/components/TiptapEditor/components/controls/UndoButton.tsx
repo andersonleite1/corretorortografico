@@ -16,7 +16,7 @@ const UndoButton = () => {
   return (
     <MenuButton
       icon="Undo"
-      tooltip="Undo"
+      tooltip="Desfazer"
       shortcuts={["Mod", "Z"]}
       onClick={() => editor.chain().focus().undo().run()}
       {...state}

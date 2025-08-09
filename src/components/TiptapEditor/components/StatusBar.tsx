@@ -20,21 +20,21 @@ const StatusBar = () => {
       <Toolbar dense>
         <MenuButton
           icon="SourceCode"
-          text="Source Code"
+          text="Código Fonte"
           active={isSourceMode}
           onClick={toggleSourceMode}
         />
         <MenuButton
           icon={isFullScreen ? "Minimize" : "Maximize"}
-          text="Fullscreen"
+          text="Tela cheia"
           active={isFullScreen}
           onClick={toggleFullScreen}
         />
       </Toolbar>
 
       <div className="rte-counter">
-        <span className="rte-word-count">Words: {counter.words}</span>
-        <span className="rte-charater">Characters: {counter.characters}</span>
+        <span className="rte-word-count">Palavras: {counter.words}</span>
+        <span className="rte-charater">Caracteres: {counter.characters}</span>
       </div>
     </div>
   );
