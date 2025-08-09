@@ -18,7 +18,7 @@ const BulletListButton = () => {
   return (
     <MenuButton
       icon="BulletList"
-      tooltip="Bullet List"
+      tooltip="Lista com marcadores"
       shortcuts={["Mod", "Shift", "8"]}
       onClick={() => editor.chain().focus().toggleBulletList().run()}
       {...state}

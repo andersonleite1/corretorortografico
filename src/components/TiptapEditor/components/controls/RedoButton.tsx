@@ -16,7 +16,7 @@ const RedoButton = () => {
   return (
     <MenuButton
       icon="Redo"
-      tooltip="Redo"
+      tooltip="Refazer"
       shortcuts={["Mod", "Y"]}
       onClick={() => editor.chain().focus().redo().run()}
       {...state}

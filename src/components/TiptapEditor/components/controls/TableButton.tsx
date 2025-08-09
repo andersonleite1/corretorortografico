@@ -18,7 +18,7 @@ const TableButton = () => {
   return (
     <MenuButton
       icon="Table"
-      tooltip="Table"
+      tooltip="Tabela"
       type="popover"
       hideArrow
       {...state}
