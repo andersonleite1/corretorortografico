@@ -315,6 +315,7 @@ export default function EditForm() {
               contentMaxHeight={640}
               onContentChange={field.onChange}
               initialContent={field.value}
+              aria-label="Campo de conteúdo do post"
             />
           )}
         />
