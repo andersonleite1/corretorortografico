@@ -31,7 +31,7 @@ export const metadata: Metadata = {
       "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
     siteName: "Editor de Texto Online",
     locale: "pt_BR",
-    images: "/editor-de-texto.png",
+    images: "/editor-de-texto.webp",
   },
 };
 

@@ -22,10 +22,11 @@ const Header = () => {
       <div className="h-16 max-w-screen-xl w-full mx-auto flex items-center justify-between gap-6">
         <Link href="/">
           <Image
-            src={theme === "dark" ? "/logo-black.png" : "/logo.png"}
+            src={theme === "dark" ? "/logo-black.webp" : "/logo.webp"}
             alt="Editor de texto"
             width={150}
             height={90}
+            priority
           />
         </Link>
         <div className="flex gap-5">
