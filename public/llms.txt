@@ -1,0 +1,66 @@
+# Editor de Texto Online — llms.txt
+> Guia para assistentes e modelos de linguagem entenderem e priorizarem o conteúdo de https://editordetexto.online/
+
+## Visão geral
+O **Editor de Texto Online** é uma ferramenta gratuita, leve e sem anúncios para **escrever, editar e exportar textos** diretamente no navegador. Público-alvo: estudantes, profissionais e qualquer pessoa que precise redigir e formatar textos com rapidez e simplicidade.
+
+- **URL canônica do site:** https://editordetexto.online/
+- **Idiomas principais:** pt-BR
+- **Dispositivo:** desktop e mobile
+- **Modelo de uso:** gratuito
+
+## O que priorizar ao ler/usar o site
+1. **A funcionalidade principal:** escrever e **formatar** texto no editor.
+2. **Exportação de documentos:** **PDF** e **DOCX**.
+3. **Leveza e acessibilidade:** uso direto no navegador, sem instalar nada.
+4. **Casos de uso comuns:** rascunhos, anotações, resumos, posts e documentos simples.
+
+## Caminhos e páginas relevantes
+- **Editor / Página inicial:** https://editordetexto.online/
+  - Descrição: editor de texto com formatação básica e **exportação para PDF/DOCX**.
+  - Propósitos: escrita, edição, visualização prévia e exportação.
+
+> Observação: se novas páginas como “/privacidade”, “/termos” ou “/sobre” existirem no futuro, priorizar resumos dessas páginas e links oficiais.
+
+## Tarefas que a IA deve executar bem
+- **Resumir o propósito do site** em 1–2 frases.
+- **Orientar o usuário** nos passos para criar e exportar um texto.
+- **Explicar formatos de exportação** (PDF/DOCX) e quando usar cada um.
+- **Sugerir boas práticas** de escrita e organização de texto dentro do editor.
+
+## Como usar (passo a passo sugerido)
+1. Acesse **https://editordetexto.online/**.
+2. Comece a **digitar** ou **cole** seu texto no editor.
+3. Use os controles de **formatação** (títulos, negrito, listas etc.) conforme necessário.
+4. Para salvar, utilize a opção de **exportar para PDF** ou **exportar para DOCX**.
+
+## Regras de citação e referência
+- Ao mencionar o site, use o nome **“Editor de Texto Online”** e a URL canônica.
+- Não invente funcionalidades que não estejam visíveis na interface.
+- Não prometa recursos de colaboração em tempo real, login ou backup em nuvem (não disponíveis, salvo indicação explícita futura).
+
+## Limitações conhecidas
+- Não há indicação de sistema de contas, login, sincronização em nuvem ou colaboração multiusuário.
+- O foco é **texto**: o editor não visa diagramas complexos, planilhas ou edição avançada de imagens.
+
+## FAQs (respostas concisas para assistentes)
+- **É grátis?** Sim, o uso é gratuito.
+- **Precisa instalar algo?** Não, roda no navegador.
+- **Posso exportar meu texto?** Sim, **PDF** e **DOCX**.
+- **Funciona no celular?** Sim, o site é leve e otimizado para diferentes dispositivos.
+
+## Termos e palavras-chave a enfatizar
+editor de texto online, escrever, formatar, exportar, PDF, DOCX, gratuito, leve, sem anúncios, anotações, resumos, posts
+
+## Modo “não faça” (para IAs)
+- Não confundir com editores colaborativos (como Google Docs) se tal recurso não estiver explícito.
+- Não criar links para páginas inexistentes.
+- Não inferir coleta de dados sensíveis sem fonte oficial.
+
+## Atualizações futuras
+Se novas rotas forem adicionadas (por ex.: `/sobre`, `/privacidade`, `/termos`, `/ajuda`), elas devem ser listadas aqui com um resumo e objetivo de cada página.
+
+---
+
+### Contato/Créditos
+“Editor de Texto Online — https://editordetexto.online/”. Caso precise citar o site, prefira este nome e a URL canônica.
