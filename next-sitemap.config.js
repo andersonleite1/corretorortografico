@@ -4,14 +4,14 @@ module.exports = {
   generateRobotsTxt: true,
   sitemapSize: 5000,
   changefreq: 'weekly',
-  priority: 0.7,
-  exclude: ['/private'], // páginas que você não quer indexar
+  priority: 1,
+  exclude: ['/private', '/post-csr'], // páginas que você não quer indexar
   robotsTxtOptions: {
     policies: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/private'],
+        disallow: ['/private', '/post-csr'],
       },
     ],
     additionalSitemaps: [

@@ -6,11 +6,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `https://editordetexto.online`,
       lastModified: new Date(),
       priority: 1
-    },
-    {
-      url: `https://editordetexto.online/post`,
-      lastModified: new Date(),
-      priority: 0.8
     }
   ];
 }
