@@ -50,7 +50,7 @@ export default function PrivacidadePage() {
       <h2 className="text-xl font-semibold mt-8 mb-3">5. Alterações nesta política</h2>
       <p className="mb-4">
         Podemos atualizar esta Política de Privacidade periodicamente. A data da última
-        atualização será sempre indicada no início do documento.
+        atualização será sempre indicada no fim desta página.
       </p>
 
       <p className="text-sm text-gray-500 dark:text-gray-400 mt-8">
