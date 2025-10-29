@@ -3,14 +3,14 @@ import { getPost, savePost } from "@/services/post";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChevronDown, FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
-import Modal from "@/components/shared/Modal";
-
+import { v4 as uuidv4 } from "uuid";
 
 
 interface PostForm {
@@ -24,6 +24,9 @@ export default function EditForm() {
   const { control, reset, watch } = useForm<PostForm>();
 
   const [open, setOpen] = useState(false);
+
+  const [openDrafts, setOpenDrafts] = useState(false);
+  const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
 
   const pathname = usePathname();
   const isEditPage = pathname === "/";
@@ -188,6 +191,70 @@ export default function EditForm() {
 
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  useEffect(() => {
+    const content = watch("content");
+    if (content !== editorRef.current?.getInstance()?.getHTML()) {
+      editorRef.current?.getInstance()?.commands.setContent(content);
+    }
+  }, [watch("content")]);
+
+
+  // Carrega os rascunhos ao iniciar
+  useEffect(() => {
+    const savedDrafts = JSON.parse(localStorage.getItem("drafts") || "[]");
+    setDrafts(savedDrafts);
+  }, []);
+
+  // Função para salvar o rascunho atual
+  const handleSaveDraft = () => {
+    const current = {
+      id: uuidv4(),
+      title: watch("title") || "Sem título",
+      content: watch("content") || "",
+      date: new Date().toLocaleString("pt-BR"),
+    };
+
+    let updatedDrafts = [...drafts, current];
+
+    // Limita a 10 rascunhos
+    if (updatedDrafts.length > 10) {
+      updatedDrafts = updatedDrafts.slice(-10);
+    }
+
+    localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
+    setDrafts(updatedDrafts);
+    showModal("Rascunho salvo com sucesso!");
+  };
+
+  // Função para carregar um rascunho
+  const handleLoadDraft = (draftId: string) => {
+    console.log('fui chamado');
+
+    const draft = drafts.find((d) => d.id === draftId);
+    if (!draft) return;
+
+    console.log('title: ', draft.title);
+    console.log('content: ', draft.content);
+
+    // Atualiza o estado do formulário
+    reset({ title: draft.title, content: draft.content });
+
+    // Atualiza o conteúdo visível do Tiptap
+    editorRef.current?.getInstance()?.commands.setContent(draft.content);
+
+    showModal("Rascunho carregado!");
+    setOpenDrafts(false);
+  };
+
+  // Função para excluir um rascunho
+  const handleDeleteDraft = (draftId: string) => {
+    const updated = drafts.filter((d) => d.id !== draftId);
+    localStorage.setItem("drafts", JSON.stringify(updated));
+    setDrafts(updated);
+    showModal("Rascunho excluído!");
+  };
+
 
   if (isLoading) return (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
@@ -370,6 +437,60 @@ export default function EditForm() {
                   <FaFilePdf className="w-4 h-4 mr-2 text-red-500" />
                   PDF (Em Breve)
                 </button>
+              </div>
+            )}
+          </div>
+          <div className="relative inline-block text-left">
+            {/* Botão principal */}
+            <button
+              onClick={() => setOpenDrafts(!openDrafts)}
+              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            >
+              <span>Rascunhos</span>
+              <FaChevronDown className="ml-2 w-4 h-4" />
+            </button>
+
+            {/* Dropdown */}
+            {openDrafts && (
+              <div className="absolute mt-2 w-64 bg-white rounded shadow-lg z-10">
+                <button
+                  onClick={() => {
+                    handleSaveDraft();
+                    setOpenDrafts(false);
+                  }}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b"
+                >
+                  💾 Salvar Rascunho
+                </button>
+
+                {drafts.length === 0 ? (
+                  <div className="px-4 py-2 text-sm text-gray-500">Nenhum rascunho salvo</div>
+                ) : (
+                  drafts
+                    .slice()
+                    .reverse()
+                    .map((d) => (
+                      <div
+                        key={d.id}
+                        className="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-50 border-b last:border-0"
+                      >
+                        <div
+                          onClick={() => handleLoadDraft(d.id)}
+                          className="cursor-pointer text-gray-700 truncate w-40"
+                          title={d.title}
+                        >
+                          📝 {d.title}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteDraft(d.id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Excluir"
+                        >
+                          <FaTrash className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))
+                )}
               </div>
             )}
           </div>
@@ -560,6 +681,11 @@ export default function EditForm() {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message={modalMessage}/>
     </div>
   );
 }
