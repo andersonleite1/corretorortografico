@@ -8,7 +8,7 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
 import Modal from "@/components/shared/Modal";
 
 
@@ -22,6 +22,8 @@ export default function EditForm() {
   const editorRef = useRef<TiptapEditorRef>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch } = useForm<PostForm>();
+
+  const [open, setOpen] = useState(false);
 
   const pathname = usePathname();
   const isEditPage = pathname === "/";
@@ -337,21 +339,40 @@ export default function EditForm() {
             Visualizar Post
           </Link>
 
-          <button
-            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
-            onClick={handleSaveDOC}
-          >
-            <FaFileWord className="w-4 h-4 mr-2" />
-            <span>Exportar DOC</span>
-          </button>
+          <div className="relative inline-block text-left">
+            {/* Botão principal */}
+            <button
+              onClick={() => setOpen(!open)}
+              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            >
+              <span>Exportar</span>
+              <FaChevronDown className="ml-2 w-4 h-4" />
+            </button>
 
-          <button
-            disabled
-            className="bg-green-200 hover:bg-green-200 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
-          >
-            <FaFilePdf className="w-4 h-4 mr-2" />
-            PDF (Em Breve)
-          </button>
+            {/* Dropdown */}
+            {open && (
+              <div className="absolute mt-2 w-44 bg-white rounded shadow-lg z-10">
+                <button
+                  onClick={() => {
+                    handleSaveDOC();
+                    setOpen(false);
+                  }}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <FaFileWord className="w-4 h-4 mr-2 text-blue-600" />
+                  Exportar DOC
+                </button>
+
+                <button
+                  disabled
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed"
+                >
+                  <FaFilePdf className="w-4 h-4 mr-2 text-red-500" />
+                  PDF (Em Breve)
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
