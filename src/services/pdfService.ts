@@ -6,7 +6,7 @@ const PDF_API_ENDPOINT = "https://html-to-pdf-api-edt.fly.dev/api/pdf/html";
  * A API exige chave de acesso enviada via cabeçalho `x-api-key`.
  */
 export async function requestPdfFromHtml(htmlDocument: string): Promise<Blob> {
-  const apiKey = process.env.NEXT_PUBLIC_PDF_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_PDF_API_KEY || "3xEt7CBU1XydZFeA4foiNgSGJOfCcwab";
 
   if (!apiKey) {
     throw new Error("Chave da API de PDF não configurada.");
