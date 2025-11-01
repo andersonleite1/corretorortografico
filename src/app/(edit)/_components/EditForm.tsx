@@ -1,16 +1,14 @@
-import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
-import { getPost, savePost } from "@/services/post";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { FaChevronDown, FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from "uuid";
+import { getPost, savePost } from "@/services/post";
+import { requestPdfFromHtml } from "@/services/pdfService";
 
 
 interface PostForm {
@@ -21,22 +19,14 @@ interface PostForm {
 export default function EditForm() {
   const editorRef = useRef<TiptapEditorRef>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { control, reset, watch } = useForm<PostForm>();
+  const { control, reset, watch, getValues } = useForm<PostForm>();
 
   const [open, setOpen] = useState(false);
 
   const [openDrafts, setOpenDrafts] = useState(false);
   const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
 
-  const pathname = usePathname();
-  const isEditPage = pathname === "/";
-
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
-    setTheme(currentTheme);
-  }, []);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const handleClear = () => {
     localStorage.removeItem("post");
@@ -44,86 +34,51 @@ export default function EditForm() {
     setTimeout(() => window.location.reload(), 1000);
   };
 
-  const handleSavePDF = async () => {
-    const printWindow = window.open("/post-pdf", "_blank");
+  const handleExportToPDF = async () => {
+    const editorInstance = editorRef.current?.getInstance();
+    const { title, content } = getValues();
+    const htmlFromEditor = editorInstance?.getHTML() ?? content;
+    const safeHtml = htmlFromEditor?.trim();
 
-    if (!printWindow) {
-      showModal("Permita pop-ups para Exportar como PDF.");
+    if (!safeHtml) {
+      showModal("Nenhum conteúdo para exportar.");
       return;
     }
 
-    setTimeout(async () => {
-      try {
-        const postData = localStorage.getItem("post");
-        if (!postData) {
-          showModal("Nenhum conteúdo para imprimir.");
-          return;
-        }
-        const post = JSON.parse(postData);
+    const baseTitle = (title || "Documento").trim() || "Documento";
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || "Documento";
+    const fileName = `${safeTitle}.pdf`;
 
-        printWindow.document.title = "Gerando PDF...";
+    const htmlDocument = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+</head>
+<body>
+  ${safeHtml}
+</body>
+</html>`;
 
-        const printableContent = printWindow.document.getElementById("printable-content");
+    setIsExportingPDF(true);
 
-        if (!printableContent) {
-          showModal("Conteúdo para imprimir não encontrado.");
-          return;
-        }
+    try {
+      const blob = await requestPdfFromHtml(htmlDocument);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
-        const canvas = await html2canvas(printableContent, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-
-        const pdf = new jsPDF("p", "pt", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        const imgWidth = pdfWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let position = 0;
-
-        while (position < canvas.height) {
-          const pageCanvas = document.createElement("canvas");
-          const pageCtx = pageCanvas.getContext("2d");
-
-          if (!pageCtx) {
-            console.error("Erro ao obter o contexto 2D do canvas.");
-            return;
-          }
-
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = pdfHeight * (canvas.width / pdfWidth);
-
-          pageCtx.drawImage(
-            canvas,
-            0,
-            position,
-            canvas.width,
-            pageCanvas.height,
-            0,
-            0,
-            pageCanvas.width,
-            pageCanvas.height
-          );
-
-          const pageImgData = pageCanvas.toDataURL("image/png");
-
-          pdf.addImage(pageImgData, "PNG", 0, 0, imgWidth, pdfHeight);
-          position += pageCanvas.height;
-
-          if (position < canvas.height) {
-            pdf.addPage();
-          }
-        }
-
-        pdf.save(post.title != null ? `${post.title}.pdf` : "editor-de-texto-online.pdf");
-        printWindow.close();
-        showModal("PDF exportado com sucesso!");
-      } catch (error) {
-        console.error("Erro ao gerar PDF:", error);
-        showModal("Erro ao gerar o PDF.");
-      }
-    }, 2000);
+      showModal("PDF exportado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao exportar PDF:", error);
+      showModal(error instanceof Error ? error.message : "Erro ao gerar o PDF.");
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   const handleSaveDOC = async () => {
@@ -134,6 +89,8 @@ export default function EditForm() {
     }
 
     const post = JSON.parse(postData);
+    const docTitleRaw = (post.title || "documento").trim() || "documento";
+    const docTitle = docTitleRaw.replace(/[\\/:*?"<>|]/g, "-") || "documento";
 
     const html = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -141,7 +98,7 @@ export default function EditForm() {
             xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
           <meta charset="utf-8" />
-          <title>${post.title}</title>
+          <title>${docTitle}</title>
         </head>
         <body>
           ${post.content}
@@ -153,22 +110,22 @@ export default function EditForm() {
       type: "application/msword;charset=utf-8",
     });
 
-    saveAs(blob, `${post.title || "documento"}.doc`);
+    saveAs(blob, `${docTitle}.doc`);
     showModal("Documento exportado com sucesso!");
   };
 
   // Estado para gerenciar a Modal
-    const [modalMessage, setModalMessage] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = (message: string) => {
-      setModalMessage(message);
-      setIsModalOpen(true);
-      // fecha automaticamente apos 4 segundos
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 4000);
-    };
+  const showModal = (message: string) => {
+    setModalMessage(message);
+    setIsModalOpen(true);
+    // fecha automaticamente apos 4 segundos
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 4000);
+  };
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
@@ -431,11 +388,19 @@ export default function EditForm() {
                 </button>
 
                 <button
-                  disabled
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed"
+                  onClick={async () => {
+                    setOpen(false);
+                    await handleExportToPDF();
+                  }}
+                  disabled={isExportingPDF}
+                  className={`flex items-center w-full px-4 py-2 text-sm ${
+                    isExportingPDF
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
                 >
                   <FaFilePdf className="w-4 h-4 mr-2 text-red-500" />
-                  PDF (Em Breve)
+                  {isExportingPDF ? "Gerando PDF..." : "Exportar PDF"}
                 </button>
               </div>
             )}
