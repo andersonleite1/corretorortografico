@@ -646,11 +646,25 @@ export default function EditForm() {
           </tbody>
         </table>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        message={modalMessage}/>
+        message={modalMessage}
+      />
+      {isExportingPDF && (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4 p-6 bg-white/10 rounded-2xl shadow-lg border border-white/20">
+          <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
+            Gerando PDF...
+          </h4>
+          <img
+            src="/loading.gif"
+            alt="Gerando PDF"
+            className="w-20 h-20 drop-shadow-md"
+          />
+        </div>
+      </div>
+    )}
     </div>
   );
 }
