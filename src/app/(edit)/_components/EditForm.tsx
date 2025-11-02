@@ -214,44 +214,53 @@ export default function EditForm() {
   };
 
 
-  if (isLoading) return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+  if (isLoading) {
+    const toolbarItems = Array.from({ length: 6 });
+    return (
+      <div className="flex flex-col gap-6 order-2 min-w-full h-screen prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          message={modalMessage}
+        />
 
-      {/* Modal para exibir mensagens */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        message={modalMessage}
-      />
-
-      {/* Título */}
-      <div>
-        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="w-full h-10 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
-      </div>
-
-      {/* Editor */}
-      <div>
-        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="w-full h-[320px] bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
-        <div className="flex flex-wrap gap-5 mt-5 justify-center">
-          {/* Skeleton do botão Limpar */}
-          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão Visualizar/Editar Post */}
-          <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão Exportar DOC */}
-          <div className="h-10 w-44 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão PDF (Em breve) */}
-          <div className="h-10 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div>
+          <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+          <div className="w-full h-11 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
         </div>
 
-      </div>
+        <div className="flex flex-col gap-4">
+          <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[340px]">
+            <div className="h-12 border-b border-[#d1d9e0] dark:border-[#3d444d] px-4 flex items-center gap-3">
+              {toolbarItems.map((_, index) => (
+                <span
+                  key={index}
+                  className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded"
+                />
+              ))}
+              <span className="ml-auto h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+            <div className="bg-gray-100 dark:bg-gray-700 min-h-[268px]" />
+            <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="flex items-center gap-3">
+                <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            </div>
+          </div>
 
-    </div>
-  );
+          <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[52px]">
+            <div className="h-11 w-full sm:w-auto sm:min-w-[132px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[168px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[152px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[162px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 h-screen">
@@ -297,10 +306,9 @@ export default function EditForm() {
             />
           )}
         />
-
-        <div className="flex flex-wrap gap-5 mt-5 justify-center">
+        <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[52px]">
           <button
-            className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[132px]"
             onClick={handleClear}
           >
             <FaTrash className="w-4 h-4 mr-2" />
@@ -308,7 +316,7 @@ export default function EditForm() {
           </button>
 
           <Link
-            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[168px]"
             href="/post-csr"
           >
             <FaEye className="w-4 h-4 mr-2" />
@@ -319,7 +327,7 @@ export default function EditForm() {
             {/* Botão principal */}
             <button
               onClick={() => setOpen(!open)}
-              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[152px]"
             >
               <span>Exportar</span>
               <FaChevronDown className="ml-2 w-4 h-4" />
@@ -361,7 +369,7 @@ export default function EditForm() {
             {/* Botão principal */}
             <button
               onClick={() => setOpenDrafts(!openDrafts)}
-              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[162px]"
             >
               <span>Rascunhos</span>
               <FaChevronDown className="ml-2 w-4 h-4" />
