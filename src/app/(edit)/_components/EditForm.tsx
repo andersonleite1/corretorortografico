@@ -231,7 +231,7 @@ export default function EditForm() {
 
         <div className="flex flex-col gap-4">
           <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
-          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[340px]">
+          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[440px]">
             <div className="h-12 border-b border-[#d1d9e0] dark:border-[#3d444d] px-4 flex items-center gap-3">
               {toolbarItems.map((_, index) => (
                 <span
@@ -251,7 +251,7 @@ export default function EditForm() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[52px]">
+          <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[54px]">
             <div className="h-11 w-full sm:w-auto sm:min-w-[132px] bg-gray-200 dark:bg-gray-700 rounded-md" />
             <div className="h-11 w-full sm:w-auto sm:min-w-[168px] bg-gray-200 dark:bg-gray-700 rounded-md" />
             <div className="h-11 w-full sm:w-auto sm:min-w-[152px] bg-gray-200 dark:bg-gray-700 rounded-md" />
@@ -299,14 +299,14 @@ export default function EditForm() {
                 imageCaption: "Digite a legenda da imagem (opcional)",
               }}
               contentMinHeight={340}
-              contentMaxHeight={640}
+              contentMaxHeight={440}
               onContentChange={field.onChange}
               initialContent={field.value}
               aria-label="Campo de conteúdo do post"
             />
           )}
         />
-        <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[52px]">
+        <div className="flex flex-wrap gap-5 mt-5 justify-center">
           <button
             className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[132px]"
             onClick={handleClear}
