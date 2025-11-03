@@ -13,6 +13,7 @@ export { Color } from "@tiptap/extension-color";
 export { Highlight } from "@tiptap/extension-highlight";
 export { FontFamily } from "@tiptap/extension-font-family";
 export { FontSize } from "./FontSize";
+export { LineHeight } from "./LineHeight";
 
 export { CodeBlock } from "./CodeBlock";
 export { Figure } from "./Figure";

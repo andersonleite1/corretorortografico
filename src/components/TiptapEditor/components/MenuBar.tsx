@@ -24,6 +24,7 @@ import InsertDropdown from "./controls/InsertDropdown";
 import TableButton from "@/components/TiptapEditor/components/controls/TableButton";
 import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
+import LineHeightDropdown from "./controls/LineHeightDropdown";
 
 const MenuBar = () => {
   return (
@@ -38,6 +39,7 @@ const MenuBar = () => {
         <HeadingDropdown />
         <FontFamilyDropdown />
         <FontSizeDropdown />
+        <LineHeightDropdown />
 
         <ToolbarDivider />
 

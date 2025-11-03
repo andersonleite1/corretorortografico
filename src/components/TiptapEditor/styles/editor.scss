@@ -192,6 +192,17 @@
   }
 }
 
+.rte-lineheight-dropdown {
+  min-width: 8rem;
+  max-height: 15rem;
+  padding-block: 0.25rem;
+  overflow-y: auto;
+
+  [data-lineheight-option] {
+    @include font-size("sm");
+  }
+}
+
 .rte-code-dropdown {
   display: flex;
   flex-direction: column;
