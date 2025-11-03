@@ -16,6 +16,7 @@ import {
   Image,
   TextStyle,
   FontFamily,
+  FontSize,
   Color,
   Highlight,
   Table,
@@ -51,6 +52,7 @@ const ExtensionKit = [
   FontFamily.configure({
     types: ["textStyle"],
   }),
+  FontSize,
   Color,
   Highlight.configure({ multicolor: true }),
   ListKeymap,
