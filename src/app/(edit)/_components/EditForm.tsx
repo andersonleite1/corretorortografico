@@ -1,16 +1,15 @@
-import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
-import { getPost, savePost } from "@/services/post";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { FaChevronDown, FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from "uuid";
+import { getPost, savePost } from "@/services/post";
+import { requestPdfFromHtml } from "@/services/pdfService";
+import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 
 
 interface PostForm {
@@ -21,22 +20,14 @@ interface PostForm {
 export default function EditForm() {
   const editorRef = useRef<TiptapEditorRef>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { control, reset, watch } = useForm<PostForm>();
+  const { control, reset, watch, getValues } = useForm<PostForm>();
 
   const [open, setOpen] = useState(false);
 
   const [openDrafts, setOpenDrafts] = useState(false);
   const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
 
-  const pathname = usePathname();
-  const isEditPage = pathname === "/";
-
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
-    setTheme(currentTheme);
-  }, []);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const handleClear = () => {
     localStorage.removeItem("post");
@@ -44,86 +35,51 @@ export default function EditForm() {
     setTimeout(() => window.location.reload(), 1000);
   };
 
-  const handleSavePDF = async () => {
-    const printWindow = window.open("/post-pdf", "_blank");
+  const handleExportToPDF = async () => {
+    const editorInstance = editorRef.current?.getInstance();
+    const { title, content } = getValues();
+    const htmlFromEditor = editorInstance?.getHTML() ?? content;
+    const safeHtml = htmlFromEditor?.trim();
 
-    if (!printWindow) {
-      showModal("Permita pop-ups para Exportar como PDF.");
+    if (!safeHtml) {
+      showModal("Nenhum conteúdo para exportar.");
       return;
     }
 
-    setTimeout(async () => {
-      try {
-        const postData = localStorage.getItem("post");
-        if (!postData) {
-          showModal("Nenhum conteúdo para imprimir.");
-          return;
-        }
-        const post = JSON.parse(postData);
+    const baseTitle = (title || "Documento").trim() || "Documento";
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || "Documento";
+    const fileName = `${safeTitle}.pdf`;
 
-        printWindow.document.title = "Gerando PDF...";
+    const htmlDocument = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+</head>
+<body>
+  ${safeHtml}
+</body>
+</html>`;
 
-        const printableContent = printWindow.document.getElementById("printable-content");
+    setIsExportingPDF(true);
 
-        if (!printableContent) {
-          showModal("Conteúdo para imprimir não encontrado.");
-          return;
-        }
+    try {
+      const blob = await requestPdfFromHtml(htmlDocument);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
-        const canvas = await html2canvas(printableContent, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-
-        const pdf = new jsPDF("p", "pt", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        const imgWidth = pdfWidth;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let position = 0;
-
-        while (position < canvas.height) {
-          const pageCanvas = document.createElement("canvas");
-          const pageCtx = pageCanvas.getContext("2d");
-
-          if (!pageCtx) {
-            console.error("Erro ao obter o contexto 2D do canvas.");
-            return;
-          }
-
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = pdfHeight * (canvas.width / pdfWidth);
-
-          pageCtx.drawImage(
-            canvas,
-            0,
-            position,
-            canvas.width,
-            pageCanvas.height,
-            0,
-            0,
-            pageCanvas.width,
-            pageCanvas.height
-          );
-
-          const pageImgData = pageCanvas.toDataURL("image/png");
-
-          pdf.addImage(pageImgData, "PNG", 0, 0, imgWidth, pdfHeight);
-          position += pageCanvas.height;
-
-          if (position < canvas.height) {
-            pdf.addPage();
-          }
-        }
-
-        pdf.save(post.title != null ? `${post.title}.pdf` : "editor-de-texto-online.pdf");
-        printWindow.close();
-        showModal("PDF exportado com sucesso!");
-      } catch (error) {
-        console.error("Erro ao gerar PDF:", error);
-        showModal("Erro ao gerar o PDF.");
-      }
-    }, 2000);
+      showModal("PDF exportado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao exportar PDF:", error);
+      showModal(error instanceof Error ? error.message : "Erro ao gerar o PDF.");
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   const handleSaveDOC = async () => {
@@ -134,6 +90,8 @@ export default function EditForm() {
     }
 
     const post = JSON.parse(postData);
+    const docTitleRaw = (post.title || "documento").trim() || "documento";
+    const docTitle = docTitleRaw.replace(/[\\/:*?"<>|]/g, "-") || "documento";
 
     const html = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -141,7 +99,7 @@ export default function EditForm() {
             xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
           <meta charset="utf-8" />
-          <title>${post.title}</title>
+          <title>${docTitle}</title>
         </head>
         <body>
           ${post.content}
@@ -153,22 +111,22 @@ export default function EditForm() {
       type: "application/msword;charset=utf-8",
     });
 
-    saveAs(blob, `${post.title || "documento"}.doc`);
+    saveAs(blob, `${docTitle}.doc`);
     showModal("Documento exportado com sucesso!");
   };
 
   // Estado para gerenciar a Modal
-    const [modalMessage, setModalMessage] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = (message: string) => {
-      setModalMessage(message);
-      setIsModalOpen(true);
-      // fecha automaticamente apos 4 segundos
-      setTimeout(() => {
-        setIsModalOpen(false);
-      }, 4000);
-    };
+  const showModal = (message: string) => {
+    setModalMessage(message);
+    setIsModalOpen(true);
+    // fecha automaticamente apos 4 segundos
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 4000);
+  };
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
@@ -256,96 +214,56 @@ export default function EditForm() {
   };
 
 
-  if (isLoading) return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+  if (isLoading) {
+    const toolbarItems = Array.from({ length: 6 });
+    return (
+      <div className="flex flex-col gap-6 order-2 min-w-full h-screen prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          message={modalMessage}
+        />
 
-      {/* Modal para exibir mensagens */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        message={modalMessage}
-      />
-
-      {/* Título */}
-      <div>
-        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="w-full h-10 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
-      </div>
-
-      {/* Editor */}
-      <div>
-        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="w-full h-[320px] bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
-        <div className="flex flex-wrap gap-5 mt-5 justify-center">
-          {/* Skeleton do botão Limpar */}
-          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão Visualizar/Editar Post */}
-          <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão Exportar DOC */}
-          <div className="h-10 w-44 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-
-          {/* Skeleton do botão PDF (Em breve) */}
-          <div className="h-10 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div>
+          <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+          <div className="w-full h-11 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
         </div>
 
-      </div>
-
-      {/* Título da tabela 1 */}
-      <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded" />
-
-      {/* Tabela 1 */}
-      <div className="overflow-x-auto">
-        <div className="w-full border border-gray-300 dark:border-gray-700 rounded-lg shadow-md text-sm">
-          <div className="grid grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+        <div className="flex flex-col gap-4">
+          <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[440px]">
+            <div className="h-12 border-b border-[#d1d9e0] dark:border-[#3d444d] px-4 flex items-center gap-3">
+              {toolbarItems.map((_, index) => (
+                <span
+                  key={index}
+                  className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded"
+                />
+              ))}
+              <span className="ml-auto h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+            <div className="bg-gray-100 dark:bg-gray-700 min-h-[268px]" />
+            <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="flex items-center gap-3">
+                <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            </div>
           </div>
 
-          {[...Array(6)].map((_, idx) => (
-            <div
-              key={idx}
-              className="grid grid-cols-3 gap-4 px-4 py-3 border-b border-gray-300 dark:border-gray-700"
-            >
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Título da tabela 2 */}
-      <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded" />
-
-      {/* Tabela 2 */}
-      <div className="overflow-x-auto">
-        <div className="w-full border border-gray-300 dark:border-gray-700 rounded-lg shadow-md text-sm">
-          <div className="grid grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
-            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded col-span-1" />
+          <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[54px]">
+            <div className="h-11 w-full sm:w-auto sm:min-w-[132px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[168px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[152px] bg-gray-200 dark:bg-gray-700 rounded-md" />
+            <div className="h-11 w-full sm:w-auto sm:min-w-[162px] bg-gray-200 dark:bg-gray-700 rounded-md" />
           </div>
-
-          {[...Array(6)].map((_, idx) => (
-            <div
-              key={idx}
-              className="grid grid-cols-3 gap-4 px-4 py-3 border-b border-gray-300 dark:border-gray-700"
-            >
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded col-span-1" />
-            </div>
-          ))}
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8">
+    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 min-h-screen pb-12">
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">
           Título
@@ -380,18 +298,17 @@ export default function EditForm() {
                 paragraph: "Digite seu conteúdo aqui...",
                 imageCaption: "Digite a legenda da imagem (opcional)",
               }}
-              contentMinHeight={256}
-              contentMaxHeight={640}
+              contentMinHeight={320}
+              contentMaxHeight={440}
               onContentChange={field.onChange}
               initialContent={field.value}
               aria-label="Campo de conteúdo do post"
             />
           )}
         />
-
         <div className="flex flex-wrap gap-5 mt-5 justify-center">
           <button
-            className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[132px]"
             onClick={handleClear}
           >
             <FaTrash className="w-4 h-4 mr-2" />
@@ -399,7 +316,7 @@ export default function EditForm() {
           </button>
 
           <Link
-            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[168px]"
             href="/post-csr"
           >
             <FaEye className="w-4 h-4 mr-2" />
@@ -410,7 +327,7 @@ export default function EditForm() {
             {/* Botão principal */}
             <button
               onClick={() => setOpen(!open)}
-              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[152px]"
             >
               <span>Exportar</span>
               <FaChevronDown className="ml-2 w-4 h-4" />
@@ -431,11 +348,19 @@ export default function EditForm() {
                 </button>
 
                 <button
-                  disabled
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-400 cursor-not-allowed"
+                  onClick={async () => {
+                    setOpen(false);
+                    await handleExportToPDF();
+                  }}
+                  disabled={isExportingPDF}
+                  className={`flex items-center w-full px-4 py-2 text-sm ${
+                    isExportingPDF
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
                 >
                   <FaFilePdf className="w-4 h-4 mr-2 text-red-500" />
-                  PDF (Em Breve)
+                  {isExportingPDF ? "Gerando PDF..." : "Exportar PDF"}
                 </button>
               </div>
             )}
@@ -444,7 +369,7 @@ export default function EditForm() {
             {/* Botão principal */}
             <button
               onClick={() => setOpenDrafts(!openDrafts)}
-              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto"
+              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[162px]"
             >
               <span>Rascunhos</span>
               <FaChevronDown className="ml-2 w-4 h-4" />
@@ -498,194 +423,25 @@ export default function EditForm() {
 
       </div>
 
-      <h3>Fundamentos de Comandos</h3>
-      <div className="">
-        <table className="min-w-full w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                Comando
-              </th>
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                Windows/Linux
-              </th>
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                macOS
-              </th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-900 dark:text-gray-200">
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Copiar
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">C</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">C</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Recortar
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">X</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">X</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Colar
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">V</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">V</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Colar sem formatação
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">V</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">V</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Desfazer
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Z</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Z</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Refazer
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Z</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Z</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Adicionar quebra de linha
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Enter</kbd> <br />
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Enter</kbd> <br />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 className="mb-0 pb-0">Formatação de texto</h3>
-      <div className="">
-        <table className="min-w-full w-full border-collapse border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-left shadow-md mt-0 pt-0">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                Comando
-              </th>
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                Windows/Linux
-              </th>
-              <th className="px-4 py-3 border-b border-gray-300 dark:border-gray-700">
-                macOS
-              </th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-900 dark:text-gray-200">
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Negrito
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">B</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">B</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Itálico
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">I</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">I</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Sublinhado
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">U</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">U</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Tachado
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">S</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">S</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Destaque
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">H</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Cmd</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Shift</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">H</kbd>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                Código
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">Ctrl</kbd> + <kbd className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-xs font-mono">E</kbd>
-              </td>
-              <td className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        message={modalMessage}/>
+        message={modalMessage}
+      />
+      {isExportingPDF && (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4 p-6 bg-white/10 rounded-2xl shadow-lg border border-white/20">
+          <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
+            Gerando PDF...
+          </h4>
+          <img
+            src="/loading.gif"
+            alt="Gerando PDF"
+            className="w-20 h-20 drop-shadow-md"
+          />
+        </div>
+      </div>
+    )}
     </div>
   );
 }
