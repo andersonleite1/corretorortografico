@@ -15,6 +15,7 @@ import {
   Youtube,
   Image,
   TextStyle,
+  FontFamily,
   Color,
   Highlight,
   Table,
@@ -47,6 +48,9 @@ const ExtensionKit = [
   Subscript,
   TextAlign.configure({ types: ["heading", "paragraph"] }),
   TextStyle,
+  FontFamily.configure({
+    types: ["textStyle"],
+  }),
   Color,
   Highlight.configure({ multicolor: true }),
   ListKeymap,

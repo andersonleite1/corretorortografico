@@ -22,6 +22,7 @@ import TextColorButton from "./controls/TextColorButton";
 import TextHighlightButton from "./controls/TextHighlightButton";
 import InsertDropdown from "./controls/InsertDropdown";
 import TableButton from "@/components/TiptapEditor/components/controls/TableButton";
+import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 
 const MenuBar = () => {
   return (
@@ -34,6 +35,7 @@ const MenuBar = () => {
         <ToolbarDivider />
 
         <HeadingDropdown />
+        <FontFamilyDropdown />
 
         <ToolbarDivider />
 
