@@ -298,7 +298,7 @@ export default function EditForm() {
                 paragraph: "Digite seu conteúdo aqui...",
                 imageCaption: "Digite a legenda da imagem (opcional)",
               }}
-              contentMinHeight={340}
+              contentMinHeight={320}
               contentMaxHeight={440}
               onContentChange={field.onChange}
               initialContent={field.value}
