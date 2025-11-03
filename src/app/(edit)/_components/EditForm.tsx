@@ -263,7 +263,7 @@ export default function EditForm() {
   }
 
   return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 min-h-screen">
+    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 min-h-screen pb-12">
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">
           Título
