@@ -1,4 +1,4 @@
-const PDF_API_ENDPOINT = "https://html-to-pdf-api-edt.fly.dev/api/pdf/html";
+const PDF_API_ENDPOINT = "https://html-to-pdf-api-78hy.onrender.com/api/pdf/html";
 // const PDF_API_ENDPOINT = "http://localhost:3007/api/pdf/html";
 
 /**
