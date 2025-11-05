@@ -21,6 +21,19 @@ export type ExportActions = {
   onExportTxt?: () => void | Promise<void>;
 };
 
+export type DraftSummary = {
+  id: string;
+  title: string;
+  date: string;
+};
+
+export type DraftActions = {
+  drafts: DraftSummary[];
+  onSaveDraft?: () => void;
+  onLoadDraft?: (id: string) => void;
+  onDeleteDraft?: (id: string) => void;
+};
+
 type TiptapContextType = {
   editor: Editor;
   contentElement: RefObject<Element>;
@@ -31,6 +44,7 @@ type TiptapContextType = {
   toggleSourceMode: () => void;
   setIsResizing: (value: boolean) => void;
   exportActions?: ExportActions;
+  draftActions?: DraftActions;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -43,6 +57,7 @@ type TiptapProviderProps = {
   editorProps?: HTMLAttributes<HTMLDivElement>;
   children?: ReactNode;
   exportActions?: ExportActions;
+  draftActions?: DraftActions;
 };
 
 export const TiptapProvider = ({
@@ -52,6 +67,7 @@ export const TiptapProvider = ({
   slotBefore,
   slotAfter,
   exportActions,
+  draftActions,
 }: TiptapProviderProps) => {
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
@@ -101,6 +117,7 @@ export const TiptapProvider = ({
         toggleFullScreen: () => setIsFullScreen((prev) => !prev),
         toggleSourceMode: () => setIsSourceMode((prev) => !prev),
         exportActions,
+        draftActions,
       }}
     >
       {editorContent}

@@ -2,7 +2,6 @@ import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
 import { useTiptapContext } from "./Provider";
-import MenuButton from "./MenuButton";
 
 import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
@@ -29,13 +28,16 @@ import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
+import DraftsDropdown from "./controls/DraftsDropdown";
 
 const MenuBar = () => {
-  const { exportActions } = useTiptapContext();
+  const { exportActions, draftActions } = useTiptapContext();
   const showExport = Boolean(
     exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
   );
   const showPreview = Boolean(exportActions?.onPreviewPdf || exportActions?.onPreviewPost);
+  const showDrafts = Boolean(draftActions);
+  const hasExtraMenus = showExport || showPreview || showDrafts;
 
   return (
     <div className="rte-menu-bar">
@@ -43,8 +45,6 @@ const MenuBar = () => {
         <UndoButton />
         <RedoButton />
         {/* <ClearFormatButton /> */}
-
-        <ToolbarDivider />
 
         <ToolbarDivider />
 
@@ -82,10 +82,10 @@ const MenuBar = () => {
         <ToolbarDivider />
 
         {showExport && <ExportDropdown />}
-
         {showPreview && <PreviewDropdown />}
+        {showDrafts && <DraftsDropdown />}
 
-        {(showExport || showPreview) && <ToolbarDivider />}
+        {hasExtraMenus && <ToolbarDivider />}
       </Toolbar>
     </div>
   );

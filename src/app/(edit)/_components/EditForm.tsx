@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
-import { FaChevronDown, FaTrash, FaTimes } from "react-icons/fa";
+import { FaTrash, FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
@@ -23,9 +23,7 @@ export default function EditForm() {
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
 
-  const [openDrafts, setOpenDrafts] = useState(false);
   const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
-
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<{
     url: string;
@@ -280,7 +278,6 @@ export default function EditForm() {
     editorRef.current?.getInstance()?.commands.setContent(draft.content);
 
     showModal("Rascunho carregado!");
-    setOpenDrafts(false);
   };
 
   // Função para excluir um rascunho
@@ -388,6 +385,12 @@ export default function EditForm() {
                 onPreviewPost: handlePreviewPost,
                 isExportingPdf: isExportingPDF,
               }}
+              draftActions={{
+                drafts: drafts.map(({ id, title, date }) => ({ id, title, date })),
+                onSaveDraft: handleSaveDraft,
+                onLoadDraft: handleLoadDraft,
+                onDeleteDraft: handleDeleteDraft,
+              }}
               aria-label="Campo de conteúdo do post"
             />
           )}
@@ -400,61 +403,6 @@ export default function EditForm() {
             <FaTrash className="w-4 h-4 mr-2" />
             Limpar
           </button>
-
-          <div className="relative inline-block text-left">
-            {/* Botão principal */}
-            <button
-              onClick={() => setOpenDrafts(!openDrafts)}
-              className="bg-blue-400 hover:bg-blue-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[162px]"
-            >
-              <span>Rascunhos</span>
-              <FaChevronDown className="ml-2 w-4 h-4" />
-            </button>
-
-            {/* Dropdown */}
-            {openDrafts && (
-              <div className="absolute mt-2 w-64 bg-white rounded shadow-lg z-10">
-                <button
-                  onClick={() => {
-                    handleSaveDraft();
-                    setOpenDrafts(false);
-                  }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b"
-                >
-                  💾 Salvar Rascunho
-                </button>
-
-                {drafts.length === 0 ? (
-                  <div className="px-4 py-2 text-sm text-gray-500">Nenhum rascunho salvo</div>
-                ) : (
-                  drafts
-                    .slice()
-                    .reverse()
-                    .map((d) => (
-                      <div
-                        key={d.id}
-                        className="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-50 border-b last:border-0"
-                      >
-                        <div
-                          onClick={() => handleLoadDraft(d.id)}
-                          className="cursor-pointer text-gray-700 truncate w-40"
-                          title={d.title}
-                        >
-                          📝 {d.title}
-                        </div>
-                        <button
-                          onClick={() => handleDeleteDraft(d.id)}
-                          className="text-red-500 hover:text-red-700"
-                          title="Excluir"
-                        >
-                          <FaTrash className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))
-                )}
-              </div>
-            )}
-          </div>
         </div>
 
       </div>

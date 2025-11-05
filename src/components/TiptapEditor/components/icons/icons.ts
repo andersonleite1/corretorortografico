@@ -53,7 +53,8 @@ import {
   TbTextCaption,
   TbTrash,
   TbUnderline,
-  TbX
+  TbX,
+  TbNotebook
 } from "react-icons/tb";
 import { RiTextSpacing } from "react-icons/ri";
 import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
@@ -132,6 +133,7 @@ export const icons = {
   FilePdf: FaFilePdf,
   FileTxt: FaFileAlt,
   Eye: FaRegEye,
+  Drafts: TbNotebook,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };
