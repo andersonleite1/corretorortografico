@@ -7,7 +7,6 @@ import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
 import UndoButton from "./controls/UndoButton";
 import RedoButton from "./controls/RedoButton";
-import ClearFormatButton from "./controls/ClearFormatButton";
 import UnderlineButton from "./controls/UnderlineButton";
 import AlignPopover from "./controls/AlignPopover";
 import HeadingDropdown from "./controls/HeadingDropdown";
@@ -29,6 +28,7 @@ import LineHeightDropdown from "./controls/LineHeightDropdown";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
+import ClearEditorButton from "./controls/ClearEditorButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
@@ -73,8 +73,10 @@ const MenuBar = () => {
         {/* <ImageButton /> */}
         {/* <YoutubeButton /> */}
         <CodeBlockButton />
-
         <InsertDropdown />
+
+        <ToolbarDivider />
+
         <HeadingDropdown />
         <FontFamilyDropdown />
         <FontSizeDropdown />
@@ -85,7 +87,9 @@ const MenuBar = () => {
         {showPreview && <PreviewDropdown />}
         {showDrafts && <DraftsDropdown />}
 
-        {hasExtraMenus && <ToolbarDivider />}
+        {exportActions?.onClear && <ClearEditorButton />}
+
+        {/* {hasExtraMenus && <ToolbarDivider />} */}
       </Toolbar>
     </div>
   );

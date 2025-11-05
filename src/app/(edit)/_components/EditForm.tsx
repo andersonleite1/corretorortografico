@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
-import { FaTrash, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
@@ -325,13 +325,6 @@ export default function EditForm() {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-wrap gap-5 mt-5 justify-center min-h-[54px]">
-            <div className="h-11 w-full sm:w-auto sm:min-w-[132px] bg-gray-200 dark:bg-gray-700 rounded-md" />
-            <div className="h-11 w-full sm:w-auto sm:min-w-[168px] bg-gray-200 dark:bg-gray-700 rounded-md" />
-            <div className="h-11 w-full sm:w-auto sm:min-w-[152px] bg-gray-200 dark:bg-gray-700 rounded-md" />
-            <div className="h-11 w-full sm:w-auto sm:min-w-[162px] bg-gray-200 dark:bg-gray-700 rounded-md" />
-          </div>
         </div>
       </div>
     );
@@ -383,6 +376,7 @@ export default function EditForm() {
                 onExportTxt: handleExportToTxt,
                 onPreviewPdf: handlePreviewPdf,
                 onPreviewPost: handlePreviewPost,
+                onClear: handleClear,
                 isExportingPdf: isExportingPDF,
               }}
               draftActions={{
@@ -395,16 +389,6 @@ export default function EditForm() {
             />
           )}
         />
-        <div className="flex flex-wrap gap-5 mt-5 justify-center">
-          <button
-            className="bg-red-400 hover:bg-red-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[132px]"
-            onClick={handleClear}
-          >
-            <FaTrash className="w-4 h-4 mr-2" />
-            Limpar
-          </button>
-        </div>
-
       </div>
 
       <Modal

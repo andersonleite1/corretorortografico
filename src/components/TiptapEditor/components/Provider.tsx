@@ -17,6 +17,7 @@ export type ExportActions = {
   onExportPdf?: () => void | Promise<void>;
   onPreviewPdf?: () => void | Promise<void>;
   onPreviewPost?: () => void | Promise<void>;
+  onClear?: () => void | Promise<void>;
   isExportingPdf?: boolean;
   onExportTxt?: () => void | Promise<void>;
 };
