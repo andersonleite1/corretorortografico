@@ -1,12 +1,12 @@
 import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
+import { useTiptapContext } from "./Provider";
 
 import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
 import UndoButton from "./controls/UndoButton";
 import RedoButton from "./controls/RedoButton";
-import ClearFormatButton from "./controls/ClearFormatButton";
 import UnderlineButton from "./controls/UnderlineButton";
 import AlignPopover from "./controls/AlignPopover";
 import HeadingDropdown from "./controls/HeadingDropdown";
@@ -25,21 +25,26 @@ import TableButton from "@/components/TiptapEditor/components/controls/TableButt
 import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
+import ExportDropdown from "./controls/ExportDropdown";
+import PreviewDropdown from "./controls/PreviewDropdown";
+import DraftsDropdown from "./controls/DraftsDropdown";
+import ClearEditorButton from "./controls/ClearEditorButton";
 
 const MenuBar = () => {
+  const { exportActions, draftActions } = useTiptapContext();
+  const showExport = Boolean(
+    exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
+  );
+  const showPreview = Boolean(exportActions?.onPreviewPdf || exportActions?.onPreviewPost);
+  const showDrafts = Boolean(draftActions);
+  const hasExtraMenus = showExport || showPreview || showDrafts;
+
   return (
     <div className="rte-menu-bar">
       <Toolbar dense>
         <UndoButton />
         <RedoButton />
         {/* <ClearFormatButton /> */}
-
-        <ToolbarDivider />
-
-        <HeadingDropdown />
-        <FontFamilyDropdown />
-        <FontSizeDropdown />
-        <LineHeightDropdown />
 
         <ToolbarDivider />
 
@@ -58,16 +63,33 @@ const MenuBar = () => {
         <AlignPopover />
         <BulletListButton />
         <OrderedListButton />
+        <LineHeightDropdown />
 
         <ToolbarDivider />
 
         {/* <BlockquoteButton /> */}
         <LinkButton />
         <TableButton />
-        <ImageButton />
+        {/* <ImageButton /> */}
         {/* <YoutubeButton /> */}
-        {/* <CodeBlockButton /> */}
+        <CodeBlockButton />
         <InsertDropdown />
+
+        <ToolbarDivider />
+
+        <HeadingDropdown />
+        <FontFamilyDropdown />
+        <FontSizeDropdown />
+
+        <ToolbarDivider />
+
+        {showExport && <ExportDropdown />}
+        {showPreview && <PreviewDropdown />}
+        {showDrafts && <DraftsDropdown />}
+
+        {exportActions?.onClear && <ClearEditorButton />}
+
+        {/* {hasExtraMenus && <ToolbarDivider />} */}
       </Toolbar>
     </div>
   );

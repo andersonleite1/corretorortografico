@@ -1,12 +1,13 @@
 import React, { memo, useCallback } from "react";
 import { BubbleMenu } from "../../BubbleMenu";
-import {Toolbar, ToolbarDivider} from "../../ui/Toolbar";
+import { Toolbar, ToolbarDivider } from "../../ui/Toolbar";
 import { useTiptapContext } from "../../Provider";
 import MenuButton from "../../MenuButton";
 import { useEditorState } from "@tiptap/react";
 import CodeDropdown from "./CodeDropdown";
 import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 import { getNodeContainer } from "../../../utils/getNodeContainer";
+import type { VirtualElement } from "@floating-ui/dom";
 
 export const CodeBlockMenu = () => {
   const { editor, contentElement } = useTiptapContext();
@@ -40,9 +41,16 @@ export const CodeBlockMenu = () => {
     editor.chain().focus().deleteNode("codeBlock").run();
   }, [editor]);
 
-  const getReferenceClientRect = useCallback(() => {
-    const node = getNodeContainer(editor, "pre");
-    return node?.getBoundingClientRect() || new DOMRect(-1000, -1000, 0, 0);
+  const getReferencedVirtualElement = useCallback((): VirtualElement | null => {
+    const node = getNodeContainer(editor, "pre") as HTMLElement | null;
+    if (!node) {
+      return null;
+    }
+
+    return {
+      getBoundingClientRect: () => node.getBoundingClientRect(),
+      contextElement: node,
+    };
   }, [editor]);
 
   return (
@@ -51,11 +59,15 @@ export const CodeBlockMenu = () => {
       pluginKey={"code-block-bubble"}
       shouldShow={shouldShow}
       updateDelay={100}
-      tippyOptions={{
+      appendTo={() =>
+        (contentElement.current as HTMLElement | null) ??
+        editor.view.dom.parentElement ??
+        document.body
+      }
+      getReferencedVirtualElement={getReferencedVirtualElement}
+      options={{
         placement: "top",
-        maxWidth: "auto",
-        appendTo: () => contentElement.current!,
-        getReferenceClientRect,
+        offset: 10,
       }}
     >
       <Toolbar>

@@ -11,9 +11,9 @@ const { title, intro, sections, finalNote } = editorContent;
 
 export default function EditPage() {
   return (
-    <div className="max-w-[56rem] w-full mx-auto py-10 px-6">
+    <div className="max-w-[56rem] w-full mx-auto py-10 px-3 md:px-6 sm:px-0">
       <EditForm />
-      <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 pt-0">
+      <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0">
           <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
             {title}
           </h1>

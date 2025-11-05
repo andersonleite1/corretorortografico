@@ -4,7 +4,7 @@ export interface FontSizeOption {
 }
 
 export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
-  { label: "Padrão", value: "" },
+  { label: "Tamanho", value: "" },
   { label: "12px", value: "12px" },
   { label: "14px", value: "14px" },
   { label: "16px", value: "16px" },

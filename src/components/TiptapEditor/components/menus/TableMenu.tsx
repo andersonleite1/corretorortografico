@@ -4,6 +4,7 @@ import { getNodeContainer } from "../../utils/getNodeContainer";
 import { BubbleMenu } from "../BubbleMenu";
 import MenuButton from "../MenuButton";
 import { Toolbar } from "../ui/Toolbar";
+import type { VirtualElement } from "@floating-ui/dom";
 
 const TableMenu = () => {
   const { editor, contentElement } = useTiptapContext();
@@ -12,9 +13,16 @@ const TableMenu = () => {
     return editor.isActive("table");
   }, []);
 
-  const getReferenceClientRect = useCallback(() => {
-    const node = getNodeContainer(editor, "table");
-    return node?.getBoundingClientRect() || new DOMRect(-1000, -1000, 0, 0);
+  const getReferencedVirtualElement = useCallback((): VirtualElement | null => {
+    const node = getNodeContainer(editor, "table") as HTMLElement | null;
+    if (!node) {
+      return null;
+    }
+
+    return {
+      getBoundingClientRect: () => node.getBoundingClientRect(),
+      contextElement: node,
+    };
   }, [editor]);
 
   const addRowOrColumn = useCallback(
@@ -51,11 +59,15 @@ const TableMenu = () => {
       pluginKey={"table-bubble"}
       shouldShow={shouldShow}
       updateDelay={100}
-      tippyOptions={{
+      appendTo={() =>
+        (contentElement.current as HTMLElement | null) ??
+        editor.view.dom.parentElement ??
+        document.body
+      }
+      getReferencedVirtualElement={getReferencedVirtualElement}
+      options={{
         placement: "top",
-        maxWidth: "auto",
-        appendTo: () => contentElement.current!,
-        getReferenceClientRect,
+        offset: 10,
       }}
     >
       <Toolbar>

@@ -12,6 +12,29 @@ import useTiptapEditor, { type UseTiptapEditorOptions } from "../hooks/useTiptap
 import clsx from "clsx";
 import CodeMirrorEditor from "@/components/SourceEditor/Editor";
 
+export type ExportActions = {
+  onExportDoc?: () => void | Promise<void>;
+  onExportPdf?: () => void | Promise<void>;
+  onPreviewPdf?: () => void | Promise<void>;
+  onPreviewPost?: () => void | Promise<void>;
+  onClear?: () => void | Promise<void>;
+  isExportingPdf?: boolean;
+  onExportTxt?: () => void | Promise<void>;
+};
+
+export type DraftSummary = {
+  id: string;
+  title: string;
+  date: string;
+};
+
+export type DraftActions = {
+  drafts: DraftSummary[];
+  onSaveDraft?: () => void;
+  onLoadDraft?: (id: string) => void;
+  onDeleteDraft?: (id: string) => void;
+};
+
 type TiptapContextType = {
   editor: Editor;
   contentElement: RefObject<Element>;
@@ -21,6 +44,8 @@ type TiptapContextType = {
   toggleFullScreen: () => void;
   toggleSourceMode: () => void;
   setIsResizing: (value: boolean) => void;
+  exportActions?: ExportActions;
+  draftActions?: DraftActions;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -32,6 +57,8 @@ type TiptapProviderProps = {
   editorOptions: UseTiptapEditorOptions;
   editorProps?: HTMLAttributes<HTMLDivElement>;
   children?: ReactNode;
+  exportActions?: ExportActions;
+  draftActions?: DraftActions;
 };
 
 export const TiptapProvider = ({
@@ -40,6 +67,8 @@ export const TiptapProvider = ({
   editorProps,
   slotBefore,
   slotAfter,
+  exportActions,
+  draftActions,
 }: TiptapProviderProps) => {
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
@@ -88,6 +117,8 @@ export const TiptapProvider = ({
         setIsResizing,
         toggleFullScreen: () => setIsFullScreen((prev) => !prev),
         toggleSourceMode: () => setIsSourceMode((prev) => !prev),
+        exportActions,
+        draftActions,
       }}
     >
       {editorContent}
