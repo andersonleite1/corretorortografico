@@ -56,7 +56,7 @@ import {
   TbX
 } from "react-icons/tb";
 import { RiTextSpacing } from "react-icons/ri";
-import { FaFilePdf, FaFileWord } from "react-icons/fa";
+import { FaFilePdf, FaFileWord, FaFileAlt } from "react-icons/fa";
 import IconCorner from "./Corner";
 import IconInlineCode from "./InlineCode";
 import IconQuote from "./Quote";
@@ -130,6 +130,7 @@ export const icons = {
   LineHeight: RiTextSpacing,
   FileDoc: FaFileWord,
   FilePdf: FaFilePdf,
+  FileTxt: FaFileAlt,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

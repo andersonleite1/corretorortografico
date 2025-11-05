@@ -113,6 +113,27 @@ export default function EditForm() {
     showModal("Documento exportado com sucesso!");
   };
 
+  const handleExportToTxt = () => {
+    const editorInstance = editorRef.current?.getInstance();
+    const { title, content } = getValues();
+    const plainText =
+      editorInstance?.getText?.().trim() ||
+      content?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() ||
+      "";
+
+    if (!plainText) {
+      showModal("Nenhum conteúdo para exportar.");
+      return;
+    }
+
+    const baseTitle = (title || "Documento").trim() || "Documento";
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || "Documento";
+
+    const blob = new Blob([plainText], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, `${safeTitle}.txt`);
+    showModal("Arquivo TXT exportado com sucesso!");
+  };
+
   // Estado para gerenciar a Modal
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -303,6 +324,7 @@ export default function EditForm() {
               exportActions={{
                 onExportDoc: handleSaveDOC,
                 onExportPdf: handleExportToPDF,
+                onExportTxt: handleExportToTxt,
                 isExportingPdf: isExportingPDF,
               }}
               aria-label="Campo de conteúdo do post"

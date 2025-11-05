@@ -16,6 +16,7 @@ export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
   onExportPdf?: () => void | Promise<void>;
   isExportingPdf?: boolean;
+  onExportTxt?: () => void | Promise<void>;
 };
 
 type TiptapContextType = {

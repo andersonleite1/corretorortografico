@@ -8,8 +8,9 @@ const ExportDropdown = () => {
   const onExportDoc = exportActions?.onExportDoc;
   const onExportPdf = exportActions?.onExportPdf;
   const isExportingPdf = Boolean(exportActions?.isExportingPdf);
+  const onExportTxt = exportActions?.onExportTxt;
 
-  const hasAnyAction = Boolean(onExportDoc || onExportPdf);
+  const hasAnyAction = Boolean(onExportDoc || onExportPdf || onExportTxt);
   const handleExportDoc = useCallback(() => {
     onExportDoc?.();
   }, [onExportDoc]);
@@ -17,6 +18,10 @@ const ExportDropdown = () => {
   const handleExportPdf = useCallback(() => {
     return onExportPdf?.();
   }, [onExportPdf]);
+
+  const handleExportTxt = useCallback(() => {
+    onExportTxt?.();
+  }, [onExportTxt]);
 
   if (!hasAnyAction) {
     return null;
@@ -39,6 +44,16 @@ const ExportDropdown = () => {
           tooltip={false}
           onClick={handleExportDoc}
           disabled={!onExportDoc}
+        />
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild disabled={!onExportTxt}>
+        <MenuButton
+          text="Exportar TXT"
+          icon="FileTxt"
+          hideText={false}
+          tooltip={false}
+          onClick={handleExportTxt}
+          disabled={!onExportTxt}
         />
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onExportPdf}>
