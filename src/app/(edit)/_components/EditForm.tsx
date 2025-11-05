@@ -4,12 +4,12 @@ import { Controller, useForm } from "react-hook-form";
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
-import Link from "next/link";
-import { FaChevronDown, FaEye, FaTrash, FaTimes } from "react-icons/fa";
+import { FaChevronDown, FaTrash, FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
 import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
+import { useRouter } from "next/navigation";
 
 
 interface PostForm {
@@ -19,6 +19,7 @@ interface PostForm {
 
 export default function EditForm() {
   const editorRef = useRef<TiptapEditorRef>(null);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
 
@@ -184,6 +185,10 @@ export default function EditForm() {
     saveAs(pdfPreview.blob, pdfPreview.fileName);
   }, [pdfPreview]);
 
+  const handlePreviewPost = useCallback(() => {
+    router.push("/post-csr");
+  }, [router]);
+
   // Estado para gerenciar a Modal
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -207,13 +212,11 @@ export default function EditForm() {
       reset({ ...post });
       setIsLoading(false);
     });
-  }, []);
 
-  useEffect(() => {
     return () => {
       clearPdfPreview();
     };
-  }, [clearPdfPreview]);
+  }, [clearPdfPreview, reset]);
 
   useEffect(() => {
     const subscription = watch((values, { type }) => {
@@ -382,6 +385,7 @@ export default function EditForm() {
                 onExportPdf: handleExportToPDF,
                 onExportTxt: handleExportToTxt,
                 onPreviewPdf: handlePreviewPdf,
+                onPreviewPost: handlePreviewPost,
                 isExportingPdf: isExportingPDF,
               }}
               aria-label="Campo de conteúdo do post"
@@ -396,14 +400,6 @@ export default function EditForm() {
             <FaTrash className="w-4 h-4 mr-2" />
             Limpar
           </button>
-
-          <Link
-            className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[168px]"
-            href="/post-csr"
-          >
-            <FaEye className="w-4 h-4 mr-2" />
-            Visualizar Post
-          </Link>
 
           <div className="relative inline-block text-left">
             {/* Botão principal */}

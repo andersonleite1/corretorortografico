@@ -28,13 +28,14 @@ import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
 import ExportDropdown from "./controls/ExportDropdown";
+import PreviewDropdown from "./controls/PreviewDropdown";
 
 const MenuBar = () => {
   const { exportActions } = useTiptapContext();
   const showExport = Boolean(
     exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
   );
-  const showPreview = Boolean(exportActions?.onPreviewPdf);
+  const showPreview = Boolean(exportActions?.onPreviewPdf || exportActions?.onPreviewPost);
 
   return (
     <div className="rte-menu-bar">
@@ -82,18 +83,7 @@ const MenuBar = () => {
 
         {showExport && <ExportDropdown />}
 
-        {showPreview && (
-          <MenuButton
-            icon="FilePdf"
-            text="Visualizar PDF"
-            hideText={false}
-            tooltip="Visualizar PDF"
-            onClick={() => exportActions?.onPreviewPdf?.()}
-            disabled={
-              !exportActions?.onPreviewPdf || Boolean(exportActions?.isExportingPdf)
-            }
-          />
-        )}
+        {showPreview && <PreviewDropdown />}
 
         {(showExport || showPreview) && <ToolbarDivider />}
       </Toolbar>
