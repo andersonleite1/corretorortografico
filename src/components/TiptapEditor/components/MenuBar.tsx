@@ -2,6 +2,7 @@ import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
 import { useTiptapContext } from "./Provider";
+import MenuButton from "./MenuButton";
 
 import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
@@ -31,8 +32,9 @@ import ExportDropdown from "./controls/ExportDropdown";
 const MenuBar = () => {
   const { exportActions } = useTiptapContext();
   const showExport = Boolean(
-    exportActions?.onExportDoc || exportActions?.onExportPdf
+    exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
   );
+  const showPreview = Boolean(exportActions?.onPreviewPdf);
 
   return (
     <div className="rte-menu-bar">
@@ -70,19 +72,30 @@ const MenuBar = () => {
         {/* <ImageButton /> */}
         {/* <YoutubeButton /> */}
         <CodeBlockButton />
-        <ToolbarDivider />
 
         <InsertDropdown />
         <HeadingDropdown />
         <FontFamilyDropdown />
         <FontSizeDropdown />
 
-        {showExport && (
-          <>
-            <ToolbarDivider />
-            <ExportDropdown />
-          </>
+        <ToolbarDivider />
+
+        {showExport && <ExportDropdown />}
+
+        {showPreview && (
+          <MenuButton
+            icon="FilePdf"
+            text="Visualizar PDF"
+            hideText={false}
+            tooltip="Visualizar PDF"
+            onClick={() => exportActions?.onPreviewPdf?.()}
+            disabled={
+              !exportActions?.onPreviewPdf || Boolean(exportActions?.isExportingPdf)
+            }
+          />
         )}
+
+        {(showExport || showPreview) && <ToolbarDivider />}
       </Toolbar>
     </div>
   );

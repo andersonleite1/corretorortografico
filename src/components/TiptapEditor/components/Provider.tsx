@@ -15,6 +15,7 @@ import CodeMirrorEditor from "@/components/SourceEditor/Editor";
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
   onExportPdf?: () => void | Promise<void>;
+  onPreviewPdf?: () => void | Promise<void>;
   isExportingPdf?: boolean;
   onExportTxt?: () => void | Promise<void>;
 };
