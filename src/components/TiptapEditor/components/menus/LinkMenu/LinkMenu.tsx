@@ -4,6 +4,7 @@ import { useTiptapContext } from "../../Provider";
 import { BubbleMenu } from "../../BubbleMenu";
 import LinkEdit from "./LinkEdit";
 import LinkView from "./LinkView";
+import type { LinkEditorStorage } from "@/components/TiptapEditor/extensions/Link";
 
 export const LinkMenu = () => {
   const { editor, contentElement } = useTiptapContext();
@@ -13,7 +14,13 @@ export const LinkMenu = () => {
   const link = useEditorState({
     editor,
     selector: (context) => {
-      mode.current = context.editor.storage.link.mode;
+      const storage =
+        (
+          context.editor.storage as unknown as Record<string, LinkEditorStorage | undefined>
+        ).link ?? {
+         mode: 0,
+       };
+      mode.current = storage.mode;
 
       if (!context.editor.isActive("link")) return null;
       const {

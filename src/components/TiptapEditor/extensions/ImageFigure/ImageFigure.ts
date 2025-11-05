@@ -1,7 +1,6 @@
-import { JSONContent, Editor } from "@tiptap/core";
+import { JSONContent, type CommandProps } from "@tiptap/core";
 import { NodeSelection, Plugin, TextSelection } from "@tiptap/pm/state";
-// @ts-ignore : This import is necessary due to missing type definitions in the package.
-import { serializeForClipboard } from "@tiptap/pm/view";
+import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 import Figure from "../Figure";
 import ImageCaption from "./ImageCaption";
@@ -33,17 +32,22 @@ export const ImageFigure = Figure.extend({
        * Insert an imageFigure node with an image and optional caption.
        */
       setImageFigure:
-        ({ src, caption }) =>
-        ({ chain }) => {
+        ({ src, caption }: { src: string; caption?: string | null }) =>
+        ({ chain }: CommandProps) => {
           const content: JSONContent[] = [
-            { type: Image.name, attrs: { src } },
-            caption === null || caption === undefined
-              ? {}
-              : {
-                  type: ImageCaption.name,
-                  content: caption === "" ? undefined : [{ type: "text", text: caption }],
-                },
+            {
+              type: Image.name,
+              attrs: { src },
+            },
           ];
+
+          if (caption !== null && caption !== undefined) {
+            content.push({
+              type: ImageCaption.name,
+              content: caption === "" ? [] : [{ type: "text", text: caption }],
+            });
+          }
+
           return chain().insertContent({ type: this.name, content }).run();
         },
 
@@ -52,34 +56,52 @@ export const ImageFigure = Figure.extend({
        */
       imageToFigure:
         () =>
-        ({ state, chain }) => {
+        ({ state, dispatch }: CommandProps) => {
           const { selection } = state;
-          const { $anchor } = selection;
+          const imagePos =
+            selection instanceof NodeSelection ? selection.from : selection.$anchor.pos;
 
-          const imagePos = $anchor.pos;
           const imageNode = state.doc.nodeAt(imagePos);
 
           if (!imageNode || imageNode.type.name !== Image.name) {
             return false;
           }
 
-          const range = {
-            from: imagePos,
-            to: imagePos + imageNode.nodeSize,
-          };
+          const figureType = this.type;
+          const captionType = this.editor.schema.nodes[ImageCaption.name];
 
-          const content: JSONContent[] = [
-            { type: Image.name, attrs: imageNode.attrs },
-            { type: ImageCaption.name, content: undefined },
-          ];
+          const children: ProseMirrorNode[] = [imageNode];
 
-          return chain()
-            .insertContentAt(range, {
-              type: this.name,
-              content,
-            })
-            .setTextSelection(range.to + content.length)
-            .run();
+          if (captionType) {
+            const captionNode = captionType.createAndFill();
+            if (captionNode) {
+              children.push(captionNode);
+            }
+          }
+
+          const figureNode = figureType.create(null, children);
+
+          const tr = state.tr.replaceWith(
+            imagePos,
+            imagePos + imageNode.nodeSize,
+            figureNode
+          );
+
+          const mappedPos = tr.mapping.map(imagePos);
+
+          if (figureNode.childCount > 1) {
+            const imageChild = figureNode.child(0);
+            const captionStart = mappedPos + 1 + imageChild.nodeSize;
+            tr.setSelection(TextSelection.create(tr.doc, captionStart));
+          } else {
+            tr.setSelection(NodeSelection.create(tr.doc, mappedPos));
+          }
+
+          if (dispatch) {
+            dispatch(tr.scrollIntoView());
+          }
+
+          return true;
         },
 
       /**
@@ -87,32 +109,46 @@ export const ImageFigure = Figure.extend({
        */
       figureToImage:
         () =>
-        ({ state, commands }: { state: Editor['state'], commands: Editor['commands'] }) => {
+        ({ state, dispatch }: CommandProps) => {
           const { selection } = state;
-          const { $anchor } = selection;
+          const $from =
+            selection instanceof NodeSelection
+              ? state.doc.resolve(selection.from)
+              : selection.$from;
 
-          let depth = $anchor.depth;
-          let pos = $anchor.pos;
+          let depth = $from.depth;
+          let figurePos = selection instanceof NodeSelection ? selection.from : $from.pos;
 
-          while (depth > 0) {
-            pos = $anchor.before(depth);
+          while (depth > 0 && $from.node(depth).type.name !== this.name) {
+            figurePos = $from.before(depth);
             depth--;
           }
 
-          const figureNode = state.doc.nodeAt(pos);
+          const figureNode = state.doc.nodeAt(figurePos);
 
           if (!figureNode || figureNode.type.name !== this.name) {
             return false;
           }
 
-          const range = {
-            from: pos,
-            to: pos + figureNode.nodeSize,
-          };
+          const imageNode = figureNode.firstChild;
 
-          const content = figureNode.firstChild;
+          if (!imageNode) {
+            return false;
+          }
 
-          return commands.insertContentAt(range, content);
+          const tr = state.tr.replaceWith(
+            figurePos,
+            figurePos + figureNode.nodeSize,
+            imageNode
+          );
+
+          tr.setSelection(NodeSelection.create(tr.doc, tr.mapping.map(figurePos)));
+
+          if (dispatch) {
+            dispatch(tr.scrollIntoView());
+          }
+
+          return true;
         },
 
       /**
@@ -120,17 +156,10 @@ export const ImageFigure = Figure.extend({
        */
       removeImage:
         () =>
-        ({ state, tr, dispatch }) => {
+        ({ state, tr, dispatch }: CommandProps) => {
           const { selection } = state;
-          const { $anchor } = selection;
-
-          let depth = $anchor.depth;
-          let pos = $anchor.pos;
-
-          while (depth > 0) {
-            pos = $anchor.before(depth);
-            depth--;
-          }
+          const pos =
+            selection instanceof NodeSelection ? selection.from : selection.$from.pos;
 
           const node = state.doc.nodeAt(pos);
 
@@ -179,7 +208,7 @@ export const ImageFigure = Figure.extend({
               // Set up drag data
               draggedNode = NodeSelection.create(view.state.doc, $pos.before($pos.depth));
               const draggedSlice = draggedNode.content();
-              const { dom, text, slice } = serializeForClipboard(view, draggedSlice);
+              const { dom, text, slice } = view.serializeForClipboard(draggedSlice);
 
               event.dataTransfer.clearData();
               event.dataTransfer.setData("text/html", dom.innerHTML);
