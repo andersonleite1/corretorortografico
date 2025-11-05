@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
+import { useTiptapContext } from "./Provider";
 
 import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
@@ -25,8 +26,14 @@ import TableButton from "@/components/TiptapEditor/components/controls/TableButt
 import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
+import ExportDropdown from "./controls/ExportDropdown";
 
 const MenuBar = () => {
+  const { exportActions } = useTiptapContext();
+  const showExport = Boolean(
+    exportActions?.onExportDoc || exportActions?.onExportPdf
+  );
+
   return (
     <div className="rte-menu-bar">
       <Toolbar dense>
@@ -69,6 +76,13 @@ const MenuBar = () => {
         <HeadingDropdown />
         <FontFamilyDropdown />
         <FontSizeDropdown />
+
+        {showExport && (
+          <>
+            <ToolbarDivider />
+            <ExportDropdown />
+          </>
+        )}
       </Toolbar>
     </div>
   );

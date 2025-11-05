@@ -3,7 +3,7 @@
 import React, { forwardRef, useCallback, useEffect } from "react";
 import { Content, type Editor } from "@tiptap/react";
 
-import TiptapProvider from "./Provider";
+import TiptapProvider, { type ExportActions } from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
 import MenuBar from "./MenuBar";
@@ -43,6 +43,7 @@ export interface TiptapEditorProps {
   contentMinHeight?: string | number;
   contentMaxHeight?: string | number;
   onContentChange?: (value: Content) => void;
+  exportActions?: ExportActions;
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -60,6 +61,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       contentMinHeight = 200,
       contentMaxHeight,
       onContentChange,
+      exportActions,
     },
     ref
   ) => {
@@ -112,6 +114,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         editorOptions={editorOptions}
         slotBefore={!hideMenuBar && <MenuBar />}
         slotAfter={!hideStatusBar && <StatusBar />}
+        exportActions={exportActions}
       >
         {menus}
         <Resizer />

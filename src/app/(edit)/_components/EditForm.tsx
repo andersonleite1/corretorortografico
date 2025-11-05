@@ -5,7 +5,7 @@ import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
 import Link from "next/link";
-import { FaChevronDown, FaEye, FaFilePdf, FaFileWord, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaEye, FaTrash } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
@@ -21,8 +21,6 @@ export default function EditForm() {
   const editorRef = useRef<TiptapEditorRef>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
-
-  const [open, setOpen] = useState(false);
 
   const [openDrafts, setOpenDrafts] = useState(false);
   const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
@@ -302,6 +300,11 @@ export default function EditForm() {
               contentMaxHeight={440}
               onContentChange={field.onChange}
               initialContent={field.value}
+              exportActions={{
+                onExportDoc: handleSaveDOC,
+                onExportPdf: handleExportToPDF,
+                isExportingPdf: isExportingPDF,
+              }}
               aria-label="Campo de conteúdo do post"
             />
           )}
@@ -323,48 +326,6 @@ export default function EditForm() {
             Visualizar Post
           </Link>
 
-          <div className="relative inline-block text-left">
-            {/* Botão principal */}
-            <button
-              onClick={() => setOpen(!open)}
-              className="bg-green-400 hover:bg-green-500 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center w-full sm:w-auto sm:min-w-[152px]"
-            >
-              <span>Exportar</span>
-              <FaChevronDown className="ml-2 w-4 h-4" />
-            </button>
-
-            {/* Dropdown */}
-            {open && (
-              <div className="absolute mt-2 w-44 bg-white rounded shadow-lg z-10">
-                <button
-                  onClick={() => {
-                    handleSaveDOC();
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  <FaFileWord className="w-4 h-4 mr-2 text-blue-600" />
-                  Exportar DOC
-                </button>
-
-                <button
-                  onClick={async () => {
-                    setOpen(false);
-                    await handleExportToPDF();
-                  }}
-                  disabled={isExportingPDF}
-                  className={`flex items-center w-full px-4 py-2 text-sm ${
-                    isExportingPDF
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  <FaFilePdf className="w-4 h-4 mr-2 text-red-500" />
-                  {isExportingPDF ? "Gerando PDF..." : "Exportar PDF"}
-                </button>
-              </div>
-            )}
-          </div>
           <div className="relative inline-block text-left">
             {/* Botão principal */}
             <button
