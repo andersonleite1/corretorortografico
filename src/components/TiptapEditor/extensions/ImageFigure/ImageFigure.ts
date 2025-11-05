@@ -1,4 +1,4 @@
-import { JSONContent } from "@tiptap/core";
+import { JSONContent, Editor } from "@tiptap/core";
 import { NodeSelection, Plugin, TextSelection } from "@tiptap/pm/state";
 // @ts-ignore : This import is necessary due to missing type definitions in the package.
 import { serializeForClipboard } from "@tiptap/pm/view";
@@ -87,7 +87,7 @@ export const ImageFigure = Figure.extend({
        */
       figureToImage:
         () =>
-        ({ state, commands }) => {
+        ({ state, commands }: { state: Editor['state'], commands: Editor['commands'] }) => {
           const { selection } = state;
           const { $anchor } = selection;
 

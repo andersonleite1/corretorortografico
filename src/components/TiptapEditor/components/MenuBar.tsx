@@ -36,11 +36,6 @@ const MenuBar = () => {
 
         <ToolbarDivider />
 
-        <HeadingDropdown />
-        <FontFamilyDropdown />
-        <FontSizeDropdown />
-        <LineHeightDropdown />
-
         <ToolbarDivider />
 
         <BoldButton />
@@ -58,6 +53,7 @@ const MenuBar = () => {
         <AlignPopover />
         <BulletListButton />
         <OrderedListButton />
+        <LineHeightDropdown />
 
         <ToolbarDivider />
 
@@ -66,8 +62,13 @@ const MenuBar = () => {
         <TableButton />
         <ImageButton />
         {/* <YoutubeButton /> */}
-        {/* <CodeBlockButton /> */}
+        <CodeBlockButton />
+        <ToolbarDivider />
+
         <InsertDropdown />
+        <HeadingDropdown />
+        <FontFamilyDropdown />
+        <FontSizeDropdown />
       </Toolbar>
     </div>
   );

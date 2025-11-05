@@ -64,11 +64,15 @@ export const LinkMenu = () => {
       pluginKey="link-menu"
       updateDelay={100}
       shouldShow={shouldShow}
-      tippyOptions={{
+      appendTo={() =>
+        (contentElement.current as HTMLElement | null) ??
+        editor.view.dom.parentElement ??
+        document.body
+      }
+      options={{
         placement: "bottom-start",
-        duration: 100,
-        appendTo: () => contentElement.current!,
-        onHidden: () => setIsEditing(false),
+        offset: 6,
+        onHide: () => setIsEditing(false),
       }}
     >
       {isEditing ? (

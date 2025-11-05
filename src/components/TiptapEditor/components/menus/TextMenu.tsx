@@ -34,10 +34,9 @@ export const TextMenu = ({ enable }: { enable: boolean }) => {
       editor={editor}
       pluginKey={"text-bubble"}
       shouldShow={shouldShow}
-      tippyOptions={{
+      options={{
         placement: "top-start",
-        maxWidth: "auto",
-        appendTo: "parent",
+        offset: 8,
       }}
     >
       <Toolbar>

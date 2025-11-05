@@ -45,7 +45,7 @@ const FontFamilyDropdown = () => {
       tooltip="Fonte"
       hideText={false}
       buttonStyle={{
-        minWidth: "8rem",
+        minWidth: "6rem",
         fontFamily: activeOption.value || undefined,
       }}
       dropdownClass="rte-fontfamily-dropdown"

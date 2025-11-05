@@ -5,7 +5,7 @@ export interface FontFamilyOption {
 
 export const FONT_FAMILY_OPTIONS: FontFamilyOption[] = [
   {
-    label: "Fonte padrão",
+    label: "Fonte",
     value: "",
   },
   {
