@@ -42,7 +42,7 @@ const FontSizeDropdown = () => {
       text={activeOption.label}
       tooltip="Tamanho da fonte"
       hideText={false}
-      buttonStyle={{ minWidth: "6.9rem" }}
+      buttonStyle={{ minWidth: "6.7rem" }}
       dropdownClass="rte-fontsize-dropdown"
     >
       {options.map((option) => (

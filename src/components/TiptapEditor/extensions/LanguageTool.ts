@@ -233,7 +233,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
 
   addOptions() {
     return {
-      enabled: false,
+      enabled: true,
       language: "pt-BR",
       endpoint: "/api/languagetool",
       checkDelay: 10000,

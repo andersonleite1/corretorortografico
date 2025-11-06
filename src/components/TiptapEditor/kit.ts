@@ -65,7 +65,7 @@ const ExtensionKit = [
   LanguageTool.configure({
     checkDelay: 10000,
     minChars: 15,
-    enabled: false,
+    enabled: true,
   }),
 ];
 
