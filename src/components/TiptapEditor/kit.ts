@@ -19,6 +19,7 @@ import {
   Color,
   Highlight,
   Table,
+  LanguageTool,
 } from "./extensions";
 
 const ExtensionKit = [
@@ -61,6 +62,11 @@ const ExtensionKit = [
   CodeBlock,
   Youtube,
   Table,
+  LanguageTool.configure({
+    checkDelay: 2000,
+    minChars: 15,
+    enabled: false,
+  }),
 ];
 
 export default ExtensionKit;

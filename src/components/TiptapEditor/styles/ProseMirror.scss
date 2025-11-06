@@ -169,6 +169,18 @@
     position: relative;
   }
 
+  // LanguageTool highlights
+  .lt-error {
+    text-decoration: underline wavy rgba(220, 38, 38, 0.85);
+    text-decoration-thickness: 1.5px;
+    text-decoration-skip-ink: auto;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(220, 38, 38, 0.12);
+    }
+  }
+
   // Figure and figcaption styles
   figure {
     cursor: default;

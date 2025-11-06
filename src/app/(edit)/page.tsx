@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 
 import editorContent from "@/data/editorContent.json";
 import EditForm from "./_components/EditForm";
