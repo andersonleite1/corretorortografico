@@ -25,6 +25,7 @@ import TableButton from "@/components/TiptapEditor/components/controls/TableButt
 import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
+import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
@@ -80,6 +81,7 @@ const MenuBar = () => {
         <HeadingDropdown />
         <FontFamilyDropdown />
         <FontSizeDropdown />
+        <LanguageToolToggleButton />
 
         <ToolbarDivider />
 

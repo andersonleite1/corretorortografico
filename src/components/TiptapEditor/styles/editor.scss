@@ -80,6 +80,29 @@
     //  font-size: 90%;
     font-weight: 500;
     color: $muted-fg-color;
+
+    .rte-spellcheck {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: color 0.2s ease;
+
+      &[data-status="checking"] {
+        color: #0ea5e9;
+      }
+
+      &[data-status="ready"] {
+        color: #2563eb;
+      }
+
+      &[data-status="error"] {
+        color: #dc2626;
+      }
+
+      &[data-status="rate_limited"] {
+        color: #f97316;
+      }
+    }
   }
 }
 

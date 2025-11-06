@@ -21,3 +21,4 @@ export { Selection } from "./Selection";
 export { Youtube } from "./Youtube/Youtube";
 export { Image } from "./Image";
 export { Table } from "./Table";
+export { LanguageTool } from "./LanguageTool";
