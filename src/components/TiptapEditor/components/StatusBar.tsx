@@ -17,7 +17,7 @@ const StatusBar = () => {
   const languageTool = useEditorState({
     editor,
     selector: (ctx) => {
-      const storage = ctx.editor.storage.languageTool;
+      const storage = (ctx.editor.storage as any).languageTool;
       return {
         enabled: storage?.enabled ?? false,
         status: storage?.status ?? "idle",
