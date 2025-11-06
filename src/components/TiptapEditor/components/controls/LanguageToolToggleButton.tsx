@@ -76,7 +76,7 @@ const LanguageToolToggleButton = () => {
       >
         {button}
       </Tooltip>
-      <span className="rte-toggle__label">Revisão Automática</span>
+      <span className="rte-toggle__label">Corretor ortográfico</span>
     </div>
   );
 };
