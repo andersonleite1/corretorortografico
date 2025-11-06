@@ -50,7 +50,7 @@ const LanguageToolToggleButton = () => {
   }, [editor, isActive, tiptapState.disabled]); // Depende do 'isActive' local
 
   // 5. O resto do componente usa o estado local 'isActive' para a UI
-  const tooltipLabel = isActive ? "Desativar revisão automática" : "Ativar revisão automática";
+  const tooltipLabel = isActive ? "Desativar verificador gramatical por IA" : "Ativar verificador gramatical por IA";
   const iconName = isActive ? "Check" : "Close";
 
   const button = (

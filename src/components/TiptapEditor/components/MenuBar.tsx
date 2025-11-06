@@ -79,9 +79,9 @@ const MenuBar = () => {
         <ToolbarDivider />
 
         <HeadingDropdown />
-        <LanguageToolToggleButton />
         <FontFamilyDropdown />
         <FontSizeDropdown />
+        <LanguageToolToggleButton />
 
         <ToolbarDivider />
 

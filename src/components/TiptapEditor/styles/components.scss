@@ -213,7 +213,7 @@
    border-radius: 999px;
    background-color: var(--rte-toggle-off, rgba(148, 163, 184, 0.45));
    cursor: pointer;
-   transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 
    &:disabled {
       cursor: not-allowed;
@@ -237,7 +237,7 @@
    }
 
    &--active {
-      background-color: $primary-color;
+      background-color: var(--rte-toggle-on, #389e74);
 
       .rte-toggle__thumb {
          transform: translateX(1.125rem);

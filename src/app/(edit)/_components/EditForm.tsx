@@ -306,7 +306,7 @@ export default function EditForm() {
 
         <div className="flex flex-col gap-4">
           <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
-          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[440px]">
+          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[480px]">
             <div className="h-12 border-b border-[#d1d9e0] dark:border-[#3d444d] px-4 flex items-center gap-3">
               {toolbarItems.map((_, index) => (
                 <span
