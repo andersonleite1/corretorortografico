@@ -30,6 +30,7 @@ import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
 import ClearEditorButton from "./controls/ClearEditorButton";
+import ImportPdfButton from "./controls/ImportPdfButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
@@ -88,6 +89,7 @@ const MenuBar = () => {
         {showExport && <ExportDropdown />}
         {showPreview && <PreviewDropdown />}
         {showDrafts && <DraftsDropdown />}
+        <ImportPdfButton />
 
         {exportActions?.onClear && <ClearEditorButton />}
 
