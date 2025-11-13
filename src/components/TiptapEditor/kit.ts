@@ -63,9 +63,9 @@ const ExtensionKit = [
   Youtube,
   Table,
   LanguageTool.configure({
-    checkDelay: 2000,
+    checkDelay: 10000,
     minChars: 15,
-    enabled: false,
+    enabled: true,
   }),
 ];
 
