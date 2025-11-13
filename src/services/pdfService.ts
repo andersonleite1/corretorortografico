@@ -1,4 +1,4 @@
-const PDF_API_ENDPOINT = "https://html-to-pdf-api-edt.fly.dev/api/pdf/html";
+const PDF_API_ENDPOINT = "https://api.editordetexto.cloud/api/pdf/html";
 // const PDF_API_ENDPOINT = "http://localhost:3007/api/pdf/html";
 
 /**
