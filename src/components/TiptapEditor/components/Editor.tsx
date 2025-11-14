@@ -10,7 +10,7 @@ import MenuBar from "./MenuBar";
 import StatusBar from "./StatusBar";
 import Resizer from "./Resizer";
 
-import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu } from "./menus";
+import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu } from "./menus";
 
 import ExtensionKit from "../kit";
 
@@ -108,6 +108,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         <ImageMenu />
         <CodeBlockMenu />
         <TableMenu />
+        <LanguageToolMenu />
       </>
     );
 
