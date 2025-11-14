@@ -172,7 +172,7 @@ const LanguageToolMenu = () => {
       getReferencedVirtualElement={getReferencedVirtualElement as any}
       options={{ placement: "top", offset: 10 }}
     >
-      <div style={{ width: 280, maxWidth: 320, padding: "0.5rem" }}>
+      <div style={{ width: 360, maxWidth: 380, padding: "0.6rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span
@@ -195,28 +195,31 @@ const LanguageToolMenu = () => {
           </div>
         </div>
 
-        <div style={{ marginTop: 8, border: "1px solid var(--rte-border)", borderRadius: 8 }}>
+        <div style={{ marginTop: 8, border: "1px solid var(--rte-border)", borderRadius: 8, overflow: "hidden" }}>
           <div style={{ padding: "0.5rem" }}>
             <div className="rte-label" style={{ marginBottom: 4 }}>
               {(issue && (issue.ruleDescription || issue.typeName)) || "Ortografia"}
             </div>
-            <p style={{ fontSize: "0.95rem", lineHeight: 1.4 }}>{issue?.message || "Selecione um erro para ver as sugestões"}</p>
+            <p style={{ fontSize: "0.9rem", lineHeight: 1.4 }}>{issue?.message || "Selecione um erro para ver as sugestões"}</p>
+          </div>
+          <div style={{ borderTop: "1px solid var(--rte-border)", padding: "0.5rem", display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {(issue?.replacements || []).slice(0, 6).map((rep) => (
+              <button
+                key={String(rep)}
+                className="rte-button rte-button--primary"
+                style={{ backgroundColor: PrimaryColor, borderColor: PrimaryColor }}
+                onClick={() => applyReplacement(String(rep))}
+              >
+                {rep}
+              </button>
+            ))}
+            {issue && (!issue.replacements || issue.replacements.length === 0) && (
+              <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>Nenhuma sugestão</span>
+            )}
+            <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button>
           </div>
         </div>
-
-        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-          {(issue?.replacements || []).slice(0, 6).map((rep: boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | Promise<React.AwaitedReactNode> | React.Key | null | undefined) => (
-            <button
-              key={String(rep)}
-              className="rte-button rte-button--primary"
-              style={{ backgroundColor: PrimaryColor, borderColor: PrimaryColor }}
-              onClick={() => applyReplacement(String(rep))}
-            >
-              {rep}
-            </button>
-          ))}
-          <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button>
-        </div>
+        
       </div>
     </BubbleMenu>
   );
