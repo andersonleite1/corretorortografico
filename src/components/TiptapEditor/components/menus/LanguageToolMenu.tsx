@@ -183,13 +183,13 @@ const LanguageToolMenu = () => {
                 borderRadius: 6,
                 backgroundColor: PrimaryColor,
                 color: "#fff",
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: 700,
               }}
             >
-              LT
+              EDT
             </span>
-            <span style={{ fontWeight: 600 }}>Correct</span>
+            <span style={{ fontWeight: 600 }}>Corretor</span>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ const LanguageToolMenu = () => {
           </div>
           {/* Lista de sugestões (máx. 6) e ação de ignorar */}
           <div style={{ borderTop: "1px solid var(--rte-border)", padding: "0.5rem", display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {(issue?.replacements || []).slice(0, 6).map((rep) => (
+            {(issue?.replacements || []).slice(0, 6).map((rep: string) => (
               <button
                 key={String(rep)}
                 className="rte-button rte-button--primary"
