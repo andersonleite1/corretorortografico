@@ -5,12 +5,12 @@ import { useTiptapContext } from "../Provider";
 import { useEditorState } from "@tiptap/react";
 
 const PrimaryColor = "#389E74";
-let isShowDialog: boolean = false;
 
 const LanguageToolMenu = () => {
   const { editor, contentElement } = useTiptapContext();
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
+  const showDialogRef = useRef(false);
 
   const ltState = useEditorState({
     editor,
@@ -24,6 +24,23 @@ const LanguageToolMenu = () => {
   });
 
   const lastDownRef = useRef(0);
+
+  const findErrorElement = useCallback((e: MouseEvent): HTMLElement | null => {
+    const raw = e.target as Node | null;
+    const elem = (raw && (raw as any).nodeType === 3 ? (raw as any).parentElement : (raw as Element | null));
+    let el = elem?.closest?.(".lt-error") as HTMLElement | null;
+    if (!el && (e as any).composedPath) {
+      const path = (e as any).composedPath() as Array<EventTarget>;
+      for (const t of path) {
+        const et = t as Element;
+        if (et && (et as any).classList && (et as any).classList.contains("lt-error")) {
+          el = et as HTMLElement;
+          break;
+        }
+      }
+    }
+    return el;
+  }, []);
   useEffect(() => {
     const dom = editor?.view?.dom as HTMLElement | undefined;
     if (!dom) return;
@@ -34,41 +51,43 @@ const LanguageToolMenu = () => {
         return;
       }
       lastDownRef.current = now;
-      const raw = e.target as Node | null;
-      const elem = (raw && (raw as any).nodeType === 3 ? (raw as any).parentElement : (raw as Element | null));
-      let el = elem?.closest?.(".lt-error") as HTMLElement | null;
-      if (!el && (e as any).composedPath) {
-        const path = (e as any).composedPath() as Array<EventTarget>;
-        for (const t of path) {
-          const et = t as Element;
-          if (et && (et as any).classList && (et as any).classList.contains("lt-error")) {
-            el = et as HTMLElement;
-            break;
-          }
-        }
-      }
+      const el = findErrorElement(e);
       if (!el) {
-        isShowDialog = false;
+        showDialogRef.current = false;
         if (hoveredEl) {
           setHoveredEl(null);
           setHoveredIssueId(null);
         }
+        editor?.view?.dispatch(editor.view.state.tr);
         return;
       }
-      isShowDialog = true;
+      showDialogRef.current = true;
       const id = el.getAttribute("data-lt-id");
       setHoveredEl(el);
       setHoveredIssueId(id);
+      editor?.view?.dispatch(editor.view.state.tr);
     };
-    // Adicionando os dois eventos: mousedown e mouseenter (hover)
     dom.addEventListener("mousedown", handleDown, { capture: true });
-    dom.addEventListener("mouseenter", handleDown, { capture: true });
-
-    // Remover os eventos na limpeza
+    const handleMove = (e: MouseEvent) => {
+      const el = findErrorElement(e);
+      if (el) {
+        const id = el.getAttribute("data-lt-id");
+        setHoveredEl(el);
+        setHoveredIssueId(id);
+        showDialogRef.current = true;
+        editor?.view?.dispatch(editor.view.state.tr);
+      }
+    };
+    const handleLeave = () => {
+      // mantém a última seleção exibida; não limpa estados nem fecha o diálogo
+    };
+    dom.addEventListener("mousemove", handleMove, { passive: true });
+    dom.addEventListener("mouseleave", handleLeave, { passive: true });
     return () => {
-      dom.removeEventListener("mousedown", handleDown, { capture: true });
-      dom.removeEventListener("mouseenter", handleDown, { capture: true });
-};
+      dom.removeEventListener("mousedown", handleDown, true as any);
+      dom.removeEventListener("mousemove", handleMove as any);
+      dom.removeEventListener("mouseleave", handleLeave as any);
+    };
 
   }, [editor]);
 
@@ -109,9 +128,8 @@ const LanguageToolMenu = () => {
   }, [hoveredIssueId, ltState.issues, getActiveIssue]);
 
   const shouldShow = useCallback(() => {
-    const show = Boolean(ltState.enabled && isShowDialog);
-    return show;
-  }, [ltState.enabled]);
+    return Boolean(ltState.enabled && (showDialogRef.current || hoveredEl));
+  }, [ltState.enabled, hoveredEl]);
 
   const getReferencedVirtualElement = useCallback(() => {
     const container = (contentElement.current as HTMLElement | null) ?? editor?.view?.dom;
@@ -119,8 +137,13 @@ const LanguageToolMenu = () => {
     const containerRect = container.getBoundingClientRect();
     const elRect = hoveredEl?.getBoundingClientRect();
     const gap = 16;
-    const x = containerRect.right + gap;
-    const y = (elRect?.top ?? (containerRect.top + 80));
+    const estimatedWidth = 380;
+    const estimatedHeight = 260;
+    const maxX = Math.max(0, (window?.innerWidth ?? containerRect.right) - estimatedWidth - 8);
+    const x = Math.min(containerRect.right + gap, maxX);
+    const baseY = elRect?.top ?? (containerRect.top + 80);
+    const maxY = Math.max(0, (window?.innerHeight ?? containerRect.bottom) - estimatedHeight - 8);
+    const y = Math.min(Math.max(baseY, 8), maxY);
     const w = 1;
     const h = 1;
     const sideRect = {
