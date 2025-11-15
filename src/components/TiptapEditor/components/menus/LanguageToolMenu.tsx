@@ -239,6 +239,7 @@ const LanguageToolMenu = () => {
             {issue && (!issue.replacements || issue.replacements.length === 0) && (
               <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>Nenhuma sugestão</span>
             )}
+            {/* Ignorar o erro */}
             {/* <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button> */}
           </div>
         </div>
