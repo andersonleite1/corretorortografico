@@ -4,8 +4,8 @@ const baseUrl = "https://editordetexto.online";
 
 const staticRoutes = [
   { path: "/", priority: 1 },
-  { path: "/post-ssr", priority: 0.9 },
-  { path: "/editar-pdf", priority: 0.8 },
+  { path: "/post-ssr", priority: 0.6 },
+  { path: "/editar-pdf", priority: 0.9 },
   { path: "/contato", priority: 0.6 },
   { path: "/privacidade", priority: 0.6 },
   { path: "/termos", priority: 0.6 },
