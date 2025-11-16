@@ -58,6 +58,7 @@ declare module "@tiptap/core" {
       applyLanguageToolSuggestion: (options: { from: number; to: number; text: string }) => ReturnType;
       setLanguageToolEnabled: (enabled: boolean) => ReturnType;
       toggleLanguageTool: () => ReturnType;
+      ignoreLanguageToolIssue: (id: string) => ReturnType;
     };
   }
 
@@ -192,16 +193,10 @@ const toDecorationSet = (
     }
 
     const replacements = match.replacements?.map((item) => item.value) ?? [];
-    const titleParts = [match.message];
-    if (replacements.length) {
-      titleParts.push(`Sugestões: ${replacements.join(", ")}`);
-    }
-
     const attrs: Record<string, string> = {
       class: "lt-error",
       "data-lt-id": `${match.rule?.id ?? "lt"}-${index}`,
       "data-lt-message": match.message,
-      title: titleParts.join("\n"),
     };
 
     if (replacements.length) {
@@ -252,17 +247,12 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
   },
 
   addCommands() {
-    const getStorage = () => {
-      if (!this.storage.languageTool) {
-        this.storage.languageTool = {
-          status: "idle" as LanguageToolStatus,
-          issues: [] as LanguageToolIssue[],
-          message: null as string | null,
-          lastUpdated: null as number | null,
-          enabled: this.options.enabled ?? false,
-        };
-      }
-      return this.storage.languageTool;
+    const getStorage = () => this.storage as unknown as {
+      status: LanguageToolStatus;
+      issues: LanguageToolIssue[];
+      message: string | null;
+      lastUpdated: number | null;
+      enabled: boolean;
     };
 
     return {
@@ -302,6 +292,16 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
           const next = !storage.enabled;
           return editor.commands.setLanguageToolEnabled(next);
         },
+      ignoreLanguageToolIssue:
+        (id: string) =>
+        ({ state, dispatch }) => {
+          if (!dispatch || !id) {
+            return false;
+          }
+          const tr = state.tr.setMeta(pluginKey, { type: "languageToolIgnore", id });
+          dispatch(tr);
+          return true;
+        },
     };
   },
 
@@ -311,17 +311,12 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
     }
 
     const options = this.options;
-    const getStorage = () => {
-      if (!this.storage.languageTool) {
-        this.storage.languageTool = {
-          status: "idle" as LanguageToolStatus,
-          issues: [] as LanguageToolIssue[],
-          message: null as string | null,
-          lastUpdated: null as number | null,
-          enabled: this.options.enabled ?? false,
-        };
-      }
-      return this.storage.languageTool;
+    const getStorage = () => this.storage as unknown as {
+      status: LanguageToolStatus;
+      issues: LanguageToolIssue[];
+      message: string | null;
+      lastUpdated: number | null;
+      enabled: boolean;
     };
 
     return [
@@ -365,23 +360,35 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
                 status: "idle",
                 message: null,
               };
-            } else if (meta?.type === "languageToolToggle") {
-              const enabled = Boolean(meta.enabled);
+          } else if (meta?.type === "languageToolToggle") {
+            const enabled = Boolean(meta.enabled);
+            next = {
+              ...next,
+              enabled,
+              status: "idle",
+              message: null,
+              decorations: enabled ? next.decorations : DecorationSet.empty,
+              issues: enabled ? next.issues : [],
+            };
+            if (!enabled) {
               next = {
                 ...next,
-                enabled,
-                status: "idle",
-                message: null,
-                decorations: enabled ? next.decorations : DecorationSet.empty,
-                issues: enabled ? next.issues : [],
+                decorations: DecorationSet.empty,
+                issues: [],
               };
-              if (!enabled) {
-                next = {
-                  ...next,
-                  decorations: DecorationSet.empty,
-                  issues: [],
-                };
-              }
+            }
+            } else if (meta?.type === "languageToolIgnore" && meta?.id) {
+              const id: string = meta.id;
+              const toRemove = next.decorations.find(undefined, undefined, (spec: any) => {
+                return spec && typeof spec === "object" && spec["data-lt-id"] === id;
+              });
+              const filteredIssues = (next.issues || []).filter((issue) => issue.id !== id);
+              next = {
+                ...next,
+                decorations: toRemove && toRemove.length ? next.decorations.remove(toRemove) : next.decorations,
+                issues: filteredIssues,
+                status: next.status,
+              };
             }
 
             const storage = getStorage();
@@ -413,6 +420,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
           const isEnabled = () => Boolean(pluginKey.getState(editorView.state)?.enabled);
 
           const dispatchStatus = (status: LanguageToolStatus, message: string | null = null) => {
+            console.log("[LT] status", { status, message });
             const tr = editorView.state.tr.setMeta(pluginKey, {
               type: "languageToolStatus",
               status,
@@ -436,6 +444,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             timeoutId = window.setTimeout(() => {
               timeoutId = null;
               if (!destroyed && !editorView.composing && isEnabled()) {
+                console.log("[LT] scheduleCheck run");
                 void runCheck();
               }
             }, checkDelay);
@@ -456,6 +465,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             const map = buildDocumentText(editorView.state);
             const rawText = map.text;
             const trimmed = rawText.trim();
+            console.log("[LT] runCheck", { length: rawText.length });
 
             if (!trimmed || trimmed.length < minChars) {
               lastTextVersion = "";
@@ -485,6 +495,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
                 body: JSON.stringify({ text: rawText }),
                 signal: abortController.signal,
               });
+              console.log("[LT] fetch ok", { ok: response.ok, status: response.status });
             } catch (error) {
               if ((error as Error).name === "AbortError") {
                 return;
@@ -505,6 +516,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             let payload: { matches: LanguageToolMatch[] } | null = null;
             try {
               payload = (await response.json()) as { matches: LanguageToolMatch[] };
+              console.log("[LT] matches", { count: payload?.matches?.length || 0 });
             } catch (error) {
               dispatchStatus("error", "Resposta inválida do LanguageTool.");
               return;
@@ -516,6 +528,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
 
             const currentDoc = editorView.state.doc;
             const { decorations, issues } = toDecorationSet(payload.matches ?? [], map, editorView.state);
+            console.log("[LT] decorations", { issuesCount: issues.length });
 
             if (!editorView.state.doc.eq(currentDoc)) {
               return;
