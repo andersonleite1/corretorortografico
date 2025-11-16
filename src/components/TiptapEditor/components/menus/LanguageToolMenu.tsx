@@ -11,6 +11,7 @@ const LanguageToolMenu = () => {
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
   const showDialogRef = useRef(false);
+  const suppressAutoOpenRef = useRef(false);
 
   const ltState = useEditorState({
     editor,
@@ -54,6 +55,7 @@ const LanguageToolMenu = () => {
       const el = findErrorElement(e);
       if (!el) {
         showDialogRef.current = false;
+        suppressAutoOpenRef.current = true;
         if (hoveredEl) {
           setHoveredEl(null);
           setHoveredIssueId(null);
@@ -61,7 +63,10 @@ const LanguageToolMenu = () => {
         editor?.view?.dispatch(editor.view.state.tr);
         return;
       }
+      // vou remover o display none do dialog
+      document.querySelector('#language-tool-dialog')?.setAttribute('style', 'display: auto;');
       showDialogRef.current = true;
+      suppressAutoOpenRef.current = false;
       const id = el.getAttribute("data-lt-id");
       setHoveredEl(el);
       setHoveredIssueId(id);
@@ -69,6 +74,7 @@ const LanguageToolMenu = () => {
     };
     dom.addEventListener("mousedown", handleDown, { capture: true });
     const handleMove = (e: MouseEvent) => {
+      if (suppressAutoOpenRef.current) return;
       const el = findErrorElement(e);
       if (el) {
         const id = el.getAttribute("data-lt-id");
@@ -128,7 +134,7 @@ const LanguageToolMenu = () => {
   }, [hoveredIssueId, ltState.issues, getActiveIssue]);
 
   const shouldShow = useCallback(() => {
-    return Boolean(ltState.enabled && (showDialogRef.current || hoveredEl));
+    return Boolean(ltState.enabled && !suppressAutoOpenRef.current && (showDialogRef.current || hoveredEl));
   }, [ltState.enabled, hoveredEl]);
 
   const getReferencedVirtualElement = useCallback(() => {
@@ -137,13 +143,16 @@ const LanguageToolMenu = () => {
     const containerRect = container.getBoundingClientRect();
     const elRect = hoveredEl?.getBoundingClientRect();
     const gap = 16;
-    const estimatedWidth = 380;
+    const margin = 12;
+    const estimatedWidth = Math.min(380, (window?.innerWidth ?? 380) - 24);
     const estimatedHeight = 260;
-    const maxX = Math.max(0, (window?.innerWidth ?? containerRect.right) - estimatedWidth - 8);
-    const x = Math.min(containerRect.right + gap, maxX);
+    const viewportW = window?.innerWidth ?? containerRect.right;
+    const viewportH = window?.innerHeight ?? containerRect.bottom;
+    const maxX = Math.max(margin, viewportW - estimatedWidth - margin);
+    const x = Math.min(Math.max(containerRect.right + gap, margin), maxX);
     const baseY = elRect?.top ?? (containerRect.top + 80);
-    const maxY = Math.max(0, (window?.innerHeight ?? containerRect.bottom) - estimatedHeight - 8);
-    const y = Math.min(Math.max(baseY, 8), maxY);
+    const maxY = Math.max(margin, viewportH - estimatedHeight - margin);
+    const y = Math.min(Math.max(baseY, margin), maxY);
     const w = 1;
     const h = 1;
     const sideRect = {
@@ -175,6 +184,10 @@ const LanguageToolMenu = () => {
   const ignoreIssue = useCallback(() => {
     if (!issue) return;
     editor.commands.ignoreLanguageToolIssue?.(issue.id);
+    showDialogRef.current = false;
+    setHoveredEl(null);
+    setHoveredIssueId(null);
+    editor?.view?.dispatch(editor.view.state.tr);
   }, [editor, issue]);
 
   return (
@@ -193,7 +206,7 @@ const LanguageToolMenu = () => {
       }}
     >
       {/* Layout do diálogo: cabeçalho, descrição da regra/mensagem e bloco de sugestões */}
-      <div style={{ width: 360, maxWidth: 380, padding: "0.6rem" }}>
+      <div id="language-tool-dialog">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span
@@ -214,6 +227,24 @@ const LanguageToolMenu = () => {
             </span>
             <span style={{ fontWeight: 600 }}>Corretor</span>
           </div>
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={() => {
+              document.querySelector('#language-tool-dialog')?.setAttribute('style', 'display: none;');
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "var(--rte-muted-fg)",
+              cursor: "pointer",
+              fontSize: 24,
+              lineHeight: 1,
+              padding: 0,
+            }}
+          >
+            ×
+          </button>
         </div>
 
         <div style={{ marginTop: 8, border: "1px solid var(--rte-border)", borderRadius: 8, overflow: "hidden" }}>
@@ -239,8 +270,7 @@ const LanguageToolMenu = () => {
             {issue && (!issue.replacements || issue.replacements.length === 0) && (
               <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>Nenhuma sugestão</span>
             )}
-            {/* Ignorar o erro */}
-            {/* <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button> */}
+            {false && <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button>}
           </div>
         </div>
 
