@@ -240,7 +240,7 @@ const LanguageToolMenu = () => {
               cursor: "pointer",
               fontSize: 24,
               lineHeight: 1,
-              padding: 0,
+              padding: "0.35rem",
             }}
           >
             ×
