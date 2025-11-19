@@ -4,7 +4,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const AlignRightButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -17,7 +17,7 @@ const AlignRightButton = () => {
   return (
     <MenuButton
       icon="AlignRight"
-      tooltip="Direita"
+      tooltip={messages.toolbar.alignRight}
       shortcuts={["Mod", "Shift", "R"]}
       onClick={() => editor.chain().focus().setTextAlign("right").run()}
       {...state}

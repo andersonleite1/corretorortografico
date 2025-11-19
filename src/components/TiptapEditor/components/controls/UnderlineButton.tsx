@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const UnderlineButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -19,7 +19,7 @@ const UnderlineButton = () => {
   return (
     <MenuButton
       icon="Underline"
-      tooltip="Sublinhado"
+      tooltip={messages.toolbar.underline}
       shortcuts={["Mod", "U"]}
       onClick={() => editor.chain().focus().toggleUnderline().run()}
       {...state}

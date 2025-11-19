@@ -1,50 +1,7 @@
 "use client";
 
-type Shortcut = {
-  command: string;
-  windows: string;
-  mac: string;
-};
-
-const sections: Array<{
-  id: string;
-  title: string;
-  shortcuts: Shortcut[];
-}> = [
-  {
-    id: "fundamentos",
-    title: "Fundamentos de comandos",
-    shortcuts: [
-      { command: "Copiar", windows: "Ctrl + C", mac: "Cmd + C" },
-      { command: "Recortar", windows: "Ctrl + X", mac: "Cmd + X" },
-      { command: "Colar", windows: "Ctrl + V", mac: "Cmd + V" },
-      {
-        command: "Colar sem formatação",
-        windows: "Ctrl + Shift + V",
-        mac: "Cmd + Shift + V",
-      },
-      { command: "Desfazer", windows: "Ctrl + Z", mac: "Cmd + Z" },
-      { command: "Refazer", windows: "Ctrl + Shift + Z", mac: "Cmd + Shift + Z" },
-      {
-        command: "Adicionar quebra de linha",
-        windows: "Shift + Enter",
-        mac: "Shift + Enter",
-      },
-    ],
-  },
-  {
-    id: "formatacao",
-    title: "Formatação de texto",
-    shortcuts: [
-      { command: "Negrito", windows: "Ctrl + B", mac: "Cmd + B" },
-      { command: "Itálico", windows: "Ctrl + I", mac: "Cmd + I" },
-      { command: "Sublinhado", windows: "Ctrl + U", mac: "Cmd + U" },
-      { command: "Tachado", windows: "Ctrl + Shift + S", mac: "Cmd + Shift + S" },
-      { command: "Destaque", windows: "Ctrl + Shift + H", mac: "Cmd + Shift + H" },
-      { command: "Código", windows: "Ctrl + E", mac: "" },
-    ],
-  },
-];
+import { getEditMessages } from "@/data/edit/messages";
+import { type Locale } from "../../../i18n-config";
 
 function renderShortcut(shortcut: string) {
   if (!shortcut) {
@@ -61,26 +18,32 @@ function renderShortcut(shortcut: string) {
   ));
 }
 
-export default function AtalhosAccordion() {
+type Props = {
+  locale: Locale;
+};
+
+export default function AtalhosAccordion({ locale }: Props) {
+  const { shortcuts } = getEditMessages(locale);
+
   return (
     <section
-      aria-label="Atalhos do teclado"
+      aria-label={shortcuts.ariaLabel}
       className="mt-10 w-full text-slate-700 dark:text-slate-100"
     >
       <div className="rounded-[2.5rem] border border-slate-200 bg-white/95 px-5 py-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:px-8">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
-              Atalhos do teclado
+              {shortcuts.eyebrow}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-300">
-              Comandos rápidos para editar sem tirar as mãos do teclado.
+              {shortcuts.description}
             </p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
-          {sections.map((section) => (
+          {shortcuts.sections.map((section) => (
             <article
               key={section.id}
               className="rounded-xl border border-slate-100 bg-white/90 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/60"
@@ -100,13 +63,13 @@ export default function AtalhosAccordion() {
                     <div className="mt-1 flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-semibold uppercase tracking-[0.2em] text-[11px] text-slate-400 dark:text-slate-500">
-                          Win / Linux
+                          {shortcuts.windowsLabel}
                         </span>
                         <div className="flex flex-wrap gap-1">{renderShortcut(windows)}</div>
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-semibold uppercase tracking-[0.2em] text-[11px] text-slate-400 dark:text-slate-500">
-                          macOS
+                          {shortcuts.macLabel}
                         </span>
                         <div className="flex flex-wrap gap-1">{renderShortcut(mac)}</div>
                       </div>

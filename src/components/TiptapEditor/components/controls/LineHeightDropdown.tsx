@@ -7,7 +7,7 @@ import { useTiptapContext } from "../Provider";
 import { LINE_HEIGHT_OPTIONS } from "../../constants/line-height";
 
 const LineHeightDropdown = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const currentLineHeight = useEditorState({
     editor,
@@ -20,7 +20,13 @@ const LineHeightDropdown = () => {
     },
   });
 
-  const options = useMemo(() => LINE_HEIGHT_OPTIONS, []);
+  const options = useMemo(
+    () =>
+      LINE_HEIGHT_OPTIONS.map((option, index) =>
+        index === 0 ? { ...option, label: messages.lineHeight.default } : option
+      ),
+    [messages.lineHeight.default]
+  );
   const normalizedCurrent = currentLineHeight ?? "";
   const activeOption =
     options.find((option) => option.value === normalizedCurrent) ?? options[0];
@@ -45,7 +51,7 @@ const LineHeightDropdown = () => {
     <MenuButton
       type="dropdown"
       icon="LineHeight"
-      tooltip="Espaçamento de linhas"
+      tooltip={messages.toolbar.lineHeight}
       hideText
       dropdownClass="rte-lineheight-dropdown"
     >

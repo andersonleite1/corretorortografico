@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const BulletListButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const BulletListButton = () => {
   return (
     <MenuButton
       icon="BulletList"
-      tooltip="Lista com marcadores"
+      tooltip={messages.toolbar.bulletList}
       shortcuts={["Mod", "Shift", "8"]}
       onClick={() => editor.chain().focus().toggleBulletList().run()}
       {...state}

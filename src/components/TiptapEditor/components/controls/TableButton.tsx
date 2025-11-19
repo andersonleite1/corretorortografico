@@ -5,7 +5,7 @@ import {useTiptapContext} from "../Provider";
 import TableBuilder from "@/components/TiptapEditor/components/TableBuilder";
 
 const TableButton = () => {
-  const {editor} = useTiptapContext();
+  const {editor, messages} = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const TableButton = () => {
   return (
     <MenuButton
       icon="Table"
-      tooltip="Tabela"
+      tooltip={messages.toolbar.table}
       type="popover"
       hideArrow
       {...state}

@@ -13,7 +13,7 @@ import { useTiptapContext } from "../Provider";
 import { PopoverClose } from "../ui/Popover";
 
 const AlignPopover = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const current = useEditorState({
     editor,
@@ -28,7 +28,7 @@ const AlignPopover = () => {
   const isDisabled = !editor.isEditable || !editor.can().setTextAlign("left");
 
   return (
-    <MenuButton type="popover" icon={current} tooltip="Alinhamento" disabled={isDisabled}>
+    <MenuButton type="popover" icon={current} tooltip={messages.toolbar.align} disabled={isDisabled}>
       <PopoverClose asChild>
         <Toolbar dense={true}>
           <AlignLeftButton />

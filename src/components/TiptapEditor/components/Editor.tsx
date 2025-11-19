@@ -16,6 +16,7 @@ import ExtensionKit from "../kit";
 
 import { cssVar } from "../utils/cssVar";
 import { throttle } from "../utils/throttle";
+import { type Locale } from "../../../../i18n-config";
 
 import "../styles/index.scss";
 import TableMenu from "@/components/TiptapEditor/components/menus/TableMenu";
@@ -45,6 +46,7 @@ export interface TiptapEditorProps {
   onContentChange?: (value: Content) => void;
   exportActions?: ExportActions;
   draftActions?: DraftActions;
+  locale?: Locale;
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -64,6 +66,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       onContentChange,
       exportActions,
       draftActions,
+      locale,
     },
     ref
   ) => {
@@ -119,6 +122,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         slotAfter={!hideStatusBar && <StatusBar />}
         exportActions={exportActions}
         draftActions={draftActions}
+        locale={locale}
       >
         {menus}
         <Resizer />

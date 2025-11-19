@@ -2,6 +2,7 @@ import React from "react";
 import { Toolbar } from "../../ui/Toolbar";
 import MenuButton from "../../MenuButton";
 import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
+import { useTiptapContext } from "../../Provider";
 
 interface LinkViewProps {
   url: string;
@@ -11,21 +12,22 @@ interface LinkViewProps {
 
 const LinkView = ({ url, onEdit, onRemove }: LinkViewProps) => {
   const { copy, isCopied } = useCopyToClipboard();
+  const { messages } = useTiptapContext();
 
   return (
     <Toolbar>
-      <MenuButton text="Edit link" hideText={false} onClick={onEdit} />
+      <MenuButton text={messages.link.edit} hideText={false} onClick={onEdit} />
       <MenuButton
         icon="ExternalLink"
-        text="Open in new tab"
+        text={messages.link.open}
         onClick={() => window.open(url, "_blank")}
       />
       <MenuButton
         icon={isCopied ? "Check" : "Clipboard"}
-        text={isCopied ? "Copied" : "Copy link"}
+        text={isCopied ? messages.link.copied : messages.link.copy}
         onClick={() => copy(url)}
       />
-      <MenuButton icon="Unlink" text="Remove link" onClick={onRemove} />
+      <MenuButton icon="Unlink" text={messages.link.remove} onClick={onRemove} />
     </Toolbar>
   );
 };

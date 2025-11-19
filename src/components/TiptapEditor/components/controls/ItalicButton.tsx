@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const ItalicButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -19,7 +19,7 @@ const ItalicButton = () => {
   return (
     <MenuButton
       icon="Italic"
-      tooltip="Itálico"
+      tooltip={messages.toolbar.italic}
       shortcuts={["Mod", "I"]}
       onClick={() => editor.chain().focus().toggleItalic().run()}
       {...state}

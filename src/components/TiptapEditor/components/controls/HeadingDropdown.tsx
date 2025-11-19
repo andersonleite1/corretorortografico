@@ -9,7 +9,8 @@ const HEADING_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 type Heading = "p" | `h${(typeof HEADING_LEVELS)[number]}`;
 
 const HeadingDropdown = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
+  const { paragraph, h1, h2, h3, h4, menu } = messages.headings;
 
   const current = useEditorState({
     editor,
@@ -28,26 +29,26 @@ const HeadingDropdown = () => {
     () => [
       {
         value: "p",
-        label: "Parágrafo",
+        label: paragraph,
       },
       {
         value: "h1",
-        label: "Título 1",
+        label: h1,
       },
       {
         value: "h2",
-        label: "Título 2",
+        label: h2,
       },
       {
         value: "h3",
-        label: "Título 3",
+        label: h3,
       },
       {
         value: "h4",
-        label: "Título 4",
+        label: h4,
       },
     ],
-    []
+    [paragraph, h1, h2, h3, h4]
   );
 
   const onSelect = useCallback(
@@ -65,13 +66,13 @@ const HeadingDropdown = () => {
     [editor]
   );
 
-  const currentLabel = options.find((item) => item.value === current)?.label || "Títulos";
+  const currentLabel = options.find((item) => item.value === current)?.label || menu;
 
   return (
     <MenuButton
       type="dropdown"
       text={currentLabel}
-      tooltip="Headings"
+      tooltip={messages.toolbar.heading}
       hideText={false}
       disabled={!editor.isEditable || !current}
       buttonStyle={{ minWidth: "6.5rem" }}

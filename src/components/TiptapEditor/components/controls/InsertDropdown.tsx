@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import MenuButton from "../MenuButton";
 import { DropdownMenuItem } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
 
 const InsertDropdown = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const insertCodeBlock = () => editor.chain().focus().setCodeBlock().run();
 
   const insertBlockquote = () => editor.chain().focus().setBlockquote().run();
 
   const insertYoutube = () => {
-    const src = prompt("Embed Youtube Video", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    const src = prompt(messages.insert.youtubePrompt, messages.insert.youtubePlaceholder);
     if (src) {
       editor.chain().focus().embedYoutube({ src }).run();
     }
@@ -20,14 +20,14 @@ const InsertDropdown = () => {
   return (
     <MenuButton
       type="dropdown"
-      tooltip="Inserir"
+      tooltip={messages.toolbar.insert}
       disabled={!editor.isEditable}
       icon="Plus"
       dropdownStyle={{ minWidth: "8rem" }}
     >
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Citação"
+          text={messages.insert.quote}
           hideText={false}
           tooltip={false}
           icon="Quote"
@@ -36,7 +36,7 @@ const InsertDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Bloco de código"
+          text={messages.insert.codeBlock}
           hideText={false}
           tooltip={false}
           icon="CodeBlock"
@@ -45,7 +45,7 @@ const InsertDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Youtube"
+          text={messages.insert.youtube}
           hideText={false}
           tooltip={false}
           icon="Youtube"

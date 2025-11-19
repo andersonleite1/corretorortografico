@@ -3,7 +3,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const ClearEditorButton = () => {
-  const { exportActions } = useTiptapContext();
+  const { exportActions, messages } = useTiptapContext();
   const handleClear = useCallback(() => {
     exportActions?.onClear?.();
   }, [exportActions?.onClear]);
@@ -15,9 +15,9 @@ const ClearEditorButton = () => {
   return (
     <MenuButton
       icon="Trash"
-      tooltip="Limpar"
+      tooltip={messages.toolbar.clearEditor}
       onClick={handleClear}
-      aria-label="Limpar"
+      aria-label={messages.toolbar.clearEditor}
     />
   );
 };

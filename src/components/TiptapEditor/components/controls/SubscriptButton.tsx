@@ -4,7 +4,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const SubscriptButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -19,7 +19,7 @@ const SubscriptButton = () => {
   return (
     <MenuButton
       icon="Subscript"
-      tooltip="Subscrito"
+      tooltip={messages.toolbar.subscript}
       shortcuts={["Mod", ","]}
       onClick={() => editor.chain().focus().toggleSubscript().run()}
       {...state}

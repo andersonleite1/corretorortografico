@@ -7,7 +7,7 @@ import { useEditorState } from "@tiptap/react";
 const PrimaryColor = "#389E74";
 
 const LanguageToolMenu = () => {
-  const { editor, contentElement } = useTiptapContext();
+  const { editor, contentElement, messages } = useTiptapContext();
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
   const showDialogRef = useRef(false);
@@ -225,11 +225,11 @@ const LanguageToolMenu = () => {
             >
               EDT
             </span>
-            <span style={{ fontWeight: 600 }}>Corretor</span>
+            <span style={{ fontWeight: 600 }}>{messages.languageTool.title}</span>
           </div>
           <button
             type="button"
-            aria-label="Fechar"
+            aria-label={messages.languageTool.close}
             onClick={() => {
               document.querySelector('#language-tool-dialog')?.setAttribute('style', 'display: none;');
             }}
@@ -251,9 +251,11 @@ const LanguageToolMenu = () => {
           {/* Mensagem da regra e descrição do erro */}
           <div style={{ padding: "0.5rem" }}>
             <div className="rte-label" style={{ marginBottom: 4 }}>
-              {(issue && (issue.ruleDescription || issue.typeName)) || "Ortografia"}
+              {(issue && (issue.ruleDescription || issue.typeName)) || messages.languageTool.fallbackRule}
             </div>
-            <p style={{ fontSize: "0.9rem", lineHeight: 1.4 }}>{issue?.message || "Selecione um erro para ver as sugestões"}</p>
+            <p style={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
+              {issue?.message || messages.languageTool.empty}
+            </p>
           </div>
           {/* Lista de sugestões (máx. 6) e ação de ignorar */}
           <div style={{ borderTop: "1px solid var(--rte-border)", padding: "0.5rem", display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -268,9 +270,15 @@ const LanguageToolMenu = () => {
               </button>
             ))}
             {issue && (!issue.replacements || issue.replacements.length === 0) && (
-              <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>Nenhuma sugestão</span>
+              <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>
+                {messages.languageTool.noSuggestions}
+              </span>
             )}
-            {false && <button className="rte-button rte-button--outline" onClick={ignoreIssue}>Ignorar</button>}
+            {false && (
+              <button className="rte-button rte-button--outline" onClick={ignoreIssue}>
+                {messages.languageTool.ignore}
+              </button>
+            )}
           </div>
         </div>
 

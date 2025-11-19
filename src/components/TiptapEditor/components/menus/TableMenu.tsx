@@ -7,7 +7,7 @@ import { Toolbar } from "../ui/Toolbar";
 import type { VirtualElement } from "@floating-ui/dom";
 
 const TableMenu = () => {
-  const { editor, contentElement } = useTiptapContext();
+  const { editor, contentElement, messages } = useTiptapContext();
 
   const shouldShow = useCallback(({ editor }: any) => {
     return editor.isActive("table");
@@ -73,41 +73,49 @@ const TableMenu = () => {
       <Toolbar>
         <MenuButton
           icon="RowInsertTop"
-          tooltip="Add row above"
+          tooltip={messages.table.addRowAbove}
           onClick={addRowOrColumn("Row", "Before")}
         />
         <MenuButton
           icon="RowInsertBottom"
-          tooltip="Add row below"
+          tooltip={messages.table.addRowBelow}
           onClick={addRowOrColumn("Row", "After")}
         />
         <MenuButton
           icon="ColInsertLeft"
-          tooltip="Add column before"
+          tooltip={messages.table.addColumnLeft}
           onClick={addRowOrColumn("Column", "Before")}
         />
         <MenuButton
           icon="ColInsertRight"
-          tooltip="Add column after"
+          tooltip={messages.table.addColumnRight}
           onClick={addRowOrColumn("Column", "After")}
         />
-        <MenuButton icon="SplitCell" tooltip="Split cell" onClick={splitCell} />
-        <MenuButton icon="MergeCell" tooltip="Merge cells" onClick={mergeCells} />
+        <MenuButton icon="SplitCell" tooltip={messages.table.splitCell} onClick={splitCell} />
+        <MenuButton icon="MergeCell" tooltip={messages.table.mergeCells} onClick={mergeCells} />
       </Toolbar>
       <Toolbar style={{ justifyContent: "center" }}>
-        <MenuButton icon="RowHeader" tooltip="Toggle row header" onClick={toggleHeader("Row")} />
+        <MenuButton
+          icon="RowHeader"
+          tooltip={messages.table.toggleRowHeader}
+          onClick={toggleHeader("Row")}
+        />
         <MenuButton
           icon="ColHeader"
-          tooltip="Toggle column header"
+          tooltip={messages.table.toggleColumnHeader}
           onClick={toggleHeader("Column")}
         />
-        <MenuButton icon="RowRemove" tooltip="Delete row" onClick={deleteRowOrColumn("Row")} />
+        <MenuButton
+          icon="RowRemove"
+          tooltip={messages.table.deleteRow}
+          onClick={deleteRowOrColumn("Row")}
+        />
         <MenuButton
           icon="ColRemove"
-          tooltip="Delete column"
+          tooltip={messages.table.deleteColumn}
           onClick={deleteRowOrColumn("Column")}
         />
-        <MenuButton icon="Trash" tooltip="Delete table" onClick={deleteTable} />
+        <MenuButton icon="Trash" tooltip={messages.table.deleteTable} onClick={deleteTable} />
       </Toolbar>
     </BubbleMenu>
   );

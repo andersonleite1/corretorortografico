@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import MenuButton from "../MenuButton";
 
 const BlockquoteButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const BlockquoteButton = () => {
   return (
     <MenuButton
       icon="Quote"
-      tooltip="Quote"
+      tooltip={messages.toolbar.blockquote}
       shortcuts={["Mod", "Shift", "B"]}
       onClick={() => editor.chain().focus().toggleBlockquote().run()}
       {...state}

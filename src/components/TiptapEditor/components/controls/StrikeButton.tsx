@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const StrikeButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -19,7 +19,7 @@ const StrikeButton = () => {
   return (
     <MenuButton
       icon="Strike"
-      tooltip="Tachado"
+      tooltip={messages.toolbar.strikethrough}
       shortcuts={["Mod", "Shift", "S"]}
       onClick={() => editor.chain().focus().toggleStrike().run()}
       {...state}

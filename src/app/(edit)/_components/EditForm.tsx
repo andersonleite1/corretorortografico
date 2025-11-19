@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
@@ -8,8 +8,9 @@ import { FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
-import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 import { useRouter } from "next/navigation";
+import { type Locale } from "../../../../i18n-config";
+import { getEditMessages } from "@/data/edit/messages";
 
 
 interface PostForm {
@@ -17,11 +18,16 @@ interface PostForm {
   content: string;
 }
 
-export default function EditForm() {
+interface EditFormProps {
+  locale: Locale;
+}
+
+export default function EditForm({ locale }: EditFormProps) {
   const editorRef = useRef<TiptapEditorRef>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
+  const { form: formMessages } = useMemo(() => getEditMessages(locale), [locale]);
 
   const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
@@ -34,7 +40,7 @@ export default function EditForm() {
 
   const handleClear = () => {
     localStorage.removeItem("post");
-    showModal("Conteúdo limpo!");
+    showModal(formMessages.modal.cleared);
     setTimeout(() => window.location.reload(), 1000);
   };
 
@@ -45,15 +51,16 @@ export default function EditForm() {
     const safeHtml = htmlFromEditor?.trim();
 
     if (!safeHtml) {
-      showModal("Nenhum conteúdo para exportar.");
+      showModal(formMessages.modal.noContent);
       return null;
     }
 
-    const baseTitle = (title || "Documento").trim() || "Documento";
-    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || "Documento";
+    const fallbackName = formMessages.defaults.documentName;
+    const baseTitle = (title || fallbackName).trim() || fallbackName;
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
 
     const htmlDocument = `<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="${formMessages.pdfLang}">
 <head>
   <meta charset="utf-8" />
 </head>
@@ -77,10 +84,10 @@ export default function EditForm() {
     try {
       const blob = await requestPdfFromHtml(payload.htmlDocument);
       saveAs(blob, payload.fileName);
-      showModal("PDF exportado com sucesso!");
+      showModal(formMessages.modal.pdfSuccess);
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
-      showModal(error instanceof Error ? error.message : "Erro ao gerar o PDF.");
+      showModal(error instanceof Error ? error.message : formMessages.modal.pdfError);
     } finally {
       setIsExportingPDF(false);
     }
@@ -104,7 +111,7 @@ export default function EditForm() {
       setIsPreviewOpen(true);
     } catch (error) {
       console.error("Erro ao gerar prévia do PDF:", error);
-      showModal(error instanceof Error ? error.message : "Erro ao gerar o PDF.");
+      showModal(error instanceof Error ? error.message : formMessages.modal.pdfError);
     } finally {
       setIsExportingPDF(false);
     }
@@ -113,13 +120,14 @@ export default function EditForm() {
   const handleSaveDOC = async () => {
     const postData = localStorage.getItem("post");
     if (!postData) {
-      showModal("Nenhum conteúdo para Exportar.");
+      showModal(formMessages.modal.noContent);
       return;
     }
 
     const post = JSON.parse(postData);
-    const docTitleRaw = (post.title || "documento").trim() || "documento";
-    const docTitle = docTitleRaw.replace(/[\\/:*?"<>|]/g, "-") || "documento";
+    const fallbackName = formMessages.defaults.documentName;
+    const docTitleRaw = (post.title || fallbackName).trim() || fallbackName;
+    const docTitle = docTitleRaw.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
 
     const html = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -140,7 +148,7 @@ export default function EditForm() {
     });
 
     saveAs(blob, `${docTitle}.doc`);
-    showModal("Documento exportado com sucesso!");
+    showModal(formMessages.modal.docSuccess);
   };
 
   const handleExportToTxt = () => {
@@ -152,16 +160,17 @@ export default function EditForm() {
       "";
 
     if (!plainText) {
-      showModal("Nenhum conteúdo para exportar.");
+      showModal(formMessages.modal.noContent);
       return;
     }
 
-    const baseTitle = (title || "Documento").trim() || "Documento";
-    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || "Documento";
+    const fallbackName = formMessages.defaults.documentName;
+    const baseTitle = (title || fallbackName).trim() || fallbackName;
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
 
     const blob = new Blob([plainText], { type: "text/plain;charset=utf-8" });
     saveAs(blob, `${safeTitle}.txt`);
-    showModal("Arquivo TXT exportado com sucesso!");
+    showModal(formMessages.modal.txtSuccess);
   };
 
   const clearPdfPreview = useCallback(() => {
@@ -244,9 +253,9 @@ export default function EditForm() {
   const handleSaveDraft = () => {
     const current = {
       id: uuidv4(),
-      title: watch("title") || "Sem título",
+      title: watch("title") || formMessages.defaults.draftTitle,
       content: watch("content") || "",
-      date: new Date().toLocaleString("pt-BR"),
+      date: new Date().toLocaleString(formMessages.dateLocale),
     };
 
     let updatedDrafts = [...drafts, current];
@@ -258,7 +267,7 @@ export default function EditForm() {
 
     localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
     setDrafts(updatedDrafts);
-    showModal("Rascunho salvo com sucesso!");
+    showModal(formMessages.modal.draftSaved);
   };
 
   // Função para carregar um rascunho
@@ -277,7 +286,7 @@ export default function EditForm() {
     // Atualiza o conteúdo visível do Tiptap
     editorRef.current?.getInstance()?.commands.setContent(draft.content);
 
-    showModal("Rascunho carregado!");
+    showModal(formMessages.modal.draftLoaded);
   };
 
   // Função para excluir um rascunho
@@ -285,7 +294,7 @@ export default function EditForm() {
     const updated = drafts.filter((d) => d.id !== draftId);
     localStorage.setItem("drafts", JSON.stringify(updated));
     setDrafts(updated);
-    showModal("Rascunho excluído!");
+    showModal(formMessages.modal.draftDeleted);
   };
 
 
@@ -334,7 +343,7 @@ export default function EditForm() {
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 min-h-screen pb-12">
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">
-          Título
+          {formMessages.labels.title}
         </label>
         <Controller
           control={control}
@@ -344,7 +353,7 @@ export default function EditForm() {
               {...field}
               type="text"
               className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-md bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
-              placeholder="Digite o título da postagem ou nome do arquivo que será exportado..."
+              placeholder={formMessages.placeholders.title}
             />
           )}
         />
@@ -352,7 +361,7 @@ export default function EditForm() {
 
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">
-          Conteúdo
+          {formMessages.labels.content}
         </label>
         <Controller
           control={control}
@@ -362,9 +371,10 @@ export default function EditForm() {
               ref={editorRef}
               ssr={true}
               output="html"
+              locale={locale}
               placeholder={{
-                paragraph: "Digite seu conteúdo aqui...",
-                imageCaption: "Digite a legenda da imagem (opcional)",
+                paragraph: formMessages.placeholders.content,
+                imageCaption: formMessages.placeholders.imageCaption,
               }}
               contentMinHeight={320}
               contentMaxHeight={440}
@@ -385,7 +395,7 @@ export default function EditForm() {
                 onLoadDraft: handleLoadDraft,
                 onDeleteDraft: handleDeleteDraft,
               }}
-              aria-label="Campo de conteúdo do post"
+              aria-label={formMessages.aria.content}
             />
           )}
         />
@@ -402,13 +412,13 @@ export default function EditForm() {
           <div className="w-full max-w-5xl h-[85vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Pré-visualização do PDF
+                {formMessages.preview.heading}
               </h3>
               <button
                 type="button"
                 onClick={closePdfPreview}
                 className="inline-flex items-center justify-center p-2 text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
-                aria-label="Fechar pré-visualização"
+                aria-label={formMessages.preview.closeAria}
               >
                 <FaTimes className="w-5 h-5" />
               </button>
@@ -416,7 +426,7 @@ export default function EditForm() {
             <div className="flex-1 bg-gray-100 dark:bg-gray-800">
               <iframe
                 src={pdfPreview.url}
-                title="Pré-visualização do PDF"
+                title={formMessages.preview.iframeTitle}
                 className="w-full h-full"
               />
             </div>
@@ -426,14 +436,14 @@ export default function EditForm() {
                 onClick={closePdfPreview}
                 className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                Fechar
+                {formMessages.preview.close}
               </button>
               <button
                 type="button"
                 onClick={handleDownloadPreviewPdf}
                 className="px-4 py-2 rounded-md bg-green-400 hover:bg-green-500 text-gray-800 font-semibold"
               >
-                Download
+                {formMessages.preview.download}
               </button>
             </div>
           </div>
@@ -444,11 +454,11 @@ export default function EditForm() {
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4 p-6 bg-white/10 rounded-2xl shadow-lg border border-white/20">
             <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
-              Gerando PDF...
+              {formMessages.loading.label}
             </h4>
             <img
               src="/loading.gif"
-              alt="Gerando PDF"
+              alt={formMessages.loading.alt}
               className="w-20 h-20 drop-shadow-md"
             />
           </div>

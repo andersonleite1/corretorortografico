@@ -8,7 +8,7 @@ import { useTiptapContext } from "../Provider";
 import Icon from "../ui/Icon";
 
 const DraftsDropdown = () => {
-  const { draftActions } = useTiptapContext();
+  const { draftActions, messages } = useTiptapContext();
   const orderedDrafts = useMemo(() => {
     const baseDrafts = draftActions?.drafts ?? [];
     return [...baseDrafts].reverse();
@@ -42,14 +42,14 @@ const DraftsDropdown = () => {
     <MenuButton
       type="dropdown"
       icon="Drafts"
-      text="Rascunhos"
+      text={messages.toolbar.drafts}
       hideText={false}
-      tooltip="Rascunhos"
+      tooltip={messages.toolbar.drafts}
       dropdownStyle={{ minWidth: "16rem" }}
     >
       <DropdownMenuItem asChild>
         <MenuButton
-          text="Salvar rascunho"
+          text={messages.drafts.save}
           icon="Clipboard"
           hideText={false}
           tooltip={false}
@@ -62,7 +62,7 @@ const DraftsDropdown = () => {
 
       {orderedDrafts.length === 0 ? (
         <DropdownMenuItem disabled className="text-sm text-gray-500">
-          Nenhum rascunho salvo
+          {messages.drafts.empty}
         </DropdownMenuItem>
       ) : (
         orderedDrafts.map((draft) => (
@@ -80,7 +80,7 @@ const DraftsDropdown = () => {
           >
             <div className="flex flex-col text-left">
               <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate max-w-[10rem]">
-                {draft.title || "Sem título"}
+                {draft.title || messages.drafts.untitled}
               </span>
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {draft.date}
@@ -90,7 +90,7 @@ const DraftsDropdown = () => {
               type="button"
               onClick={(event) => handleDelete(event, draft.id)}
               className="ml-auto text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
-              aria-label="Excluir rascunho"
+              aria-label={messages.drafts.delete}
               disabled={!draftActions?.onDeleteDraft}
             >
               <Icon name="Trash" size={16} />

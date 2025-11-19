@@ -10,7 +10,7 @@ import { getNodeContainer } from "../../../utils/getNodeContainer";
 import type { VirtualElement } from "@floating-ui/dom";
 
 export const CodeBlockMenu = () => {
-  const { editor, contentElement } = useTiptapContext();
+  const { editor, contentElement, messages } = useTiptapContext();
   const { isCopied, copy } = useCopyToClipboard();
 
   const language = useEditorState({
@@ -75,10 +75,10 @@ export const CodeBlockMenu = () => {
         <ToolbarDivider />
         <MenuButton
           icon={isCopied ? "Check" : "Clipboard"}
-          tooltip="Copy code"
+          tooltip={messages.codeBlock.copy}
           onClick={handleCopy}
         />
-        <MenuButton icon="Trash" tooltip="Delete code" onClick={handleDelete} />
+        <MenuButton icon="Trash" tooltip={messages.codeBlock.delete} onClick={handleDelete} />
       </Toolbar>
     </BubbleMenu>
   );

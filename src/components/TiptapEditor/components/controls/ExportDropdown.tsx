@@ -4,7 +4,7 @@ import { DropdownMenuItem } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
 
 const ExportDropdown = () => {
-  const { exportActions } = useTiptapContext();
+  const { exportActions, messages } = useTiptapContext();
   const onExportDoc = exportActions?.onExportDoc;
   const onExportPdf = exportActions?.onExportPdf;
   const isExportingPdf = Boolean(exportActions?.isExportingPdf);
@@ -31,14 +31,14 @@ const ExportDropdown = () => {
     <MenuButton
       type="dropdown"
       icon="Download"
-      text="Exportar"
+      text={messages.toolbar.export}
       hideText={false}
-      tooltip="Exportar"
+      tooltip={messages.toolbar.export}
       dropdownStyle={{ minWidth: "11rem" }}
     >
       <DropdownMenuItem asChild disabled={!onExportDoc}>
         <MenuButton
-          text="Exportar DOC"
+          text={messages.export.doc}
           icon="FileDoc"
           hideText={false}
           tooltip={false}
@@ -48,7 +48,7 @@ const ExportDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onExportTxt}>
         <MenuButton
-          text="Exportar TXT"
+          text={messages.export.txt}
           icon="FileTxt"
           hideText={false}
           tooltip={false}
@@ -58,7 +58,7 @@ const ExportDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onExportPdf}>
         <MenuButton
-          text={isExportingPdf ? "Gerando PDF..." : "Exportar PDF"}
+          text={isExportingPdf ? messages.export.generatingPdf : messages.export.pdf}
           icon="FilePdf"
           hideText={false}
           tooltip={false}

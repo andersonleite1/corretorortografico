@@ -7,7 +7,7 @@ import MediaLibrary from "@/components/MediaLibrary";
 import useModal from "@/components/TiptapEditor/hooks/useModal";
 
 const ImageButton = () => {
-  const {editor} = useTiptapContext();
+  const {editor, messages} = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -23,7 +23,7 @@ const ImageButton = () => {
 
   return (
     <>
-      <MenuButton icon="Image" tooltip="Imagem" {...state} onClick={handleOpen}/>
+      <MenuButton icon="Image" tooltip={messages.toolbar.image} {...state} onClick={handleOpen}/>
       <Dialog open={open} onOpenChange={handleClose}>
         <MediaLibrary onClose={handleClose} onInsert={(image)=>{
           editor

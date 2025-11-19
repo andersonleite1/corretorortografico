@@ -11,6 +11,8 @@ import { EditorContent, type Editor } from "@tiptap/react";
 import useTiptapEditor, { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 import clsx from "clsx";
 import CodeMirrorEditor from "@/components/SourceEditor/Editor";
+import { type Locale, i18n } from "../../../../i18n-config";
+import { getEditorMessages, type EditorMessages } from "../i18n/messages";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -46,6 +48,8 @@ type TiptapContextType = {
   setIsResizing: (value: boolean) => void;
   exportActions?: ExportActions;
   draftActions?: DraftActions;
+  messages: EditorMessages;
+  locale: Locale;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -59,6 +63,7 @@ type TiptapProviderProps = {
   children?: ReactNode;
   exportActions?: ExportActions;
   draftActions?: DraftActions;
+  locale?: Locale;
 };
 
 export const TiptapProvider = ({
@@ -69,12 +74,15 @@ export const TiptapProvider = ({
   slotAfter,
   exportActions,
   draftActions,
+  locale,
 }: TiptapProviderProps) => {
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+  const messages = getEditorMessages(normalizedLocale);
 
   if (!editor) {
     return null;
@@ -119,6 +127,8 @@ export const TiptapProvider = ({
         toggleSourceMode: () => setIsSourceMode((prev) => !prev),
         exportActions,
         draftActions,
+        messages,
+        locale: normalizedLocale,
       }}
     >
       {editorContent}

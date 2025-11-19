@@ -5,7 +5,14 @@ import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
 
 const StatusBar = () => {
-  const { editor, isFullScreen, isSourceMode, toggleFullScreen, toggleSourceMode } =
+  const {
+    editor,
+    isFullScreen,
+    isSourceMode,
+    toggleFullScreen,
+    toggleSourceMode,
+    messages,
+  } =
     useTiptapContext();
   const counter = useEditorState({
     editor,
@@ -34,13 +41,13 @@ const StatusBar = () => {
 
     switch (languageTool.status) {
       case "checking":
-        return "Revisando…";
+        return messages.statusBar.spellcheck.checking;
       case "ready":
-        return `Sugestões: ${languageTool.count}`;
+        return messages.statusBar.spellcheck.ready(languageTool.count);
       case "rate_limited":
-        return "Limite atingido";
+        return messages.statusBar.spellcheck.rateLimited;
       case "error":
-        return "Indisponível";
+        return messages.statusBar.spellcheck.error;
       default:
         return null;
     }
@@ -51,21 +58,25 @@ const StatusBar = () => {
       <Toolbar dense>
         <MenuButton
           icon="SourceCode"
-          text="Código Fonte"
+          text={messages.statusBar.source}
           active={isSourceMode}
           onClick={toggleSourceMode}
         />
         <MenuButton
           icon={isFullScreen ? "Minimize" : "Maximize"}
-          text="Tela cheia"
+          text={messages.statusBar.fullscreen}
           active={isFullScreen}
           onClick={toggleFullScreen}
         />
       </Toolbar>
 
       <div className="rte-counter">
-        <span className="rte-word-count">Palavras: {counter.words}</span>
-        <span className="rte-charater">Caracteres: {counter.characters}</span>
+        <span className="rte-word-count">
+          {messages.statusBar.words}: {counter.words}
+        </span>
+        <span className="rte-charater">
+          {messages.statusBar.characters}: {counter.characters}
+        </span>
         {spellcheckLabel && (
           <span
             className="rte-spellcheck"

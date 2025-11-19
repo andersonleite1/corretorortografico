@@ -12,7 +12,7 @@ interface CodeDropdownProps {
 }
 
 const CodeDropdown = ({ value, onSelect }: CodeDropdownProps) => {
-  const { contentElement } = useTiptapContext();
+  const { contentElement, messages } = useTiptapContext();
   const [search, setSearch] = useState("");
 
   const options = CODE_BLOCK_LANGUAGUES.map((item) => ({ label: item.label, value: item.syntax }));
@@ -35,7 +35,7 @@ const CodeDropdown = ({ value, onSelect }: CodeDropdownProps) => {
     >
       <Input
         className="code-search"
-        placeholder="Seach language..."
+        placeholder={messages.codeBlock.search}
         style={{ width: "10rem" }}
         value={search}
         onChange={(e) => setSearch(e.target.value.trim())}

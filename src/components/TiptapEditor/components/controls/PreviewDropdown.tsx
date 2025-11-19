@@ -4,7 +4,7 @@ import { DropdownMenuItem } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
 
 const PreviewDropdown = () => {
-  const { exportActions } = useTiptapContext();
+  const { exportActions, messages } = useTiptapContext();
   const onPreviewPdf = exportActions?.onPreviewPdf;
   const onPreviewPost = exportActions?.onPreviewPost;
   const isExportingPdf = Boolean(exportActions?.isExportingPdf);
@@ -27,14 +27,14 @@ const PreviewDropdown = () => {
     <MenuButton
       type="dropdown"
       icon="Eye"
-      text="Visualizar"
+      text={messages.toolbar.preview}
       hideText={false}
-      tooltip="Visualizar"
+      tooltip={messages.toolbar.preview}
       dropdownStyle={{ minWidth: "12rem" }}
     >
       <DropdownMenuItem asChild disabled={!onPreviewPdf}>
         <MenuButton
-          text={isExportingPdf ? "Gerando PDF..." : "Visualizar PDF"}
+          text={isExportingPdf ? messages.preview.generatingPdf : messages.preview.pdf}
           icon="FilePdf"
           hideText={false}
           tooltip={false}
@@ -44,7 +44,7 @@ const PreviewDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onPreviewPost}>
         <MenuButton
-          text="Visualizar Post"
+          text={messages.preview.post}
           icon="Eye"
           hideText={false}
           tooltip={false}

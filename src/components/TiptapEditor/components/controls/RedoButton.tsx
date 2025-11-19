@@ -4,7 +4,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const RedoButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -16,7 +16,7 @@ const RedoButton = () => {
   return (
     <MenuButton
       icon="Redo"
-      tooltip="Refazer"
+      tooltip={messages.toolbar.redo}
       shortcuts={["Mod", "Y"]}
       onClick={() => editor.chain().focus().redo().run()}
       {...state}

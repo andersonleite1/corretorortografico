@@ -7,14 +7,20 @@ import { useTiptapContext } from "../Provider";
 import { FONT_SIZE_OPTIONS } from "../../constants/font-size";
 
 const FontSizeDropdown = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const currentSize = useEditorState({
     editor,
     selector: ({ editor }) => editor.getAttributes("textStyle").fontSize as string | undefined,
   });
 
-  const options = useMemo(() => FONT_SIZE_OPTIONS, []);
+  const options = useMemo(
+    () =>
+      FONT_SIZE_OPTIONS.map((option, index) =>
+        index === 0 ? { ...option, label: messages.fontSize.default } : option
+      ),
+    [messages.fontSize.default]
+  );
   const normalizedCurrent = currentSize ?? "";
 
   const activeOption =
@@ -40,7 +46,7 @@ const FontSizeDropdown = () => {
     <MenuButton
       type="dropdown"
       text={activeOption.label}
-      tooltip="Tamanho da fonte"
+      tooltip={messages.toolbar.fontSize}
       hideText={false}
       buttonStyle={{ minWidth: "6.7rem" }}
       dropdownClass="rte-fontsize-dropdown"

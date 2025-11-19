@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 import MenuButton from "../../MenuButton";
+import { useTiptapContext } from "../../Provider";
 
 interface AltTextEditProps {
   initialText?: string;
@@ -12,6 +13,7 @@ interface AltTextEditProps {
 
 const AltTextEdit = ({ initialText, onApply, onCancel }: AltTextEditProps) => {
   const [text, setText] = useState(initialText || "");
+  const { messages } = useTiptapContext();
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,7 +25,7 @@ const AltTextEdit = ({ initialText, onApply, onCancel }: AltTextEditProps) => {
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Text alternative"
+        placeholder={messages.image.altPlaceholder}
         autoFocus
       />
       <MenuButton buttonType="submit" icon={"Check"} tooltip={false} />

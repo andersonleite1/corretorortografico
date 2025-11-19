@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const OrderedListButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const OrderedListButton = () => {
   return (
     <MenuButton
       icon="OrderedList"
-      tooltip="Lista Numerada"
+      tooltip={messages.toolbar.orderedList}
       shortcuts={["Mod", "Shift", "7"]}
       onClick={() => editor.chain().focus().toggleOrderedList().run()}
       {...state}

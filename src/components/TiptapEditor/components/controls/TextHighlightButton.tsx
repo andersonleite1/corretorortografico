@@ -9,7 +9,7 @@ import ColorPicker from "../color-picker";
 const TextHighlightButton: React.FC = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const mounted = useMount();
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const [highlightColor, setHighlightColor] = useState<string | "DEFAULT">("DEFAULT");
   const state = useEditorState({
     editor,
@@ -41,7 +41,7 @@ const TextHighlightButton: React.FC = () => {
         type="popover"
         icon="TextHighlight"
         hideArrow={true}
-        tooltip="Cor de fundo"
+        tooltip={messages.toolbar.highlightColor}
         disabled={state.disabled}
       >
         <ColorPicker

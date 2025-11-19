@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 import Label from "../../ui/Label";
+import { useTiptapContext } from "../../Provider";
 
 interface LinkEditProps {
   initialUrl?: string;
@@ -16,6 +17,7 @@ const LinkEdit = ({ initialUrl, initialText, isCreate, onApply, onCancel }: Link
   const [url, setUrl] = useState(initialUrl || "");
   const [text, setText] = useState(initialText || "");
   const [canSubmit, setCanSubmit] = useState(isCreate);
+  const { messages } = useTiptapContext();
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -33,31 +35,31 @@ const LinkEdit = ({ initialUrl, initialText, isCreate, onApply, onCancel }: Link
 
   return (
     <form className="rte-link__form" onSubmit={onSubmit}>
-      <Label className="rte-link__label">URL</Label>
+      <Label className="rte-link__label">{messages.link.urlLabel}</Label>
       <Input
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         className="rte-link__input"
-        placeholder="Colar URL do link"
+        placeholder={messages.link.urlPlaceholder}
         type="url"
         required
         autoFocus
       />
 
-      <Label className="rte-link__label">Exibir texto</Label>
+      <Label className="rte-link__label">{messages.link.textLabel}</Label>
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}
         className="rte-link__input"
-        placeholder="Insira o texto do link"
+        placeholder={messages.link.textPlaceholder}
       />
 
       <div className="rte-link__actions">
         <Button variant="secondary" onClick={onCancel}>
-          Cancelar
+          {messages.link.cancel}
         </Button>
         <Button type="submit" disabled={!canSubmit}>
-          Aplicar
+          {messages.link.apply}
         </Button>
       </div>
     </form>

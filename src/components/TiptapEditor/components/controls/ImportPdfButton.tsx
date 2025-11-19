@@ -4,9 +4,11 @@ import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import MenuButton from "../MenuButton";
+import { useTiptapContext } from "../Provider";
 
 const ImportPdfButton = () => {
   const router = useRouter();
+  const { messages } = useTiptapContext();
 
   const handleClick = useCallback(() => {
     router.push("/editar-pdf");
@@ -15,8 +17,8 @@ const ImportPdfButton = () => {
   return (
     <MenuButton
       icon="FilePdf"
-      text="Importar PDF"
-      tooltip="Importar PDF"
+      text={messages.toolbar.importPdf}
+      tooltip={messages.toolbar.importPdf}
       onClick={handleClick}
       hideText
     />

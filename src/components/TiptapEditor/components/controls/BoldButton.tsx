@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const BoldButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const BoldButton = () => {
   return (
     <MenuButton
       icon="Bold"
-      tooltip="Negrito"
+      tooltip={messages.toolbar.bold}
       shortcuts={["Mod", "B"]}
       onClick={() => editor.chain().focus().toggleBold().run()}
       {...state}

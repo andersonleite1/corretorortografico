@@ -6,7 +6,7 @@ import Tooltip from "../ui/Tooltip";
 import Icon from "../ui/Icon";
 
 const LanguageToolToggleButton = () => {
-  const { editor, contentElement } = useTiptapContext();
+  const { editor, contentElement, messages } = useTiptapContext();
 
   // 1. Buscamos o estado *real* do Tiptap (fonte da verdade)
   const tiptapState = useEditorState({
@@ -50,7 +50,9 @@ const LanguageToolToggleButton = () => {
   }, [editor, isActive, tiptapState.disabled]); // Depende do 'isActive' local
 
   // 5. O resto do componente usa o estado local 'isActive' para a UI
-  const tooltipLabel = isActive ? "Desativar verificador gramatical por IA" : "Ativar verificador gramatical por IA";
+  const tooltipLabel = isActive
+    ? messages.languageTool.disableTooltip
+    : messages.languageTool.enableTooltip;
   const iconName = isActive ? "Check" : "Close";
 
   const button = (
@@ -76,7 +78,7 @@ const LanguageToolToggleButton = () => {
       >
         {button}
       </Tooltip>
-      <span className="rte-toggle__label">Corretor ortográfico</span>
+      <span className="rte-toggle__label">{messages.languageTool.label}</span>
     </div>
   );
 };

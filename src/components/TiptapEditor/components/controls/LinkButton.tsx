@@ -4,7 +4,7 @@ import { useTiptapContext } from "../Provider";
 import { useEditorState } from "@tiptap/react";
 
 const LinkButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -16,7 +16,7 @@ const LinkButton = () => {
   return (
     <MenuButton
       icon="Link"
-      tooltip="Inserir Link"
+      tooltip={messages.toolbar.link}
       shortcuts={["Mod", "K"]}
       onClick={() => editor.commands.startEditLink()}
       {...state}

@@ -4,7 +4,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const UndoButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -16,7 +16,7 @@ const UndoButton = () => {
   return (
     <MenuButton
       icon="Undo"
-      tooltip="Desfazer"
+      tooltip={messages.toolbar.undo}
       shortcuts={["Mod", "Z"]}
       onClick={() => editor.chain().focus().undo().run()}
       {...state}

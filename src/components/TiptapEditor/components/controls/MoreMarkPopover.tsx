@@ -12,7 +12,7 @@ import CodeButton from "./CodeButton";
 import { PopoverClose } from "../ui/Popover";
 
 const MoreMarkPopover = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const isDisabled = useEditorState({
     editor,
@@ -24,7 +24,12 @@ const MoreMarkPopover = () => {
   });
 
   return (
-    <MenuButton type="popover" icon="LetterCase" tooltip="Mais formato" disabled={isDisabled}>
+    <MenuButton
+      type="popover"
+      icon="LetterCase"
+      tooltip={messages.toolbar.moreFormats}
+      disabled={isDisabled}
+    >
       <PopoverClose asChild>
         <Toolbar dense={true}>
           <StrikeButton />

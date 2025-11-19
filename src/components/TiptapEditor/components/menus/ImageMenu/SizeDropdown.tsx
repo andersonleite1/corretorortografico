@@ -1,6 +1,7 @@
 import React from "react";
 import MenuButton from "../../MenuButton";
 import { DropdownMenuItem } from "../../ui/DropdownMenu";
+import { useTiptapContext } from "../../Provider";
 
 interface SizeDropdownProps {
   value: number;
@@ -8,6 +9,7 @@ interface SizeDropdownProps {
 }
 
 const SizeDropdown = ({ value, onChange }: SizeDropdownProps) => {
+  const { messages } = useTiptapContext();
   const options = [null, 25, 50, 75, 100];
   return (
     <MenuButton
@@ -15,7 +17,7 @@ const SizeDropdown = ({ value, onChange }: SizeDropdownProps) => {
       buttonStyle={{ width: "6.5rem" }}
       dropdownStyle={{ width: "7rem" }}
       icon="Ruler"
-      text={value ? `${value}%` : "Default"}
+      text={value ? `${value}%` : messages.general.default}
       hideText={false}
       tooltip={false}
     >
@@ -25,7 +27,7 @@ const SizeDropdown = ({ value, onChange }: SizeDropdownProps) => {
           data-active={option == value || undefined}
           onSelect={() => onChange(option)}
         >
-          {option ? `${option}% width` : "Default"}
+          {option ? messages.image.sizeOptionLabel(option) : messages.general.default}
         </DropdownMenuItem>
       ))}
     </MenuButton>

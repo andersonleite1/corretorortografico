@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const CodeBlockButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,7 +18,7 @@ const CodeBlockButton = () => {
   return (
     <MenuButton
       icon="Code"
-      tooltip="Code block"
+      tooltip={messages.toolbar.codeBlock}
       onClick={() => editor.chain().focus().setCodeBlock().run()}
       {...state}
     />

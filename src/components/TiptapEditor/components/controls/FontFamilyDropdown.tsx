@@ -7,14 +7,20 @@ import { useTiptapContext } from "../Provider";
 import { FONT_FAMILY_OPTIONS } from "../../constants/font-family";
 
 const FontFamilyDropdown = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const currentFont = useEditorState({
     editor,
     selector: ({ editor }) => editor.getAttributes("textStyle").fontFamily as string | undefined,
   });
 
-  const options = useMemo(() => FONT_FAMILY_OPTIONS, []);
+  const options = useMemo(
+    () =>
+      FONT_FAMILY_OPTIONS.map((option, index) =>
+        index === 0 ? { ...option, label: messages.fontFamily.default } : option
+      ),
+    [messages.fontFamily.default]
+  );
   const normalizedCurrent = currentFont ?? "";
 
   const activeOption =
@@ -42,7 +48,7 @@ const FontFamilyDropdown = () => {
     <MenuButton
       type="dropdown"
       text={activeOption.label}
-      tooltip="Fonte"
+      tooltip={messages.toolbar.fontFamily}
       hideText={false}
       buttonStyle={{
         minWidth: "6.4rem",

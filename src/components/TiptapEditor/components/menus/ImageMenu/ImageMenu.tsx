@@ -12,7 +12,7 @@ import { Node } from "@tiptap/pm/model";
 import type { VirtualElement } from "@floating-ui/dom";
 
 export const ImageMenu = () => {
-  const { editor, isResizing, contentElement } = useTiptapContext();
+  const { editor, isResizing, contentElement, messages } = useTiptapContext();
   const [isEditText, setIsEditText] = useState(false);
 
   const image = useEditorState({
@@ -138,22 +138,24 @@ export const ImageMenu = () => {
       ) : (
         <Toolbar>
           <MenuButton
-            text="Alt text"
+            text={messages.image.altButton}
             hideText={false}
-            tooltip={"Alternative text"}
+            tooltip={messages.image.altTooltip}
             onClick={toggleEditAltText}
           />
           <MenuButton
             icon="ImageCaption"
-            tooltip={`Caption: ${image?.hasCaption ? "ON" : "OFF"}`}
+            tooltip={`${messages.image.caption}: ${
+              image?.hasCaption ? messages.general.on : messages.general.off
+            }`}
             active={image?.hasCaption}
             onClick={toggleCaption}
           />
           <ToolbarDivider />
           <SizeDropdown value={image?.width} onChange={setSize} />
           <ToolbarDivider />
-          <MenuButton icon="Download" tooltip="Download" onClick={downloadImage} />
-          <MenuButton icon="Trash" tooltip="Delete" onClick={removeImage} />
+          <MenuButton icon="Download" tooltip={messages.general.download} onClick={downloadImage} />
+          <MenuButton icon="Trash" tooltip={messages.general.delete} onClick={removeImage} />
         </Toolbar>
       )}
     </BubbleMenu>

@@ -4,7 +4,7 @@ import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 const SuperscriptButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -19,7 +19,7 @@ const SuperscriptButton = () => {
   return (
     <MenuButton
       icon="Superscript"
-      tooltip="Sobrescrito"
+      tooltip={messages.toolbar.superscript}
       shortcuts={["Mod", "."]}
       onClick={() => editor.chain().focus().toggleSuperscript().run()}
       {...state}

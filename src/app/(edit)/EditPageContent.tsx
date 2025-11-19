@@ -15,7 +15,7 @@ export default function EditPageContent({ content }: Props) {
 
   return (
     <div className="max-w-[56rem] w-full mx-auto py-10 px-3 md:px-6 sm:px-0">
-      <EditForm />
+      <EditForm locale={content.locale} />
       <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0">
         <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
           {article.title}
@@ -56,7 +56,7 @@ export default function EditPageContent({ content }: Props) {
           dangerouslySetInnerHTML={{ __html: article.finalNoteHtml }}
         ></p>
 
-        <AtalhosAccordion />
+        <AtalhosAccordion locale={content.locale} />
       </section>
       <section
         id="faq"
