@@ -2,6 +2,7 @@ import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { cookies } from "next/headers";
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -15,6 +16,8 @@ import "@/styles/globals.scss";
 import Head from "next/head";
 import Script from "next/script";
 import Footer from "@/components/Footer/footer";
+import { getHomeFaqSchema } from "@/data/home";
+import { i18n, Locale } from "../../i18n-config";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -40,8 +43,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as Locale | undefined;
+  const locale = storedLocale && i18n.locales.includes(storedLocale) ? storedLocale : i18n.defaultLocale;
+  const faqSchema = getHomeFaqSchema(locale);
+
   return (
-    <html lang="pt-BR" className={`${fontMono.variable} ${fontSans.variable}`}>
+    <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <Head>
         <script type="application/ld+json">
           {JSON.stringify({
@@ -73,48 +81,7 @@ export default function RootLayout({
           })}
         </script>
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: [
-              {
-                "@type": "Question",
-                name: "O que é um editor de texto?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text:
-                    "Um editor de texto é uma ferramenta essencial voltada para a criação e manipulação de arquivos de texto simples (plain text). Diferente de processadores complexos, o foco aqui é a agilidade e a limpeza do código ou da escrita. Nosso editor de texto online permite que você digite, copie, cole e formate suas ideias instantaneamente, funcionando como um bloco de notas digital aprimorado, sem a necessidade de baixar programas pesados.",
-                },
-              },
-              {
-                "@type": "Question",
-                name: "Qual a diferença entre um editor de texto e o Word?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text:
-                    "O Word é um processador de documentos focado em layouts complexos para impressão. Já um editor de texto puro foca no conteúdo. Ele é mais leve, carrega mais rápido e é ideal para rascunhos, anotações rápidas, limpeza de formatação ou códigos de programação. Se você precisa apenas escrever ou editar texto sem distrações e menus complicados, esta ferramenta online é a melhor escolha.",
-                },
-              },
-              {
-                "@type": "Question",
-                name: "Este editor de texto é gratuito?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text:
-                    "Sim, o editordetexto.online é uma ferramenta 100% gratuita. Nossa missão é oferecer um editor de texto simples e acessível a qualquer momento. Você pode utilizar todos os recursos de contagem de caracteres, formatação básica e download do arquivo sem pagar nada e sem precisar fazer cadastro.",
-                },
-              },
-              {
-                "@type": "Question",
-                name: "Posso usar este editor de texto no celular?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text:
-                    "Com certeza. Nossa plataforma foi otimizada para funcionar perfeitamente como um editor de texto mobile. Seja no Android ou no iPhone (iOS), você consegue digitar suas notas, listas ou textos acadêmicos diretamente pelo navegador do celular, com a mesma eficiência de um aplicativo, mas sem ocupar memória do seu aparelho.",
-                },
-              },
-            ],
-          })}
+          {JSON.stringify(faqSchema)}
         </script>
       </Head>
       <body>
