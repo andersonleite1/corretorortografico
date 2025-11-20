@@ -1,0 +1,122 @@
+"use client";
+
+import {ProductData} from "@/services/productMetadata";
+import clsx from "clsx";
+import Image from "next/image";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {Autoplay, Pagination} from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/autoplay";
+import "swiper/css/pagination";
+
+interface SidebarCarouselProps {
+  products: ProductData[];
+  className?: string;
+  orientation?: "vertical" | "horizontal";
+}
+
+export function SidebarCarousel({
+  products,
+  className,
+  orientation = "horizontal",
+}: SidebarCarouselProps) {
+  if (!products.length) {
+    return null;
+  }
+
+  const autoplayDelay = products.length === 1 ? 999999 : 4500;
+  const currency = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+
+  return (
+    <div className={clsx("w-full", className)}>
+      <Swiper
+        modules={[Autoplay, Pagination]}
+        autoplay={{delay: autoplayDelay, disableOnInteraction: false}}
+        loop={products.length > 1}
+        direction={orientation}
+        slidesPerView={1}
+        spaceBetween={12}
+        pagination={{clickable: true, dynamicBullets: true}}
+        className="h-full pb-8"
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product.affiliateUrl} className="h-auto">
+            <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                {product.image ? (
+                  <Image
+                    src={product.image}
+                    alt={product.title}
+                    width={96}
+                    height={96}
+                    className="h-24 w-24 rounded-lg object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-500">
+                    Sem imagem
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {truncate(product.title, 80)}
+                  </h3>
+                  {renderPriceInfo(product, currency)}
+                </div>
+              </div>
+              <a
+                href={product.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center justify-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                Ver Oferta
+              </a>
+            </article>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
+  );
+}
+
+function truncate(text: string, max: number) {
+  if (text.length <= max) {
+    return text;
+  }
+
+  return `${text.slice(0, max - 1)}…`;
+}
+
+function renderPriceInfo(
+  product: ProductData,
+  formatter: Intl.NumberFormat
+) {
+  if (typeof product.price !== "number") {
+    return null;
+  }
+
+  const installments = product.installments ?? 12;
+  const installmentValue = product.price / installments;
+
+  return (
+    <div className="mt-1">
+      <p className="text-xs font-semibold uppercase text-emerald-500">
+        {installments}X{" "}
+        <span className="text-sm font-bold text-emerald-600">
+          {formatter.format(installmentValue)}
+        </span>
+      </p>
+      <p className="text-sm font-semibold text-slate-600">
+        À vista{" "}
+        <span className="text-base text-slate-900">
+          {formatter.format(product.price)}
+        </span>
+      </p>
+    </div>
+  );
+}
