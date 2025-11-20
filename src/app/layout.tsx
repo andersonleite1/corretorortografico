@@ -43,11 +43,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${fontMono.variable} ${fontSans.variable}`}>
       <Head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014576791981285"
-          crossOrigin="anonymous"
-        ></script>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -145,6 +140,11 @@ export default function RootLayout({
               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
             })(window, document, "clarity", "script", "sc6j3d7url");`,
           }}
+        />
+        <Script id="adsense"
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014576791981285"
+          crossOrigin="anonymous"
         />
         <Header />
         <main>{children}</main>
