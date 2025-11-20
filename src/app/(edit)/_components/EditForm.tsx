@@ -272,13 +272,9 @@ export default function EditForm({ locale }: EditFormProps) {
 
   // Função para carregar um rascunho
   const handleLoadDraft = (draftId: string) => {
-    console.log('fui chamado');
 
     const draft = drafts.find((d) => d.id === draftId);
     if (!draft) return;
-
-    console.log('title: ', draft.title);
-    console.log('content: ', draft.content);
 
     // Atualiza o estado do formulário
     reset({ title: draft.title, content: draft.content });

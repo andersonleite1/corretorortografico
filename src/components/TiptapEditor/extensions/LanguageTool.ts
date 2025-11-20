@@ -420,7 +420,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
           const isEnabled = () => Boolean(pluginKey.getState(editorView.state)?.enabled);
 
           const dispatchStatus = (status: LanguageToolStatus, message: string | null = null) => {
-            console.log("[LT] status", { status, message });
             const tr = editorView.state.tr.setMeta(pluginKey, {
               type: "languageToolStatus",
               status,
@@ -444,7 +443,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             timeoutId = window.setTimeout(() => {
               timeoutId = null;
               if (!destroyed && !editorView.composing && isEnabled()) {
-                console.log("[LT] scheduleCheck run");
                 void runCheck();
               }
             }, checkDelay);
@@ -465,7 +463,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             const map = buildDocumentText(editorView.state);
             const rawText = map.text;
             const trimmed = rawText.trim();
-            console.log("[LT] runCheck", { length: rawText.length });
 
             if (!trimmed || trimmed.length < minChars) {
               lastTextVersion = "";
@@ -495,7 +492,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
                 body: JSON.stringify({ text: rawText, language }),
                 signal: abortController.signal,
               });
-              console.log("[LT] fetch ok", { ok: response.ok, status: response.status });
             } catch (error) {
               if ((error as Error).name === "AbortError") {
                 return;
@@ -516,7 +512,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
             let payload: { matches: LanguageToolMatch[] } | null = null;
             try {
               payload = (await response.json()) as { matches: LanguageToolMatch[] };
-              console.log("[LT] matches", { count: payload?.matches?.length || 0 });
             } catch (error) {
               dispatchStatus("error", "Resposta inválida do LanguageTool.");
               return;
@@ -528,7 +523,6 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
 
             const currentDoc = editorView.state.doc;
             const { decorations, issues } = toDecorationSet(payload.matches ?? [], map, editorView.state);
-            console.log("[LT] decorations", { issuesCount: issues.length });
 
             if (!editorView.state.doc.eq(currentDoc)) {
               return;
