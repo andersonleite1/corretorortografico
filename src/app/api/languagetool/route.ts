@@ -3,6 +3,8 @@ import { LanguageToolResponse } from "@/types/languageTool";
 
 const MAX_TEXT_LENGTH = 20000;
 const apiEndpoint = "https://languagetool.editordetexto.cloud/v2/check";
+const supportedLanguages = new Set(["pt-BR", "en-US", "es"]);
+const defaultLanguage = "pt-BR";
 
 export async function POST(request: NextRequest) {
   const respond = (data: object, init?: ResponseInit) =>
@@ -11,6 +13,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const text = typeof body?.text === "string" ? body.text : "";
+    const requestedLanguage = typeof body?.language === "string" ? body.language : defaultLanguage;
+    const language = supportedLanguages.has(requestedLanguage) ? requestedLanguage : defaultLanguage;
     if (!text.trim()) {
       return respond({ error: "Texto inválido para análise." }, { status: 400 });
     }
@@ -20,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const params = new URLSearchParams();
     params.append("text", trimmedText);
-    params.append("language", "pt-BR");
+    params.append("language", language);
 
     const ltResponse = await fetch(apiEndpoint, {
       method: "POST",
@@ -46,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     return respond({
       matches: data.matches ?? [],
-      language: data.language?.code ?? "pt-BR",
+      language: data.language?.code ?? language,
     });
   } catch (error) {
     return respond(

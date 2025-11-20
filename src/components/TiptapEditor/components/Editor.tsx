@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useCallback, useEffect } from "react";
+import React, { forwardRef, useCallback, useEffect, useMemo } from "react";
 import { Content, type Editor } from "@tiptap/react";
 
 import TiptapProvider, { type ExportActions, type DraftActions } from "./Provider";
@@ -12,7 +12,7 @@ import Resizer from "./Resizer";
 
 import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu } from "./menus";
 
-import ExtensionKit from "../kit";
+import getExtensionKit from "../kit";
 
 import { cssVar } from "../utils/cssVar";
 import { throttle } from "../utils/throttle";
@@ -87,10 +87,12 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       [throttledUpdate, output]
     );
 
+    const extensions = useMemo(() => getExtensionKit(locale), [locale]);
+
     const editorOptions: UseTiptapEditorOptions = {
       ref,
       placeholder,
-      extensions: ExtensionKit,
+      extensions,
       content: initialContent,
       editable: isEditable,
       immediatelyRender: !ssr,

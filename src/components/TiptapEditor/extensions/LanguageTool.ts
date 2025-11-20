@@ -8,7 +8,7 @@ type LanguageToolStatus = "idle" | "checking" | "ready" | "error" | "rate_limite
 
 type LanguageToolOptions = {
   enabled: boolean;
-  language: "pt-BR";
+  language: string;
   endpoint: string;
   checkDelay: number;
   minChars: number;
@@ -411,7 +411,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
           },
         },
         view(editorView) {
-          const { checkDelay, endpoint, minChars } = options;
+          const { checkDelay, endpoint, minChars, language } = options;
           let abortController: AbortController | null = null;
           let lastTextVersion = "";
           let destroyed = false;
@@ -492,7 +492,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ text: rawText }),
+                body: JSON.stringify({ text: rawText, language }),
                 signal: abortController.signal,
               });
               console.log("[LT] fetch ok", { ok: response.ok, status: response.status });

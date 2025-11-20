@@ -21,8 +21,20 @@ import {
   Table,
   LanguageTool,
 } from "./extensions";
+import { Locale, i18n } from "../../../i18n-config";
 
-const ExtensionKit = [
+const languageToolCodeByLocale: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en-US",
+  es: "es",
+};
+
+const resolveLanguageToolCode = (locale?: Locale) => {
+  const normalized = (locale && languageToolCodeByLocale[locale]) ? locale : i18n.defaultLocale;
+  return languageToolCodeByLocale[normalized];
+};
+
+const createExtensionKit = (locale?: Locale) => [
   StarterKit.configure({
     horizontalRule: false,
     hardBreak: false,
@@ -66,7 +78,8 @@ const ExtensionKit = [
     checkDelay: 10000,
     minChars: 15,
     enabled: true,
+    language: resolveLanguageToolCode(locale),
   }),
 ];
 
-export default ExtensionKit;
+export default createExtensionKit;
