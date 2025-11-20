@@ -7,6 +7,8 @@ import Negotiator from "negotiator";
 import { i18n } from "../i18n-config";
 import type { I18nConfig } from "../i18n-config";
 
+const PUBLIC_FILE = /\.[^/]+$/;
+
 function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
   const { locales, defaultLocale } = i18nConfig;
 
@@ -19,12 +21,16 @@ function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
 }
 
 export function middleware(request: NextRequest) {
+  const { pathname, basePath } = request.nextUrl;
+
+  if (PUBLIC_FILE.test(pathname)) {
+    return NextResponse.next();
+  }
+
   let response;
   let nextLocale;
 
   const { locales, defaultLocale } = i18n;
-
-  const { basePath, pathname } = request.nextUrl;
 
   const pathLocale = locales.find(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`

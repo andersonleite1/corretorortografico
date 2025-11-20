@@ -1,3 +1,5 @@
+"use client";
+
 // Componente de menu do LanguageTool
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BubbleMenu } from "../BubbleMenu";
@@ -6,7 +8,7 @@ import { useEditorState } from "@tiptap/react";
 
 const PrimaryColor = "#389E74";
 
-const LanguageToolMenu = () => {
+const LanguageToolMenuComponent = () => {
   const { editor, contentElement, messages } = useTiptapContext();
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
@@ -288,4 +290,6 @@ const LanguageToolMenu = () => {
 };
 
 // Memoização para evitar re-renderizações desnecessárias do menu
-export default memo(LanguageToolMenu);
+export const LanguageToolMenu = memo(LanguageToolMenuComponent);
+
+export default LanguageToolMenu;
