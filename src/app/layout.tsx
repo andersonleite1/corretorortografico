@@ -43,6 +43,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${fontMono.variable} ${fontSans.variable}`}>
       <Head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014576791981285"
+          crossOrigin="anonymous"
+        ></script>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
