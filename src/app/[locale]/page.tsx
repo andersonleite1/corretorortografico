@@ -7,17 +7,6 @@ import { SidebarCarouselServer } from "@/components/SidebarCarousel/SidebarCarou
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
 
-const affiliateLinks = [
-  "https://mercadolivre.com/sec/19fZEDo",
-  "https://mercadolivre.com/sec/2TiwTZr",
-  "https://mercadolivre.com/sec/18Zxwzc",
-  "https://mercadolivre.com/sec/1Zb2hYb",
-  "https://mercadolivre.com/sec/2G3wg7W",
-  "https://mercadolivre.com/sec/1LTwBCE",
-  "https://mercadolivre.com/sec/2v3EgoT",
-  "https://mercadolivre.com/sec/1NnviT7",
-];
-
 export function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
@@ -61,10 +50,7 @@ export default function LocaleHomePage({ params }: Props) {
                 priority
               />
             </div>
-            <SidebarCarouselServer
-              affiliateLinks={affiliateLinks}
-              className="w-full"
-            />
+            <SidebarCarouselServer className="w-full" />
           </div>
         </aside>
       </div>

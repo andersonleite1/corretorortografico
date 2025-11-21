@@ -1,70 +1,93 @@
-import axios from "axios";
-import * as cheerio from "cheerio";
-
 export interface ProductData {
+  id?: string;
   title: string;
   image?: string;
   price?: number;
   affiliateUrl: string;
   installments?: number;
+  installmentValue?: number;
+  installmentLabel?: string;
+  originalPrice?: number;
 }
 
-const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+interface MercadoLivreApiResponse {
+  products?: MercadoLivreApiProduct[];
+}
 
-const PRICE_PATTERNS = [
-  'meta[property="product:price:amount"]',
-  'meta[property="product:price"]',
-  'meta[property="og:price:amount"]',
-  'meta[itemprop="price"]',
-  'meta[name="twitter:data1"]',
-];
+interface MercadoLivreApiProduct {
+  id: string;
+  title: string;
+  url: string;
+  cashPrice?: string;
+  originalPrice?: string;
+  installments?: {
+    text?: string;
+    quantity?: number;
+    value?: string;
+  };
+  image?: string;
+  scrapedAt?: string;
+  category?: string;
+  active?: boolean;
+}
 
-export async function fetchProductMetadata(
-  url: string
-): Promise<ProductData | null> {
+const DEFAULT_API_URL =
+  "http://192.168.1.104:3000/api/mercado-livre/products";
+
+export async function fetchMercadoLivreProducts(): Promise<ProductData[]> {
+  const apiUrl = process.env.MELI_API_URL ?? DEFAULT_API_URL;
+  const apiKey = process.env.MELI_API_KEY;
+
+  if (!apiKey) {
+    console.warn(
+      "[fetchMercadoLivreProducts] MELI_API_KEY not configured. Skipping request."
+    );
+    return [];
+  }
+
   try {
-    const response = await axios.get<string>(url, {
+    const response = await fetch(apiUrl, {
       headers: {
-        "User-Agent": USER_AGENT,
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "x-api-key": apiKey,
       },
-      timeout: 10000,
-      maxRedirects: 5,
+      next: { revalidate: 60 * 30 },
     });
 
-    const html = response.data;
-    const $ = cheerio.load(html);
+    if (!response.ok) {
+      console.error(
+        `[fetchMercadoLivreProducts] Request failed with status ${response.status}`
+      );
+      return [];
+    }
 
-    const title =
-      $('meta[property="og:title"]').attr("content")?.trim() ||
-      $("title").text().trim() ||
-      "Oferta Mercado Livre";
+    const payload = (await response.json()) as MercadoLivreApiResponse;
+    const products = payload.products ?? [];
 
-    const image = $('meta[property="og:image"]').attr("content")?.trim();
-
-    const price =
-      parsePrice(
-        PRICE_PATTERNS.map((selector) => $(selector).attr("content")?.trim())
-          .filter(Boolean)
-          .shift()
-      ) ?? parsePrice(extractPriceFromText(title) || undefined);
-
-    return {
-      title,
-      image,
-      price,
-      affiliateUrl: url,
-      installments: 12,
-    };
+    return products
+      .filter(
+        (product) =>
+          Boolean(product.active) &&
+          Boolean(product.title) &&
+          Boolean(product.url)
+      )
+      .map<ProductData>((product) => ({
+        id: product.id,
+        title: product.title,
+        image: product.image,
+        price: parseCurrency(product.cashPrice),
+        affiliateUrl: product.url,
+        installments: product.installments?.quantity,
+        installmentValue: parseCurrency(product.installments?.value),
+        installmentLabel: product.installments?.text,
+        originalPrice: parseCurrency(product.originalPrice),
+      }));
   } catch (error) {
-    console.error(`[fetchProductMetadata] Failed for ${url}:`, error);
-    return null;
+    console.error("[fetchMercadoLivreProducts] Failed to fetch products:", error);
+    return [];
   }
 }
 
-function parsePrice(raw?: string | null): number | undefined {
+function parseCurrency(raw?: string | null): number | undefined {
   if (!raw) {
     return undefined;
   }
@@ -76,9 +99,4 @@ function parsePrice(raw?: string | null): number | undefined {
 
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function extractPriceFromText(text: string): string | null {
-  const match = text.match(/\d+(?:[\.,]\d{2})?/);
-  return match ? match[0] : null;
 }

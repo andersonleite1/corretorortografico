@@ -92,25 +92,38 @@ function truncate(text: string, max: number) {
   return `${text.slice(0, max - 1)}…`;
 }
 
-function renderPriceInfo(
-  product: ProductData,
-  formatter: Intl.NumberFormat
-) {
+function renderPriceInfo(product: ProductData, formatter: Intl.NumberFormat) {
   if (typeof product.price !== "number") {
     return null;
   }
 
-  const installments = product.installments ?? 12;
-  const installmentValue = product.price / installments;
+  const installments = product.installments;
+  const installmentValue =
+    typeof product.installmentValue === "number"
+      ? product.installmentValue
+      : installments
+        ? product.price / installments
+        : undefined;
+  const installmentLabel =
+    product.installmentLabel ??
+    (installments ? `${installments}X` : undefined);
 
   return (
     <div className="mt-1">
-      <p className="text-xs font-semibold uppercase text-emerald-500">
-        {installments}X{" "}
-        <span className="text-sm font-bold text-emerald-600">
-          {formatter.format(installmentValue)}
-        </span>
-      </p>
+      {installmentLabel && installmentValue ? (
+        <p className="text-xs font-semibold uppercase text-emerald-500">
+          {installmentLabel}{" "}
+          <span className="text-sm font-bold text-emerald-600">
+            {formatter.format(installmentValue)}
+          </span>
+        </p>
+      ) : null}
+      {typeof product.originalPrice === "number" &&
+      product.originalPrice > product.price ? (
+        <p className="text-xs text-slate-400 line-through">
+          {formatter.format(product.originalPrice)}
+        </p>
+      ) : null}
       <p className="text-sm font-semibold text-slate-600">
         À vista{" "}
         <span className="text-base text-slate-900">
