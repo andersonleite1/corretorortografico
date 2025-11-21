@@ -32,7 +32,7 @@ interface MercadoLivreApiProduct {
 }
 
 const DEFAULT_API_URL =
-  "http://192.168.1.104:3000/api/mercado-livre/products";
+  "https://api.editordetexto.cloud/api/mercado-livre/products";
 
 export async function fetchMercadoLivreProducts(): Promise<ProductData[]> {
   const apiUrl = process.env.MELI_API_URL ?? DEFAULT_API_URL;

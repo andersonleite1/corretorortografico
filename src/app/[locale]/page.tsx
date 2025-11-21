@@ -40,7 +40,7 @@ export default function LocaleHomePage({ params }: Props) {
         </div>
         <aside className="hidden w-full max-w-xs flex-shrink-0 xl:block">
           <div className="sticky top-6 flex flex-col gap-4">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm">
               <Image
                 src="/banner-meli.jpg"
                 alt="Promoções Mercado Livre"

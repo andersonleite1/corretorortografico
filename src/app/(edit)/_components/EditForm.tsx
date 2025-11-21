@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
@@ -338,9 +338,6 @@ export default function EditForm({ locale }: EditFormProps) {
   return (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 min-h-screen pb-12">
       <div>
-        <label className="inline-block font-medium dark:text-white mb-2">
-          {formMessages.labels.title}
-        </label>
         <Controller
           control={control}
           name="title"
@@ -348,7 +345,7 @@ export default function EditForm({ locale }: EditFormProps) {
             <input
               {...field}
               type="text"
-              className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-md bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
+              className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-full bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
               placeholder={formMessages.placeholders.title}
             />
           )}
@@ -356,43 +353,45 @@ export default function EditForm({ locale }: EditFormProps) {
       </div>
 
       <div>
-        <label className="inline-block font-medium dark:text-white mb-2">
-          {formMessages.labels.content}
-        </label>
         <Controller
           control={control}
           name="content"
           render={({ field }) => (
-            <TiptapEditor
-              ref={editorRef}
-              ssr={true}
-              output="html"
-              locale={locale}
-              placeholder={{
-                paragraph: formMessages.placeholders.content,
-                imageCaption: formMessages.placeholders.imageCaption,
-              }}
-              contentMinHeight={320}
-              contentMaxHeight={440}
-              onContentChange={field.onChange}
-              initialContent={field.value}
-              exportActions={{
-                onExportDoc: handleSaveDOC,
-                onExportPdf: handleExportToPDF,
-                onExportTxt: handleExportToTxt,
-                onPreviewPdf: handlePreviewPdf,
-                onPreviewPost: handlePreviewPost,
-                onClear: handleClear,
-                isExportingPdf: isExportingPDF,
-              }}
-              draftActions={{
-                drafts: drafts.map(({ id, title, date }) => ({ id, title, date })),
-                onSaveDraft: handleSaveDraft,
-                onLoadDraft: handleLoadDraft,
-                onDeleteDraft: handleDeleteDraft,
-              }}
-              aria-label={formMessages.aria.content}
-            />
+            <div
+              className="w-full rounded-[2rem]"
+              style={{ "--rte-radius": "2rem" } as CSSProperties}
+            >
+              <TiptapEditor
+                ref={editorRef}
+                ssr={true}
+                output="html"
+                locale={locale}
+                placeholder={{
+                  paragraph: formMessages.placeholders.content,
+                  imageCaption: formMessages.placeholders.imageCaption,
+                }}
+                contentMinHeight={320}
+                contentMaxHeight={440}
+                onContentChange={field.onChange}
+                initialContent={field.value}
+                exportActions={{
+                  onExportDoc: handleSaveDOC,
+                  onExportPdf: handleExportToPDF,
+                  onExportTxt: handleExportToTxt,
+                  onPreviewPdf: handlePreviewPdf,
+                  onPreviewPost: handlePreviewPost,
+                  onClear: handleClear,
+                  isExportingPdf: isExportingPDF,
+                }}
+                draftActions={{
+                  drafts: drafts.map(({ id, title, date }) => ({ id, title, date })),
+                  onSaveDraft: handleSaveDraft,
+                  onLoadDraft: handleLoadDraft,
+                  onDeleteDraft: handleDeleteDraft,
+                }}
+                aria-label={formMessages.aria.content}
+              />
+            </div>
           )}
         />
       </div>
