@@ -14,18 +14,21 @@ interface SidebarCarouselProps {
   products: ProductData[];
   className?: string;
   orientation?: "vertical" | "horizontal";
+  autoplayDelayOffset?: number;
 }
 
 export function SidebarCarousel({
   products,
   className,
   orientation = "horizontal",
+  autoplayDelayOffset = 0,
 }: SidebarCarouselProps) {
   if (!products.length) {
     return null;
   }
 
-  const autoplayDelay = products.length === 1 ? 999999 : 4500;
+  const baseAutoplayDelay = products.length === 1 ? 999999 : 6000;
+  const autoplayDelay = baseAutoplayDelay + autoplayDelayOffset;
   const currency = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",

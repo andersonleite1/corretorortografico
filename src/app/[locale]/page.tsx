@@ -53,10 +53,12 @@ export default function LocaleHomePage({ params }: Props) {
             <SidebarCarouselServer
               className="w-full"
               category="SMARTPHONE"
+              autoplayDelayOffset={1000}
             />
             <SidebarCarouselServer
               className="w-full"
               category="OTHERS"
+              autoplayDelayOffset={2000}
             />
           </div>
         </aside>

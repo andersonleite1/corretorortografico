@@ -5,12 +5,14 @@ interface SidebarCarouselServerProps {
   orientation?: "vertical" | "horizontal";
   className?: string;
   category?: string;
+  autoplayDelayOffset?: number;
 }
 
 export async function SidebarCarouselServer({
   orientation,
   className,
   category,
+  autoplayDelayOffset,
 }: SidebarCarouselServerProps) {
   const products = await fetchMercadoLivreProducts();
   const filteredProducts = category
@@ -26,6 +28,7 @@ export async function SidebarCarouselServer({
       products={filteredProducts}
       orientation={orientation}
       className={className}
+      autoplayDelayOffset={autoplayDelayOffset}
     />
   );
 }
