@@ -56,7 +56,7 @@ export function SidebarCarousel({
                     alt={product.title}
                     width={96}
                     height={96}
-                    className="h-24 w-24 rounded-[1.5rem] object-cover border border-slate-100"
+                    className="h-24 w-24 rounded-[1.5rem] border border-slate-100 bg-white object-contain p-1"
                     unoptimized
                   />
                 ) : (
