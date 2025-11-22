@@ -39,13 +39,13 @@ export default function LocaleHomePage({ params }: Props) {
           <EditPageContent content={content} />
         </div>
         <aside className="hidden w-full max-w-xs flex-shrink-0 xl:block">
-          <div className="sticky top-6 flex flex-col gap-4">
+          <div className="sticky top-6 flex flex-col gap-4 mt-10">
             <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm">
               <Image
-                src="/banner-meli.jpg"
+                src="/mercado_livre_azul_editado.png"
                 alt="Promoções Mercado Livre"
-                width={320}
-                height={180}
+                width={300}
+                height={120}
                 className="h-auto w-full object-cover"
                 priority
               />
