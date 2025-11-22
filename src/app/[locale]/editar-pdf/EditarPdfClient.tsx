@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { PdfEditorContent } from "@/data/pages/pdfEditor";
 import { convertPdfToHtml } from "@/services/pdfToHtmlService";
 import { savePost } from "@/services/post";
+import { BackHomeButton } from "@/components/shared/BackHomeButton";
 
 const MAX_FILE_SIZE_MB = 15;
 const PRIMARY_COLOR = "#3E9971";
@@ -183,6 +184,7 @@ export default function EditarPdfClient({ content, homeHref }: EditarPdfClientPr
       <section className="px-4 py-16 sm:py-20">
         <div className="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[1.05fr,0.95fr]">
           <div className="flex flex-col justify-center space-y-8">
+            <BackHomeButton locale={content.locale} className="self-start" />
             <div className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.4em]" style={{ color: PRIMARY_COLOR }}>
                 {content.hero.eyebrow}

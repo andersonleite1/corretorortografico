@@ -1,6 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
+import {BackHomeButton} from "@/components/shared/BackHomeButton";
 import {buildAboutMetadata, getAboutContent} from "@/data/pages/about";
 import {i18n, Locale} from "../../../../i18n-config";
 
@@ -31,6 +32,7 @@ export default function AboutPage({params}: PageParams) {
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-12 text-slate-900 dark:text-slate-100">
+      <BackHomeButton locale={locale} className="self-start" />
       <header className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-500">
           {content.hero.eyebrow}
