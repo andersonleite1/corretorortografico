@@ -15,6 +15,8 @@ export type ContactPageContent = {
     title: string;
     description: string;
   };
+  heroTitle: string;
+  heroSubtitle: string;
   title: string;
   description: string;
   form: ContactFormContent;
@@ -29,6 +31,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
       title: "Fale conosco | Editor de Texto Online",
       description: "Fale conosco e converse com a equipe do Editor de Texto Online",
     },
+    heroTitle: "Fale diretamente com nossa equipe",
+    heroSubtitle: "Fale diretamente",
     title: "Fale conosco",
     description:
       "Tem alguma dúvida, sugestão ou precisa de suporte? Fale conosco preenchendo o formulário abaixo e responderemos o mais rápido possível.",
@@ -47,6 +51,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
       title: "Talk to us | Online Text Editor",
       description: "Talk to us and reach the Online Text Editor team",
     },
+    heroTitle: "Talk directly with our team",
+    heroSubtitle: "Talk directly",
     title: "Talk to us",
     description:
       "Have a question, feedback, or need support? Talk to us using the form below and we'll get back to you as soon as possible.",
@@ -65,6 +71,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
       title: "Hable con nosotros | Editor de Texto en Línea",
       description: "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
     },
+    heroTitle: "Hable directamente con nuestro equipo",
+    heroSubtitle: "Hable directamente",
     title: "Hable con nosotros",
     description:
       "¿Tienes dudas, sugerencias o necesitas soporte? Hable con nosotros completando el formulario y responderemos lo antes posible.",
