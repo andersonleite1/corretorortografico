@@ -73,7 +73,7 @@ export default async function LocaleHomePage({ params }: Props) {
             <SidebarCarouselServer
               className="w-full"
               category="OTHERS"
-              autoplayDelayOffset={2000}
+              autoplayDelayOffset={2300}
               products={othersProducts}
             />
           </div>

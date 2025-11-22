@@ -33,7 +33,7 @@ export default function EditPageContent({
           />
         </div>
       ) : null}
-      <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0">
+      <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0 pb-4">
         <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
           {article.title}
         </h1>
@@ -87,7 +87,7 @@ export default function EditPageContent({
       </section>
       <section
         id="faq"
-        className="order-2 min-w-full mt-12 text-gray-900 dark:text-gray-100"
+        className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 mt-0 py-6"
         aria-labelledby="faq-heading"
         itemScope
         itemType="https://schema.org/FAQPage"
