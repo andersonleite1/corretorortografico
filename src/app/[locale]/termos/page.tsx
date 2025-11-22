@@ -30,37 +30,54 @@ export default function TermsPage({ params }: PageParams) {
   const content = getTermsContent(locale);
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-12 text-gray-800 dark:text-gray-200">
-      <h1 className="text-3xl font-bold mb-6">{content.title}</h1>
+    <main className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-12 text-slate-900 dark:text-slate-100">
+      <header className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-500">
+          {content.title}
+        </p>
+        <h1 className="mt-3 text-4xl font-bold text-slate-900 dark:text-white">
+          {content.title}
+        </h1>
+        <p
+          className="mt-4 text-base text-slate-600 dark:text-slate-300"
+          dangerouslySetInnerHTML={{
+            __html: content.introHtml,
+          }}
+        />
+      </header>
 
-      <p
-        className="mb-4"
-        dangerouslySetInnerHTML={{
-          __html: content.introHtml,
-        }}
-      />
+      <section className="space-y-6">
+        {content.sections.map((section) => (
+          <article
+            key={section.title}
+            className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/60"
+          >
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
+              {section.title}
+            </h2>
+            <div className="mt-4 space-y-4 text-base text-slate-600 dark:text-slate-300">
+              {section.paragraphs.map((paragraph, index) => (
+                <p key={`${section.title}-paragraph-${index}`}>{paragraph}</p>
+              ))}
+            </div>
+          </article>
+        ))}
+      </section>
 
-      {content.sections.map((section) => (
-        <section key={section.title} className="mt-8">
-          <h2 className="text-xl font-semibold mb-3">{section.title}</h2>
-          {section.paragraphs.map((paragraph, index) => (
-            <p key={`${section.title}-paragraph-${index}`} className="mb-4">
-              {paragraph}
-            </p>
-          ))}
-        </section>
-      ))}
+      <section className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-6 text-emerald-900 shadow-sm dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-50">
+        <p
+          className="text-base"
+          dangerouslySetInnerHTML={{
+            __html: content.contactHtml,
+          }}
+        />
+      </section>
 
-      <p
-        className="mb-4"
-        dangerouslySetInnerHTML={{
-          __html: content.contactHtml,
-        }}
-      />
-
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-8">
-        {content.lastUpdatedLabel}: {content.lastUpdatedValue}
-      </p>
+      <footer className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+        <p>
+          {content.lastUpdatedLabel}: <strong>{content.lastUpdatedValue}</strong>
+        </p>
+      </footer>
     </main>
   );
 }
