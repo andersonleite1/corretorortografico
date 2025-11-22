@@ -8,6 +8,8 @@ export interface ProductData {
   installmentValue?: number;
   installmentLabel?: string;
   originalPrice?: number;
+  category?: string;
+  active?: boolean;
 }
 
 interface MercadoLivreApiResponse {
@@ -66,7 +68,7 @@ export async function fetchMercadoLivreProducts(): Promise<ProductData[]> {
     return products
       .filter(
         (product) =>
-          Boolean(product.active) &&
+          product.active === true &&
           Boolean(product.title) &&
           Boolean(product.url)
       )
@@ -80,6 +82,8 @@ export async function fetchMercadoLivreProducts(): Promise<ProductData[]> {
         installmentValue: parseCurrency(product.installments?.value),
         installmentLabel: product.installments?.text,
         originalPrice: parseCurrency(product.originalPrice),
+        category: product.category,
+        active: product.active,
       }));
   } catch (error) {
     console.error("[fetchMercadoLivreProducts] Failed to fetch products:", error);

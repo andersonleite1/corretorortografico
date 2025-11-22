@@ -50,7 +50,14 @@ export default function LocaleHomePage({ params }: Props) {
                 priority
               />
             </div>
-            <SidebarCarouselServer className="w-full" />
+            <SidebarCarouselServer
+              className="w-full"
+              category="SMARTPHONE"
+            />
+            <SidebarCarouselServer
+              className="w-full"
+              category="OTHERS"
+            />
           </div>
         </aside>
       </div>
