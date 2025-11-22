@@ -26,12 +26,12 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
   pt: {
     locale: "pt",
     metadata: {
-      title: "Contato | Editor de Texto Online",
-      description: "Entre em contato com a equipe do Editor de Texto Online",
+      title: "Fale conosco | Editor de Texto Online",
+      description: "Fale conosco e converse com a equipe do Editor de Texto Online",
     },
-    title: "Contato",
+    title: "Fale conosco",
     description:
-      "Tem alguma dúvida, sugestão ou precisa de suporte? Preencha o formulário abaixo e responderemos o mais rápido possível.",
+      "Tem alguma dúvida, sugestão ou precisa de suporte? Fale conosco preenchendo o formulário abaixo e responderemos o mais rápido possível.",
     form: {
       nameLabel: "Nome",
       emailLabel: "E-mail",
@@ -44,12 +44,12 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
   en: {
     locale: "en",
     metadata: {
-      title: "Contact | Online Text Editor",
-      description: "Get in touch with the Online Text Editor team",
+      title: "Talk to us | Online Text Editor",
+      description: "Talk to us and reach the Online Text Editor team",
     },
-    title: "Contact",
+    title: "Talk to us",
     description:
-      "Have a question, feedback, or need support? Fill out the form below and we'll get back to you as soon as possible.",
+      "Have a question, feedback, or need support? Talk to us using the form below and we'll get back to you as soon as possible.",
     form: {
       nameLabel: "Name",
       emailLabel: "Email",
@@ -62,12 +62,12 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
   es: {
     locale: "es",
     metadata: {
-      title: "Contacto | Editor de Texto en Línea",
-      description: "Comunícate con el equipo de Editor de Texto en Línea",
+      title: "Hable con nosotros | Editor de Texto en Línea",
+      description: "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
     },
-    title: "Contacto",
+    title: "Hable con nosotros",
     description:
-      "¿Tienes dudas, sugerencias o necesitas soporte? Completa el formulario y responderemos lo antes posible.",
+      "¿Tienes dudas, sugerencias o necesitas soporte? Hable con nosotros completando el formulario y responderemos lo antes posible.",
     form: {
       nameLabel: "Nombre",
       emailLabel: "Correo electrónico",

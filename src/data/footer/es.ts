@@ -7,7 +7,7 @@ const es: FooterContent = {
     { path: "/sobre", label: "Acerca de" },
     { path: "/privacidade", label: "Política de Privacidad" },
     { path: "/termos", label: "Términos de Uso" },
-    { path: "/contato", label: "Contacto" },
+    { path: "/contato", label: "Hable con nosotros" },
   ],
   rightsText: "Todos los derechos reservados.",
 };

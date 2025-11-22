@@ -44,7 +44,7 @@ export default function ContactPage({ params }: PageParams) {
             id="nome"
             name="nome"
             required
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -57,7 +57,7 @@ export default function ContactPage({ params }: PageParams) {
             id="email"
             name="email"
             required
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -70,13 +70,13 @@ export default function ContactPage({ params }: PageParams) {
             name="mensagem"
             rows={6}
             required
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
         >
           {content.form.submitLabel}
         </button>
@@ -85,7 +85,7 @@ export default function ContactPage({ params }: PageParams) {
       <div className="mt-12 text-gray-500 dark:text-gray-400 text-sm">
         <p>
           {content.altContactPrefix}{" "}
-          <a href="mailto:contato@editordetexto.online" className="text-green-400 hover:underline">
+          <a href="mailto:contato@editordetexto.online" className="text-emerald-400 hover:underline">
             {content.altContactEmailLabel}
           </a>
         </p>
