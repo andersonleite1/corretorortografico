@@ -68,8 +68,11 @@ const StatusBar = () => {
           active={isFullScreen}
           onClick={toggleFullScreen}
         />
-        <span className="rte-word-count" onClick={toggleFullScreen}>
-          {messages.statusBar.toggleHint(isFullScreen)}
+        <span
+          className="rte-word-count hidden sm:inline"
+          onClick={toggleFullScreen}
+        >
+          {messages.statusBar.toggleHint}
         </span>
       </Toolbar>
 

@@ -6,6 +6,7 @@ import EditPageContent from "../(edit)/EditPageContent";
 import { SidebarCarouselServer } from "@/components/SidebarCarousel/SidebarCarouselServer";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
+import { fetchMercadoLivreProducts } from "@/services/productMetadata";
 
 export function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -23,7 +24,7 @@ export function generateMetadata({ params }: Props): Metadata {
   return buildHomeMetadata(params.locale);
 }
 
-export default function LocaleHomePage({ params }: Props) {
+export default async function LocaleHomePage({ params }: Props) {
   const { locale } = params;
 
   if (!i18n.locales.includes(locale)) {
@@ -31,12 +32,25 @@ export default function LocaleHomePage({ params }: Props) {
   }
 
   const content = getHomeContent(locale);
+  const products = await fetchMercadoLivreProducts();
+  const smartphoneProducts = products.filter(
+    (product) => product.category?.toUpperCase() === "SMARTPHONE"
+  );
+  const othersProducts = products.filter(
+    (product) => product.category?.toUpperCase() === "OTHERS"
+  );
 
   return (
     <div className="px-3 py-6 sm:px-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 xl:flex-row">
         <div className="flex w-full justify-center">
-          <EditPageContent content={content} />
+          <div className="flex w-full flex-col items-center gap-6">
+            <EditPageContent
+              content={content}
+              mobileProducts={smartphoneProducts}
+              mobileOthersProducts={othersProducts}
+            />
+          </div>
         </div>
         <aside className="hidden w-full max-w-xs flex-shrink-0 xl:block">
           <div className="sticky top-6 flex flex-col gap-4 mt-10">
@@ -54,11 +68,13 @@ export default function LocaleHomePage({ params }: Props) {
               className="w-full"
               category="SMARTPHONE"
               autoplayDelayOffset={1000}
+              products={smartphoneProducts}
             />
             <SidebarCarouselServer
               className="w-full"
               category="OTHERS"
               autoplayDelayOffset={2000}
+              products={othersProducts}
             />
           </div>
         </aside>

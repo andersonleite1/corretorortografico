@@ -105,7 +105,7 @@ export type EditorMessages = {
     fullscreen: string;
     words: string;
     characters: string;
-    toggleHint: (isFullScreen: boolean) => string;
+    toggleHint: string;
     spellcheck: {
       checking: string;
       ready: (count: number) => string;
@@ -259,10 +259,7 @@ export const editorMessages = withDefault({
       fullscreen: "Tela cheia",
       words: "Palavras",
       characters: "Caracteres",
-      toggleHint: (isFullScreen: boolean) =>
-        `Clique aqui para ${
-          isFullScreen ? "sair da tela cheia" : "ocultar anúncios"
-        }`,
+      toggleHint: "Clique aqui para ocultar anúncios",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugestões: ${count}`,
@@ -412,8 +409,7 @@ export const editorMessages = withDefault({
       fullscreen: "Full screen",
       words: "Words",
       characters: "Characters",
-      toggleHint: (isFullScreen: boolean) =>
-        `Click to ${isFullScreen ? "exit full screen" : "hide ads"}`,
+      toggleHint: "Click here to hide ads",
       spellcheck: {
         checking: "Checking…",
         ready: (count: number) => `Suggestions: ${count}`,
@@ -563,12 +559,7 @@ export const editorMessages = withDefault({
       fullscreen: "Pantalla completa",
       words: "Palabras",
       characters: "Caracteres",
-      toggleHint: (isFullScreen: boolean) =>
-        `Haz clic para ${
-          isFullScreen
-            ? "salir de la pantalla completa"
-            : "ocultar los anuncios"
-        }`,
+      toggleHint: "Haz clic para ocultar los anuncios",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugerencias: ${count}`,

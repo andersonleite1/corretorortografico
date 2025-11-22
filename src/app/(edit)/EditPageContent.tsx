@@ -3,19 +3,36 @@
 import EditForm from "./_components/EditForm";
 import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 import { HomeContent } from "@/data/home";
+import { SidebarCarousel } from "@/components/SidebarCarousel/SidebarCarousel";
+import { ProductData } from "@/services/productMetadata";
 
 import "./style.scss";
 
 type Props = {
   content: HomeContent;
+  mobileProducts?: ProductData[];
+  mobileOthersProducts?: ProductData[];
 };
 
-export default function EditPageContent({ content }: Props) {
+export default function EditPageContent({
+  content,
+  mobileProducts,
+  mobileOthersProducts,
+}: Props) {
   const { article, faq } = content;
 
   return (
     <div className="max-w-[56rem] w-full mx-auto py-10 px-3 md:px-6 sm:px-0">
       <EditForm locale={content.locale} />
+      {mobileProducts?.length ? (
+        <div className="mt-4 w-full xl:hidden mb-6">
+          <SidebarCarousel
+            products={mobileProducts}
+            className="px-1 sm:px-0"
+            variant="mobile"
+          />
+        </div>
+      ) : null}
       <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0">
         <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
           {article.title}
@@ -55,6 +72,16 @@ export default function EditPageContent({ content }: Props) {
           className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: article.finalNoteHtml }}
         ></p>
+
+        {mobileOthersProducts?.length ? (
+          <div className="mt-4 w-full xl:hidden mb-6">
+            <SidebarCarousel
+              products={mobileOthersProducts}
+              className="px-1 sm:px-0"
+              variant="mobile"
+            />
+          </div>
+        ) : null}
 
         <AtalhosAccordion locale={content.locale} />
       </section>

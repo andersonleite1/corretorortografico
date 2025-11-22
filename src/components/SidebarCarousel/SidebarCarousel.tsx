@@ -15,6 +15,7 @@ interface SidebarCarouselProps {
   className?: string;
   orientation?: "vertical" | "horizontal";
   autoplayDelayOffset?: number;
+  variant?: "default" | "mobile";
 }
 
 export function SidebarCarousel({
@@ -22,6 +23,7 @@ export function SidebarCarousel({
   className,
   orientation = "horizontal",
   autoplayDelayOffset = 0,
+  variant = "default",
 }: SidebarCarouselProps) {
   if (!products.length) {
     return null;
@@ -29,13 +31,26 @@ export function SidebarCarousel({
 
   const baseAutoplayDelay = products.length === 1 ? 999999 : 6000;
   const autoplayDelay = baseAutoplayDelay + autoplayDelayOffset;
+  const isMobileVariant = variant === "mobile";
   const currency = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
+  const cardClasses = isMobileVariant
+    ? "flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-md"
+    : "flex h-full flex-col rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm";
+  const wrapperClasses = clsx(
+    "w-full",
+    isMobileVariant && "max-w-3xl",
+    className
+  );
+  const swiperClasses = clsx("h-full", isMobileVariant ? "pb-6" : "pb-8");
+  const buttonClasses = isMobileVariant
+    ? "mt-4 inline-flex items-center justify-center rounded-full bg-blue-600/90 px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-blue-700"
+    : "mt-4 inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700";
 
   return (
-    <div className={clsx("w-full", className)}>
+    <div className={wrapperClasses}>
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{delay: autoplayDelay, disableOnInteraction: false}}
@@ -44,11 +59,11 @@ export function SidebarCarousel({
         slidesPerView={1}
         spaceBetween={12}
         pagination={{clickable: true, dynamicBullets: true}}
-        className="h-full pb-8"
+        className={swiperClasses}
       >
         {products.map((product) => (
           <SwiperSlide key={product.affiliateUrl} className="h-auto">
-            <article className="flex h-full flex-col rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+            <article className={cardClasses}>
               <div className="flex items-center gap-3">
                 {product.image ? (
                   <Image
@@ -75,7 +90,7 @@ export function SidebarCarousel({
                 href={product.affiliateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className={buttonClasses}
               >
                 Ver Oferta
               </a>

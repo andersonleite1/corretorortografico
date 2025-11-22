@@ -1,4 +1,7 @@
-import {fetchMercadoLivreProducts} from "@/services/productMetadata";
+import {
+  fetchMercadoLivreProducts,
+  type ProductData,
+} from "@/services/productMetadata";
 import {SidebarCarousel} from "./SidebarCarousel";
 
 interface SidebarCarouselServerProps {
@@ -6,6 +9,8 @@ interface SidebarCarouselServerProps {
   className?: string;
   category?: string;
   autoplayDelayOffset?: number;
+  variant?: "default" | "mobile";
+  products?: ProductData[];
 }
 
 export async function SidebarCarouselServer({
@@ -13,11 +18,17 @@ export async function SidebarCarouselServer({
   className,
   category,
   autoplayDelayOffset,
+  variant,
+  products,
 }: SidebarCarouselServerProps) {
-  const products = await fetchMercadoLivreProducts();
-  const filteredProducts = category
-    ? products.filter((product) => product.category === category)
-    : products;
+  const data = products ?? (await fetchMercadoLivreProducts());
+  const normalizedCategory = category?.toUpperCase();
+  const filteredProducts = normalizedCategory
+    ? data.filter(
+        (product) =>
+          product.category?.toUpperCase() === normalizedCategory
+      )
+    : data;
 
   if (!filteredProducts.length) {
     return null;
@@ -29,6 +40,7 @@ export async function SidebarCarouselServer({
       orientation={orientation}
       className={className}
       autoplayDelayOffset={autoplayDelayOffset}
+      variant={variant}
     />
   );
 }
