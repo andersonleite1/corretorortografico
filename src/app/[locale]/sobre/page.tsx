@@ -5,29 +5,29 @@ import {BackHomeButton} from "@/components/shared/BackHomeButton";
 import {buildAboutMetadata, getAboutContent} from "@/data/pages/about";
 import {i18n, Locale} from "../../../../i18n-config";
 
+const ABOUT_SUPPORTED_LOCALES: Locale[] = ["pt", "es"];
+
 type PageParams = {
   params: {locale: Locale};
 };
 
 export function generateStaticParams() {
-  return i18n.locales.map((locale) => ({locale}));
+  return ABOUT_SUPPORTED_LOCALES.map((locale) => ({locale}));
 }
 
 export function generateMetadata({params}: PageParams): Metadata {
-  if (!i18n.locales.includes(params.locale)) {
-    return buildAboutMetadata(i18n.defaultLocale);
-  }
+  const locale = ABOUT_SUPPORTED_LOCALES.includes(params.locale)
+    ? params.locale
+    : i18n.defaultLocale;
 
-  return buildAboutMetadata(params.locale);
+  return buildAboutMetadata(locale);
 }
 
-export default function AboutPage({params}: PageParams) {
-  const {locale} = params;
+type AboutPageContentProps = {
+  locale: Locale;
+};
 
-  if (!i18n.locales.includes(locale)) {
-    notFound();
-  }
-
+export function AboutPageContent({locale}: AboutPageContentProps) {
   const content = getAboutContent(locale);
 
   return (
@@ -74,4 +74,14 @@ export default function AboutPage({params}: PageParams) {
       </section>
     </main>
   );
+}
+
+export default function AboutPage({params}: PageParams) {
+  const {locale} = params;
+
+  if (!ABOUT_SUPPORTED_LOCALES.includes(locale)) {
+    notFound();
+  }
+
+  return <AboutPageContent locale={locale} />;
 }

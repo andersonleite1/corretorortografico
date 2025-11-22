@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, {useCallback} from "react";
+import {useRouter} from "next/navigation";
 
 import MenuButton from "../MenuButton";
-import { useTiptapContext } from "../Provider";
+import {useTiptapContext} from "../Provider";
+import {getRouteHref} from "@/lib/localeRoutes";
 
 const ImportPdfButton = () => {
   const router = useRouter();
-  const { messages } = useTiptapContext();
+  const {messages, locale} = useTiptapContext();
 
   const handleClick = useCallback(() => {
-    router.push("/editar-pdf");
-  }, [router]);
+    router.push(getRouteHref("pdfEditor", locale));
+  }, [locale, router]);
 
   return (
     <MenuButton

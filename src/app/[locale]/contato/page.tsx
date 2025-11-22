@@ -1,33 +1,33 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import {Metadata} from "next";
+import {notFound} from "next/navigation";
 
-import { BackHomeButton } from "@/components/shared/BackHomeButton";
-import { buildContactMetadata, getContactContent } from "@/data/pages/contact";
-import { i18n, Locale } from "../../../../i18n-config";
+import {BackHomeButton} from "@/components/shared/BackHomeButton";
+import {buildContactMetadata, getContactContent} from "@/data/pages/contact";
+import {i18n, Locale} from "../../../../i18n-config";
+
+const CONTACT_SUPPORTED_LOCALES: Locale[] = ["pt", "es"];
 
 type PageParams = {
-  params: { locale: Locale };
+  params: {locale: Locale};
 };
 
 export function generateStaticParams() {
-  return i18n.locales.map((locale) => ({ locale }));
+  return CONTACT_SUPPORTED_LOCALES.map((locale) => ({locale}));
 }
 
-export function generateMetadata({ params }: PageParams): Metadata {
-  if (!i18n.locales.includes(params.locale)) {
-    return buildContactMetadata(i18n.defaultLocale);
-  }
+export function generateMetadata({params}: PageParams): Metadata {
+  const locale = CONTACT_SUPPORTED_LOCALES.includes(params.locale)
+    ? params.locale
+    : i18n.defaultLocale;
 
-  return buildContactMetadata(params.locale);
+  return buildContactMetadata(locale);
 }
 
-export default function ContactPage({ params }: PageParams) {
-  const { locale } = params;
+type ContactPageContentProps = {
+  locale: Locale;
+};
 
-  if (!i18n.locales.includes(locale)) {
-    notFound();
-  }
-
+export function ContactPageContent({locale}: ContactPageContentProps) {
   const content = getContactContent(locale);
 
   return (
@@ -126,4 +126,14 @@ export default function ContactPage({ params }: PageParams) {
       </section>
     </main>
   );
+}
+
+export default function ContactPage({params}: PageParams) {
+  const {locale} = params;
+
+  if (!CONTACT_SUPPORTED_LOCALES.includes(locale)) {
+    notFound();
+  }
+
+  return <ContactPageContent locale={locale} />;
 }

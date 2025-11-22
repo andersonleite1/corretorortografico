@@ -1,33 +1,33 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import {Metadata} from "next";
+import {notFound} from "next/navigation";
 
-import { BackHomeButton } from "@/components/shared/BackHomeButton";
-import { buildTermsMetadata, getTermsContent } from "@/data/pages/terms";
-import { i18n, Locale } from "../../../../i18n-config";
+import {BackHomeButton} from "@/components/shared/BackHomeButton";
+import {buildTermsMetadata, getTermsContent} from "@/data/pages/terms";
+import {i18n, Locale} from "../../../../i18n-config";
+
+const TERMS_SUPPORTED_LOCALES: Locale[] = ["pt", "es"];
 
 type PageParams = {
-  params: { locale: Locale };
+  params: {locale: Locale};
 };
 
 export function generateStaticParams() {
-  return i18n.locales.map((locale) => ({ locale }));
+  return TERMS_SUPPORTED_LOCALES.map((locale) => ({locale}));
 }
 
-export function generateMetadata({ params }: PageParams): Metadata {
-  if (!i18n.locales.includes(params.locale)) {
-    return buildTermsMetadata(i18n.defaultLocale);
-  }
+export function generateMetadata({params}: PageParams): Metadata {
+  const locale = TERMS_SUPPORTED_LOCALES.includes(params.locale)
+    ? params.locale
+    : i18n.defaultLocale;
 
-  return buildTermsMetadata(params.locale);
+  return buildTermsMetadata(locale);
 }
 
-export default function TermsPage({ params }: PageParams) {
-  const { locale } = params;
+type TermsPageContentProps = {
+  locale: Locale;
+};
 
-  if (!i18n.locales.includes(locale)) {
-    notFound();
-  }
-
+export function TermsPageContent({locale}: TermsPageContentProps) {
   const content = getTermsContent(locale);
 
   return (
@@ -82,4 +82,14 @@ export default function TermsPage({ params }: PageParams) {
       </footer>
     </main>
   );
+}
+
+export default function TermsPage({params}: PageParams) {
+  const {locale} = params;
+
+  if (!TERMS_SUPPORTED_LOCALES.includes(locale)) {
+    notFound();
+  }
+
+  return <TermsPageContent locale={locale} />;
 }

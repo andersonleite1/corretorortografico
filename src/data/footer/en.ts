@@ -4,10 +4,10 @@ const en: FooterContent = {
   locale: "en",
   brandName: "Online Text Editor",
   links: [
-    { path: "/sobre", label: "About" },
-    { path: "/privacidade", label: "Privacy Policy" },
-    { path: "/termos", label: "Terms of Use" },
-    { path: "/contato", label: "Talk to us" },
+    { path: "/about", label: "About" },
+    { path: "/privacy", label: "Privacy Policy" },
+    { path: "/terms", label: "Terms of Use" },
+    { path: "/contact", label: "Talk to us" },
   ],
   rightsText: "All rights reserved.",
 };

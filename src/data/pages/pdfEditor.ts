@@ -1,6 +1,7 @@
-import { Metadata } from "next";
+import {Metadata} from "next";
 
-import { i18n, Locale } from "../../../i18n-config";
+import {getRouteHref} from "@/lib/localeRoutes";
+import {i18n, Locale} from "../../../i18n-config";
 
 export type PdfEditorTimelineStep = {
   label: string;
@@ -390,7 +391,7 @@ export function getPdfEditorContent(locale: string): PdfEditorContent {
 export function buildPdfEditorMetadata(locale: string): Metadata {
   const content = getPdfEditorContent(locale);
   const normalized = i18n.locales.includes(locale as Locale) ? (locale as Locale) : i18n.defaultLocale;
-  const path = normalized === i18n.defaultLocale ? "/editar-pdf" : `/${normalized}/editar-pdf`;
+  const path = getRouteHref("pdfEditor", normalized);
   return {
     title: content.metadata.title,
     description: content.metadata.description,
