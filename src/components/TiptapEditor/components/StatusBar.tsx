@@ -68,6 +68,9 @@ const StatusBar = () => {
           active={isFullScreen}
           onClick={toggleFullScreen}
         />
+        <span className="rte-word-count" onClick={toggleFullScreen}>
+          {messages.statusBar.toggleHint(isFullScreen)}
+        </span>
       </Toolbar>
 
       <div className="rte-counter">
