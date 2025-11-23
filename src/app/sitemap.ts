@@ -1,22 +1,127 @@
 import type { MetadataRoute } from "next";
 
-const baseUrl = "https://editordetexto.online";
+import { i18n, type Locale } from "../../i18n-config";
 
-const staticRoutes = [
-  { path: "/", priority: 1 },
-  { path: "/post-ssr", priority: 0.6 },
-  { path: "/editar-pdf", priority: 0.9 },
-  { path: "/contato", priority: 0.6 },
-  { path: "/privacidade", priority: 0.6 },
-  { path: "/termos", priority: 0.6 },
+const baseUrl = "https://editordetexto.online";
+const defaultLocale = i18n.defaultLocale;
+
+type LocalizedRoute = {
+  priority: number;
+  changeFrequency?: MetadataRoute.Sitemap[0]["changeFrequency"];
+  paths: Partial<Record<Locale, string>>;
+};
+
+const localizedRoutes: LocalizedRoute[] = [
+  {
+    priority: 1,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/",
+      en: "/en",
+      es: "/es",
+    },
+  },
+  {
+    priority: 0.9,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/editar-pdf",
+      es: "/es/editar-pdf",
+      en: "/en/edit-pdf",
+    },
+  },
+  {
+    priority: 0.7,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/sobre",
+      es: "/es/sobre",
+      en: "/en/about",
+    },
+  },
+  {
+    priority: 0.65,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/contato",
+      es: "/es/contato",
+      en: "/en/contact",
+    },
+  },
+  {
+    priority: 0.6,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/privacidade",
+      es: "/es/privacidade",
+      en: "/en/privacy",
+    },
+  },
+  {
+    priority: 0.6,
+    changeFrequency: "weekly",
+    paths: {
+      pt: "/termos",
+      es: "/es/termos",
+      en: "/en/terms",
+    },
+  },
 ];
+
+const standaloneRoutes = [{ path: "/post-ssr", priority: 0.6, changeFrequency: "monthly" as const }];
+
+const toAbsoluteUrl = (path: string) => `${baseUrl}${path}`;
+
+const buildAlternates = (paths: LocalizedRoute["paths"]) => {
+  const entries = Object.entries(paths).filter(
+    (entry): entry is [Locale, string] => Boolean(entry[1])
+  );
+
+  if (entries.length <= 1) {
+    return undefined;
+  }
+
+  const languages: Record<string, string> = {};
+
+  entries.forEach(([locale, path]) => {
+    const absoluteUrl = toAbsoluteUrl(path);
+    languages[locale] = absoluteUrl;
+
+    if (locale === defaultLocale) {
+      languages["x-default"] = absoluteUrl;
+    }
+  });
+
+  if (!languages["x-default"] && entries[0]) {
+    languages["x-default"] = toAbsoluteUrl(entries[0][1]);
+  }
+
+  return languages;
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  return staticRoutes.map(({ path, priority }) => ({
-    url: `${baseUrl}${path}`,
+  const localizedEntries = localizedRoutes.flatMap(({ paths, priority, changeFrequency }) => {
+    const alternates = buildAlternates(paths);
+
+    return Object.values(paths)
+      .filter((path): path is string => Boolean(path))
+      .map((path) => ({
+        url: toAbsoluteUrl(path),
+        lastModified,
+        priority,
+        changeFrequency,
+        ...(alternates && { alternates: { languages: alternates } }),
+      }));
+  });
+
+  const staticEntries = standaloneRoutes.map(({ path, priority, changeFrequency }) => ({
+    url: toAbsoluteUrl(path),
     lastModified,
     priority,
+    changeFrequency,
   }));
+
+  return [...localizedEntries, ...staticEntries];
 }
