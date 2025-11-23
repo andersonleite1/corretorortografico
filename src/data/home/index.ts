@@ -12,6 +12,17 @@ const contentMap: Record<Locale, HomeContent> = {
   es,
 };
 
+const BASE_URL = "https://editordetexto.online";
+const hrefLangMap: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+  es: "es",
+};
+
+function getLocaleUrl(locale: Locale) {
+  return locale === i18n.defaultLocale ? BASE_URL : `${BASE_URL}/${locale}`;
+}
+
 export function getHomeContent(locale: string): HomeContent {
   const normalized = (locale ?? i18n.defaultLocale) as Locale;
   if (contentMap[normalized]) {
@@ -51,16 +62,30 @@ export function getHomeSeo(locale: string) {
 
 export function buildHomeMetadata(locale: string): Metadata {
   const seo = getHomeSeo(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+  const languages = Object.fromEntries(
+    i18n.locales.map((loc) => [
+      hrefLangMap[loc] ?? loc,
+      getLocaleUrl(loc),
+    ])
+  );
+
+  languages["x-default"] = BASE_URL;
+
   return {
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
     openGraph: {
       type: "website",
-      url: "https://editordetexto.online",
+      url: getLocaleUrl(normalizedLocale),
       title: seo.openGraphTitle,
       description: seo.openGraphDescription,
       siteName: "Editor de Texto Online",
+    },
+    alternates: {
+      canonical: getLocaleUrl(normalizedLocale),
+      languages,
     },
   };
 }
