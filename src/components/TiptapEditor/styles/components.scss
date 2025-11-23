@@ -200,9 +200,16 @@
 }
 
 .rte-toggle__label {
+   all: unset;
+   cursor: pointer;
    @include font-size("sm");
    font-weight: 500;
    color: $muted-fg-color;
+
+   &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+   }
 }
 
 .rte-toggle {

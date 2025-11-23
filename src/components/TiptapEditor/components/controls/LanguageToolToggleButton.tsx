@@ -78,7 +78,14 @@ const LanguageToolToggleButton = () => {
       >
         {button}
       </Tooltip>
-      <span className="rte-toggle__label">{messages.languageTool.label}</span>
+      <button
+        type="button"
+        className="rte-toggle__label"
+        onClick={handleToggle}
+        disabled={tiptapState.disabled}
+      >
+        {messages.languageTool.label}
+      </button>
     </div>
   );
 };
