@@ -72,7 +72,8 @@ export function SidebarCarousel({
                     width={96}
                     height={96}
                     className="h-24 w-24 rounded-[1.5rem] border border-slate-100 bg-white object-contain p-1"
-                    unoptimized
+                    sizes="96px"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="flex h-24 w-24 items-center justify-center rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">

@@ -35,7 +35,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['res.cloudinary.com', 'images.unsplash.com'],
+    domains: ["res.cloudinary.com", "images.unsplash.com", "http2.mlstatic.com"],
   //   remotePatterns: [
   //     {
   //       protocol: "https",
@@ -51,6 +51,19 @@ const nextConfig = {
   //       pathname: "**",
   //     },
   //   ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:all*(svg|jpg|jpeg|png|gif|ico|webp|woff2)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
   },
 };
 

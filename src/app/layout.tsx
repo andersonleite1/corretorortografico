@@ -86,10 +86,10 @@ export default function RootLayout({
       </Head>
       <body>
         <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-            strategy="afterInteractive"
-          />
-        <Script id="google-analytics" strategy="afterInteractive">
+          src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
+          strategy="lazyOnload"
+        />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -99,7 +99,7 @@ export default function RootLayout({
         </Script>
         <Script
           id="ms-clarity"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `(function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -108,8 +108,9 @@ export default function RootLayout({
             })(window, document, "clarity", "script", "sc6j3d7url");`,
           }}
         />
-        <Script id="adsense"
-          strategy="afterInteractive"
+        <Script
+          id="adsense"
+          strategy="lazyOnload"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014576791981285"
           crossOrigin="anonymous"
         />

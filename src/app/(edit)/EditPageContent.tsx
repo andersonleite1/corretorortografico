@@ -4,30 +4,25 @@ import EditForm from "./_components/EditForm";
 import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 import { HomeContent } from "@/data/home";
 import { SidebarCarousel } from "@/components/SidebarCarousel/SidebarCarousel";
-import { ProductData } from "@/services/productMetadata";
+import { useMercadoLivreProductGroups } from "@/hooks/useMercadoLivreProducts";
 
 import "./style.scss";
 
 type Props = {
   content: HomeContent;
-  mobileProducts?: ProductData[];
-  mobileOthersProducts?: ProductData[];
 };
 
-export default function EditPageContent({
-  content,
-  mobileProducts,
-  mobileOthersProducts,
-}: Props) {
+export default function EditPageContent({ content }: Props) {
   const { article, faq } = content;
+  const { smartphoneProducts, othersProducts } = useMercadoLivreProductGroups();
 
   return (
     <div className="max-w-[56rem] w-full mx-auto py-10 px-3 md:px-6 sm:px-0">
       <EditForm locale={content.locale} />
-      {mobileProducts?.length ? (
+      {smartphoneProducts.length ? (
         <div className="mt-4 w-full xl:hidden mb-6">
           <SidebarCarousel
-            products={mobileProducts}
+            products={smartphoneProducts}
             className="px-1 sm:px-0"
             variant="mobile"
           />
@@ -73,10 +68,10 @@ export default function EditPageContent({
           dangerouslySetInnerHTML={{ __html: article.finalNoteHtml }}
         ></p>
 
-        {mobileOthersProducts?.length ? (
+        {othersProducts.length ? (
           <div className="mt-4 w-full xl:hidden mb-6">
             <SidebarCarousel
-              products={mobileOthersProducts}
+              products={othersProducts}
               className="px-1 sm:px-0"
               variant="mobile"
             />
