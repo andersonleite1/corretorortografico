@@ -7,7 +7,6 @@ import { SidebarRecommendations } from "@/components/SidebarCarousel/SidebarReco
 import { MercadoLivreProductsProvider } from "@/hooks/useMercadoLivreProducts";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
-import { fetchMercadoLivreProducts } from "@/services/productMetadata";
 
 export function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -25,7 +24,7 @@ export function generateMetadata({ params }: Props): Metadata {
   return buildHomeMetadata(params.locale);
 }
 
-export default async function LocaleHomePage({ params }: Props) {
+export default function LocaleHomePage({ params }: Props) {
   const { locale } = params;
 
   if (!i18n.locales.includes(locale)) {
@@ -33,9 +32,8 @@ export default async function LocaleHomePage({ params }: Props) {
   }
 
   const content = getHomeContent(locale);
-  const products = await fetchMercadoLivreProducts();
   return (
-    <MercadoLivreProductsProvider initialProducts={products}>
+    <MercadoLivreProductsProvider>
       <div className="px-3 py-6 sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 xl:flex-row">
           <div className="flex w-full justify-center">
