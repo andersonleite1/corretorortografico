@@ -51,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <Head>
+        <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

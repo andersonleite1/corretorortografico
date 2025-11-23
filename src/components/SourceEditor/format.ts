@@ -1,5 +1,24 @@
-import prettier from "prettier/standalone";
-import parserHtml from "prettier/plugins/html";
+type PrettierModule = typeof import("prettier/standalone");
+type HtmlPluginModule = typeof import("prettier/plugins/html");
+
+let prettierLoader: Promise<{
+  prettier: PrettierModule;
+  parserHtml: HtmlPluginModule;
+}> | null = null;
+
+async function loadPrettier() {
+  if (!prettierLoader) {
+    prettierLoader = Promise.all([
+      import("prettier/standalone"),
+      import("prettier/plugins/html"),
+    ]).then(([prettier, parserHtml]) => ({
+      prettier: prettier.default ?? prettier,
+      parserHtml: parserHtml.default ?? parserHtml,
+    }));
+  }
+
+  return prettierLoader;
+}
 
 function removeHtmlEntities(html: string) {
   const textarea = document.createElement("textarea");
@@ -9,6 +28,7 @@ function removeHtmlEntities(html: string) {
 
 export const formatHtml = async (content: string) => {
   try {
+    const { prettier, parserHtml } = await loadPrettier();
     const decodedContent = removeHtmlEntities(content).trim();
     return await prettier.format(decodedContent, {
       parser: "html",
