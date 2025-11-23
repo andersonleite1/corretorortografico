@@ -37,6 +37,7 @@ export type EditorMessages = {
     preview: string;
     importPdf: string;
     clearEditor: string;
+    copyEditor: string;
   };
   insert: {
     quote: string;
@@ -149,6 +150,9 @@ export type EditorMessages = {
     on: string;
     off: string;
   };
+  notifications: {
+    copySuccess: string;
+  };
 };
 
 const withDefault = <T extends Record<Locale, EditorMessages>>(map: T) => map;
@@ -191,6 +195,7 @@ export const editorMessages = withDefault({
       preview: "Visualizar",
       importPdf: "Importar PDF",
       clearEditor: "Limpar conteúdo",
+      copyEditor: "Copiar conteúdo",
     },
     insert: {
       quote: "Citação",
@@ -303,6 +308,9 @@ export const editorMessages = withDefault({
       on: "Ativado",
       off: "Desativado",
     },
+    notifications: {
+      copySuccess: "Conteúdo copiado para a área de transferência",
+    },
   },
   en: {
     toolbar: {
@@ -341,6 +349,7 @@ export const editorMessages = withDefault({
       preview: "Preview",
       importPdf: "Import PDF",
       clearEditor: "Clear content",
+      copyEditor: "Copy content",
     },
     insert: {
       quote: "Quote",
@@ -453,6 +462,9 @@ export const editorMessages = withDefault({
       on: "On",
       off: "Off",
     },
+    notifications: {
+      copySuccess: "Content copied to the clipboard",
+    },
   },
   es: {
     toolbar: {
@@ -491,6 +503,7 @@ export const editorMessages = withDefault({
       preview: "Vista previa",
       importPdf: "Importar PDF",
       clearEditor: "Limpiar contenido",
+      copyEditor: "Copiar contenido",
     },
     insert: {
       quote: "Cita",
@@ -602,6 +615,9 @@ export const editorMessages = withDefault({
       delete: "Eliminar",
       on: "Activado",
       off: "Desactivado",
+    },
+    notifications: {
+      copySuccess: "Contenido copiado al portapapeles",
     },
   },
 });

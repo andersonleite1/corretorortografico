@@ -31,6 +31,7 @@ import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
+import CopyEditorButton from "./controls/CopyEditorButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
@@ -91,6 +92,7 @@ const MenuBar = () => {
         {showDrafts && <DraftsDropdown />}
         <ImportPdfButton />
 
+        <CopyEditorButton />
         {exportActions?.onClear && <ClearEditorButton />}
 
         {/* {hasExtraMenus && <ToolbarDivider />} */}

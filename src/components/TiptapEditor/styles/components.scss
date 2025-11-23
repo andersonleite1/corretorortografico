@@ -212,6 +212,30 @@
    }
 }
 
+.rte-toast {
+   position: absolute;
+   right: 1.5rem;
+   bottom: 1.5rem;
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   padding: 0.45rem 0.85rem;
+   border-radius: $radius;
+   background-color: $tooltip-color;
+   color: $tooltip-fg-color;
+   box-shadow: $shadow-2;
+   @include font-size("sm");
+   font-weight: 600;
+   pointer-events: none;
+   z-index: 60;
+   animation: rte-toast-in 0.2s ease,
+      rte-toast-out 0.2s ease 1.8s forwards;
+
+   .rte-icon {
+      color: currentColor;
+   }
+}
+
 .rte-toggle {
    all: unset;
    position: relative;
@@ -442,5 +466,29 @@
       &--active {
         box-shadow: 0 0 0 1.5px $primary-color;
       }
+   }
+}
+
+@keyframes rte-toast-in {
+   from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+   }
+
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+@keyframes rte-toast-out {
+   from {
+      opacity: 1;
+      transform: translateY(0);
+   }
+
+   to {
+      opacity: 0;
+      transform: translateY(0.25rem);
    }
 }
