@@ -1,8 +1,8 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import EditarPdfClient from "./EditarPdfClient";
-import {buildPdfEditorMetadata, getPdfEditorContent} from "@/data/pages/pdfEditor";
+import PdfEditorPageContent from "./PdfEditorPageContent";
+import {buildPdfEditorMetadata} from "@/data/pages/pdfEditor";
 import {i18n, Locale} from "../../../../i18n-config";
 
 const PDF_EDITOR_SUPPORTED_LOCALES: Locale[] = ["pt", "es"];
@@ -21,17 +21,6 @@ export function generateMetadata({params}: PageParams): Metadata {
     : i18n.defaultLocale;
 
   return buildPdfEditorMetadata(locale);
-}
-
-type PdfEditorPageContentProps = {
-  locale: Locale;
-};
-
-export function PdfEditorPageContent({locale}: PdfEditorPageContentProps) {
-  const content = getPdfEditorContent(locale);
-  const homeHref = locale === i18n.defaultLocale ? "/" : `/${locale}`;
-
-  return <EditarPdfClient content={content} homeHref={homeHref} />;
 }
 
 export default function EditarPdfPage({params}: PageParams) {

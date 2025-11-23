@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import {TermsPageContent} from "../termos/page";
+import TermsPageContent from "../termos/TermsPageContent";
 import {buildTermsMetadata} from "@/data/pages/terms";
 import {Locale} from "../../../../i18n-config";
 

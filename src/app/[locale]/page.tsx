@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import EditPageContent from "../(edit)/EditPageContent";
-import { SidebarCarouselServer } from "@/components/SidebarCarousel/SidebarCarouselServer";
+import { SidebarCarousel } from "@/components/SidebarCarousel/SidebarCarousel";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
 import { fetchMercadoLivreProducts } from "@/services/productMetadata";
@@ -64,15 +64,13 @@ export default async function LocaleHomePage({ params }: Props) {
                 priority
               />
             </div>
-            <SidebarCarouselServer
+            <SidebarCarousel
               className="w-full"
-              category="SMARTPHONE"
               autoplayDelayOffset={1000}
               products={smartphoneProducts}
             />
-            <SidebarCarouselServer
+            <SidebarCarousel
               className="w-full"
-              category="OTHERS"
               autoplayDelayOffset={2300}
               products={othersProducts}
             />

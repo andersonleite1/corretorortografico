@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import {PrivacyPageContent} from "../privacidade/page";
+import PrivacyPageContent from "../privacidade/PrivacyPageContent";
 import {buildPrivacyMetadata} from "@/data/pages/privacy";
 import {Locale} from "../../../../i18n-config";
 

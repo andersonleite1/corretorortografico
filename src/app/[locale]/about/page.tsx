@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import {AboutPageContent} from "../sobre/page";
+import AboutPageContent from "../sobre/AboutPageContent";
 import {buildAboutMetadata} from "@/data/pages/about";
 import {Locale} from "../../../../i18n-config";
 

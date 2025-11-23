@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import {ContactPageContent} from "../contato/page";
+import ContactPageContent from "../contato/ContactPageContent";
 import {buildContactMetadata} from "@/data/pages/contact";
 import {Locale} from "../../../../i18n-config";
 

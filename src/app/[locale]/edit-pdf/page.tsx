@@ -1,7 +1,7 @@
 import {Metadata} from "next";
 import {notFound} from "next/navigation";
 
-import {PdfEditorPageContent} from "../editar-pdf/page";
+import PdfEditorPageContent from "../editar-pdf/PdfEditorPageContent";
 import {buildPdfEditorMetadata} from "@/data/pages/pdfEditor";
 import {Locale} from "../../../../i18n-config";
 
