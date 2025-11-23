@@ -16,6 +16,13 @@ type ProductsContextValue = {
   error?: string;
 };
 
+const DEFAULT_CONTEXT: ProductsContextValue = {
+  products: [],
+  loading: true,
+};
+
+let hasWarnedAboutMissingProvider = false;
+
 const MercadoLivreProductsContext = createContext<
   ProductsContextValue | undefined
 >(undefined);
@@ -43,9 +50,14 @@ export function useMercadoLivreProducts() {
   const context = useContext(MercadoLivreProductsContext);
 
   if (!context) {
-    throw new Error(
-      "useMercadoLivreProducts must be used inside MercadoLivreProductsProvider"
-    );
+    if (!hasWarnedAboutMissingProvider && process.env.NODE_ENV !== "production") {
+      hasWarnedAboutMissingProvider = true;
+      console.error(
+        "[useMercadoLivreProducts] Hook used outside provider. Returning fallback state."
+      );
+    }
+
+    return DEFAULT_CONTEXT;
   }
 
   return context;
