@@ -117,7 +117,7 @@ export default function RootLayout({
         <main>{children}</main>
         <SpeedInsights />
         <Analytics />
-        <Footer locale={locale} />
+        <Footer initialLocale={locale} />
       </body>
     </html>
   );

@@ -1,17 +1,46 @@
+"use client";
+
+import {useMemo} from "react";
+import {usePathname} from "next/navigation";
 import Link from "next/link";
 
-import { getFooterContent } from "@/data/footer";
-import { i18n, Locale } from "../../../i18n-config";
+import {getFooterContent} from "@/data/footer";
+import {i18n, type Locale} from "../../../i18n-config";
 
 type FooterProps = {
-  locale: Locale;
+  initialLocale?: Locale;
 };
 
-const Footer = ({ locale }: FooterProps) => {
-  const content = getFooterContent(locale);
-  const { defaultLocale } = i18n;
-  const localePrefix = locale === defaultLocale ? "" : `/${locale}`;
-  const homeHref = locale === defaultLocale ? "/" : `/${locale}`;
+const Footer = ({initialLocale}: FooterProps) => {
+  const pathname = usePathname();
+  const {locales, defaultLocale} = i18n;
+
+  const fallbackLocale = useMemo<Locale>(() => {
+    if (initialLocale && locales.includes(initialLocale)) {
+      return initialLocale;
+    }
+
+    return defaultLocale;
+  }, [initialLocale, locales, defaultLocale]);
+
+  const currentLocale = useMemo<Locale>(() => {
+    if (!pathname) {
+      return fallbackLocale;
+    }
+
+    const segments = pathname.split("/").filter(Boolean);
+    const potential = segments[0] as Locale | undefined;
+
+    if (potential && locales.includes(potential)) {
+      return potential;
+    }
+
+    return fallbackLocale;
+  }, [pathname, locales, fallbackLocale]);
+
+  const content = getFooterContent(currentLocale);
+  const localePrefix = currentLocale === defaultLocale ? "" : `/${currentLocale}`;
+  const homeHref = currentLocale === defaultLocale ? "/" : `/${currentLocale}`;
   const currentYear = new Date().getFullYear();
 
   return (
