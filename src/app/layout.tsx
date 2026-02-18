@@ -109,12 +109,6 @@ export default function RootLayout({
             })(window, document, "clarity", "script", "sc6j3d7url");`,
           }}
         />
-        <Script
-          id="adsense"
-          strategy="lazyOnload"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014576791981285"
-          crossOrigin="anonymous"
-        />
         <Header />
         <main>{children}</main>
         <SpeedInsights />
