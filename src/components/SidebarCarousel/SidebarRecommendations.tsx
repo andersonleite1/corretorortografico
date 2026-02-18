@@ -4,8 +4,6 @@ import clsx from "clsx";
 
 import { useMercadoLivreProductGroups } from "@/hooks/useMercadoLivreProducts";
 
-import { SidebarCarousel } from "./SidebarCarousel";
-
 type SidebarRecommendationsProps = {
   className?: string;
 };
@@ -20,20 +18,6 @@ export function SidebarRecommendations({
 
   return (
     <div className={clsx("flex flex-col gap-4", className)}>
-      {smartphoneProducts.length ? (
-        <SidebarCarousel
-          className="w-full"
-          autoplayDelayOffset={1000}
-          products={smartphoneProducts}
-        />
-      ) : null}
-      {othersProducts.length ? (
-        <SidebarCarousel
-          className="w-full"
-          autoplayDelayOffset={2300}
-          products={othersProducts}
-        />
-      ) : null}
       {loading ? <SidebarSkeleton /> : null}
       {showEmptyState ? (
         <div className="rounded-[2rem] border border-dashed border-slate-200 bg-white/80 px-5 py-6 text-center text-sm text-slate-500 shadow-sm">

@@ -55,9 +55,6 @@ const MobileCarouselSkeleton = () => (
   </div>
 );
 
-const SidebarCarouselSkeleton = () => (
-  <SkeletonBlock className="h-64 rounded-[2.5rem]" />
-);
 
 const EditorSkeleton = () => (
   <div className="w-full rounded-[2.5rem] border border-slate-200 bg-white/80 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
@@ -116,8 +113,6 @@ const SidebarSkeleton = () => (
   <aside className="hidden w-full max-w-xs flex-shrink-0 xl:block">
     <div className="sticky top-6 mt-10 flex flex-col gap-4">
       <SkeletonBlock className="h-32 rounded-[2rem]" />
-      <SidebarCarouselSkeleton />
-      <SidebarCarouselSkeleton />
     </div>
   </aside>
 );

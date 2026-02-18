@@ -3,7 +3,6 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import EditPageContent from "../(edit)/EditPageContent";
-import { SidebarRecommendations } from "@/components/SidebarCarousel/SidebarRecommendations";
 import { MercadoLivreProductsProvider } from "@/hooks/useMercadoLivreProducts";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
@@ -41,21 +40,6 @@ export default function LocaleHomePage({ params }: Props) {
               <EditPageContent content={content} />
             </div>
           </div>
-          <aside className="hidden w-full max-w-xs flex-shrink-0 xl:block">
-            <div className="sticky top-6 mt-10 flex flex-col gap-4">
-              <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm">
-                <Image
-                  src="/mercado_livre_azul_editado.png"
-                  alt="Promoções Mercado Livre"
-                  width={300}
-                  height={120}
-                  className="h-auto w-full object-cover"
-                  priority
-                />
-              </div>
-              <SidebarRecommendations />
-            </div>
-          </aside>
         </div>
       </div>
     </MercadoLivreProductsProvider>
