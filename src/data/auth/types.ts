@@ -5,7 +5,9 @@ export interface AuthContent {
         password_incorrect: string;
         code_incorrect: string;
         identifier_invalid: string;
-        invalid_strategy: string; // The one mentioned by user
+        invalid_strategy: string;
+        identifier_exists: string;
+        password_pwned: string;
         [key: string]: string;
     };
 }

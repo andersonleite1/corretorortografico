@@ -3,7 +3,10 @@
 import { useSignUp } from "@clerk/nextjs";
 import { useState } from "react";
 import { Loader2, Mail, KeyRound, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useMemo } from "react";
+import { i18n, Locale } from "../../../i18n-config";
+import { getAuthContent } from "@/data/auth";
 
 interface EmailCodeSignUpProps {
     onClose?: () => void;
@@ -13,6 +16,16 @@ interface EmailCodeSignUpProps {
 export default function EmailCodeSignUp({ onClose, onSignInClick }: EmailCodeSignUpProps) {
     const { isLoaded, signUp, setActive } = useSignUp();
     const router = useRouter();
+    const pathname = usePathname() || "/";
+    const { locales, defaultLocale } = i18n;
+
+    const currentLocale = useMemo<Locale>(() => {
+        const segments = pathname.split("/").filter(Boolean);
+        const potential = segments[0] as Locale | undefined;
+        return locales.includes(potential as Locale) ? potential! : defaultLocale;
+    }, [pathname, locales, defaultLocale]);
+
+    const authContent = getAuthContent(currentLocale);
 
     const [emailAddress, setEmailAddress] = useState("");
     const [code, setCode] = useState("");
@@ -22,21 +35,21 @@ export default function EmailCodeSignUp({ onClose, onSignInClick }: EmailCodeSig
 
     const getFriendlyErrorMessage = (err: any) => {
         const errorItem = err.errors?.[0];
-        if (!errorItem) return "Ocorreu um erro inesperado. Por favor, tente novamente.";
+        if (!errorItem) return authContent.errors.unexpected;
 
         const code = errorItem.code;
 
         switch (code) {
             case "form_identifier_exists":
-                return "Este e-mail já está em uso. Tente fazer login.";
+                return authContent.errors.identifier_exists;
             case "form_password_pwned":
-                return "Esta senha é muito comum. Por favor, escolha outra.";
+                return authContent.errors.password_pwned;
             case "form_code_incorrect":
-                return "O código inserido está incorreto. Por favor, verifique e tente novamente.";
+                return authContent.errors.code_incorrect;
             case "form_identifier_invalid":
-                return "O formato do e-mail é inválido.";
+                return authContent.errors.identifier_invalid;
             default:
-                return errorItem.longMessage || "Ocorreu um erro ao processar sua solicitação.";
+                return errorItem.longMessage || authContent.errors.unexpected;
         }
     };
 

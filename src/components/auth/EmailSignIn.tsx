@@ -3,7 +3,10 @@
 import { useSignIn } from "@clerk/nextjs";
 import { useState } from "react";
 import { Loader2, Mail, KeyRound, Lock, Eye, EyeOff, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { i18n, Locale } from "../../../i18n-config";
+import { getAuthContent } from "@/data/auth";
+import { useMemo } from "react";
 
 interface EmailSignInProps {
     onClose?: () => void;
@@ -15,6 +18,16 @@ type SignInStep = "email" | "code" | "password";
 export default function EmailSignIn({ onClose, onSignUpClick }: EmailSignInProps) {
     const { isLoaded, signIn, setActive } = useSignIn();
     const router = useRouter();
+    const pathname = usePathname() || "/";
+    const { locales, defaultLocale } = i18n;
+
+    const currentLocale = useMemo<Locale>(() => {
+        const segments = pathname.split("/").filter(Boolean);
+        const potential = segments[0] as Locale | undefined;
+        return locales.includes(potential as Locale) ? potential! : defaultLocale;
+    }, [pathname, locales, defaultLocale]);
+
+    const authContent = getAuthContent(currentLocale);
 
     const [emailAddress, setEmailAddress] = useState("");
     const [password, setPassword] = useState("");
@@ -26,21 +39,27 @@ export default function EmailSignIn({ onClose, onSignUpClick }: EmailSignInProps
 
     const getFriendlyErrorMessage = (err: any) => {
         const errorItem = err.errors?.[0];
-        if (!errorItem) return "Ocorreu um erro inesperado. Por favor, tente novamente.";
+        if (!errorItem) return authContent.errors.unexpected;
 
         const code = errorItem.code;
 
         switch (code) {
             case "form_identifier_not_found":
-                return "Não encontramos nenhuma conta com este e-mail.";
+                return authContent.errors.identifier_not_found;
             case "form_password_incorrect":
-                return "Senha incorreta. Por favor, tente novamente.";
+                return authContent.errors.password_incorrect;
             case "form_code_incorrect":
-                return "O código inserido está incorreto. Por favor, verifique e tente novamente.";
+                return authContent.errors.code_incorrect;
             case "form_identifier_invalid":
-                return "O formato do e-mail é inválido.";
+                return authContent.errors.identifier_invalid;
+            case "verification_strategy_not_valid":
+                return authContent.errors.invalid_strategy;
             default:
-                return errorItem.longMessage || "Ocorreu um erro ao processar sua solicitação.";
+                // Handle the case from the screenshot which might be another code or longMessage fallback
+                if (errorItem.longMessage?.includes("verification strategy is not valid")) {
+                    return authContent.errors.invalid_strategy;
+                }
+                return errorItem.longMessage || authContent.errors.unexpected;
         }
     };
 
