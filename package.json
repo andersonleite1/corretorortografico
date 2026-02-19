@@ -13,6 +13,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.38.0",
     "@codemirror/lang-html": "^6.4.9",
     "@floating-ui/dom": "^1.7.4",
     "@formatjs/intl-localematcher": "^0.6.2",

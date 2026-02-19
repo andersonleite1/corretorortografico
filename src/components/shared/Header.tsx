@@ -6,6 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { i18n, Locale } from "../../../i18n-config";
 import ThemeSwitcher from "./ThemeSwitcher";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const Header = () => {
   const pathname = usePathname() || "/";
@@ -63,11 +70,10 @@ const Header = () => {
                     key={locale}
                     type="button"
                     onClick={() => switchLocale(locale as Locale)}
-                    className={`px-3 py-1 rounded-full transition ${
-                      isActive
-                        ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                        : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-full transition ${isActive
+                      ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                      : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                      }`}
                   >
                     {locale.toUpperCase()}
                   </button>
@@ -75,7 +81,22 @@ const Header = () => {
               })}
             </div>
           </div>
-          <div className="flex gap-5">
+          <div className="flex gap-4 items-center">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors">
+                  Entrar
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity">
+                  Começar agora
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
             <ThemeSwitcher />
           </div>
         </div>

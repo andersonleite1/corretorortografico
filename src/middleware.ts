@@ -7,6 +7,8 @@ import Negotiator from "negotiator";
 import { i18n } from "../i18n-config";
 import type { I18nConfig } from "../i18n-config";
 
+import { clerkMiddleware } from "@clerk/nextjs/server";
+
 const PUBLIC_FILE = /\.[^/]+$/;
 
 function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
@@ -20,7 +22,7 @@ function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
   return match(languages, locales, defaultLocale);
 }
 
-export function middleware(request: NextRequest) {
+function i18nMiddleware(request: NextRequest) {
   const { pathname, basePath } = request.nextUrl;
 
   if (PUBLIC_FILE.test(pathname)) {
@@ -72,6 +74,15 @@ export function middleware(request: NextRequest) {
   return response;
 }
 
+export default clerkMiddleware((auth, request) => {
+  return i18nMiddleware(request);
+});
+
 export const config = {
-  matcher: "/((?!api|_next/static|_next/image|img/|favicon.ico).*)",
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

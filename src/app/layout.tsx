@@ -11,6 +11,7 @@ const fontMono = JetBrains_Mono({
 const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 import Header from "@/components/shared/Header";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import "@/styles/globals.scss";
 import Head from "next/head";
@@ -49,72 +50,74 @@ export default function RootLayout({
   const faqSchema = getHomeFaqSchema(locale);
 
   return (
-    <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
-      <Head>
-        <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: "Editor de Texto Online",
-            url: "https://editordetexto.online",
-            description:
-              "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-            applicationCategory: "Utility",
-            operatingSystem: "All",
-            creator: {
-              "@type": "Organization",
+    <ClerkProvider>
+      <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
+        <Head>
+          <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
               name: "Editor de Texto Online",
-            },
-            featureList: [
-              "Edição de texto avançada",
-              "Exportação para PDF e DOCX",
-              "Interface minimalista e intuitiva",
-              "Compatível com dispositivos móveis",
-            ],
-            keywords: [
-              "editor de texto online",
-              "escrever textos online",
-              "ferramenta gratuita para textos",
-              "exportar textos para PDF",
-              "editor de documentos online",
-            ],
-          })}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(faqSchema)}
-        </script>
-      </Head>
-      <body>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XFE7CNSV4S');
-          `}
-        </Script>
-        <Script
-          id="ms-clarity"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `(function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "sc6j3d7url");`,
-          }}
-        />
-        <Header />
-        <main>{children}</main>
-        <SpeedInsights />
-        <Analytics />
-        <Footer initialLocale={locale} />
-      </body>
-    </html>
+              url: "https://editordetexto.online",
+              description:
+                "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
+              applicationCategory: "Utility",
+              operatingSystem: "All",
+              creator: {
+                "@type": "Organization",
+                name: "Editor de Texto Online",
+              },
+              featureList: [
+                "Edição de texto avançada",
+                "Exportação para PDF e DOCX",
+                "Interface minimalista e intuitiva",
+                "Compatível com dispositivos móveis",
+              ],
+              keywords: [
+                "editor de texto online",
+                "escrever textos online",
+                "ferramenta gratuita para textos",
+                "exportar textos para PDF",
+                "editor de documentos online",
+              ],
+            })}
+          </script>
+          <script type="application/ld+json">
+            {JSON.stringify(faqSchema)}
+          </script>
+        </Head>
+        <body>
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
+            strategy="lazyOnload"
+          />
+          <Script id="google-analytics" strategy="lazyOnload">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XFE7CNSV4S');
+            `}
+          </Script>
+          <Script
+            id="ms-clarity"
+            strategy="lazyOnload"
+            dangerouslySetInnerHTML={{
+              __html: `(function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "sc6j3d7url");`,
+            }}
+          />
+          <Header />
+          <main>{children}</main>
+          <SpeedInsights />
+          <Analytics />
+          <Footer initialLocale={locale} />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
