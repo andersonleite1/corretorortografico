@@ -2,7 +2,7 @@
 
 import { SignIn } from "@clerk/nextjs";
 import { X } from "lucide-react";
-import EmailLinkSignUp from "./EmailLinkSignUp";
+import EmailCodeSignUp from "./EmailCodeSignUp";
 
 interface AuthOverlayProps {
     isOpen: boolean;
@@ -22,7 +22,7 @@ export default function AuthOverlay({ isOpen, view, onClose, onSwitchView }: Aut
             />
             <div className="relative z-10 w-full max-w-md">
                 {view === "sign-up" ? (
-                    <EmailLinkSignUp
+                    <EmailCodeSignUp
                         onClose={onClose}
                         onSignInClick={() => onSwitchView("sign-in")}
                     />

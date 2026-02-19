@@ -192,7 +192,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 // Rotas que requerem autenticação
 const isProtectedRoute = createRouteMatcher([
   "/editor(.*)",     // Editor principal
-  "/dashboard(.*)",  // Painel do usuário
+  "/(.*)",  // Painel do usuário
   "/settings(.*)",   // Configurações
   "/api/ai(.*)",     // APIs de IA (verificadas também no handler)
   "/api/documents(.*)",

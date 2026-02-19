@@ -29,7 +29,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000   # Em produção: https://seudominio.
 
 ## 🎛️ 3.2 Criação de Produtos no Stripe Dashboard
 
-1. Acesse [dashboard.stripe.com/products](https://dashboard.stripe.com/products)
+1. Acesse [dashboard.stripe.com/products](https://.stripe.com/products)
 2. Crie dois produtos:
 
 | Produto | Nome | Preço | Periodicidade | Metadata |
