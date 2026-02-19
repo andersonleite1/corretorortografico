@@ -10,7 +10,7 @@ import MenuBar from "./MenuBar";
 import StatusBar from "./StatusBar";
 import Resizer from "./Resizer";
 
-import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu } from "./menus";
+import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu, AiBubbleMenu } from "./menus";
 
 import getExtensionKit from "../kit";
 
@@ -47,6 +47,7 @@ export interface TiptapEditorProps {
   exportActions?: ExportActions;
   draftActions?: DraftActions;
   locale?: Locale;
+  userPlan?: "free" | "pro" | "team";
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -67,6 +68,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       exportActions,
       draftActions,
       locale,
+      userPlan = "free",
     },
     ref
   ) => {
@@ -114,6 +116,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         <CodeBlockMenu />
         <TableMenu />
         <LanguageToolMenu />
+        <AiBubbleMenu />
       </>
     );
 
@@ -125,6 +128,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         exportActions={exportActions}
         draftActions={draftActions}
         locale={locale}
+        userPlan={userPlan}
       >
         {menus}
         <Resizer />

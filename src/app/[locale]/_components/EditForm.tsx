@@ -20,9 +20,10 @@ interface PostForm {
 
 interface EditFormProps {
   locale: Locale;
+  userPlan: "free" | "pro" | "team";
 }
 
-export default function EditForm({ locale }: EditFormProps) {
+export default function EditForm({ locale, userPlan }: EditFormProps) {
   const editorRef = useRef<TiptapEditorRef>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -389,6 +390,7 @@ export default function EditForm({ locale }: EditFormProps) {
                   onLoadDraft: handleLoadDraft,
                   onDeleteDraft: handleDeleteDraft,
                 }}
+                userPlan={userPlan}
                 aria-label={formMessages.aria.content}
               />
             </div>

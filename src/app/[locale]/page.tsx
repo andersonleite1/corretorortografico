@@ -6,6 +6,7 @@ import EditPageContent from "./EditPageContent";
 import { MercadoLivreProductsProvider } from "@/hooks/useMercadoLivreProducts";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";
+import { getUserPlan } from "@/lib/auth";
 
 export function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -23,7 +24,7 @@ export function generateMetadata({ params }: Props): Metadata {
   return buildHomeMetadata(params.locale);
 }
 
-export default function LocaleHomePage({ params }: Props) {
+export default async function LocaleHomePage({ params }: Props) {
   const { locale } = params;
 
   if (!i18n.locales.includes(locale)) {
@@ -31,13 +32,15 @@ export default function LocaleHomePage({ params }: Props) {
   }
 
   const content = getHomeContent(locale);
+  const userPlan = await getUserPlan();
+
   return (
     <MercadoLivreProductsProvider>
       <div className="px-3 py-6 sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 xl:flex-row">
           <div className="flex w-full justify-center">
             <div className="flex w-full flex-col items-center gap-6">
-              <EditPageContent content={content} />
+              <EditPageContent content={content} userPlan={userPlan} />
             </div>
           </div>
         </div>

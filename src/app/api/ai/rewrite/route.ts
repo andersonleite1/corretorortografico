@@ -1,0 +1,70 @@
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
+import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+
+export const runtime = "edge"; // ⚡ Menor latência global
+
+const schema = z.object({
+    text: z.string().min(1).max(5000),
+    tone: z.enum(["professional", "casual", "concise", "expanded", "creative"]),
+    language: z.string().default("pt-BR"),
+});
+
+const TONE_PROMPTS = {
+    professional: "de forma profissional, clara e objetiva",
+    casual: "de forma casual e descontraída",
+    concise: "de forma concisa, removendo redundâncias",
+    expanded: "de forma expandida, com mais contexto e exemplos",
+    creative: "de forma criativa, com metáforas e linguagem cativante",
+};
+
+export async function POST(req: Request) {
+    // 1. Autenticação
+    try {
+        const { userId: clerkId } = await auth();
+        if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+
+        // 2. Buscar usuário e plano
+        const user = await db.user.findUnique({
+            where: { clerkId },
+            include: { subscription: true },
+        });
+        if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+
+        // 3. Rate Limiting
+        const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "free");
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: "Limite de uso gratuito atingido.", message: `${rateLimit.used}/${rateLimit.limit} usos hoje. Faça upgrade para Pro.`, upgradeUrl: "/pricing" },
+                { status: 429 }
+            );
+        }
+
+        // 4. Validar input
+        const body = await req.json();
+        const { text, tone, language } = schema.parse(body);
+
+        // 5. Chamada IA com streaming
+        const result = await streamText({
+            model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
+            system: "Você é um assistente de escrita. Responda APENAS com o texto reescrito, sem explicações.",
+            messages: [{
+                role: "user",
+                content: `Reescreva ${TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS]}. Idioma: ${language}.\n\nTexto:\n${text}`,
+            }],
+            maxTokens: 2000,
+            onFinish: async ({ usage }) => {
+                await db.aiUsage.create({ data: { userId: user.id, feature: "rewrite", tokensUsed: usage.totalTokens } });
+            },
+        });
+
+        return result.toDataStreamResponse();
+    } catch (error) {
+        console.error("[AI_REWRITE_ERROR]", error);
+        return NextResponse.json({ error: "Erro interno no servidor." }, { status: 500 });
+    }
+}

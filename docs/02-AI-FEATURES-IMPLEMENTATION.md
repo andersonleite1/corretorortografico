@@ -13,7 +13,7 @@ npm install ai @ai-sdk/openai zod
 ### `.env.local`
 ```env
 OPENAI_API_KEY=sk-proj-xxx
-AI_MODEL=gpt-4o-mini   # ou gpt-4o para máxima qualidade
+AI_MODEL=gpt-4o-mini
 ```
 
 ---
