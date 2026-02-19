@@ -1,0 +1,106 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+// ==============================
+// MODELO DE USUÁRIO PRINCIPAL
+// ==============================
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Clerk ID — sempre presente
+  clerkId   String   @unique
+
+  // Dados básicos (sincronizados via Webhook do Clerk)
+  email     String   @unique
+  name      String?
+  imageUrl  String?
+
+  // ===== STRIPE =====
+  // ID do customer no Stripe (criado no primeiro checkout)
+  stripeCustomerId String? @unique
+
+  // ===== ASSINATURA =====
+  subscription Subscription?
+
+  // ===== CONTEÚDO =====
+  documents Document[]
+  aiUsage   AiUsage[]
+
+  @@map("users")
+}
+
+// ==============================
+// ASSINATURA (1-para-1 com User)
+// ==============================
+model Subscription {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Dados do Stripe
+  stripeSubscriptionId String   @unique
+  stripePriceId        String   // ID do plano no Stripe
+  stripeCurrentPeriodEnd DateTime // Quando expira o período pago
+
+  // Status atual da assinatura
+  // Valores possíveis: 'active' | 'canceled' | 'past_due' | 'trialing'
+  status String @default("active")
+
+  // Plano atual: 'free' | 'pro' | 'team'
+  plan   String @default("free")
+
+  @@map("subscriptions")
+}
+
+// ==============================
+// DOCUMENTOS (Sync na Nuvem — Pro)
+// ==============================
+model Document {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title   String  @default("Sem título")
+  content String  @db.Text // HTML do Tiptap
+  slug    String? @unique  // Para compartilhamento público
+
+  isPublished Boolean @default(false)
+
+  @@index([userId])
+  @@map("documents")
+}
+
+// ==============================
+// CONSUMO DE IA (Rate Limiting)
+// ==============================
+model AiUsage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Tipo de uso: 'rewrite' | 'translate' | 'seo' | 'ghostwriter'
+  feature String
+
+  // Tokens consumidos nessa chamada
+  tokensUsed Int @default(0)
+
+  @@index([userId, createdAt])
+  @@map("ai_usage")
+}

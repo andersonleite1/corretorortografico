@@ -11,10 +11,12 @@ import {
   SignUpButton,
   SignedIn,
   SignedOut,
-  UserButton,
 } from "@clerk/nextjs";
+interface HeaderProps {
+  userButton?: React.ReactNode;
+}
 
-const Header = () => {
+const Header = ({ userButton }: HeaderProps) => {
   const pathname = usePathname() || "/";
   const router = useRouter();
   const { locales, defaultLocale } = i18n;
@@ -95,7 +97,7 @@ const Header = () => {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
-              <UserButton />
+              {userButton}
             </SignedIn>
             <ThemeSwitcher />
           </div>

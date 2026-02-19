@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import EditPageContent from "../(edit)/EditPageContent";
+import EditPageContent from "./EditPageContent";
 import { MercadoLivreProductsProvider } from "@/hooks/useMercadoLivreProducts";
 import { buildHomeMetadata, getHomeContent } from "@/data/home";
 import { i18n, Locale } from "../../../i18n-config";

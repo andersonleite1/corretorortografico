@@ -11,7 +11,9 @@ const fontMono = JetBrains_Mono({
 const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 import Header from "@/components/shared/Header";
+import { UserButton } from "@/components/shared/UserButton";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 
 import "@/styles/globals.scss";
 import Head from "next/head";
@@ -50,7 +52,14 @@ export default function RootLayout({
   const faqSchema = getHomeFaqSchema(locale);
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: {
+          colorPrimary: "#6366f1",
+        },
+      }}
+    >
       <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
         <Head>
           <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
@@ -111,7 +120,7 @@ export default function RootLayout({
               })(window, document, "clarity", "script", "sc6j3d7url");`,
             }}
           />
-          <Header />
+          <Header userButton={<UserButton />} />
           <main>{children}</main>
           <SpeedInsights />
           <Analytics />

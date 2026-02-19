@@ -7,9 +7,21 @@ import Negotiator from "negotiator";
 import { i18n } from "../i18n-config";
 import type { I18nConfig } from "../i18n-config";
 
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const PUBLIC_FILE = /\.[^/]+$/;
+
+// Rotas que requerem autenticação
+const isProtectedRoute = createRouteMatcher([
+  "/:locale/editor(.*)",     // Editor principal (com locale)
+  "/editor(.*)",             // Editor principal (sem locale)
+  "/:locale/dashboard(.*)",  // Painel do usuário
+  "/dashboard(.*)",
+  "/:locale/settings(.*)",   // Configurações
+  "/settings(.*)",
+  "/api/ai(.*)",             // APIs de IA
+  "/api/documents(.*)",
+]);
 
 function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
   const { locales, defaultLocale } = i18nConfig;
@@ -74,7 +86,10 @@ function i18nMiddleware(request: NextRequest) {
   return response;
 }
 
-export default clerkMiddleware((auth, request) => {
+export default clerkMiddleware(async (auth, request) => {
+  if (isProtectedRoute(request)) {
+    await auth.protect();
+  }
   return i18nMiddleware(request);
 });
 
