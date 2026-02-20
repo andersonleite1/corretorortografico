@@ -12,6 +12,7 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
+import { DocumentsDialog } from "./DocumentsDialog";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -45,6 +46,7 @@ const Header = ({ userButton }: HeaderProps) => {
     isOpen: false,
     view: "sign-in",
   });
+  const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
 
   useEffect(() => {
     const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -73,15 +75,26 @@ const Header = ({ userButton }: HeaderProps) => {
     <>
       <header className="sticky z-50 top-0 px-6 border-b border-neutral-300 dark:border-neutral-700 bg-white/20 dark:bg-[#0d101820] backdrop-blur-lg">
         <div className="h-16 max-w-screen-xl w-full mx-auto flex items-center justify-between gap-6">
-          <Link href="/">
-            <Image
-              src={theme === "dark" ? "/logo-black.webp" : "/logo.webp"}
-              alt="Editor de texto"
-              width={150}
-              height={90}
-              priority
-            />
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link href="/">
+              <Image
+                src={theme === "dark" ? "/logo-black.webp" : "/logo.webp"}
+                alt="Editor de texto"
+                width={150}
+                height={90}
+                priority
+              />
+            </Link>
+
+            <SignedIn>
+              <button
+                onClick={() => setIsDocumentsDialogOpen(true)}
+                className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+              >
+                Documentos
+              </button>
+            </SignedIn>
+          </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
               <span>Idioma</span>
@@ -139,6 +152,11 @@ const Header = ({ userButton }: HeaderProps) => {
         view={authModal.view}
         onClose={closeAuthModal}
         onSwitchView={(view) => setAuthModal({ isOpen: true, view })}
+      />
+
+      <DocumentsDialog
+        isOpen={isDocumentsDialogOpen}
+        onClose={() => setIsDocumentsDialogOpen(false)}
       />
     </>
   );

@@ -48,6 +48,7 @@ export interface TiptapEditorProps {
   draftActions?: DraftActions;
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
+  documentTitle?: string;
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -69,6 +70,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       draftActions,
       locale,
       userPlan = "free",
+      documentTitle,
     },
     ref
   ) => {
@@ -129,6 +131,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         draftActions={draftActions}
         locale={locale}
         userPlan={userPlan}
+        documentTitle={documentTitle}
       >
         {menus}
         <Resizer />

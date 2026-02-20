@@ -8,6 +8,7 @@ import ItalicButton from "./controls/ItalicButton";
 import UndoButton from "./controls/UndoButton";
 import RedoButton from "./controls/RedoButton";
 import UnderlineButton from "./controls/UnderlineButton";
+import SaveButton from "./controls/SaveButton";
 import AlignPopover from "./controls/AlignPopover";
 import HeadingDropdown from "./controls/HeadingDropdown";
 import BlockquoteButton from "./controls/BlockquoteButton";
@@ -47,6 +48,7 @@ const MenuBar = () => {
       <Toolbar dense>
         <UndoButton />
         <RedoButton />
+        <SaveButton />
         {/* <ClearFormatButton /> */}
 
         <ToolbarDivider />

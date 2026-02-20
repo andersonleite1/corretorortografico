@@ -51,6 +51,7 @@ type TiptapContextType = {
   messages: EditorMessages;
   locale: Locale;
   userPlan: "free" | "pro" | "team";
+  documentTitle?: string;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -66,6 +67,7 @@ type TiptapProviderProps = {
   draftActions?: DraftActions;
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
+  documentTitle?: string;
 };
 
 export const TiptapProvider = ({
@@ -78,6 +80,7 @@ export const TiptapProvider = ({
   draftActions,
   locale,
   userPlan = "free",
+  documentTitle,
 }: TiptapProviderProps) => {
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
@@ -133,6 +136,7 @@ export const TiptapProvider = ({
         messages,
         locale: normalizedLocale,
         userPlan,
+        documentTitle,
       }}
     >
       {editorContent}

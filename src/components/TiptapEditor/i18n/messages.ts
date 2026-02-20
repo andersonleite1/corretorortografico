@@ -38,6 +38,7 @@ export type EditorMessages = {
     importPdf: string;
     clearEditor: string;
     copyEditor: string;
+    save: string;
   };
   insert: {
     quote: string;
@@ -196,6 +197,7 @@ export const editorMessages = withDefault({
       importPdf: "Importar PDF",
       clearEditor: "Limpar conteúdo",
       copyEditor: "Copiar conteúdo",
+      save: "Salvar documento",
     },
     insert: {
       quote: "Citação",
@@ -350,6 +352,7 @@ export const editorMessages = withDefault({
       importPdf: "Import PDF",
       clearEditor: "Clear content",
       copyEditor: "Copy content",
+      save: "Save document",
     },
     insert: {
       quote: "Quote",
@@ -503,7 +506,8 @@ export const editorMessages = withDefault({
       preview: "Vista previa",
       importPdf: "Importar PDF",
       clearEditor: "Limpiar contenido",
-      copyEditor: "Copiar contenido",
+      copyEditor: "Copiar conteúdo",
+      save: "Guardar documento",
     },
     insert: {
       quote: "Cita",

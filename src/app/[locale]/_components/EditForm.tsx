@@ -8,7 +8,7 @@ import { FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 
@@ -26,6 +26,8 @@ interface EditFormProps {
 export default function EditForm({ locale, userPlan }: EditFormProps) {
   const editorRef = useRef<TiptapEditorRef>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const docId = searchParams.get("docId");
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
   const { form: formMessages } = useMemo(() => getEditMessages(locale), [locale]);
@@ -41,8 +43,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   const handleClear = () => {
     localStorage.removeItem("post");
+    reset({ title: "", content: "" });
+    editorRef.current?.getInstance()?.commands.setContent("");
+    router.push(`/${locale}`);
     showModal(formMessages.modal.cleared);
-    setTimeout(() => window.location.reload(), 1000);
   };
 
   const preparePdfExport = () => {
@@ -216,15 +220,36 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   );
 
   useEffect(() => {
-    getPost().then((post) => {
-      reset({ ...post });
-      setIsLoading(false);
-    });
+    setIsLoading(true);
+    if (docId) {
+      fetch(`/api/documents/${docId}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Documento não encontrado");
+          return res.json();
+        })
+        .then((doc) => {
+          reset({ title: doc.title, content: doc.content });
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          // Se não encontrar, continua com o post do localStorage ou mock
+          getPost().then((post) => {
+            reset({ ...post });
+            setIsLoading(false);
+          });
+        });
+    } else {
+      getPost().then((post) => {
+        reset({ ...post });
+        setIsLoading(false);
+      });
+    }
 
     return () => {
       clearPdfPreview();
     };
-  }, [clearPdfPreview, reset]);
+  }, [clearPdfPreview, reset, docId]);
 
   useEffect(() => {
     const subscription = watch((values, { type }) => {
@@ -391,6 +416,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                   onDeleteDraft: handleDeleteDraft,
                 }}
                 userPlan={userPlan}
+                documentTitle={watch("title")}
                 aria-label={formMessages.aria.content}
               />
             </div>
