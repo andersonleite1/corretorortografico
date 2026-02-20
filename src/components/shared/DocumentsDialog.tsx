@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
+import clsx from "clsx";
 import { Icon } from "../TiptapEditor/components/ui/Icon";
+import { useSidebar } from "../providers/SidebarProvider";
+import { ToolbarDivider } from "../TiptapEditor/components/ui/Toolbar";
 
 interface Document {
     id: string;
@@ -23,17 +26,28 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0
+    });
+    const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
     const router = useRouter();
     const params = useParams();
     const locale = params.locale as string;
 
-    const fetchDocuments = async () => {
+    const fetchDocuments = async (page = 1) => {
         setIsLoading(true);
         try {
-            const response = await fetch("/api/documents");
+            const response = await fetch(`/api/documents?page=${page}&limit=6`);
             if (!response.ok) throw new Error("Erro ao carregar documentos");
             const data = await response.json();
-            setDocuments(data);
+            setDocuments(data.documents);
+            setPagination({
+                currentPage: data.metadata.currentPage,
+                totalPages: data.metadata.totalPages,
+                totalCount: data.metadata.totalCount
+            });
         } catch (error) {
             console.error(error);
             toast.error("Erro ao carregar documentos");
@@ -44,9 +58,9 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchDocuments();
+            fetchDocuments(pagination.currentPage);
         }
-    }, [isOpen]);
+    }, [isOpen, pagination.currentPage]);
 
     const handleDelete = async (id: string) => {
         try {
@@ -235,6 +249,53 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
                             </div>
                         ))
                     )}
+                </div>
+
+                {/* Rodapé do Diálogo */}
+                <div className="px-8 py-5 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
+                                isSidebarOpen
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20"
+                            )}
+                        >
+                            <Icon name="Columns" size={18} />
+                            {isSidebarOpen ? "Lateral Ativada" : "Mostrar na Lateral"}
+                        </button>
+                    </div>
+
+                    {pagination.totalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setPagination(prev => ({ ...prev, currentPage: Math.max(1, prev.currentPage - 1) }))}
+                                disabled={pagination.currentPage === 1 || isLoading}
+                                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 disabled:opacity-30 transition-colors"
+                            >
+                                <Icon name="ChevronLeft" size={20} />
+                            </button>
+                            <span className="text-sm font-medium text-gray-500">
+                                {pagination.currentPage} / {pagination.totalPages}
+                            </span>
+                            <button
+                                onClick={() => setPagination(prev => ({ ...prev, currentPage: Math.min(prev.totalPages, prev.currentPage + 1) }))}
+                                disabled={pagination.currentPage === pagination.totalPages || isLoading}
+                                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 disabled:opacity-30 transition-colors"
+                            >
+                                <Icon name="ChevronRight" size={20} />
+                            </button>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={onClose}
+                        className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                    >
+                        Fechar
+                    </button>
                 </div>
 
             </div>

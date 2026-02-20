@@ -13,6 +13,8 @@ import clsx from "clsx";
 import CodeMirrorEditor from "@/components/SourceEditor/Editor";
 import { type Locale, i18n } from "../../../../i18n-config";
 import { getEditorMessages, type EditorMessages } from "../i18n/messages";
+import SideBar from "./SideBar";
+import { useSidebar } from "@/components/providers/SidebarProvider";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -52,6 +54,8 @@ type TiptapContextType = {
   locale: Locale;
   userPlan: "free" | "pro" | "team";
   documentTitle?: string;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (value: boolean) => void;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -87,6 +91,8 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
 
@@ -106,17 +112,20 @@ export const TiptapProvider = ({
   };
 
   const editorContent = (
-    <div className={clsx("rte-editor", isFullScreen && "rte-editor--fullscreen")}>
-      {slotBefore}
-      <div className="rte-editor__container" onMouseDown={focusEditorViaContainer}>
-        {isSourceMode ? (
-          <CodeMirrorEditor initialContent={editor.getHTML() || ""} />
-        ) : (
-          <EditorContent ref={contentElement} editor={editor} className="rte-editor__content" />
-        )}
+    <div className={clsx("rte-editor", isFullScreen && "rte-editor--fullscreen", isSidebarOpen && "rte-editor--with-sidebar")}>
+      <SideBar isOpen={isSidebarOpen} />
+      <div className="rte-editor__main">
+        {slotBefore}
+        <div className="rte-editor__container" onMouseDown={focusEditorViaContainer}>
+          {isSourceMode ? (
+            <CodeMirrorEditor initialContent={editor.getHTML() || ""} />
+          ) : (
+            <EditorContent ref={contentElement} editor={editor} className="rte-editor__content" />
+          )}
+        </div>
+        {children}
+        {slotAfter}
       </div>
-      {children}
-      {slotAfter}
     </div>
   );
 
@@ -137,6 +146,8 @@ export const TiptapProvider = ({
         locale: normalizedLocale,
         userPlan,
         documentTitle,
+        isSidebarOpen,
+        setIsSidebarOpen,
       }}
     >
       {editorContent}

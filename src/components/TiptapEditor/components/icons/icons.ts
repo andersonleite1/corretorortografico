@@ -55,7 +55,11 @@ import {
   TbUnderline,
   TbX,
   TbNotebook,
-  TbDeviceFloppy
+  TbDeviceFloppy,
+  TbLayoutSidebar,
+  TbRefresh,
+  TbChevronLeft,
+  TbChevronRight
 } from "react-icons/tb";
 import { RiTextSpacing } from "react-icons/ri";
 import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
@@ -136,6 +140,10 @@ export const icons = {
   Eye: FaRegEye,
   Drafts: TbNotebook,
   Save: TbDeviceFloppy,
+  Columns: TbLayoutSidebar,
+  Refresh: TbRefresh,
+  ChevronLeft: TbChevronLeft,
+  ChevronRight: TbChevronRight,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

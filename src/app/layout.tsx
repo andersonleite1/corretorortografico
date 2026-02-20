@@ -1,7 +1,5 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import { cookies } from "next/headers";
 
 const fontMono = JetBrains_Mono({
@@ -10,17 +8,17 @@ const fontMono = JetBrains_Mono({
 });
 const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
-import Header from "@/components/shared/Header";
 import { UserButton } from "@/components/shared/UserButton";
 import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
+import { SidebarProvider } from "@/components/providers/SidebarProvider";
 import { syncUserWithDb } from "@/lib/sync-user";
 
 import "@/styles/globals.scss";
 import Head from "next/head";
 import Script from "next/script";
-import Footer from "@/components/Footer/footer";
 import { getHomeFaqSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
+import { MainContent } from "./MainContent";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -56,73 +54,73 @@ export default async function RootLayout({
 
   return (
     <ClerkThemeProvider locale={locale}>
-      <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
-        <Head>
-          <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
-          <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              name: "Editor de Texto Online",
-              url: "https://editordetexto.online",
-              description:
-                "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-              applicationCategory: "Utility",
-              operatingSystem: "All",
-              creator: {
-                "@type": "Organization",
+      <SidebarProvider>
+        <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
+          <Head>
+            <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
+            <script type="application/ld+json">
+              {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
                 name: "Editor de Texto Online",
-              },
-              featureList: [
-                "Edição de texto avançada",
-                "Exportação para PDF e DOCX",
-                "Interface minimalista e intuitiva",
-                "Compatível com dispositivos móveis",
-              ],
-              keywords: [
-                "editor de texto online",
-                "escrever textos online",
-                "ferramenta gratuita para textos",
-                "exportar textos para PDF",
-                "editor de documentos online",
-              ],
-            })}
-          </script>
-          <script type="application/ld+json">
-            {JSON.stringify(faqSchema)}
-          </script>
-        </Head>
-        <body>
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-            strategy="lazyOnload"
-          />
-          <Script id="google-analytics" strategy="lazyOnload">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XFE7CNSV4S');
-            `}
-          </Script>
-          <Script
-            id="ms-clarity"
-            strategy="lazyOnload"
-            dangerouslySetInnerHTML={{
-              __html: `(function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "sc6j3d7url");`,
-            }}
-          />
-          <Header userButton={<UserButton />} />
-          <main>{children}</main>
-          <SpeedInsights />
-          <Analytics />
-          <Footer initialLocale={locale} />
-        </body>
-      </html>
+                url: "https://editordetexto.online",
+                description:
+                  "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
+                applicationCategory: "Utility",
+                operatingSystem: "All",
+                creator: {
+                  "@type": "Organization",
+                  name: "Editor de Texto Online",
+                },
+                featureList: [
+                  "Edição de texto avançada",
+                  "Exportação para PDF e DOCX",
+                  "Interface minimalista e intuitiva",
+                  "Compatível com dispositivos móveis",
+                ],
+                keywords: [
+                  "editor de texto online",
+                  "escrever textos online",
+                  "ferramenta gratuita para textos",
+                  "exportar textos para PDF",
+                  "editor de documentos online",
+                ],
+              })}
+            </script>
+            <script type="application/ld+json">
+              {JSON.stringify(faqSchema)}
+            </script>
+          </Head>
+          <body>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
+              strategy="lazyOnload"
+            />
+            <Script id="google-analytics" strategy="lazyOnload">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-XFE7CNSV4S');
+              `}
+            </Script>
+            <Script
+              id="ms-clarity"
+              strategy="lazyOnload"
+              dangerouslySetInnerHTML={{
+                __html: `(function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "sc6j3d7url");`,
+              }}
+            />
+            <MainContent userButton={<UserButton />} locale={locale}>
+              {children}
+            </MainContent>
+          </body>
+        </html>
+      </SidebarProvider>
     </ClerkThemeProvider>
   );
 }

@@ -62,6 +62,17 @@ export async function GET(req: Request) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+        const skip = (page - 1) * limit;
+
+        const totalCount = await db.document.count({
+            where: {
+                userId: user.id,
+            },
+        });
+
         const documents = await db.document.findMany({
             where: {
                 userId: user.id,
@@ -69,9 +80,19 @@ export async function GET(req: Request) {
             orderBy: {
                 updatedAt: "desc",
             },
+            skip,
+            take: limit,
         });
 
-        return NextResponse.json(documents);
+        return NextResponse.json({
+            documents,
+            metadata: {
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                limit,
+            },
+        });
     } catch (error) {
         console.error("[DOCUMENTS_GET]", error);
         return new NextResponse("Erro Interno", { status: 500 });

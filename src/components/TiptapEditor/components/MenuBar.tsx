@@ -30,6 +30,7 @@ import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
+import DocumentsButton from "./controls/DocumentsButton";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
@@ -91,6 +92,7 @@ const MenuBar = () => {
 
         {showExport && <ExportDropdown />}
         {showPreview && <PreviewDropdown />}
+        <DocumentsButton />
         {showDrafts && <DraftsDropdown />}
         <ImportPdfButton />
 

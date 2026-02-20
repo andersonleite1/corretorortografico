@@ -12,7 +12,6 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
-import { DocumentsDialog } from "./DocumentsDialog";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -33,7 +32,7 @@ const Header = ({ userButton }: HeaderProps) => {
   const pathname = usePathname() || "/";
   const router = useRouter();
   const { locales, defaultLocale } = i18n;
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded } = useAuth();
 
   const segments = useMemo(() => pathname.split("/").filter(Boolean), [pathname]);
   const currentLocale = useMemo<Locale>(() => {
@@ -46,7 +45,6 @@ const Header = ({ userButton }: HeaderProps) => {
     isOpen: false,
     view: "sign-in",
   });
-  const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
 
   useEffect(() => {
     const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -85,15 +83,6 @@ const Header = ({ userButton }: HeaderProps) => {
                 priority
               />
             </Link>
-
-            <SignedIn>
-              <button
-                onClick={() => setIsDocumentsDialogOpen(true)}
-                className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-              >
-                Documentos
-              </button>
-            </SignedIn>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
@@ -152,11 +141,6 @@ const Header = ({ userButton }: HeaderProps) => {
         view={authModal.view}
         onClose={closeAuthModal}
         onSwitchView={(view) => setAuthModal({ isOpen: true, view })}
-      />
-
-      <DocumentsDialog
-        isOpen={isDocumentsDialogOpen}
-        onClose={() => setIsDocumentsDialogOpen(false)}
       />
     </>
   );
