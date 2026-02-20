@@ -266,7 +266,7 @@ export const editorMessages = withDefault({
       fullscreen: "Tela cheia",
       words: "Palavras",
       characters: "Caracteres",
-      toggleHint: "Clique aqui para ocultar anúncios",
+      toggleHint: "Clique aqui para expandir",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugestões: ${count}`,
@@ -421,7 +421,7 @@ export const editorMessages = withDefault({
       fullscreen: "Full screen",
       words: "Words",
       characters: "Characters",
-      toggleHint: "Click here to hide ads",
+      toggleHint: "Click here to expand",
       spellcheck: {
         checking: "Checking…",
         ready: (count: number) => `Suggestions: ${count}`,
@@ -576,7 +576,7 @@ export const editorMessages = withDefault({
       fullscreen: "Pantalla completa",
       words: "Palabras",
       characters: "Caracteres",
-      toggleHint: "Haz clic para ocultar los anuncios",
+      toggleHint: "Haz clic para expandir",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugerencias: ${count}`,

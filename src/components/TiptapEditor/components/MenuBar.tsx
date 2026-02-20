@@ -27,6 +27,7 @@ import FontFamilyDropdown from "./controls/FontFamilyDropdown";
 import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
 import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
+import LanguageToolSidebarButton from "./controls/LanguageToolSidebarButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
@@ -87,6 +88,7 @@ const MenuBar = () => {
         <FontFamilyDropdown />
         <FontSizeDropdown />
         <LanguageToolToggleButton />
+        <LanguageToolSidebarButton />
 
         <ToolbarDivider />
 

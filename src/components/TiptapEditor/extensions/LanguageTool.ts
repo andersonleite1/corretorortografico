@@ -217,6 +217,7 @@ const toDecorationSet = (
       ruleDescription: match.rule?.description,
       typeName: match.type?.typeName,
       sentence: match.sentence,
+      issueType,
     });
   });
 

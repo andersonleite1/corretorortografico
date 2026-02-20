@@ -14,6 +14,7 @@ import CodeMirrorEditor from "@/components/SourceEditor/Editor";
 import { type Locale, i18n } from "../../../../i18n-config";
 import { getEditorMessages, type EditorMessages } from "../i18n/messages";
 import SideBar from "./SideBar";
+import LanguageToolSidebar from "./LanguageToolSidebar";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 
 export type ExportActions = {
@@ -56,6 +57,8 @@ type TiptapContextType = {
   documentTitle?: string;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (value: boolean) => void;
+  isLTSidebarOpen: boolean;
+  setIsLTSidebarOpen: (value: boolean) => void;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -91,6 +94,7 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isLTSidebarOpen, setIsLTSidebarOpen] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
@@ -112,7 +116,12 @@ export const TiptapProvider = ({
   };
 
   const editorContent = (
-    <div className={clsx("rte-editor", isFullScreen && "rte-editor--fullscreen", isSidebarOpen && "rte-editor--with-sidebar")}>
+    <div className={clsx(
+      "rte-editor",
+      isFullScreen && "rte-editor--fullscreen",
+      isSidebarOpen && "rte-editor--with-sidebar",
+      isLTSidebarOpen && "rte-editor--with-lt-sidebar"
+    )}>
       <SideBar isOpen={isSidebarOpen} />
       <div className="rte-editor__main">
         {slotBefore}
@@ -126,6 +135,7 @@ export const TiptapProvider = ({
         {children}
         {slotAfter}
       </div>
+      <LanguageToolSidebar isOpen={isLTSidebarOpen} />
     </div>
   );
 
@@ -148,6 +158,8 @@ export const TiptapProvider = ({
         documentTitle,
         isSidebarOpen,
         setIsSidebarOpen,
+        isLTSidebarOpen,
+        setIsLTSidebarOpen,
       }}
     >
       {editorContent}

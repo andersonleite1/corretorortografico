@@ -48,4 +48,5 @@ export type LanguageToolIssue = {
   ruleDescription?: string;
   typeName?: string;
   sentence?: string;
+  issueType?: string;
 };
