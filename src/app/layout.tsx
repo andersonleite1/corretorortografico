@@ -13,6 +13,7 @@ const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
 import Header from "@/components/shared/Header";
 import { UserButton } from "@/components/shared/UserButton";
 import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
+import { syncUserWithDb } from "@/lib/sync-user";
 
 import "@/styles/globals.scss";
 import Head from "next/head";
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -49,6 +50,9 @@ export default function RootLayout({
   const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as Locale | undefined;
   const locale = storedLocale && i18n.locales.includes(storedLocale) ? storedLocale : i18n.defaultLocale;
   const faqSchema = getHomeFaqSchema(locale);
+
+  // Sincroniza o usuário com o banco de dados (Fallback)
+  await syncUserWithDb();
 
   return (
     <ClerkThemeProvider locale={locale}>
