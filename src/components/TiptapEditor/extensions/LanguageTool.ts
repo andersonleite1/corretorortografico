@@ -192,9 +192,12 @@ const toDecorationSet = (
       return;
     }
 
+    const issueType = match.rule?.issueType || "other";
+    const typeClassName = `lt-type-${issueType.toLowerCase().replace(/_/g, "-")}`;
+
     const replacements = match.replacements?.map((item) => item.value) ?? [];
     const attrs: Record<string, string> = {
-      class: "lt-error",
+      class: `lt-error ${typeClassName}`,
       "data-lt-id": `${match.rule?.id ?? "lt"}-${index}`,
       "data-lt-message": match.message,
     };
@@ -231,7 +234,7 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
       enabled: true,
       language: "pt-BR",
       endpoint: "/api/languagetool",
-      checkDelay: 10000,
+      checkDelay: 1000,
       minChars: 20,
     };
   },
@@ -258,50 +261,50 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
     return {
       applyLanguageToolSuggestion:
         ({ from, to, text }) =>
-        ({ chain }) => {
-          if (from < 0 || to < from) {
-            return false;
-          }
-          return chain().focus().insertContentAt({ from, to }, text).run();
-        },
+          ({ chain }) => {
+            if (from < 0 || to < from) {
+              return false;
+            }
+            return chain().focus().insertContentAt({ from, to }, text).run();
+          },
       setLanguageToolEnabled:
         (enabled: boolean) =>
-        ({ state, dispatch }) => {
-          if (!dispatch) {
-            return false;
-          }
+          ({ state, dispatch }) => {
+            if (!dispatch) {
+              return false;
+            }
 
-          const current = pluginKey.getState(state);
-          if (current?.enabled === enabled) {
-            const storage = getStorage();
-            storage.enabled = enabled;
+            const current = pluginKey.getState(state);
+            if (current?.enabled === enabled) {
+              const storage = getStorage();
+              storage.enabled = enabled;
+              return true;
+            }
+
+            const tr = state.tr.setMeta(pluginKey, {
+              type: "languageToolToggle",
+              enabled,
+            });
+            dispatch(tr);
             return true;
-          }
-
-          const tr = state.tr.setMeta(pluginKey, {
-            type: "languageToolToggle",
-            enabled,
-          });
-          dispatch(tr);
-          return true;
-        },
+          },
       toggleLanguageTool:
         () =>
-        ({ editor }) => {
-          const storage = getStorage();
-          const next = !storage.enabled;
-          return editor.commands.setLanguageToolEnabled(next);
-        },
+          ({ editor }) => {
+            const storage = getStorage();
+            const next = !storage.enabled;
+            return editor.commands.setLanguageToolEnabled(next);
+          },
       ignoreLanguageToolIssue:
         (id: string) =>
-        ({ state, dispatch }) => {
-          if (!dispatch || !id) {
-            return false;
-          }
-          const tr = state.tr.setMeta(pluginKey, { type: "languageToolIgnore", id });
-          dispatch(tr);
-          return true;
-        },
+          ({ state, dispatch }) => {
+            if (!dispatch || !id) {
+              return false;
+            }
+            const tr = state.tr.setMeta(pluginKey, { type: "languageToolIgnore", id });
+            dispatch(tr);
+            return true;
+          },
     };
   },
 
@@ -360,23 +363,23 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
                 status: "idle",
                 message: null,
               };
-          } else if (meta?.type === "languageToolToggle") {
-            const enabled = Boolean(meta.enabled);
-            next = {
-              ...next,
-              enabled,
-              status: "idle",
-              message: null,
-              decorations: enabled ? next.decorations : DecorationSet.empty,
-              issues: enabled ? next.issues : [],
-            };
-            if (!enabled) {
+            } else if (meta?.type === "languageToolToggle") {
+              const enabled = Boolean(meta.enabled);
               next = {
                 ...next,
-                decorations: DecorationSet.empty,
-                issues: [],
+                enabled,
+                status: "idle",
+                message: null,
+                decorations: enabled ? next.decorations : DecorationSet.empty,
+                issues: enabled ? next.issues : [],
               };
-            }
+              if (!enabled) {
+                next = {
+                  ...next,
+                  decorations: DecorationSet.empty,
+                  issues: [],
+                };
+              }
             } else if (meta?.type === "languageToolIgnore" && meta?.id) {
               const id: string = meta.id;
               const toRemove = next.decorations.find(undefined, undefined, (spec: any) => {

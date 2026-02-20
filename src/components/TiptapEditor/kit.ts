@@ -75,7 +75,7 @@ const createExtensionKit = (locale?: Locale) => [
   Youtube,
   Table,
   LanguageTool.configure({
-    checkDelay: 10000,
+    checkDelay: 1000,
     minChars: 15,
     enabled: true,
     language: resolveLanguageToolCode(locale),
