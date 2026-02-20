@@ -56,6 +56,12 @@ export async function POST(req: Request) {
                 email,
                 name: [first_name, last_name].filter(Boolean).join(" ") || null,
                 imageUrl: image_url || null,
+                subscription: {
+                    create: {
+                        plan: "free",
+                        status: "active",
+                    }
+                }
             },
         });
 

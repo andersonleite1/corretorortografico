@@ -29,9 +29,9 @@ model Subscription {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   userId                 String   @unique
-  stripeSubscriptionId   String   @unique
-  stripePriceId          String
-  stripeCurrentPeriodEnd DateTime
+  stripeSubscriptionId   String?  @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
   status                 String   @default("active")
   plan                   String   @default("free")
   user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
