@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
     try {
@@ -31,13 +31,12 @@ export async function POST(req: Request) {
             model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
             system: "Tradutor profissional. Preserve toda a formatação HTML. Retorne APENAS o HTML traduzido.",
             messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }],
-            maxTokens: 4000,
             onFinish: async ({ usage }) => {
                 await db.aiUsage.create({ data: { userId: user.id, feature: "translate", tokensUsed: usage.totalTokens } });
             },
         });
 
-        return result.toDataStreamResponse();
+        return result.toTextStreamResponse();
     } catch (error) {
         console.error("[AI_TRANSLATE_ERROR]", error);
         return NextResponse.json({ error: "Erro interno no servidor." }, { status: 500 });

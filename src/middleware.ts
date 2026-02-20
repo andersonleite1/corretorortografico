@@ -35,7 +35,12 @@ function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
 function i18nMiddleware(request: NextRequest) {
   const { pathname, basePath } = request.nextUrl;
 
-  if (PUBLIC_FILE.test(pathname) || pathname.startsWith("/_clerk") || pathname.includes("clerk_catchall_check")) {
+  if (
+    PUBLIC_FILE.test(pathname) ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_clerk") ||
+    pathname.includes("clerk_catchall_check")
+  ) {
     return NextResponse.next();
   }
 

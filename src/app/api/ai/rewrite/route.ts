@@ -5,8 +5,15 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import fs from "fs";
+import path from "path";
 
-export const runtime = "edge"; // ⚡ Menor latência global
+function logError(msg: string) {
+    const logPath = path.join(process.cwd(), "rewrite-error.log");
+    fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+}
+
+export const runtime = "nodejs"; // Prisma padrão requer Node.js
 
 const schema = z.object({
     text: z.string().min(1).max(5000),
@@ -33,9 +40,12 @@ export async function POST(req: Request) {
             where: { clerkId },
             include: { subscription: true },
         });
-        if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+        if (!user) {
+            return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+        }
 
-        // 3. Rate Limiting
+        // 3. Rate Limiting (desabilitado para debug)
+        /*
         const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "free");
         if (!rateLimit.allowed) {
             return NextResponse.json(
@@ -43,6 +53,7 @@ export async function POST(req: Request) {
                 { status: 429 }
             );
         }
+        */
 
         // 4. Validar input
         const body = await req.json();
@@ -51,20 +62,28 @@ export async function POST(req: Request) {
         // 5. Chamada IA com streaming
         const result = await streamText({
             model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
-            system: "Você é um assistente de escrita. Responda APENAS com o texto reescrito, sem explicações.",
+            system: "Você é um assistente de escrita. Sua tarefa é reescrever o texto fornecido pelo usuário, mantendo o sentido original, mas ajustando o tom conforme solicitado. Retorne APENAS o texto reescrito, sem comentários, explicações ou aspas.",
             messages: [{
                 role: "user",
                 content: `Reescreva ${TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS]}. Idioma: ${language}.\n\nTexto:\n${text}`,
             }],
-            maxTokens: 2000,
             onFinish: async ({ usage }) => {
-                await db.aiUsage.create({ data: { userId: user.id, feature: "rewrite", tokensUsed: usage.totalTokens } });
+                try {
+                    await db.aiUsage.create({ data: { userId: user.id, feature: "rewrite", tokensUsed: usage.totalTokens } });
+                } catch (e: any) {
+                    logError(`Usage record error: ${e.message}`);
+                }
             },
         });
 
-        return result.toDataStreamResponse();
-    } catch (error) {
+        return result.toTextStreamResponse();
+    } catch (error: any) {
+        logError(`AI_REWRITE_ERROR: ${error.message}\n${error.stack}`);
         console.error("[AI_REWRITE_ERROR]", error);
-        return NextResponse.json({ error: "Erro interno no servidor." }, { status: 500 });
+        return NextResponse.json({
+            error: "Erro interno no servidor debug",
+            message: error.message,
+            stack: error.stack
+        }, { status: 500 });
     }
 }
