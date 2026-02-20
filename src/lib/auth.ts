@@ -26,8 +26,10 @@ export const getUserPlan = cache(async () => {
     const sub = user.subscription;
     if (!sub || sub.status !== "active") return "free";
 
-    // Verifica se a assinatura não expirou
-    if (new Date() > sub.stripeCurrentPeriodEnd) return "free";
+    // Se tiver stripeCurrentPeriodEnd, verifica se expirou
+    if (sub.stripeCurrentPeriodEnd && new Date() > sub.stripeCurrentPeriodEnd) {
+        return "free";
+    }
 
     return sub.plan as "free" | "pro" | "team";
 });
