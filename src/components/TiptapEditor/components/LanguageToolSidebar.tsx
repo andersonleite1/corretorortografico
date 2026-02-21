@@ -189,9 +189,6 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
                                         {issue.ruleDescription || "Sugestão"}
                                     </div>
                                     <div className="lt-issue__desc">{issue.message}</div>
-                                    {issue.sentence && (
-                                        <div className="lt-issue__sentence" dangerouslySetInnerHTML={{ __html: issue.sentence.replace(/<fixed>(.*?)<\/fixed>/g, "<strong>$1</strong>") }} />
-                                    )}
                                     <div className="lt-issue__suggestions">
                                         {issue.replacements.slice(0, 3).map((rep, idx) => (
                                             <button
