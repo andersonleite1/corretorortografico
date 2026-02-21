@@ -59,7 +59,9 @@ import {
   TbLayoutSidebar,
   TbRefresh,
   TbChevronLeft,
-  TbChevronRight
+  TbChevronRight,
+  TbSquareCheck,
+  TbSquare
 } from "react-icons/tb";
 import { RiTextSpacing } from "react-icons/ri";
 import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
@@ -144,6 +146,8 @@ export const icons = {
   Refresh: TbRefresh,
   ChevronLeft: TbChevronLeft,
   ChevronRight: TbChevronRight,
+  CheckboxChecked: TbSquareCheck,
+  CheckboxEmpty: TbSquare,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };
