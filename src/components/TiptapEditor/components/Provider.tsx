@@ -16,6 +16,8 @@ import { getEditorMessages, type EditorMessages } from "../i18n/messages";
 import SideBar from "./SideBar";
 import LanguageToolSidebar from "./LanguageToolSidebar";
 import { useSidebar } from "@/components/providers/SidebarProvider";
+import { EditorSettingsProvider } from "@/components/providers/EditorSettingsProvider";
+import { SettingsDialog } from "@/components/shared/SettingsDialog";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -144,41 +146,44 @@ export const TiptapProvider = ({
   );
 
   return (
-    <TiptapContext.Provider
-      value={{
-        editor,
-        contentElement,
-        isFullScreen,
-        isResizing,
-        isSourceMode,
-        setIsResizing,
-        toggleFullScreen: () => setIsFullScreen((prev) => !prev),
-        toggleSourceMode: () => setIsSourceMode((prev) => !prev),
-        exportActions,
-        draftActions,
-        messages,
-        locale: normalizedLocale,
-        userPlan,
-        documentTitle,
-        isSidebarOpen,
-        setIsSidebarOpen,
-        isLTSidebarOpen,
-        setIsLTSidebarOpen,
-        isBrowserSpellcheckEnabled,
-        setIsBrowserSpellcheckEnabled: (value: boolean) => {
-          setIsBrowserSpellcheckEnabled(value);
-          editor.setOptions({
-            editorProps: {
-              attributes: {
-                spellcheck: value ? "true" : "false",
+    <EditorSettingsProvider>
+      <TiptapContext.Provider
+        value={{
+          editor,
+          contentElement,
+          isFullScreen,
+          isResizing,
+          isSourceMode,
+          setIsResizing,
+          toggleFullScreen: () => setIsFullScreen((prev) => !prev),
+          toggleSourceMode: () => setIsSourceMode((prev) => !prev),
+          exportActions,
+          draftActions,
+          messages,
+          locale: normalizedLocale,
+          userPlan,
+          documentTitle,
+          isSidebarOpen,
+          setIsSidebarOpen,
+          isLTSidebarOpen,
+          setIsLTSidebarOpen,
+          isBrowserSpellcheckEnabled,
+          setIsBrowserSpellcheckEnabled: (value: boolean) => {
+            setIsBrowserSpellcheckEnabled(value);
+            editor.setOptions({
+              editorProps: {
+                attributes: {
+                  spellcheck: value ? "true" : "false",
+                },
               },
-            },
-          });
-        },
-      }}
-    >
-      {editorContent}
-    </TiptapContext.Provider>
+            });
+          },
+        }}
+      >
+        {editorContent}
+        <SettingsDialog />
+      </TiptapContext.Provider>
+    </EditorSettingsProvider>
   );
 };
 

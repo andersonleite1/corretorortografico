@@ -2,6 +2,7 @@ import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
 import { useTiptapContext } from "./Provider";
+import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 
 import BoldButton from "./controls/BoldButton";
 import ItalicButton from "./controls/ItalicButton";
@@ -36,9 +37,12 @@ import DocumentsButton from "./controls/DocumentsButton";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
+import SettingsButton from "./controls/SettingsButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
+  const { buttonVisibility } = useEditorSettings();
+
   const showExport = Boolean(
     exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
   );
@@ -49,61 +53,62 @@ const MenuBar = () => {
   return (
     <div className="rte-menu-bar">
       <Toolbar dense>
-        <UndoButton />
-        <RedoButton />
-        <SaveButton />
+        {buttonVisibility.undo && <UndoButton />}
+        {buttonVisibility.redo && <RedoButton />}
+        {buttonVisibility.save && <SaveButton />}
         {/* <ClearFormatButton /> */}
 
         <ToolbarDivider />
 
-        <BoldButton />
-        <ItalicButton />
-        <UnderlineButton />
-        <MoreMarkDropdown />
+        {buttonVisibility.bold && <BoldButton />}
+        {buttonVisibility.italic && <ItalicButton />}
+        {buttonVisibility.underline && <UnderlineButton />}
+        {buttonVisibility.moreMark && <MoreMarkDropdown />}
 
         <ToolbarDivider />
 
-        <TextColorButton />
-        <TextHighlightButton />
+        {buttonVisibility.textColor && <TextColorButton />}
+        {buttonVisibility.textHighlight && <TextHighlightButton />}
 
         <ToolbarDivider />
 
-        <AlignPopover />
-        <BulletListButton />
-        <OrderedListButton />
-        <LineHeightDropdown />
+        {buttonVisibility.align && <AlignPopover />}
+        {buttonVisibility.bulletList && <BulletListButton />}
+        {buttonVisibility.orderedList && <OrderedListButton />}
+        {buttonVisibility.lineHeight && <LineHeightDropdown />}
 
         <ToolbarDivider />
 
         {/* <BlockquoteButton /> */}
-        <LinkButton />
-        <TableButton />
+        {buttonVisibility.link && <LinkButton />}
+        {buttonVisibility.table && <TableButton />}
         {/* <ImageButton /> */}
         {/* <YoutubeButton /> */}
-        <CodeBlockButton />
-        <InsertDropdown />
+        {buttonVisibility.codeBlock && <CodeBlockButton />}
+        {buttonVisibility.insert && <InsertDropdown />}
 
         <ToolbarDivider />
 
-        <HeadingDropdown />
-        <FontFamilyDropdown />
-        <FontSizeDropdown />
-        <LanguageToolToggleButton />
-        <LanguageToolSidebarButton />
-        <BrowserSpellcheckButton />
+        {buttonVisibility.heading && <HeadingDropdown />}
+        {buttonVisibility.fontFamily && <FontFamilyDropdown />}
+        {buttonVisibility.fontSize && <FontSizeDropdown />}
+        {buttonVisibility.languageTool && <LanguageToolToggleButton />}
+        {buttonVisibility.languageToolSidebar && <LanguageToolSidebarButton />}
+        {buttonVisibility.browserSpellcheck && <BrowserSpellcheckButton />}
 
         <ToolbarDivider />
 
-        {showExport && <ExportDropdown />}
-        {showPreview && <PreviewDropdown />}
-        <DocumentsButton />
-        {showDrafts && <DraftsDropdown />}
-        <ImportPdfButton />
+        {showExport && buttonVisibility.export && <ExportDropdown />}
+        {showPreview && buttonVisibility.preview && <PreviewDropdown />}
+        {buttonVisibility.documents && <DocumentsButton />}
+        {showDrafts && buttonVisibility.drafts && <DraftsDropdown />}
+        {buttonVisibility.importPdf && <ImportPdfButton />}
 
-        <CopyEditorButton />
-        {exportActions?.onClear && <ClearEditorButton />}
+        {buttonVisibility.copyEditor && <CopyEditorButton />}
+        {exportActions?.onClear && buttonVisibility.clearEditor && <ClearEditorButton />}
 
-        {/* {hasExtraMenus && <ToolbarDivider />} */}
+        <ToolbarDivider />
+        <SettingsButton />
       </Toolbar>
     </div>
   );
