@@ -241,6 +241,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             }
           }
           reset({ title: doc.title, content });
+          editorRef.current?.getInstance()?.commands.setContent(content);
           setIsLoading(false);
         })
         .catch((error) => {
@@ -248,12 +249,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           // Se não encontrar, continua com o post do localStorage ou mock
           getPost().then((post) => {
             reset({ ...post });
+            editorRef.current?.getInstance()?.commands.setContent(post.content || "");
             setIsLoading(false);
           });
         });
     } else {
       getPost().then((post) => {
         reset({ ...post });
+        editorRef.current?.getInstance()?.commands.setContent(post.content || "");
         setIsLoading(false);
       });
     }
@@ -273,12 +276,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  useEffect(() => {
-    const content = watch("content");
-    if (content !== editorRef.current?.getInstance()?.getHTML()) {
-      editorRef.current?.getInstance()?.commands.setContent(content);
-    }
-  }, [watch("content")]);
 
 
   // Carrega os rascunhos ao iniciar

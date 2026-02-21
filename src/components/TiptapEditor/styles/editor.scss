@@ -19,6 +19,14 @@
     position: fixed;
     inset: 0;
     z-index: 50;
+    overflow: hidden;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   &__content {
@@ -153,6 +161,13 @@
   border-radius: $radius;
   background-color: $bubble;
   box-shadow: $shadow-2;
+  z-index: 9999;
+}
+
+// Fix for Tiptap/Floating-UI portal container stacking context
+div:has(.rte-bubble-menu),
+div:has(.lt-menu-card) {
+  z-index: 10000 !important;
 }
 
 .rte-link {
