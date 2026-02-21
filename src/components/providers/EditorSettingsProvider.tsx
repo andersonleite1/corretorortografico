@@ -10,6 +10,11 @@ export type ToolbarButtonId =
     | "browserSpellcheck" | "export" | "preview" | "documents" | "drafts"
     | "importPdf" | "copyEditor" | "clearEditor";
 
+export type ToneId =
+    | "formal" | "casual" | "academic" | "creative" | "simplified" | "romantic"
+    | "narrative" | "instagram" | "whatsapp" | "tweet" | "professional" | "persuasive"
+    | "friendly" | "prompt";
+
 export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     undo: true, redo: true, save: true, bold: true, italic: true, underline: true, moreMark: true,
     textColor: true, textHighlight: true, align: true, bulletList: true, orderedList: true,
@@ -17,6 +22,12 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     fontFamily: true, fontSize: true, languageTool: true, languageToolSidebar: true,
     browserSpellcheck: true, export: true, preview: true, documents: true, drafts: true,
     importPdf: true, copyEditor: true, clearEditor: true
+};
+
+export const DEFAULT_TONES: Record<ToneId, boolean> = {
+    formal: true, casual: true, academic: true, creative: true, simplified: true,
+    romantic: true, narrative: true, instagram: true, whatsapp: true, tweet: true,
+    professional: true, persuasive: true, friendly: true, prompt: true
 };
 
 export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
@@ -52,9 +63,62 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
     clearEditor: "Limpar Editor"
 };
 
+export const TONE_LABELS: Record<ToneId, string> = {
+    formal: "FORMAL",
+    casual: "CASUAL",
+    academic: "ACADÊMICO",
+    creative: "CRIATIVO",
+    simplified: "SIMPLIFICADO",
+    romantic: "ROMÂNTICO",
+    narrative: "NARRATIVO",
+    instagram: "INSTAGRAM",
+    whatsapp: "WHATSAPP",
+    tweet: "TWEET",
+    professional: "PROFISSIONAL",
+    persuasive: "PERSUASIVO",
+    friendly: "AMIGÁVEL",
+    prompt: "Prompt IA"
+};
+
+export const TONE_DESCRIPTIONS: Record<ToneId, string> = {
+    formal: "Profissional e sério",
+    casual: "Descontraído e informal",
+    academic: "Erudito e estruturado",
+    creative: "Original e imaginativo",
+    simplified: "Simples e direto",
+    romantic: "Emotivo e apaixonado",
+    narrative: "Para contar histórias",
+    instagram: "Estilo social e envolvente",
+    whatsapp: "Direto e conversacional",
+    tweet: "Conciso e impactante",
+    professional: "Focado em negócios",
+    persuasive: "Convincente e focado",
+    friendly: "Acolhedor e gentil",
+    prompt: "Dedicado a agentes LLM"
+};
+
+export const TONE_ICONS: Record<ToneId, string> = {
+    formal: "👔",
+    casual: "👕",
+    academic: "🎓",
+    creative: "🎨",
+    simplified: "💡",
+    romantic: "❤️",
+    narrative: "📖",
+    instagram: "📸",
+    whatsapp: "💬",
+    tweet: "🐦",
+    professional: "💼",
+    persuasive: "🎯",
+    friendly: "😊",
+    prompt: "🤖"
+};
+
 interface EditorSettingsContextData {
     buttonVisibility: Record<ToolbarButtonId, boolean>;
     toggleButtonVisibility: (id: ToolbarButtonId) => void;
+    activeTones: Record<ToneId, boolean>;
+    toggleToneActivation: (id: ToneId) => void;
     isSettingsDialogOpen: boolean;
     setIsSettingsDialogOpen: (open: boolean) => void;
 }
@@ -62,21 +126,33 @@ interface EditorSettingsContextData {
 const EditorSettingsContext = createContext<EditorSettingsContextData>({
     buttonVisibility: DEFAULT_SETTINGS,
     toggleButtonVisibility: () => { },
+    activeTones: DEFAULT_TONES,
+    toggleToneActivation: () => { },
     isSettingsDialogOpen: false,
     setIsSettingsDialogOpen: () => { },
 });
 
 export const EditorSettingsProvider = ({ children }: { children: React.ReactNode }) => {
     const [buttonVisibility, setButtonVisibility] = useState<Record<ToolbarButtonId, boolean>>(DEFAULT_SETTINGS);
+    const [activeTones, setActiveTones] = useState<Record<ToneId, boolean>>(DEFAULT_TONES);
     const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem("editor_toolbar_settings");
-        if (saved) {
+        const savedButtons = localStorage.getItem("editor_toolbar_settings");
+        if (savedButtons) {
             try {
-                setButtonVisibility({ ...DEFAULT_SETTINGS, ...JSON.parse(saved) });
+                setButtonVisibility({ ...DEFAULT_SETTINGS, ...JSON.parse(savedButtons) });
             } catch (e) {
-                console.error("Failed to parse editor settings");
+                console.error("Failed to parse editor button settings");
+            }
+        }
+
+        const savedTones = localStorage.getItem("editor_active_tones");
+        if (savedTones) {
+            try {
+                setActiveTones({ ...DEFAULT_TONES, ...JSON.parse(savedTones) });
+            } catch (e) {
+                console.error("Failed to parse editor tone settings");
             }
         }
     }, []);
@@ -89,8 +165,16 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
         });
     };
 
+    const toggleToneActivation = (id: ToneId) => {
+        setActiveTones((prev) => {
+            const nextSettings = { ...prev, [id]: !prev[id] };
+            localStorage.setItem("editor_active_tones", JSON.stringify(nextSettings));
+            return nextSettings;
+        });
+    };
+
     return (
-        <EditorSettingsContext.Provider value={{ buttonVisibility, toggleButtonVisibility, isSettingsDialogOpen, setIsSettingsDialogOpen }}>
+        <EditorSettingsContext.Provider value={{ buttonVisibility, toggleButtonVisibility, activeTones, toggleToneActivation, isSettingsDialogOpen, setIsSettingsDialogOpen }}>
             {children}
         </EditorSettingsContext.Provider>
     );

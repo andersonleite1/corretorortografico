@@ -8,21 +8,13 @@ import { useState } from "react";
 import { useTiptapContext } from "../Provider";
 import { BubbleMenu } from "../BubbleMenu";
 
-type Tone = "professional" | "casual" | "concise" | "expanded" | "creative" | "prompt";
-
-const TONES: { value: Tone; label: string }[] = [
-    { value: "professional", label: "Profissional" },
-    { value: "casual", label: "Casual" },
-    { value: "concise", label: "Conciso" },
-    { value: "expanded", label: "Expandido" },
-    { value: "creative", label: "Criativo" },
-    { value: "prompt", label: "Prompt IA" },
-];
+import { useEditorSettings, ToneId, TONE_LABELS, TONE_ICONS } from "@/components/providers/EditorSettingsProvider";
 
 interface Props { }
 
 export function AiBubbleMenu({ }: Props) {
     const { editor, userPlan } = useTiptapContext();
+    const { activeTones } = useEditorSettings();
     const isPro = userPlan !== "free";
     const [open, setOpen] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
@@ -46,7 +38,7 @@ export function AiBubbleMenu({ }: Props) {
         },
     });
 
-    const handleRewrite = (tone: Tone) => {
+    const handleRewrite = (tone: ToneId) => {
         const text = editor.state.doc.textBetween(
             editor.state.selection.from,
             editor.state.selection.to,
@@ -108,15 +100,29 @@ export function AiBubbleMenu({ }: Props) {
                                 <div className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                                     Escolha o tom
                                 </div>
-                                {TONES.map((t) => (
-                                    <button
-                                        key={t.value}
-                                        onClick={() => { setOpen(false); handleRewrite(t.value); }}
-                                        className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 transition-colors"
-                                    >
-                                        {t.label}
-                                    </button>
-                                ))}
+                                {(() => {
+                                    const toneIds = Object.keys(TONE_LABELS) as ToneId[];
+                                    const activeToneIds = toneIds.filter(id => activeTones[id]);
+
+                                    if (activeToneIds.length === 0) {
+                                        return (
+                                            <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500 text-center">
+                                                Nenhum tom selecionado nas configurações.
+                                            </div>
+                                        );
+                                    }
+
+                                    return activeToneIds.map((id) => (
+                                        <button
+                                            key={id}
+                                            onClick={() => { setOpen(false); handleRewrite(id); }}
+                                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2"
+                                        >
+                                            <span className="text-sm">{TONE_ICONS[id]}</span>
+                                            <span>{TONE_LABELS[id]}</span>
+                                        </button>
+                                    ));
+                                })()}
                             </div>
                         )}
                     </>
