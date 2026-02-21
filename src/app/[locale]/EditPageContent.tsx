@@ -17,12 +17,24 @@ type Props = {
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
   const { smartphoneProducts, othersProducts } = useMercadoLivreProductGroups();
-  const { isSidebarOpen } = useSidebar();
+  const { isSidebarOpen, isLTSidebarOpen } = useSidebar();
+
+  // Base width: 56rem (896px)
+  // Left Sidebar: 260px (16.25rem)
+  // Right Sidebar: 320px (20rem)
+  let maxWidthClass = "max-w-[56rem]";
+  if (isSidebarOpen && isLTSidebarOpen) {
+    maxWidthClass = "max-w-[92.25rem]";
+  } else if (isSidebarOpen) {
+    maxWidthClass = "max-w-[72.25rem]";
+  } else if (isLTSidebarOpen) {
+    maxWidthClass = "max-w-[76rem]";
+  }
 
   return (
     <div className={clsx(
       "w-full mx-auto py-10 px-3 md:px-6 sm:px-0 transition-all duration-300 ease-in-out",
-      isSidebarOpen ? "max-w-[72.25rem]" : "max-w-[56rem]"
+      maxWidthClass
     )}>
       <EditForm locale={content.locale} userPlan={userPlan} />
       <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0 pb-4">

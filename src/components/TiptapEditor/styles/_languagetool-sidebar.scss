@@ -253,11 +253,9 @@
 
 .rte-editor--with-lt-sidebar {
     flex-direction: row !important;
-    overflow-x: auto;
 
     .rte-editor__main {
         flex: 1;
-        min-width: 800px;
         display: flex;
         flex-direction: column;
         overflow: hidden;

@@ -96,8 +96,7 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [isLTSidebarOpen, setIsLTSidebarOpen] = useState(false);
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen } = useSidebar();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
