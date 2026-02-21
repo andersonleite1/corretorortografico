@@ -1,12 +1,14 @@
 .rte-sidebar {
     width: 260px;
-    height: 100%;
-    border-right: 1px solid $border-color;
     background-color: $bg-color;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     overflow: hidden;
+    align-self: stretch;
+    border-right: 1px solid $border-color;
+    border-top-left-radius: $radius;
+    border-bottom-left-radius: $radius;
 
     &__header {
         padding: 1rem;
@@ -19,7 +21,6 @@
     &__content {
         flex: 1;
         overflow-y: auto;
-        max-height: $editor-max-height;
         @include custom-scrollbar;
     }
 }
