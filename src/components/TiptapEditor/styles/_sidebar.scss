@@ -19,6 +19,7 @@
     &__content {
         flex: 1;
         overflow-y: auto;
+        max-height: $editor-max-height;
         @include custom-scrollbar;
     }
 }
