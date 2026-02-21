@@ -38,6 +38,8 @@ export type DraftActions = {
   onSaveDraft?: () => void;
   onLoadDraft?: (id: string) => void;
   onDeleteDraft?: (id: string) => void;
+  onCompareDraft?: (id: string) => void;
+  savingStatus?: "idle" | "saving" | "saved" | "error";
 };
 
 type TiptapContextType = {

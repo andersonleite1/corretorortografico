@@ -21,7 +21,8 @@ export const SaveButton = () => {
 
         setIsSaving(true);
         try {
-            const content = editor.getHTML();
+            const content = editor.getJSON();
+            const stringifiedContent = JSON.stringify(content);
             const response = await fetch("/api/documents", {
                 method: "POST",
                 headers: {
@@ -29,7 +30,7 @@ export const SaveButton = () => {
                 },
                 body: JSON.stringify({
                     id: documentId,
-                    content,
+                    content: stringifiedContent,
                     title: documentTitle || "Sem título",
                 }),
             });

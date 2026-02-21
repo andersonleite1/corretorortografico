@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-// Evita múltiplas instâncias do Prisma Client em desenvolvimento (hot reload)
+// Evita múltiplas instâncias do Prisma Client em desenvolvimento (hot reload) - Refreshed
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
 };
