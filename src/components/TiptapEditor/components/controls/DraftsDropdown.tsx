@@ -42,7 +42,7 @@ const DraftsDropdown = () => {
   return (
     <MenuButton
       type="dropdown"
-      icon="Drafts"
+      icon="History"
       text={messages.toolbar.drafts}
       hideText={false}
       tooltip={messages.toolbar.drafts}

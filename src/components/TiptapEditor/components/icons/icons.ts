@@ -63,6 +63,7 @@ import {
   TbSquareCheck,
   TbSquare
 } from "react-icons/tb";
+import { MdHistory } from "react-icons/md";
 import { RiTextSpacing } from "react-icons/ri";
 import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
 import IconCorner from "./Corner";
@@ -148,6 +149,7 @@ export const icons = {
   ChevronRight: TbChevronRight,
   CheckboxChecked: TbSquareCheck,
   CheckboxEmpty: TbSquare,
+  History: MdHistory,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };
