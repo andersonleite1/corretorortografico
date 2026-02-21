@@ -103,6 +103,11 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       shouldRerenderOnTransaction: false,
       autofocus: false,
       onUpdate: ({ editor }) => handleUpdate(editor),
+      editorProps: {
+        attributes: {
+          spellcheck: "false",
+        },
+      },
     };
 
     useEffect(() => {

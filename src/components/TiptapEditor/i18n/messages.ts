@@ -126,6 +126,11 @@ export type EditorMessages = {
     noSuggestions: string;
     ignore: string;
   };
+  browserSpellcheck: {
+    enableTooltip: string;
+    disableTooltip: string;
+    label: string;
+  };
   codeBlock: {
     copy: string;
     delete: string;
@@ -285,6 +290,11 @@ export const editorMessages = withDefault({
       noSuggestions: "Nenhuma sugestão",
       ignore: "Ignorar",
     },
+    browserSpellcheck: {
+      enableTooltip: "Ativar sugestões do navegador",
+      disableTooltip: "Desativar sugestões do navegador",
+      label: "Sugestões do navegador",
+    },
     codeBlock: {
       copy: "Copiar código",
       delete: "Excluir bloco",
@@ -440,6 +450,11 @@ export const editorMessages = withDefault({
       noSuggestions: "No suggestions",
       ignore: "Ignore",
     },
+    browserSpellcheck: {
+      enableTooltip: "Enable browser suggestions",
+      disableTooltip: "Disable browser suggestions",
+      label: "Browser suggestions",
+    },
     codeBlock: {
       copy: "Copy code",
       delete: "Delete block",
@@ -594,6 +609,11 @@ export const editorMessages = withDefault({
       empty: "Seleccione un error para ver sugerencias",
       noSuggestions: "Sin sugerencias",
       ignore: "Ignorar",
+    },
+    browserSpellcheck: {
+      enableTooltip: "Activar sugerencias del navegador",
+      disableTooltip: "Desactivar sugerencias del navegador",
+      label: "Sugerencias del navegador",
     },
     codeBlock: {
       copy: "Copiar código",

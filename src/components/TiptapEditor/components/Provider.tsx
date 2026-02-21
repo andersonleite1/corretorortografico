@@ -61,6 +61,8 @@ type TiptapContextType = {
   setIsSidebarOpen: (value: boolean) => void;
   isLTSidebarOpen: boolean;
   setIsLTSidebarOpen: (value: boolean) => void;
+  isBrowserSpellcheckEnabled: boolean;
+  setIsBrowserSpellcheckEnabled: (value: boolean) => void;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -96,6 +98,7 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isBrowserSpellcheckEnabled, setIsBrowserSpellcheckEnabled] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen } = useSidebar();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
@@ -161,6 +164,17 @@ export const TiptapProvider = ({
         setIsSidebarOpen,
         isLTSidebarOpen,
         setIsLTSidebarOpen,
+        isBrowserSpellcheckEnabled,
+        setIsBrowserSpellcheckEnabled: (value: boolean) => {
+          setIsBrowserSpellcheckEnabled(value);
+          editor.setOptions({
+            editorProps: {
+              attributes: {
+                spellcheck: value ? "true" : "false",
+              },
+            },
+          });
+        },
       }}
     >
       {editorContent}

@@ -28,6 +28,7 @@ import FontSizeDropdown from "./controls/FontSizeDropdown";
 import LineHeightDropdown from "./controls/LineHeightDropdown";
 import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
 import LanguageToolSidebarButton from "./controls/LanguageToolSidebarButton";
+import BrowserSpellcheckButton from "./controls/BrowserSpellcheckButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
 import DraftsDropdown from "./controls/DraftsDropdown";
@@ -89,6 +90,7 @@ const MenuBar = () => {
         <FontSizeDropdown />
         <LanguageToolToggleButton />
         <LanguageToolSidebarButton />
+        <BrowserSpellcheckButton />
 
         <ToolbarDivider />
 
