@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useTiptapContext } from "../Provider";
 import { BubbleMenu } from "../BubbleMenu";
 
-type Tone = "professional" | "casual" | "concise" | "expanded" | "creative";
+type Tone = "professional" | "casual" | "concise" | "expanded" | "creative" | "prompt";
 
 const TONES: { value: Tone; label: string }[] = [
     { value: "professional", label: "Profissional" },
@@ -16,6 +16,7 @@ const TONES: { value: Tone; label: string }[] = [
     { value: "concise", label: "Conciso" },
     { value: "expanded", label: "Expandido" },
     { value: "creative", label: "Criativo" },
+    { value: "prompt", label: "Prompt IA" },
 ];
 
 interface Props { }

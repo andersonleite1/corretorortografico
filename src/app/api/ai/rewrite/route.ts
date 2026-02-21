@@ -17,7 +17,7 @@ export const runtime = "nodejs"; // Prisma padrão requer Node.js
 
 const schema = z.object({
     text: z.string().min(1).max(5000),
-    tone: z.enum(["professional", "casual", "concise", "expanded", "creative"]),
+    tone: z.enum(["professional", "casual", "concise", "expanded", "creative", "prompt"]),
     language: z.string().default("pt-BR"),
 });
 
@@ -27,6 +27,7 @@ const TONE_PROMPTS = {
     concise: "de forma concisa, removendo redundâncias",
     expanded: "de forma expandida, com mais contexto e exemplos",
     creative: "de forma criativa, com metáforas e linguagem cativante",
+    prompt: "de forma estruturada e descritiva, sendo o mais eficiente possível para ser usado como prompt ou lista de execução de ações por um agente de IA (LLM). Transforme o texto fornecido em instruções claras, diretas, livres de ambiguidades e orientadas à ação",
 };
 
 export async function POST(req: Request) {
