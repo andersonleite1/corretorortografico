@@ -4,6 +4,8 @@ import EditForm from "./_components/EditForm";
 import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 import { HomeContent } from "@/data/home";
 import { useMercadoLivreProductGroups } from "@/hooks/useMercadoLivreProducts";
+import { useSidebar } from "@/components/providers/SidebarProvider";
+import clsx from "clsx";
 
 import "./style.scss";
 
@@ -15,9 +17,13 @@ type Props = {
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
   const { smartphoneProducts, othersProducts } = useMercadoLivreProductGroups();
+  const { isSidebarOpen } = useSidebar();
 
   return (
-    <div className="max-w-[56rem] w-full mx-auto py-10 px-3 md:px-6 sm:px-0">
+    <div className={clsx(
+      "w-full mx-auto py-10 px-3 md:px-6 sm:px-0 transition-all duration-300 ease-in-out",
+      isSidebarOpen ? "max-w-[72.25rem]" : "max-w-[56rem]"
+    )}>
       <EditForm locale={content.locale} userPlan={userPlan} />
       <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0 pb-4">
         <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
