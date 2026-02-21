@@ -15,6 +15,14 @@ export type ToneId =
     | "narrative" | "instagram" | "whatsapp" | "tweet" | "professional" | "persuasive"
     | "friendly" | "prompt";
 
+export interface CustomTone {
+    id: string;
+    name: string;
+    description: string;
+    instructions: string;
+    isActive: boolean;
+}
+
 export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     undo: true, redo: true, save: true, bold: true, italic: true, underline: true, moreMark: true,
     textColor: true, textHighlight: true, align: true, bulletList: true, orderedList: true,
@@ -119,6 +127,10 @@ interface EditorSettingsContextData {
     toggleButtonVisibility: (id: ToolbarButtonId) => void;
     activeTones: Record<ToneId, boolean>;
     toggleToneActivation: (id: ToneId) => void;
+    customTones: CustomTone[];
+    addCustomTone: (tone: Omit<CustomTone, "id" | "isActive">) => void;
+    deleteCustomTone: (id: string) => void;
+    toggleCustomToneActivation: (id: string) => void;
     isSettingsDialogOpen: boolean;
     setIsSettingsDialogOpen: (open: boolean) => void;
 }
@@ -128,6 +140,10 @@ const EditorSettingsContext = createContext<EditorSettingsContextData>({
     toggleButtonVisibility: () => { },
     activeTones: DEFAULT_TONES,
     toggleToneActivation: () => { },
+    customTones: [],
+    addCustomTone: () => { },
+    deleteCustomTone: () => { },
+    toggleCustomToneActivation: () => { },
     isSettingsDialogOpen: false,
     setIsSettingsDialogOpen: () => { },
 });
@@ -135,6 +151,7 @@ const EditorSettingsContext = createContext<EditorSettingsContextData>({
 export const EditorSettingsProvider = ({ children }: { children: React.ReactNode }) => {
     const [buttonVisibility, setButtonVisibility] = useState<Record<ToolbarButtonId, boolean>>(DEFAULT_SETTINGS);
     const [activeTones, setActiveTones] = useState<Record<ToneId, boolean>>(DEFAULT_TONES);
+    const [customTones, setCustomTones] = useState<CustomTone[]>([]);
     const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -155,6 +172,15 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
                 console.error("Failed to parse editor tone settings");
             }
         }
+
+        const savedCustomTones = localStorage.getItem("editor_custom_tones");
+        if (savedCustomTones) {
+            try {
+                setCustomTones(JSON.parse(savedCustomTones));
+            } catch (e) {
+                console.error("Failed to parse editor custom tones");
+            }
+        }
     }, []);
 
     const toggleButtonVisibility = (id: ToolbarButtonId) => {
@@ -173,8 +199,49 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
         });
     };
 
+    const addCustomTone = (tone: Omit<CustomTone, "id" | "isActive">) => {
+        setCustomTones((prev) => {
+            if (prev.length >= 5) return prev;
+            const newTone: CustomTone = {
+                ...tone,
+                id: `custom-${Date.now()}`,
+                isActive: true
+            };
+            const next = [...prev, newTone];
+            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            return next;
+        });
+    };
+
+    const deleteCustomTone = (id: string) => {
+        setCustomTones((prev) => {
+            const next = prev.filter(t => t.id !== id);
+            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            return next;
+        });
+    };
+
+    const toggleCustomToneActivation = (id: string) => {
+        setCustomTones((prev) => {
+            const next = prev.map(t => t.id === id ? { ...t, isActive: !t.isActive } : t);
+            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            return next;
+        });
+    };
+
     return (
-        <EditorSettingsContext.Provider value={{ buttonVisibility, toggleButtonVisibility, activeTones, toggleToneActivation, isSettingsDialogOpen, setIsSettingsDialogOpen }}>
+        <EditorSettingsContext.Provider value={{
+            buttonVisibility,
+            toggleButtonVisibility,
+            activeTones,
+            toggleToneActivation,
+            customTones,
+            addCustomTone,
+            deleteCustomTone,
+            toggleCustomToneActivation,
+            isSettingsDialogOpen,
+            setIsSettingsDialogOpen
+        }}>
             {children}
         </EditorSettingsContext.Provider>
     );

@@ -14,7 +14,7 @@ interface Props { }
 
 export function AiBubbleMenu({ }: Props) {
     const { editor, userPlan } = useTiptapContext();
-    const { activeTones } = useEditorSettings();
+    const { activeTones, customTones } = useEditorSettings();
     const isPro = userPlan !== "free";
     const [open, setOpen] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
@@ -38,7 +38,7 @@ export function AiBubbleMenu({ }: Props) {
         },
     });
 
-    const handleRewrite = (tone: ToneId) => {
+    const handleRewrite = (toneId: string, customInstructions?: string) => {
         const text = editor.state.doc.textBetween(
             editor.state.selection.from,
             editor.state.selection.to,
@@ -48,7 +48,14 @@ export function AiBubbleMenu({ }: Props) {
         setCompletion("");
         setShowPreview(true);
         setOpen(false);
-        complete("", { body: { text, tone, language: "pt-BR" } });
+        complete("", {
+            body: {
+                text,
+                tone: toneId,
+                customInstructions,
+                language: "pt-BR"
+            }
+        });
     };
 
     const handleAccept = () => {
@@ -103,8 +110,9 @@ export function AiBubbleMenu({ }: Props) {
                                 {(() => {
                                     const toneIds = Object.keys(TONE_LABELS) as ToneId[];
                                     const activeToneIds = toneIds.filter(id => activeTones[id]);
+                                    const activeCustomTones = customTones.filter(t => t.isActive);
 
-                                    if (activeToneIds.length === 0) {
+                                    if (activeToneIds.length === 0 && activeCustomTones.length === 0) {
                                         return (
                                             <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500 text-center">
                                                 Nenhum tom selecionado nas configurações.
@@ -112,16 +120,45 @@ export function AiBubbleMenu({ }: Props) {
                                         );
                                     }
 
-                                    return activeToneIds.map((id) => (
-                                        <button
-                                            key={id}
-                                            onClick={() => { setOpen(false); handleRewrite(id); }}
-                                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2"
-                                        >
-                                            <span className="text-sm">{TONE_ICONS[id]}</span>
-                                            <span>{TONE_LABELS[id]}</span>
-                                        </button>
-                                    ));
+                                    return (
+                                        <div className="max-h-[300px] overflow-y-auto overflow-x-hidden">
+                                            {activeToneIds.length > 0 && (
+                                                <>
+                                                    <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">
+                                                        Tons Padrão
+                                                    </div>
+                                                    {activeToneIds.map((id) => (
+                                                        <button
+                                                            key={id}
+                                                            onClick={() => { setOpen(false); handleRewrite(id); }}
+                                                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2"
+                                                        >
+                                                            <span className="text-sm">{TONE_ICONS[id]}</span>
+                                                            <span>{TONE_LABELS[id]}</span>
+                                                        </button>
+                                                    ))}
+                                                </>
+                                            )}
+
+                                            {activeCustomTones.length > 0 && (
+                                                <>
+                                                    <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-t border-gray-100 dark:border-white/5 mt-1 pt-1">
+                                                        Seus Tons
+                                                    </div>
+                                                    {activeCustomTones.map((tone) => (
+                                                        <button
+                                                            key={tone.id}
+                                                            onClick={() => { setOpen(false); handleRewrite(tone.id, tone.instructions); }}
+                                                            className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2"
+                                                        >
+                                                            <span className="text-sm">✨</span>
+                                                            <span className="truncate">{tone.name}</span>
+                                                        </button>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </div>
+                                    );
                                 })()}
                             </div>
                         )}
