@@ -340,7 +340,7 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 ### 🟡 Melhorias Recomendadas (pós-MVP)
 
 - [x] **MÉDIO-08:** (FIXED) Adicionar validação Zod nas configurações do editor
-- [ ] Implementar testes automatizados (pelo menos para as rotas de API críticas)
+- [x] Implementar testes automatizados (pelo menos para as rotas de API críticas)
 - [x] **MÉDIO-06:** (FIXED) Substituir `fs.appendFileSync` por logging estruturado (console.error para serverless)
 - [x] **BUG-02:** (FIXED) Possível inconsistência de cache em `src/lib/auth.ts`
 - [x] **SCALE-01:** (FIXED) Adicionar paginação nos endpoints de rascunhos
@@ -348,7 +348,7 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 - [x] **MÉDIO-09:** (FIXED) Tratamento de erro no webhook do Clerk
 - [x] **BAIXO-10:** (FIXED) Verificar a existência da variável `STRIPE_WEBHOOK_SECRET` no handler
 - [x] **HEADERS:** (FIXED) Configurar Security Headers em `next.config.mjs` (CSP, HSTS, X-Frame-Options)
-- [ ] Configurar Sentry ou equivalente para monitoramento de erros em produção
+- [x] Configurar Sentry ou equivalente para monitoramento de erros em produção
 
 ---
 

@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         const { content, title } = await req.json();
 
         const { object } = await generateObject({
-            model: openai("gpt-4o"),
+            model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
             schema: seoSchema,
             prompt: `Analise o seguinte artigo e retorne análise SEO completa.\nTítulo: ${title ?? "Sem título"}\n\n${content}`,
         });
