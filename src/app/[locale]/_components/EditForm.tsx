@@ -2,8 +2,8 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Controller, useForm } from "react-hook-form";
 
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
-import Modal from "@/components/shared/Modal";
 import { saveAs } from "file-saver";
+import { SaveNotification } from "@/components/shared/SaveNotification";
 import { FaTimes } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
@@ -44,13 +44,21 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{ content: any, id: string } | null>(null);
   const [draftSavingStatus, setDraftSavingStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
+
+  const showNotification = (message: string, type: "success" | "error" | "info" = "success") => {
+    setNotification({ message, type });
+  };
 
   const handleClear = () => {
     localStorage.removeItem("post");
     reset({ title: "", content: "" });
     editorRef.current?.getInstance()?.commands.setContent("");
     router.push(`/${locale}`);
-    showModal(formMessages.modal.cleared);
+    showNotification(formMessages.modal.cleared);
   };
 
   const preparePdfExport = () => {
@@ -60,7 +68,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const safeHtml = htmlFromEditor?.trim();
 
     if (!safeHtml) {
-      showModal(formMessages.modal.noContent);
+      showNotification(formMessages.modal.noContent, "info");
       return null;
     }
 
@@ -93,10 +101,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     try {
       const blob = await requestPdfFromHtml(payload.htmlDocument);
       saveAs(blob, payload.fileName);
-      showModal(formMessages.modal.pdfSuccess);
+      showNotification(formMessages.modal.pdfSuccess);
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
-      showModal(error instanceof Error ? error.message : formMessages.modal.pdfError);
+      showNotification(error instanceof Error ? error.message : formMessages.modal.pdfError, "error");
     } finally {
       setIsExportingPDF(false);
     }
@@ -120,7 +128,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       setIsPreviewOpen(true);
     } catch (error) {
       console.error("Erro ao gerar prévia do PDF:", error);
-      showModal(error instanceof Error ? error.message : formMessages.modal.pdfError);
+      showNotification(error instanceof Error ? error.message : formMessages.modal.pdfError, "error");
     } finally {
       setIsExportingPDF(false);
     }
@@ -129,7 +137,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const handleSaveDOC = async () => {
     const postData = localStorage.getItem("post");
     if (!postData) {
-      showModal(formMessages.modal.noContent);
+      showNotification(formMessages.modal.noContent, "info");
       return;
     }
 
@@ -157,7 +165,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     });
 
     saveAs(blob, `${docTitle}.doc`);
-    showModal(formMessages.modal.docSuccess);
+    showNotification(formMessages.modal.docSuccess);
   };
 
   const handleExportToTxt = () => {
@@ -169,7 +177,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       "";
 
     if (!plainText) {
-      showModal(formMessages.modal.noContent);
+      showNotification(formMessages.modal.noContent, "info");
       return;
     }
 
@@ -179,7 +187,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
     const blob = new Blob([plainText], { type: "text/plain;charset=utf-8" });
     saveAs(blob, `${safeTitle}.txt`);
-    showModal(formMessages.modal.txtSuccess);
+    showNotification(formMessages.modal.txtSuccess);
   };
 
   const clearPdfPreview = useCallback(() => {
@@ -204,19 +212,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const handlePreviewPost = useCallback(() => {
     router.push("/post-csr");
   }, [router]);
-
-  // Estado para gerenciar a Modal
-  const [modalMessage, setModalMessage] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = (message: string) => {
-    setModalMessage(message);
-    setIsModalOpen(true);
-    // fecha automaticamente apos 4 segundos
-    setTimeout(() => {
-      setIsModalOpen(false);
-    }, 4000);
-  };
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
@@ -313,7 +308,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       if (updatedDrafts.length > 10) updatedDrafts = updatedDrafts.slice(-10);
       localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
       setDrafts(updatedDrafts);
-      if (isExplicit) showModal(formMessages.modal.draftSaved);
+      if (isExplicit) showNotification(formMessages.modal.draftSaved);
       return;
     }
 
@@ -353,7 +348,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           content: d.content,
           date: new Date(d.createdAt).toLocaleString(locale === 'pt' ? 'pt-BR' : 'en-US')
         })));
-        if (isExplicit) showModal(formMessages.modal.draftSaved);
+        if (isExplicit) showNotification(formMessages.modal.draftSaved);
       } else {
         const errorText = await res.text();
         throw new Error(errorText || "Error saving draft");
@@ -363,7 +358,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       if (!isExplicit) {
         setDraftSavingStatus("error");
       } else {
-        showModal(error instanceof Error ? error.message : "Erro ao salvar rascunho");
+        showNotification(error instanceof Error ? error.message : "Erro ao salvar rascunho", "error");
       }
     }
   };
@@ -397,7 +392,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
     reset({ title: draft.title, content });
     editorRef.current?.getInstance()?.commands.setContent(content);
-    showModal(formMessages.modal.draftLoaded);
+    showNotification(formMessages.modal.draftLoaded);
   };
 
   // Função para excluir um rascunho
@@ -406,7 +401,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       const updated = drafts.filter((d) => d.id !== draftId);
       localStorage.setItem("drafts", JSON.stringify(updated));
       setDrafts(updated);
-      showModal(formMessages.modal.draftDeleted);
+      showNotification(formMessages.modal.draftDeleted);
       return;
     }
 
@@ -429,12 +424,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const toolbarItems = Array.from({ length: 6 });
     return (
       <div className="flex flex-col gap-6 order-2 min-w-full h-screen prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          message={modalMessage}
-        />
-
         <div>
           <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
           <div className="w-full h-11 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
@@ -531,12 +520,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         />
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        message={modalMessage}
-      />
-
       {isPreviewOpen && pdfPreview && (
         <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="w-full max-w-5xl h-[85vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700 flex flex-col overflow-hidden">
@@ -609,6 +592,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             />
           </div>
         </div>
+      )}
+
+      {notification && (
+        <SaveNotification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
       )}
     </div>
   );
