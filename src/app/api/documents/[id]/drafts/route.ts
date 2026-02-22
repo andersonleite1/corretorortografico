@@ -10,12 +10,26 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
-        const user = await getCurrentUser();
         const { id: documentId } = params;
+        const user = await getCurrentUser();
 
         if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 100);
+        const skip = (page - 1) * limit;
+
+        const totalCount = await db.draft.count({
+            where: {
+                documentId,
+                document: {
+                    userId: user.id
+                }
+            }
+        });
 
         const drafts = await db.draft.findMany({
             where: {
@@ -27,9 +41,19 @@ export async function GET(
             orderBy: {
                 createdAt: "desc",
             },
+            skip,
+            take: limit,
         });
 
-        return NextResponse.json(drafts);
+        return NextResponse.json({
+            drafts,
+            metadata: {
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                limit,
+            },
+        });
     } catch (error) {
         console.error("[DRAFTS_GET]", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
@@ -41,16 +65,6 @@ export async function POST(
     { params }: { params: { id: string } }
 ) {
     try {
-        const dbModels = Object.keys(db).filter(k => !k.startsWith('_') && !k.startsWith('$'));
-        if (req.headers.get("x-diagnose") === "true") {
-            return NextResponse.json({
-                dbModels,
-                dbDraftType: typeof (db as any).draft,
-                documentInModels: dbModels.includes("document"),
-                draftInModels: dbModels.includes("draft")
-            });
-        }
-
         const user = await getCurrentUser();
         const { id: documentId } = params;
         const body = await req.json();
@@ -72,60 +86,64 @@ export async function POST(
             return NextResponse.json({ error: "Document Not Found" }, { status: 404 });
         }
 
-        const now = new Date();
-        const throttleLimit = new Date(now.getTime() - THROTTLE_MINUTES * 60 * 1000);
+        const draft = await db.$transaction(async (tx) => {
+            const now = new Date();
+            const throttleLimit = new Date(now.getTime() - THROTTLE_MINUTES * 60 * 1000);
 
-        // Check for latest draft
-        const latestDraft = await db.draft.findFirst({
-            where: { documentId },
-            orderBy: { createdAt: "desc" }
-        });
-
-        let draft;
-
-        if (!isExplicitSave && latestDraft && latestDraft.createdAt > throttleLimit) {
-            // Update existing recently created draft
-            draft = await db.draft.update({
-                where: { id: latestDraft.id },
-                data: {
-                    title: title || latestDraft.title,
-                    content
-                }
-            });
-        } else {
-            if (!content) {
-                return NextResponse.json({ error: "Content is required" }, { status: 400 });
-            }
-
-            // Create a new draft
-            draft = await db.draft.create({
-                data: {
-                    documentId,
-                    title: (title || document.title || "Untitled").trim(),
-                    content: typeof content === "string" ? content : JSON.stringify(content)
-                }
-            });
-
-            // Enforce the 5-draft limit
-            const allDrafts = await db.draft.findMany({
+            // Check for latest draft within transaction
+            const latestDraft = await tx.draft.findFirst({
                 where: { documentId },
-                orderBy: { createdAt: "desc" },
-                select: { id: true }
+                orderBy: { createdAt: "desc" }
             });
 
-            if (allDrafts.length > MAX_DRAFTS) {
-                const draftIdsToDelete = allDrafts.slice(MAX_DRAFTS).map(d => d.id);
-                await db.draft.deleteMany({
-                    where: {
-                        id: { in: draftIdsToDelete }
+            let resultDraft;
+
+            if (!isExplicitSave && latestDraft && latestDraft.createdAt > throttleLimit) {
+                // Update existing recently created draft
+                resultDraft = await tx.draft.update({
+                    where: { id: latestDraft.id },
+                    data: {
+                        title: title || latestDraft.title,
+                        content: typeof content === "string" ? content : JSON.stringify(content)
                     }
                 });
+            } else {
+                if (!content) {
+                    throw new Error("Content is required");
+                }
+
+                // Create a new draft
+                resultDraft = await tx.draft.create({
+                    data: {
+                        documentId,
+                        title: (title || document.title || "Untitled").trim(),
+                        content: typeof content === "string" ? content : JSON.stringify(content)
+                    }
+                });
+
+                // Enforce the 5-draft limit
+                const allDrafts = await tx.draft.findMany({
+                    where: { documentId },
+                    orderBy: { createdAt: "desc" },
+                    select: { id: true }
+                });
+
+                if (allDrafts.length > MAX_DRAFTS) {
+                    const draftIdsToDelete = allDrafts.slice(MAX_DRAFTS).map(d => d.id);
+                    await tx.draft.deleteMany({
+                        where: {
+                            id: { in: draftIdsToDelete }
+                        }
+                    });
+                }
             }
-        }
+            return resultDraft;
+        });
 
         return NextResponse.json(draft);
-    } catch (error) {
+    } catch (error: any) {
         console.error("[DRAFTS_POST] Error detail:", error);
-        return NextResponse.json({ error: error instanceof Error ? error.message : "Internal Error" }, { status: 500 });
+        const status = error.message === "Content is required" ? 400 : 500;
+        return NextResponse.json({ error: error.message || "Internal Error" }, { status });
     }
 }

@@ -2,11 +2,16 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { cache } from "react";
 
-// `cache` evita múltiplos fetches do mesmo usuário no mesmo request
-export const getCurrentUser = cache(async () => {
+// `cache` evita múltiplos fetches do mesmo usuário no mesmo request.
+// Adicionamos um parâmetro opcional para permitir bypass do cache se necessário.
+export const getCurrentUser = cache(async (forceRefresh: boolean = false) => {
     const { userId: clerkId } = await auth();
 
     if (!clerkId) return null;
+
+    // Se forceRefresh for true, podemos passar um valor único para o cache
+    // ou simplesmente confiar que quem chama com true quer dados novos do DB.
+    // No React cache, a mesma função com argumentos diferentes gera entradas de cache diferentes.
 
     const user = await db.user.findUnique({
         where: { clerkId },
@@ -19,8 +24,8 @@ export const getCurrentUser = cache(async () => {
 });
 
 // Helper para verificar plano
-export const getUserPlan = cache(async () => {
-    const user = await getCurrentUser();
+export const getUserPlan = cache(async (forceRefresh: boolean = false) => {
+    const user = await getCurrentUser(forceRefresh);
     if (!user) return "free";
 
     const sub = user.subscription;

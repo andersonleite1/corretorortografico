@@ -1,5 +1,6 @@
-import {v2 as cloudinary} from 'cloudinary';
-import {NextResponse} from 'next/server';
+import { v2 as cloudinary } from 'cloudinary';
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,12 @@ cloudinary.config({
 
 export async function GET() {
   try {
-    const {resources} = await cloudinary.search
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { resources } = await cloudinary.search
       .expression('resource_type:image')
       .sort_by('created_at', 'desc')
       .execute();
@@ -30,17 +36,22 @@ export async function GET() {
     return NextResponse.json(map);
   } catch (error) {
     console.error('Error fetching images:', error);
-    return NextResponse.json({error: 'Failed to fetch images'}, {status: 500});
+    return NextResponse.json({ error: 'Failed to fetch images' }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({error: 'No file provided'}, {status: 400});
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -77,6 +88,6 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     console.error('Error uploading file:', error);
-    return NextResponse.json({error: 'Failed to upload file'}, {status: 500});
+    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
   }
 }

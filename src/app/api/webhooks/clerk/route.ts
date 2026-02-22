@@ -41,53 +41,56 @@ export async function POST(req: Request) {
 
     const { type, data } = event;
 
-    // ===== EVENTO: Usuário criado =====
-    if (type === "user.created") {
+    // ===== EVENTO: Usuário criado ou atualizado =====
+    if (type === "user.created" || type === "user.updated") {
         const { id, email_addresses, first_name, last_name, image_url } = data;
         const email = email_addresses[0]?.email_address;
 
         if (!email) {
+            console.error("Email not found in Clerk event data.");
             return new NextResponse("Email não encontrado.", { status: 400 });
         }
 
-        await db.user.create({
-            data: {
-                clerkId: id,
-                email,
-                name: [first_name, last_name].filter(Boolean).join(" ") || null,
-                imageUrl: image_url || null,
-                subscription: {
-                    create: {
-                        plan: "free",
-                        status: "active",
+        try {
+            await db.user.upsert({
+                where: { clerkId: id },
+                create: {
+                    clerkId: id,
+                    email,
+                    name: [first_name, last_name].filter(Boolean).join(" ") || null,
+                    imageUrl: image_url || null,
+                    subscription: {
+                        create: {
+                            plan: "free",
+                            status: "active",
+                        }
                     }
-                }
-            },
-        });
-
-        console.log(`✅ Usuário criado no DB: ${email}`);
-    }
-
-    // ===== EVENTO: Usuário atualizado =====
-    if (type === "user.updated") {
-        const { id, email_addresses, first_name, last_name, image_url } = data;
-        const email = email_addresses[0]?.email_address;
-
-        await db.user.update({
-            where: { clerkId: id },
-            data: {
-                email: email || undefined,
-                name: [first_name, last_name].filter(Boolean).join(" ") || null,
-                imageUrl: image_url || null,
-            },
-        });
+                },
+                update: {
+                    email,
+                    name: [first_name, last_name].filter(Boolean).join(" ") || null,
+                    imageUrl: image_url || null,
+                },
+            });
+            console.log(`✅ Usuário ${type === "user.created" ? "criado" : "atualizado"} no DB: ${email}`);
+        } catch (dbError) {
+            console.error(`Error processing user ${type}:`, dbError);
+            return new NextResponse("Erro ao processar usuário no banco de dados.", { status: 500 });
+        }
     }
 
     // ===== EVENTO: Usuário deletado =====
     if (type === "user.deleted") {
         const { id } = data;
-        await db.user.delete({ where: { clerkId: id as string } });
-        console.log(`🗑️ Usuário deletado do DB: clerkId=${id}`);
+        try {
+            await db.user.delete({ where: { clerkId: id as string } });
+            console.log(`🗑️ Usuário deletado do DB: clerkId=${id}`);
+        } catch (dbError) {
+            console.error("Error deleting user:", dbError);
+            // Non-ideal but common for deletion if user already deleted: 
+            // we can either ignore or return success since the end state is achieved.
+            return new NextResponse("Erro ao deletar usuário.", { status: 200 });
+        }
     }
 
     return new NextResponse("OK", { status: 200 });

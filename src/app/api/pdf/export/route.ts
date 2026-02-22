@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     try {
         const htmlDocument = await req.text();
-        const apiKey = process.env.NEXT_PUBLIC_PDF_API_KEY || "3xEt7CBU1XydZFeA4foiNgSGJOfCcwab";
+        const apiKey = process.env.PDF_API_KEY;
 
         if (!apiKey) {
-            return new NextResponse("Chave da API de PDF não configurada.", { status: 500 });
+            console.error("PDF_API_KEY is not configured");
+            return new NextResponse("Erro de configuração no servidor.", { status: 500 });
         }
 
         const response = await fetch("https://api.editordetexto.cloud/api/pdf/html", {

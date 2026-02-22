@@ -9,8 +9,7 @@ import fs from "fs";
 import path from "path";
 
 function logError(msg: string) {
-    const logPath = path.join(process.cwd(), "rewrite-error.log");
-    fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+    console.error(`[AI_REWRITE_ERROR] ${msg}`);
 }
 
 export const runtime = "nodejs"; // Prisma padrão requer Node.js
@@ -60,8 +59,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
         }
 
-        // 3. Rate Limiting (desabilitado para debug)
-        /*
+        // 3. Rate Limiting
         const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "free");
         if (!rateLimit.allowed) {
             return NextResponse.json(
@@ -69,7 +67,6 @@ export async function POST(req: Request) {
                 { status: 429 }
             );
         }
-        */
 
         // 4. Validar input
         const body = await req.json();
@@ -100,12 +97,9 @@ export async function POST(req: Request) {
 
         return result.toTextStreamResponse();
     } catch (error: any) {
-        logError(`AI_REWRITE_ERROR: ${error.message}\n${error.stack}`);
-        console.error("[AI_REWRITE_ERROR]", error);
+        logError(`${error.message}\n${error.stack}`);
         return NextResponse.json({
-            error: "Erro interno no servidor debug",
-            message: error.message,
-            stack: error.stack
+            error: "Erro interno no servidor",
         }, { status: 500 });
     }
 }

@@ -8,6 +8,8 @@ import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 
 export const runtime = "nodejs";
 
+const SUPPORTED_LANGUAGES = ["Portuguese", "English", "Spanish", "French", "German", "Italian", "pt-BR", "en-US", "es-ES"];
+
 export async function POST(req: Request) {
     try {
         const { userId: clerkId } = await auth();
@@ -24,8 +26,12 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { content, to } = z.object({
             content: z.string().min(1).max(10000),
-            to: z.string().min(2),
+            to: z.string().min(2).max(20),
         }).parse(body);
+
+        if (!SUPPORTED_LANGUAGES.includes(to)) {
+            return NextResponse.json({ error: "Idioma não suportado." }, { status: 400 });
+        }
 
         const result = await streamText({
             model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
