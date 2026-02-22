@@ -42,6 +42,14 @@ export type EditPageMessages = {
       close: string;
       download: string;
     };
+    postPreview: {
+      heading: string;
+      close: string;
+      viewHtml: string;
+      downloadHtml: string;
+      blogPreview: string;
+      htmlCode: string;
+    };
     loading: {
       label: string;
       alt: string;
@@ -99,6 +107,14 @@ const editMessages: Record<Locale, EditPageMessages> = {
         iframeTitle: "Pré-visualização do PDF",
         close: "Fechar",
         download: "Download",
+      },
+      postPreview: {
+        heading: "Pré-visualização do Post",
+        close: "Fechar Visualização",
+        viewHtml: "Visualizar HTML Gerado",
+        downloadHtml: "Baixar Conteúdo HTML Gerado",
+        blogPreview: "Prévia do Blog",
+        htmlCode: "Código HTML",
       },
       loading: {
         label: "Gerando PDF...",
@@ -186,6 +202,14 @@ const editMessages: Record<Locale, EditPageMessages> = {
         close: "Close",
         download: "Download",
       },
+      postPreview: {
+        heading: "Post Preview",
+        close: "Close Preview",
+        viewHtml: "View Generated HTML",
+        downloadHtml: "Download Generated HTML",
+        blogPreview: "Blog Preview",
+        htmlCode: "HTML Code",
+      },
       loading: {
         label: "Generating PDF...",
         alt: "Generating PDF",
@@ -271,6 +295,14 @@ const editMessages: Record<Locale, EditPageMessages> = {
         iframeTitle: "Vista previa del PDF",
         close: "Cerrar",
         download: "Descargar",
+      },
+      postPreview: {
+        heading: "Vista previa del Post",
+        close: "Cerrar Vista Previa",
+        viewHtml: "Ver HTML Generado",
+        downloadHtml: "Descargar Contenido HTML Generado",
+        blogPreview: "Vista Previa del Blog",
+        htmlCode: "Código HTML",
       },
       loading: {
         label: "Generando PDF...",

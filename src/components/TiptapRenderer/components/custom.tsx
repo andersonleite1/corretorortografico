@@ -13,15 +13,32 @@ export const components: Partial<Components> = {
   h2: (props) => <HeadingWithAnchor level={2} {...props} />,
   h3: (props) => <HeadingWithAnchor level={3} {...props} />,
   h4: (props) => <HeadingWithAnchor level={4} {...props} />,
-  img: ({ src, alt, width, ...props }: any) => (
-    <Image
-      src={src}
-      alt={alt || ""}
-      width={props["data-width"]}
-      height={props["data-height"]}
-      className="mx-auto rounded-lg"
-    />
-  ),
+  img: ({ src, alt, width, height, ...props }: any) => {
+    const finalWidth = width || props["data-width"];
+    const finalHeight = height || props["data-height"];
+
+    if (finalWidth && finalHeight) {
+      return (
+        <Image
+          src={src}
+          alt={alt || ""}
+          width={Number(finalWidth)}
+          height={Number(finalHeight)}
+          className="mx-auto rounded-lg"
+        />
+      );
+    }
+
+    // Fallback to standard img tag if dimensions are missing to avoid Next.js runtime error
+    return (
+      <img
+        src={src}
+        alt={alt || ""}
+        className="mx-auto rounded-lg"
+        loading="lazy"
+      />
+    );
+  },
   iframe: ({ ...props }) => (
     <div>
       <iframe

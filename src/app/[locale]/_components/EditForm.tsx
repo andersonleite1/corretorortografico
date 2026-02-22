@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 import { DraftComparison } from "@/components/Drafts/DraftComparison";
+import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 
 
 interface PostForm {
@@ -41,6 +42,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     fileName: string;
   } | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPostPreviewOpen, setIsPostPreviewOpen] = useState(false);
+  const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{ content: any, id: string } | null>(null);
   const [draftSavingStatus, setDraftSavingStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -210,8 +213,48 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }, [pdfPreview]);
 
   const handlePreviewPost = useCallback(() => {
-    router.push("/post-csr");
-  }, [router]);
+    setIsPostPreviewOpen(true);
+    setIsPreviewHtmlMode(false);
+  }, []);
+
+  const handleDownloadHtml = () => {
+    const editorInstance = editorRef.current?.getInstance();
+    const { title, content } = getValues();
+    const htmlFromEditor = editorInstance?.getHTML() ?? content;
+    const safeHtml = htmlFromEditor?.trim();
+
+    if (!safeHtml) {
+      showNotification(formMessages.modal.noContent, "info");
+      return;
+    }
+
+    const fallbackName = formMessages.defaults.documentName;
+    const baseTitle = (title || fallbackName).trim() || fallbackName;
+    const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
+
+    const htmlDocument = `<!DOCTYPE html>
+<html lang="${formMessages.pdfLang}">
+<head>
+  <meta charset="utf-8" />
+  <title>${baseTitle}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
+    h1 { font-size: 2.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
+    img { max-width: 100%; height: auto; border-radius: 8px; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+    blockquote { border-left: 4px solid #ddd; padding-left: 1rem; color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>${baseTitle}</h1>
+  ${safeHtml}
+</body>
+</html>`;
+
+    const blob = new Blob([htmlDocument], { type: "text/html;charset=utf-8" });
+    saveAs(blob, `${safeTitle}.html`);
+    showNotification(formMessages.modal.docSuccess);
+  };
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
@@ -581,6 +624,93 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 {formMessages.preview.download}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isPostPreviewOpen && (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-[#0d1117] overflow-hidden animate-in fade-in duration-300">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0d1117]/80 backdrop-blur-md">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {formMessages.postPreview.heading}
+            </h3>
+            <button
+              onClick={() => setIsPostPreviewOpen(false)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            >
+              <FaTimes className="w-6 h-6 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Content Container */}
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#010409] p-4 md:p-12">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white dark:bg-[#0d1117] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-500">
+                {/* Visual Decor */}
+                <div className="h-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+
+                <div className="p-8 md:p-12">
+                  {isPreviewHtmlMode ? (
+                    <div className="relative">
+                      <div className="absolute top-0 right-0 py-1 px-3 bg-gray-800 text-white text-xs rounded-bl-lg font-mono">
+                        {formMessages.postPreview.htmlCode}
+                      </div>
+                      <pre className="p-6 bg-gray-900 text-green-400 rounded-xl overflow-x-auto font-mono text-sm leading-relaxed border border-gray-700">
+                        <code>{editorRef.current?.getInstance()?.getHTML() || watch("content")}</code>
+                      </pre>
+                    </div>
+                  ) : (
+                    <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-blue-500 prose-img:rounded-2xl prose-img:shadow-lg">
+                      <h1 className="text-4xl md:text-5xl font-black mb-8 text-gray-900 dark:text-white leading-tight">
+                        {watch("title") || formMessages.defaults.documentName}
+                      </h1>
+                      <div className="flex items-center gap-4 mb-10 text-gray-500 dark:text-gray-400">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-md">
+                          {watch("title")?.charAt(0) || "P"}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-gray-200">User</p>
+                          <p className="text-xs">{new Date().toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US')}</p>
+                        </div>
+                        <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1" />
+                        <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                          Post Preview
+                        </span>
+                      </div>
+                      <TiptapRenderer>
+                        {editorRef.current?.getInstance()?.getHTML() || watch("content")}
+                      </TiptapRenderer>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer with actions */}
+          <div className="py-6 px-10 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0d1117] flex flex-wrap justify-between items-center gap-4">
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => setIsPreviewHtmlMode(!isPreviewHtmlMode)}
+                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-500/25 active:scale-95"
+              >
+                {isPreviewHtmlMode ? formMessages.postPreview.blogPreview : formMessages.postPreview.viewHtml}
+              </button>
+              <button
+                onClick={handleDownloadHtml}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-emerald-500/25 active:scale-95"
+              >
+                {formMessages.postPreview.downloadHtml}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsPostPreviewOpen(false)}
+              className="px-8 py-3 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-bold transition-all active:scale-95"
+            >
+              {formMessages.postPreview.close}
+            </button>
           </div>
         </div>
       )}
