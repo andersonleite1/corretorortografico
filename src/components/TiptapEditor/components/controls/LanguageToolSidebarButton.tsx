@@ -8,7 +8,7 @@ import Tooltip from "../ui/Tooltip";
 import Icon from "../ui/Icon";
 
 const LanguageToolSidebarButton = () => {
-    const { isLTSidebarOpen, setIsLTSidebarOpen, contentElement, editor } = useTiptapContext();
+    const { isLTSidebarOpen, setIsLTSidebarOpen, contentElement, editor, isMobile } = useTiptapContext();
 
     // Sincronizar painel com o estado do LanguageTool
     const isLTEnabled = useEditorState({
@@ -41,6 +41,8 @@ const LanguageToolSidebarButton = () => {
 
         setIsLTSidebarOpen(nextState);
     };
+
+    if (isMobile) return null;
 
     const label = isLTSidebarOpen ? "Fechar Painel de Erros" : "Abrir Painel de Erros";
 

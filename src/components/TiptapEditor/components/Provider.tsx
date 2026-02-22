@@ -72,6 +72,7 @@ type TiptapContextType = {
   setIsBrowserSpellcheckEnabled: (value: boolean) => void;
   onSaveDocument: () => void;
   isSaving: boolean;
+  isMobile: boolean;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -114,7 +115,7 @@ export const TiptapProvider = ({
   const router = useRouter();
   const documentId = searchParams.get("docId");
 
-  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen } = useSidebar();
+  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen, isMobile } = useSidebar();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
@@ -261,6 +262,7 @@ export const TiptapProvider = ({
           },
           onSaveDocument: handleSaveDocument,
           isSaving,
+          isMobile,
         }}
       >
         {editorContent}

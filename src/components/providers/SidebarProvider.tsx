@@ -9,6 +9,7 @@ type SidebarContextType = {
     setIsLTSidebarOpen: (open: boolean) => void;
     isDocumentsDialogOpen: boolean;
     setIsDocumentsDialogOpen: (open: boolean) => void;
+    isMobile: boolean;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -17,26 +18,43 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isLTSidebarOpen, setIsLTSidebarOpen] = useState(false);
     const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 1024;
+            setIsMobile(mobile);
+            if (mobile) {
+                setIsSidebarOpen(false);
+                setIsLTSidebarOpen(false);
+            }
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+
         if (typeof window !== "undefined") {
             const stored = localStorage.getItem("rte-sidebar-open");
-            if (stored === "true") {
+            if (stored === "true" && window.innerWidth >= 1024) {
                 setIsSidebarOpen(true);
             }
             const storedLT = localStorage.getItem("rte-lt-sidebar-open");
-            if (storedLT === "true") {
+            if (storedLT === "true" && window.innerWidth >= 1024) {
                 setIsLTSidebarOpen(true);
             }
         }
+
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     const toggleSidebar = (value: boolean) => {
+        if (isMobile && value) return; // Prevent opening on mobile
         setIsSidebarOpen(value);
         localStorage.setItem("rte-sidebar-open", String(value));
     };
 
     const toggleLTSidebar = (value: boolean) => {
+        if (isMobile && value) return; // Prevent opening on mobile
         setIsLTSidebarOpen(value);
         localStorage.setItem("rte-lt-sidebar-open", String(value));
     };
@@ -48,7 +66,8 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
             isLTSidebarOpen,
             setIsLTSidebarOpen: toggleLTSidebar,
             isDocumentsDialogOpen,
-            setIsDocumentsDialogOpen
+            setIsDocumentsDialogOpen,
+            isMobile // Export isMobile to help components decide to hide themselves
         }}>
             {children}
         </SidebarContext.Provider>
@@ -64,7 +83,8 @@ export const useSidebar = () => {
             isLTSidebarOpen: false,
             setIsLTSidebarOpen: () => console.warn("useSidebar used outside SidebarProvider"),
             isDocumentsDialogOpen: false,
-            setIsDocumentsDialogOpen: () => console.warn("useSidebar used outside SidebarProvider")
+            setIsDocumentsDialogOpen: () => console.warn("useSidebar used outside SidebarProvider"),
+            isMobile: false
         };
     }
     return context;

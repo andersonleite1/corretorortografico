@@ -12,6 +12,8 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
+import { Menu } from "lucide-react";
+import MobileMenu from "./MobileMenu";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -45,6 +47,7 @@ const Header = ({ userButton }: HeaderProps) => {
     isOpen: false,
     view: "sign-in",
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -85,56 +88,76 @@ const Header = ({ userButton }: HeaderProps) => {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-              <span>Idioma</span>
-              <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60">
-                {locales.map((locale) => {
-                  const isActive = locale === currentLocale;
-                  return (
-                    <button
-                      key={locale}
-                      type="button"
-                      onClick={() => switchLocale(locale as Locale)}
-                      className={`px-3 py-1 rounded-full transition ${isActive
-                        ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                        : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                        }`}
-                    >
-                      {locale.toUpperCase()}
-                    </button>
-                  );
-                })}
+            <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                <span>Idioma</span>
+                <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60">
+                  {locales.map((locale) => {
+                    const isActive = locale === currentLocale;
+                    return (
+                      <button
+                        key={locale}
+                        type="button"
+                        onClick={() => switchLocale(locale as Locale)}
+                        className={`px-3 py-1 rounded-full transition ${isActive
+                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                          : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                          }`}
+                      >
+                        {locale.toUpperCase()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex gap-4 items-center min-w-[140px] justify-end">
+                {!isLoaded ? (
+                  <HeaderSkeleton />
+                ) : (
+                  <>
+                    <SignedOut>
+                      <button
+                        onClick={() => setAuthModal({ isOpen: true, view: "sign-in" })}
+                        className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                      >
+                        Entrar
+                      </button>
+                      <button
+                        onClick={() => setAuthModal({ isOpen: true, view: "sign-up" })}
+                        className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                      >
+                        Começar agora
+                      </button>
+                    </SignedOut>
+                    <SignedIn>
+                      {userButton}
+                    </SignedIn>
+                  </>
+                )}
+                <ThemeSwitcher />
               </div>
             </div>
-            <div className="flex gap-4 items-center min-w-[140px] justify-end">
-              {!isLoaded ? (
-                <HeaderSkeleton />
-              ) : (
-                <>
-                  <SignedOut>
-                    <button
-                      onClick={() => setAuthModal({ isOpen: true, view: "sign-in" })}
-                      className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-                    >
-                      Entrar
-                    </button>
-                    <button
-                      onClick={() => setAuthModal({ isOpen: true, view: "sign-up" })}
-                      className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
-                    >
-                      Começar agora
-                    </button>
-                  </SignedOut>
-                  <SignedIn>
-                    {userButton}
-                  </SignedIn>
-                </>
-              )}
-              <ThemeSwitcher />
-            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              aria-label="Open Menu"
+            >
+              <Menu className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
+            </button>
           </div>
         </div>
       </header>
+
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        currentLocale={currentLocale}
+        switchLocale={switchLocale}
+        setAuthModal={setAuthModal}
+        userButton={userButton}
+      />
 
       <AuthOverlay
         isOpen={authModal.isOpen}

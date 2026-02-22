@@ -3,7 +3,7 @@ import MenuButton from "../MenuButton";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 
 const DocumentsButton = () => {
-    const { setIsDocumentsDialogOpen, isSidebarOpen, setIsSidebarOpen } = useSidebar();
+    const { setIsDocumentsDialogOpen, isSidebarOpen, setIsSidebarOpen, isMobile } = useSidebar();
 
     return (
         <>
@@ -14,12 +14,14 @@ const DocumentsButton = () => {
                 tooltip="Meus Documentos"
                 onClick={() => setIsDocumentsDialogOpen(true)}
             />
-            <MenuButton
-                icon="Columns"
-                tooltip="Mostrar na Lateral Meus Documentos"
-                active={isSidebarOpen}
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            />
+            {!isMobile && (
+                <MenuButton
+                    icon="Columns"
+                    tooltip="Mostrar na Lateral Meus Documentos"
+                    active={isSidebarOpen}
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                />
+            )}
         </>
     );
 };
