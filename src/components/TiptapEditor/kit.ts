@@ -20,6 +20,7 @@ import {
   Highlight,
   Table,
   LanguageTool,
+  Shortcuts,
 } from "./extensions";
 import { Locale, i18n } from "../../../i18n-config";
 
@@ -56,6 +57,7 @@ const createExtensionKit = (locale?: Locale) => [
     },
   }),
   Selection,
+  Shortcuts,
   CharacterCount,
   Superscript,
   Subscript,
