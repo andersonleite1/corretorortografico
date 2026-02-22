@@ -19,6 +19,7 @@ import Script from "next/script";
 import { getHomeFaqSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -118,6 +119,7 @@ export default async function RootLayout({
             <MainContent userButton={<UserButton />} locale={locale}>
               {children}
             </MainContent>
+            <Toaster richColors position="top-right" />
           </body>
         </html>
       </SidebarProvider>

@@ -22,15 +22,6 @@ const localizedRoutes: LocalizedRoute[] = [
     },
   },
   {
-    priority: 0.9,
-    changeFrequency: "weekly",
-    paths: {
-      pt: "/editar-pdf",
-      es: "/es/editar-pdf",
-      en: "/en/edit-pdf",
-    },
-  },
-  {
     priority: 0.7,
     changeFrequency: "weekly",
     paths: {
