@@ -35,22 +35,23 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["res.cloudinary.com", "images.unsplash.com", "http2.mlstatic.com"],
-    //   remotePatterns: [
-    //     {
-    //       protocol: "https",
-    //       hostname: "images.unsplash.com",
-    //       port: "",
-    //       pathname: "**",
-    //     },
-    //
-    //     {
-    //       protocol: "http",
-    //       hostname: "res.cloudinary.com",
-    //       port: "",
-    //       pathname: "**",
-    //     },
-    //   ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "http2.mlstatic.com",
+        pathname: "/**",
+      },
+    ],
   },
   async headers() {
     return [

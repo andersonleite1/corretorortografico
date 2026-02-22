@@ -1,8 +1,29 @@
 import { NextResponse } from "next/server";
 import DOMPurify from 'isomorphic-dompurify';
 
+const ipRateLimitMap = new Map<string, { count: number, resetTime: number }>();
+const LIMIT = 10;
+const WINDOW_IN_MS = 60 * 1000;
+
 export async function POST(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
+        const now = Date.now();
+
+        const rateLimitInfo = ipRateLimitMap.get(ip);
+        if (rateLimitInfo) {
+            if (now > rateLimitInfo.resetTime) {
+                ipRateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_IN_MS });
+            } else {
+                if (rateLimitInfo.count >= LIMIT) {
+                    return new NextResponse("Rate limit exceeded. Tente novamente em 1 minuto.", { status: 429 });
+                }
+                rateLimitInfo.count++;
+            }
+        } else {
+            ipRateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_IN_MS });
+        }
+
         const htmlDocument = await req.text();
         const apiKey = process.env.PDF_API_KEY;
 
@@ -43,6 +64,6 @@ export async function POST(req: Request) {
         });
     } catch (error: any) {
         console.error("Erro no proxy de PDF:", error);
-        return new NextResponse(error.message || "Erro interno no servidor de proxy", { status: 500 });
+        return new NextResponse("Erro interno no servidor de proxy.", { status: 500 });
     }
 }

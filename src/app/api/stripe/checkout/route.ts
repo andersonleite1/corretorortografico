@@ -3,9 +3,15 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { PLAN_BY_PRICE_ID } from "@/lib/stripe";
+
+const VALID_PRICE_IDS = Object.keys(PLAN_BY_PRICE_ID);
 
 const schema = z.object({
-    priceId: z.string(),
+    priceId: z.string().refine(
+        (id) => VALID_PRICE_IDS.includes(id),
+        { message: "Plano inválido." }
+    ),
 });
 
 export async function POST(req: Request) {

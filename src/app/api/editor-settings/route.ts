@@ -8,9 +8,10 @@ import {
 import { z } from "zod";
 
 const settingsSchema = z.object({
-    toolbarSettings: z.record(z.boolean()).optional(),
-    activeTones: z.record(z.boolean()).optional(),
+    toolbarSettings: z.record(z.string(), z.boolean()).optional(),
+    activeTones: z.record(z.string(), z.boolean()).optional(),
     customTones: z.array(z.object({
+        id: z.string().optional(),
         name: z.string().min(1).max(50),
         description: z.string().min(1).max(200),
         priority: z.number().optional().default(0),
@@ -97,17 +98,17 @@ export async function PUT(req: Request) {
                 // Merge parcial: só atualiza os campos presentes no body
                 ...(toolbarSettings !== undefined && {
                     toolbarSettings: {
-                        ...(existing?.toolbarSettings as object ?? DEFAULT_SETTINGS),
+                        ...(existing?.toolbarSettings as Record<string, any> ?? DEFAULT_SETTINGS),
                         ...toolbarSettings,
-                    },
+                    } as any,
                 }),
                 ...(activeTones !== undefined && {
                     activeTones: {
-                        ...(existing?.activeTones as object ?? DEFAULT_TONES),
+                        ...(existing?.activeTones as Record<string, any> ?? DEFAULT_TONES),
                         ...activeTones,
-                    },
+                    } as any,
                 }),
-                ...(customTones !== undefined && { customTones }),
+                ...(customTones !== undefined && { customTones: customTones as any }),
             },
         });
 

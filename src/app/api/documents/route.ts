@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
         const parseResult = documentSchema.safeParse(body);
         if (!parseResult.success) {
-            return new NextResponse(parseResult.error.errors.map(e => e.message).join(", "), { status: 400 });
+            return new NextResponse(parseResult.error.issues.map((e: any) => e.message).join(", "), { status: 400 });
         }
 
         const { id, title, content } = parseResult.data;
@@ -72,7 +72,7 @@ export async function GET(req: Request) {
         }
 
         const { searchParams } = new URL(req.url);
-        const page = parseInt(searchParams.get("page") || "1");
+        const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
         const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 100);
         const skip = (page - 1) * limit;
 

@@ -1,6 +1,13 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const draftSchema = z.object({
+    title: z.string().max(500).optional(),
+    content: z.string().min(1, "O conteúdo não pode estar vazio").max(500000, "O conteúdo excede o limite máximo de caracteres permitidos"),
+    isExplicitSave: z.boolean().optional().default(false),
+});
 
 const MAX_DRAFTS = 5;
 const THROTTLE_MINUTES = 30;
@@ -18,7 +25,7 @@ export async function GET(
         }
 
         const { searchParams } = new URL(req.url);
-        const page = parseInt(searchParams.get("page") || "1");
+        const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
         const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 100);
         const skip = (page - 1) * limit;
 
@@ -68,7 +75,14 @@ export async function POST(
         const user = await getCurrentUser();
         const { id: documentId } = params;
         const body = await req.json();
-        const { title, content, isExplicitSave } = body;
+
+        // Validar através do Zod (BUG-T02)
+        const parseResult = draftSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 });
+        }
+
+        const { title, content, isExplicitSave } = parseResult.data;
 
         if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
