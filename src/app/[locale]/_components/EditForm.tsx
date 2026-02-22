@@ -220,6 +220,27 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   useEffect(() => {
     setIsLoading(true);
+    const checkRecovery = (serverData: any) => {
+      const localDataStr = localStorage.getItem("post");
+      if (!localDataStr) return serverData;
+
+      try {
+        const localData = JSON.parse(localDataStr);
+        // Se o docId bater ou for nulo (pra docs novos) e o timestamp local for maior
+        const isSameDoc = localData.docId === docId;
+        const serverUpdateAt = serverData?.updatedAt ? new Date(serverData.updatedAt).getTime() : 0;
+        const localUpdatedAt = localData.lastSaved || 0;
+
+        if (isSameDoc && localUpdatedAt > serverUpdateAt) {
+          console.log("Recuperando do Local Storage (mais recente)");
+          return localData;
+        }
+      } catch (e) {
+        console.error("Erro ao verificar recuperação:", e);
+      }
+      return serverData;
+    };
+
     if (docId) {
       fetch(`/api/documents/${docId}`)
         .then((res) => {
@@ -235,13 +256,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
               // Fallback
             }
           }
-          reset({ title: doc.title, content });
-          editorRef.current?.getInstance()?.commands.setContent(content);
+
+          const recovered = checkRecovery({ title: doc.title, content, updatedAt: doc.updatedAt });
+          reset({ title: recovered.title, content: recovered.content });
+          editorRef.current?.getInstance()?.commands.setContent(recovered.content);
           setIsLoading(false);
         })
         .catch((error) => {
           console.error(error);
-          // Se não encontrar, continua com o post do localStorage ou mock
           getPost().then((post) => {
             reset({ ...post });
             editorRef.current?.getInstance()?.commands.setContent(post.content || "");
@@ -264,12 +286,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   useEffect(() => {
     const subscription = watch((values, { type }) => {
       if (type === "change") {
-        savePost({ ...values, wordCount: getWordCount() });
+        savePost({ ...values, wordCount: getWordCount() }, docId);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, docId, getWordCount]);
 
 
 

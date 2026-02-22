@@ -174,6 +174,19 @@ export const TiptapProvider = ({
     }
   }, [editor, handleSaveDocument, draftActions?.onSaveDraft]);
 
+  // Auto-save document every 30 seconds
+  useEffect(() => {
+    if (!documentId || userPlan === "free" || !handleSaveDocument) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      handleSaveDocument();
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [documentId, userPlan, handleSaveDocument]);
+
   if (!editor) {
     return null;
   }

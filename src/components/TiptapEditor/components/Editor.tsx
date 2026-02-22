@@ -77,18 +77,13 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
     const isEditable = !readonly && !disabled;
     const displayBubbleMenu = isEditable && hideBubbleMenu;
 
-    const throttledUpdate = useCallback(
-      throttle((value: Content) => onContentChange?.(value), 1500),
-      []
-    );
-
     const handleUpdate = useCallback(
       (editor: Editor) => {
         const content =
           output === "html" ? (editor.isEmpty ? "" : editor.getHTML()) : editor.getJSON();
-        throttledUpdate(content);
+        onContentChange?.(content);
       },
-      [throttledUpdate, output]
+      [onContentChange, output]
     );
 
     const extensions = useMemo(() => getExtensionKit(locale), [locale]);
