@@ -8,7 +8,8 @@ export type ToolbarButtonId =
     | "lineHeight" | "link" | "table" | "codeBlock" | "insert" | "heading"
     | "fontFamily" | "fontSize" | "languageTool" | "languageToolSidebar"
     | "browserSpellcheck" | "export" | "preview" | "documents" | "drafts"
-    | "importPdf" | "copyEditor" | "clearEditor" | "sourceCode" | "fullScreen";
+    | "importPdf" | "copyEditor" | "clearEditor" | "sourceCode" | "fullScreen"
+    | "aiRewrite";
 
 export type ToneId =
     | "formal" | "casual" | "academic" | "creative" | "simplified" | "romantic"
@@ -29,7 +30,8 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     lineHeight: true, link: true, table: true, codeBlock: true, insert: true, heading: true,
     fontFamily: true, fontSize: true, languageTool: true, languageToolSidebar: true,
     browserSpellcheck: true, export: true, preview: true, documents: true, drafts: true,
-    importPdf: true, copyEditor: true, clearEditor: true, sourceCode: true, fullScreen: true
+    importPdf: true, copyEditor: true, clearEditor: true, sourceCode: true, fullScreen: true,
+    aiRewrite: true
 };
 
 export const DEFAULT_TONES: Record<ToneId, boolean> = {
@@ -70,7 +72,8 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
     copyEditor: "Copiar Texto",
     clearEditor: "Limpar Editor",
     sourceCode: "Código-fonte",
-    fullScreen: "Tela cheia"
+    fullScreen: "Tela cheia",
+    aiRewrite: "Reescrever IA"
 };
 
 export const TONE_LABELS: Record<ToneId, string> = {

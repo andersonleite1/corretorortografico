@@ -38,6 +38,7 @@ import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
 import SettingsButton from "./controls/SettingsButton";
+import AiRewriteButton from "./controls/AiRewriteButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
@@ -106,9 +107,10 @@ const MenuBar = () => {
 
         {buttonVisibility.copyEditor && <CopyEditorButton />}
         {exportActions?.onClear && buttonVisibility.clearEditor && <ClearEditorButton />}
+        <SettingsButton />
 
         <ToolbarDivider />
-        <SettingsButton />
+        {buttonVisibility.aiRewrite && <AiRewriteButton />}
       </Toolbar>
     </div>
   );

@@ -104,15 +104,15 @@ export const SettingsDialog = () => {
                                             key={id}
                                             onClick={() => toggleToneActivation(id)}
                                             className={`flex flex-col items-center justify-center text-center p-6 rounded-2xl border transition-all duration-200 outline-none ${isActive
-                                                ? "border-blue-300 bg-blue-50/50 dark:border-blue-500/30 dark:bg-blue-500/10 shadow-sm"
-                                                : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 dark:border-white/5 dark:bg-black/20 dark:hover:border-white/10"
+                                                ? "border-blue-300 bg-emerald-50/50 dark:border-blue-500/30 dark:bg-emerald-500/10 shadow-sm"
+                                                : "border-blue-100 bg-red-50/50 hover:border-blue-200 hover:bg-red-50/80 dark:border-blue-500/10 dark:bg-red-500/5 dark:hover:border-blue-500/20"
                                                 }`}
                                         >
                                             <div className="text-3xl mb-3">{TONE_ICONS[id]}</div>
-                                            <h4 className={`text-sm font-bold tracking-wider mb-2 uppercase ${isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`}>
+                                            <h4 className={`text-sm font-bold tracking-wider mb-2 uppercase ${isActive ? "text-blue-600 dark:text-blue-400" : "text-blue-600/70 dark:text-blue-400/70"}`}>
                                                 {TONE_LABELS[id]}
                                             </h4>
-                                            <p className={`text-xs ${isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-gray-500 dark:text-gray-400"}`}>
+                                            <p className={`text-xs ${isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-blue-500/60 dark:text-blue-400/60"}`}>
                                                 {TONE_DESCRIPTIONS[id]}
                                             </p>
                                         </button>
@@ -123,8 +123,8 @@ export const SettingsDialog = () => {
                                     <div
                                         key={tone.id}
                                         className={`relative group flex flex-col items-center justify-center text-center p-6 rounded-2xl border transition-all duration-200 ${tone.isActive
-                                            ? "border-blue-300 bg-blue-50/50 dark:border-blue-500/30 dark:bg-blue-500/10 shadow-sm"
-                                            : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 dark:border-white/5 dark:bg-black/20 dark:hover:border-white/10"
+                                            ? "border-blue-300 bg-emerald-50/50 dark:border-blue-500/30 dark:bg-emerald-500/10 shadow-sm"
+                                            : "border-blue-100 bg-red-50/50 hover:border-blue-200 hover:bg-red-50/80 dark:border-blue-500/10 dark:bg-red-500/5 dark:hover:border-blue-500/20"
                                             }`}
                                     >
                                         <button
@@ -138,10 +138,10 @@ export const SettingsDialog = () => {
                                             <Icon name="Trash" size={14} />
                                         </button>
                                         <div className="text-3xl mb-3 z-10">✨</div>
-                                        <h4 className={`text-sm font-bold tracking-wider mb-2 uppercase z-10 ${tone.isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`}>
+                                        <h4 className={`text-sm font-bold tracking-wider mb-2 uppercase z-10 ${tone.isActive ? "text-blue-600 dark:text-blue-400" : "text-blue-600/70 dark:text-blue-400/70"}`}>
                                             {tone.name}
                                         </h4>
-                                        <p className={`text-xs z-10 ${tone.isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-gray-500 dark:text-gray-400"}`}>
+                                        <p className={`text-xs z-10 ${tone.isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-blue-500/60 dark:text-blue-400/60"}`}>
                                             {tone.description}
                                         </p>
                                     </div>
