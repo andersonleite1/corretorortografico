@@ -17,7 +17,7 @@ vi.mock('@/lib/db', () => ({
 
 // Mock the AI rate limit
 vi.mock('@/lib/ai-rate-limit', () => ({
-    checkAiRateLimit: vi.fn().mockResolvedValue({ success: false }), // we will mock success: false to test bounds
+    checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: false }), // we will mock allowed: false to test bounds
 }))
 
 describe('POST /api/ai/rewrite', () => {

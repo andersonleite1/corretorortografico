@@ -18,7 +18,7 @@ export async function GET() {
     }
 
     const { resources } = await cloudinary.search
-      .expression('resource_type:image')
+      .expression(`resource_type:image AND tags=${userId}`)
       .sort_by('created_at', 'desc')
       .execute();
 
@@ -54,6 +54,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: 'Tipo de arquivo não permitido. Apenas JPEG, PNG, WEBP e GIF são suportados.' }, { status: 400 });
+    }
+
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'Arquivo muito grande (máx. 5 MB).' }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -63,6 +74,7 @@ export async function POST(req: Request) {
           public_id: file.name.split(/\.\w+$/)[0],
           resource_type: 'image',
           invalidate: true,
+          tags: [userId],
         },
         (error, result) => {
           if (error) reject(error);

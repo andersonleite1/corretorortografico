@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
         const body = await req.json();
         const { content, to } = z.object({
-            content: z.string().min(1).max(10000),
+            content: z.string().min(1).max(5000),
             to: z.string().min(2).max(20),
         }).parse(body);
 

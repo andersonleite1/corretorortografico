@@ -7,6 +7,17 @@ const supportedLanguages = new Set(["pt-BR", "en-US", "es"]);
 const defaultLanguage = "pt-BR";
 
 export async function POST(request: NextRequest) {
+  // --- Proteção contra Abuso (Origin Check) ---
+  const origin = request.headers.get("origin") || request.headers.get("referer");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  // Verifica se a requisição originou de dentro da própria aplicação
+  if (!origin || !origin.startsWith(appUrl)) {
+    console.warn(`[LanguageTool API] Acesso negado para a origem: ${origin}`);
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
+  }
+  // ---------------------------------------------
+
   const respond = (data: object, init?: ResponseInit) =>
     NextResponse.json(data, init);
 

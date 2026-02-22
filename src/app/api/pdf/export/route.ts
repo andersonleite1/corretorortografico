@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import DOMPurify from 'isomorphic-dompurify';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
     try {
         const htmlDocument = await req.text();
         const apiKey = process.env.PDF_API_KEY;
@@ -10,13 +11,21 @@ export async function POST(req: NextRequest) {
             return new NextResponse("Erro de configuração no servidor.", { status: 500 });
         }
 
+        if (!htmlDocument) {
+            return new NextResponse("Documento HTML é obrigatório", { status: 400 });
+        }
+
+        const sanitizedHtml = DOMPurify.sanitize(htmlDocument, {
+            USE_PROFILES: { html: true }, // permite tags HTML normais
+        });
+
         const response = await fetch("https://api.editordetexto.cloud/api/pdf/html", {
             method: "POST",
             headers: {
                 "Content-Type": "text/html",
                 "x-api-key": apiKey,
             },
-            body: htmlDocument,
+            body: sanitizedHtml,
         });
 
         if (!response.ok) {

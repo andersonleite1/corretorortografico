@@ -1,6 +1,13 @@
 import { db } from "@/lib/db";
 import { getCurrentUser, getUserPlan } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const documentSchema = z.object({
+    id: z.string().cuid().optional(),
+    title: z.string().max(500).optional(),
+    content: z.string().min(1, "Conteúdo é obrigatório").max(500000, "Conteúdo excede o limite máximo permitido (500KB)")
+});
 
 export async function POST(req: Request) {
     try {
@@ -17,11 +24,13 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { id, title, content } = body;
 
-        if (!content) {
-            return new NextResponse("Conteúdo é obrigatório", { status: 400 });
+        const parseResult = documentSchema.safeParse(body);
+        if (!parseResult.success) {
+            return new NextResponse(parseResult.error.errors.map(e => e.message).join(", "), { status: 400 });
         }
+
+        const { id, title, content } = parseResult.data;
 
         let document;
 

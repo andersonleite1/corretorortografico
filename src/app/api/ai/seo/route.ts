@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 
 export const runtime = "nodejs";
 
@@ -29,15 +30,24 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "SEO é exclusivo Pro+.", upgradeUrl: "/pricing" }, { status: 403 });
         }
 
-        const { content, title } = await req.json();
+        const rateLimit = await checkAiRateLimit(user.id, user.subscription.plan);
+        if (!rateLimit.allowed) {
+            return NextResponse.json({ error: "Limite atingido.", message: "Você atingiu seu limite de uso.", upgradeUrl: "/pricing" }, { status: 429 });
+        }
 
-        const { object } = await generateObject({
+        const body = await req.json();
+        const { content, title } = z.object({
+            content: z.string().min(1).max(5000),
+            title: z.string().max(500).optional()
+        }).parse(body);
+
+        const { object, usage } = await generateObject({
             model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
             schema: seoSchema,
             prompt: `Analise o seguinte artigo e retorne análise SEO completa.\nTítulo: ${title ?? "Sem título"}\n\n${content}`,
         });
 
-        await db.aiUsage.create({ data: { userId: user.id, feature: "seo", tokensUsed: 500 } });
+        await db.aiUsage.create({ data: { userId: user.id, feature: "seo", tokensUsed: usage.totalTokens } });
 
         return NextResponse.json(object);
     } catch (error) {

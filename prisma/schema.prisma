@@ -105,6 +105,7 @@ model AiUsage {
   tokensUsed Int      @default(0)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, feature, createdAt])
   @@index([userId, createdAt])
   @@map("ai_usage")
 }

@@ -87,9 +87,8 @@ export async function POST(req: Request) {
             console.log(`🗑️ Usuário deletado do DB: clerkId=${id}`);
         } catch (dbError) {
             console.error("Error deleting user:", dbError);
-            // Non-ideal but common for deletion if user already deleted: 
-            // we can either ignore or return success since the end state is achieved.
-            return new NextResponse("Erro ao deletar usuário.", { status: 200 });
+            // We return 500 here so Clerk will retry the webhook if an actual DB failure occurred
+            return new NextResponse("Erro ao deletar usuário no banco.", { status: 500 });
         }
     }
 
