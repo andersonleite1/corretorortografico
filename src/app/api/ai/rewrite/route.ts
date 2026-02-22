@@ -5,8 +5,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
-import fs from "fs";
-import path from "path";
 
 function logError(msg: string) {
     console.error(`[AI_REWRITE_ERROR] ${msg}`);

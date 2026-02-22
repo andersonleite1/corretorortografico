@@ -5,15 +5,21 @@ import {
     DEFAULT_SETTINGS,
     DEFAULT_TONES,
 } from "@/components/providers/editor-settings.constants";
+import { z } from "zod";
+
+const settingsSchema = z.object({
+    toolbarSettings: z.record(z.boolean()).optional(),
+    activeTones: z.record(z.boolean()).optional(),
+    customTones: z.array(z.object({
+        name: z.string().min(1).max(50),
+        description: z.string().min(1).max(200),
+        priority: z.number().optional().default(0),
+        instructions: z.string().min(1).max(1000).optional(),
+    })).max(5).optional(),
+});
 
 /**
  * GET /api/editor-settings
- *
- * Retorna as configurações do editor do usuário autenticado.
- * Multi-tenancy: a query sempre filtra por `userId` do usuário autenticado,
- * garantindo que nenhum tenant possa acessar dados de outro.
- *
- * Se o usuário ainda não tem configurações salvas, retorna os defaults.
  */
 export async function GET() {
     try {
@@ -25,14 +31,11 @@ export async function GET() {
 
         const settings = await db.editorSettings.findUnique({
             where: {
-                // Isolamento de tenant: garante que somente o registro
-                // pertencente a este userId será retornado.
                 userId: user.id,
             },
         });
 
         if (!settings) {
-            // Usuário autenticado sem configurações salvas ainda — retorna defaults
             return NextResponse.json({
                 toolbarSettings: DEFAULT_SETTINGS,
                 activeTones: DEFAULT_TONES,
@@ -51,20 +54,6 @@ export async function GET() {
     }
 }
 
-/**
- * PUT /api/editor-settings
- *
- * Cria ou atualiza (upsert) as configurações do editor do usuário autenticado.
- * Multi-tenancy: usa `userId` como chave do upsert, nunca como parâmetro
- * vindo do body — o ID do tenant vem apenas do token de autenticação.
- *
- * Body esperado (todos opcionais — partial update):
- * {
- *   toolbarSettings?: Record<string, boolean>,
- *   activeTones?: Record<string, boolean>,
- *   customTones?: CustomTone[],
- * }
- */
 export async function PUT(req: Request) {
     try {
         const user = await getCurrentUser();
@@ -74,7 +63,7 @@ export async function PUT(req: Request) {
         }
 
         const body = await req.json();
-        const { toolbarSettings, activeTones, customTones } = body;
+        const { toolbarSettings, activeTones, customTones } = settingsSchema.parse(body);
 
         // Validação mínima: pelo menos um campo deve ser enviado
         if (
@@ -87,24 +76,13 @@ export async function PUT(req: Request) {
             });
         }
 
-        // Validação: customTones não pode exceder 5 itens
-        if (Array.isArray(customTones) && customTones.length > 5) {
-            return new NextResponse(
-                "Máximo de 5 tons personalizados permitidos",
-                { status: 400 }
-            );
-        }
-
         // Busca o registro atual para fazer merge parcial (evita sobrescrever
         // campos não enviados no body)
         const existing = await db.editorSettings.findUnique({
             where: { userId: user.id },
         });
 
-        // Upsert com isolamento de tenant:
-        // - `where.userId` garante que só o registro deste tenant é afetado
-        // - `create.userId` vincula o novo registro ao tenant atual
-        // - nunca confiamos no userId vindo do body
+        // Upsert com isolamento de tenant
         const settings = await db.editorSettings.upsert({
             where: {
                 userId: user.id,
@@ -138,7 +116,13 @@ export async function PUT(req: Request) {
             activeTones: settings.activeTones,
             customTones: settings.customTones,
         });
-    } catch (error) {
+    } catch (error: any) {
+        if (error instanceof z.ZodError) {
+            return NextResponse.json({
+                error: "Dados inválidos",
+                details: error.issues
+            }, { status: 400 });
+        }
         console.error("[EDITOR_SETTINGS_PUT]", error);
         return new NextResponse("Erro Interno", { status: 500 });
     }

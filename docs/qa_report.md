@@ -315,7 +315,7 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 | 12 | Schema de banco migrado | ✅ | Prisma schema bem estruturado |
 | 13 | i18n implementado | ✅ | Middleware de locale presente |
 | 14 | SEO básico | ✅ | Sitemap e robots.txt configurados |
-| 15 | CORS / Headers de segurança | ⚠️ | Não verificados headers HTTP Security (CSP, HSTS, X-Frame-Options) em `next.config.mjs` |
+| 15 | CORS / Headers de segurança | ✅ | HSTS, CSP, X-Frame-Options configurados |
 
 ---
 
@@ -339,12 +339,15 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 
 ### 🟡 Melhorias Recomendadas (pós-MVP)
 
-- [ ] Adicionar validação Zod nas configurações do editor
+- [x] **MÉDIO-08:** (FIXED) Adicionar validação Zod nas configurações do editor
 - [ ] Implementar testes automatizados (pelo menos para as rotas de API críticas)
-- [ ] Substituir `fs.appendFileSync` por logging estruturado (Sentry/Pino)
+- [x] **MÉDIO-06:** (FIXED) Substituir `fs.appendFileSync` por logging estruturado (console.error para serverless)
 - [x] **BUG-02:** (FIXED) Possível inconsistência de cache em `src/lib/auth.ts`
 - [x] **SCALE-01:** (FIXED) Adicionar paginação nos endpoints de rascunhos
-- [ ] Configurar Security Headers em `next.config.mjs` (CSP, HSTS, X-Frame-Options)
+- [x] **MÉDIO-07:** (FIXED) Adicionar limite em ?limit= na paginação de documentos
+- [x] **MÉDIO-09:** (FIXED) Tratamento de erro no webhook do Clerk
+- [x] **BAIXO-10:** (FIXED) Verificar a existência da variável `STRIPE_WEBHOOK_SECRET` no handler
+- [x] **HEADERS:** (FIXED) Configurar Security Headers em `next.config.mjs` (CSP, HSTS, X-Frame-Options)
 - [ ] Configurar Sentry ou equivalente para monitoramento de erros em produção
 
 ---

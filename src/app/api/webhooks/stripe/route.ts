@@ -51,6 +51,13 @@ async function handleSubscriptionUpsert(
 }
 
 export async function POST(req: Request) {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        console.error("STRIPE_WEBHOOK_SECRET is not set");
+        return new NextResponse("Configuração do servidor ausente.", { status: 500 });
+    }
+
     const body = await req.text();
     const signature = (await headers()).get("stripe-signature")!;
 
@@ -60,7 +67,7 @@ export async function POST(req: Request) {
         event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_WEBHOOK_SECRET!
+            webhookSecret
         );
     } catch (err: any) {
         console.error("Webhook inválido:", err.message);
