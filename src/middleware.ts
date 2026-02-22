@@ -19,6 +19,7 @@ const isProtectedRoute = createRouteMatcher([
   "/settings(.*)",
   "/api/ai(.*)",             // APIs de IA
   "/api/documents(.*)",
+  "/api/editor-settings(.*)",  // Configurações do editor (multi-tenant)
 ]);
 
 function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {

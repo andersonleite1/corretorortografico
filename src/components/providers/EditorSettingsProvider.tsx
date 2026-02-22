@@ -1,132 +1,73 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { useUser } from "@clerk/nextjs";
+import {
+    ToolbarButtonId,
+    ToneId,
+    CustomTone,
+    DEFAULT_SETTINGS,
+    DEFAULT_TONES,
+    TOOLBAR_BUTTON_LABELS,
+    TONE_LABELS,
+    TONE_DESCRIPTIONS,
+    TONE_ICONS,
+} from "./editor-settings.constants";
 
-export type ToolbarButtonId =
-    | "undo" | "redo" | "save" | "bold" | "italic" | "underline" | "moreMark"
-    | "textColor" | "textHighlight" | "align" | "bulletList" | "orderedList"
-    | "lineHeight" | "link" | "table" | "codeBlock" | "insert" | "heading"
-    | "fontFamily" | "fontSize" | "languageTool" | "languageToolSidebar"
-    | "browserSpellcheck" | "export" | "preview" | "documents" | "drafts"
-    | "importPdf" | "copyEditor" | "clearEditor" | "sourceCode" | "fullScreen"
-    | "aiRewrite";
+// Re-exporta tudo do constants para não quebrar imports existentes
+export type { ToolbarButtonId, ToneId, CustomTone };
+export {
+    DEFAULT_SETTINGS,
+    DEFAULT_TONES,
+    TOOLBAR_BUTTON_LABELS,
+    TONE_LABELS,
+    TONE_DESCRIPTIONS,
+    TONE_ICONS,
+};
 
-export type ToneId =
-    | "formal" | "casual" | "academic" | "creative" | "simplified" | "romantic"
-    | "narrative" | "instagram" | "whatsapp" | "tweet" | "professional" | "persuasive"
-    | "friendly" | "prompt";
+// ---------------------------------------------------------------------------
+// Chaves de localStorage (fallback para usuários anônimos)
+// ---------------------------------------------------------------------------
+const LS_TOOLBAR = "editor_toolbar_settings";
+const LS_TONES = "editor_active_tones";
+const LS_CUSTOM = "editor_custom_tones";
 
-export interface CustomTone {
-    id: string;
-    name: string;
-    description: string;
-    instructions: string;
-    isActive: boolean;
+// ---------------------------------------------------------------------------
+// Helpers de localStorage
+// ---------------------------------------------------------------------------
+function loadFromLocalStorage(): {
+    buttonVisibility: Record<ToolbarButtonId, boolean>;
+    activeTones: Record<ToneId, boolean>;
+    customTones: CustomTone[];
+} {
+    if (typeof window === "undefined") {
+        return { buttonVisibility: DEFAULT_SETTINGS, activeTones: DEFAULT_TONES, customTones: [] };
+    }
+    let buttonVisibility = { ...DEFAULT_SETTINGS };
+    let activeTones = { ...DEFAULT_TONES };
+    let customTones: CustomTone[] = [];
+
+    try {
+        const raw = localStorage.getItem(LS_TOOLBAR);
+        if (raw) buttonVisibility = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    } catch { /* ignorar JSON inválido */ }
+
+    try {
+        const raw = localStorage.getItem(LS_TONES);
+        if (raw) activeTones = { ...DEFAULT_TONES, ...JSON.parse(raw) };
+    } catch { /* ignorar JSON inválido */ }
+
+    try {
+        const raw = localStorage.getItem(LS_CUSTOM);
+        if (raw) customTones = JSON.parse(raw);
+    } catch { /* ignorar JSON inválido */ }
+
+    return { buttonVisibility, activeTones, customTones };
 }
 
-export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
-    undo: true, redo: true, save: true, bold: true, italic: true, underline: true, moreMark: true,
-    textColor: true, textHighlight: true, align: true, bulletList: true, orderedList: true,
-    lineHeight: true, link: true, table: true, codeBlock: true, insert: true, heading: true,
-    fontFamily: true, fontSize: true, languageTool: true, languageToolSidebar: true,
-    browserSpellcheck: true, export: true, preview: true, documents: true, drafts: true,
-    importPdf: true, copyEditor: true, clearEditor: true, sourceCode: true, fullScreen: true,
-    aiRewrite: true
-};
-
-export const DEFAULT_TONES: Record<ToneId, boolean> = {
-    formal: true, casual: true, academic: true, creative: true, simplified: true,
-    romantic: true, narrative: true, instagram: true, whatsapp: true, tweet: true,
-    professional: true, persuasive: true, friendly: true, prompt: true
-};
-
-export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
-    undo: "Desfazer",
-    redo: "Refazer",
-    save: "Salvar",
-    bold: "Negrito",
-    italic: "Itálico",
-    underline: "Sublinhado",
-    moreMark: "Mais Formatações",
-    textColor: "Cor do Texto",
-    textHighlight: "Cor de Fundo",
-    align: "Alinhamento",
-    bulletList: "Lista com Marcadores",
-    orderedList: "Lista Numerada",
-    lineHeight: "Espaçamento de Linhas",
-    link: "Inserir Link",
-    table: "Inserir Tabela",
-    codeBlock: "Bloco de Código",
-    insert: "Inserir Outros",
-    heading: "Cabeçalhos",
-    fontFamily: "Fonte",
-    fontSize: "Tamanho da Fonte",
-    languageTool: "Corretor (LanguageTool)",
-    languageToolSidebar: "Painel do Corretor",
-    browserSpellcheck: "Corretor do Navegador",
-    export: "Exportar",
-    preview: "Visualizar",
-    documents: "Meus Documentos",
-    drafts: "Rascunhos",
-    importPdf: "Importar PDF",
-    copyEditor: "Copiar Texto",
-    clearEditor: "Limpar Editor",
-    sourceCode: "Código-fonte",
-    fullScreen: "Tela cheia",
-    aiRewrite: "Reescrever IA"
-};
-
-export const TONE_LABELS: Record<ToneId, string> = {
-    formal: "FORMAL",
-    casual: "CASUAL",
-    academic: "ACADÊMICO",
-    creative: "CRIATIVO",
-    simplified: "SIMPLIFICADO",
-    romantic: "ROMÂNTICO",
-    narrative: "NARRATIVO",
-    instagram: "INSTAGRAM",
-    whatsapp: "WHATSAPP",
-    tweet: "TWEET",
-    professional: "PROFISSIONAL",
-    persuasive: "PERSUASIVO",
-    friendly: "AMIGÁVEL",
-    prompt: "Prompt IA"
-};
-
-export const TONE_DESCRIPTIONS: Record<ToneId, string> = {
-    formal: "Profissional e sério",
-    casual: "Descontraído e informal",
-    academic: "Erudito e estruturado",
-    creative: "Original e imaginativo",
-    simplified: "Simples e direto",
-    romantic: "Emotivo e apaixonado",
-    narrative: "Para contar histórias",
-    instagram: "Estilo social e envolvente",
-    whatsapp: "Direto e conversacional",
-    tweet: "Conciso e impactante",
-    professional: "Focado em negócios",
-    persuasive: "Convincente e focado",
-    friendly: "Acolhedor e gentil",
-    prompt: "Dedicado a agentes LLM"
-};
-
-export const TONE_ICONS: Record<ToneId, string> = {
-    formal: "👔",
-    casual: "👕",
-    academic: "🎓",
-    creative: "🎨",
-    simplified: "💡",
-    romantic: "❤️",
-    narrative: "📖",
-    instagram: "📸",
-    whatsapp: "💬",
-    tweet: "🐦",
-    professional: "💼",
-    persuasive: "🎯",
-    friendly: "😊",
-    prompt: "🤖"
-};
-
+// ---------------------------------------------------------------------------
+// Context
+// ---------------------------------------------------------------------------
 interface EditorSettingsContextData {
     buttonVisibility: Record<ToolbarButtonId, boolean>;
     toggleButtonVisibility: (id: ToolbarButtonId) => void;
@@ -138,6 +79,8 @@ interface EditorSettingsContextData {
     toggleCustomToneActivation: (id: string) => void;
     isSettingsDialogOpen: boolean;
     setIsSettingsDialogOpen: (open: boolean) => void;
+    /** true enquanto as configurações estão sendo carregadas do banco */
+    isLoadingSettings: boolean;
 }
 
 const EditorSettingsContext = createContext<EditorSettingsContextData>({
@@ -151,56 +94,113 @@ const EditorSettingsContext = createContext<EditorSettingsContextData>({
     toggleCustomToneActivation: () => { },
     isSettingsDialogOpen: false,
     setIsSettingsDialogOpen: () => { },
+    isLoadingSettings: false,
 });
 
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
 export const EditorSettingsProvider = ({ children }: { children: React.ReactNode }) => {
-    const [buttonVisibility, setButtonVisibility] = useState<Record<ToolbarButtonId, boolean>>(DEFAULT_SETTINGS);
-    const [activeTones, setActiveTones] = useState<Record<ToneId, boolean>>(DEFAULT_TONES);
+    const { isSignedIn, isLoaded: isClerkLoaded } = useUser();
+
+    const [buttonVisibility, setButtonVisibility] = useState<Record<ToolbarButtonId, boolean>>({ ...DEFAULT_SETTINGS });
+    const [activeTones, setActiveTones] = useState<Record<ToneId, boolean>>({ ...DEFAULT_TONES });
     const [customTones, setCustomTones] = useState<CustomTone[]>([]);
     const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+    const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
+    // Ref para debounce de sincronização com o banco
+    const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Ref para rastrear o último estado de autenticação que iniciamos o carregamento
+    // Previne chamadas duplicadas quando há re-renders, mas permite corretamente
+    // detectar mudanças reais (ex: login/logout).
+    const loadedForSignedIn = useRef<boolean | null>(null);
+
+    // -----------------------------------------------------------------------
+    // Carregamento inicial das configurações
+    // -----------------------------------------------------------------------
     useEffect(() => {
-        const savedButtons = localStorage.getItem("editor_toolbar_settings");
-        if (savedButtons) {
-            try {
-                setButtonVisibility({ ...DEFAULT_SETTINGS, ...JSON.parse(savedButtons) });
-            } catch (e) {
-                console.error("Failed to parse editor button settings");
-            }
-        }
+        // Aguardar Clerk resolver o estado de auth
+        if (!isClerkLoaded) return;
 
-        const savedTones = localStorage.getItem("editor_active_tones");
-        if (savedTones) {
-            try {
-                setActiveTones({ ...DEFAULT_TONES, ...JSON.parse(savedTones) });
-            } catch (e) {
-                console.error("Failed to parse editor tone settings");
-            }
-        }
+        // Evitar recarregar se já carregamos para este mesmo estado de auth
+        if (loadedForSignedIn.current === isSignedIn) return;
+        loadedForSignedIn.current = isSignedIn;
 
-        const savedCustomTones = localStorage.getItem("editor_custom_tones");
-        if (savedCustomTones) {
-            try {
-                setCustomTones(JSON.parse(savedCustomTones));
-            } catch (e) {
-                console.error("Failed to parse editor custom tones");
-            }
+        if (isSignedIn) {
+            // Usuário autenticado — carrega do banco (isolamento multi-tenant)
+            setIsLoadingSettings(true);
+            fetch("/api/editor-settings")
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: Falha ao carregar configurações`);
+                    return res.json();
+                })
+                .then((data) => {
+                    setButtonVisibility({ ...DEFAULT_SETTINGS, ...(data.toolbarSettings ?? {}) });
+                    setActiveTones({ ...DEFAULT_TONES, ...(data.activeTones ?? {}) });
+                    setCustomTones(Array.isArray(data.customTones) ? data.customTones : []);
+                })
+                .catch((err) => {
+                    console.error("[EditorSettings] Erro ao carregar do banco, usando localStorage como fallback:", err);
+                    // Fallback para localStorage em caso de erro de rede
+                    const local = loadFromLocalStorage();
+                    setButtonVisibility(local.buttonVisibility);
+                    setActiveTones(local.activeTones);
+                    setCustomTones(local.customTones);
+                })
+                .finally(() => setIsLoadingSettings(false));
+        } else {
+            // Usuário anônimo — usa apenas localStorage
+            const local = loadFromLocalStorage();
+            setButtonVisibility(local.buttonVisibility);
+            setActiveTones(local.activeTones);
+            setCustomTones(local.customTones);
         }
-    }, []);
+    }, [isClerkLoaded, isSignedIn]);
 
+    // -----------------------------------------------------------------------
+    // Sincronização com o banco (debounced — 600ms após a última alteração)
+    // -----------------------------------------------------------------------
+    const syncToDatabase = useCallback(
+        (payload: {
+            toolbarSettings?: Record<ToolbarButtonId, boolean>;
+            activeTones?: Record<ToneId, boolean>;
+            customTones?: CustomTone[];
+        }) => {
+            if (!isSignedIn) return;
+
+            if (syncTimer.current) clearTimeout(syncTimer.current);
+            syncTimer.current = setTimeout(() => {
+                fetch("/api/editor-settings", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }).catch((err) =>
+                    console.error("[EditorSettings] Erro ao sincronizar com o banco:", err)
+                );
+            }, 600);
+        },
+        [isSignedIn]
+    );
+
+    // -----------------------------------------------------------------------
+    // Ações — escrevem no localStorage (imediato) + sincronizam banco (debounce)
+    // -----------------------------------------------------------------------
     const toggleButtonVisibility = (id: ToolbarButtonId) => {
         setButtonVisibility((prev) => {
-            const nextSettings = { ...prev, [id]: !prev[id] };
-            localStorage.setItem("editor_toolbar_settings", JSON.stringify(nextSettings));
-            return nextSettings;
+            const next = { ...prev, [id]: !prev[id] };
+            localStorage.setItem(LS_TOOLBAR, JSON.stringify(next));
+            syncToDatabase({ toolbarSettings: next });
+            return next;
         });
     };
 
     const toggleToneActivation = (id: ToneId) => {
         setActiveTones((prev) => {
-            const nextSettings = { ...prev, [id]: !prev[id] };
-            localStorage.setItem("editor_active_tones", JSON.stringify(nextSettings));
-            return nextSettings;
+            const next = { ...prev, [id]: !prev[id] };
+            localStorage.setItem(LS_TONES, JSON.stringify(next));
+            syncToDatabase({ activeTones: next });
+            return next;
         });
     };
 
@@ -210,10 +210,11 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
             const newTone: CustomTone = {
                 ...tone,
                 id: `custom-${Date.now()}`,
-                isActive: true
+                isActive: true,
             };
             const next = [...prev, newTone];
-            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
+            syncToDatabase({ customTones: next });
             return next;
         });
     };
@@ -221,7 +222,8 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
     const deleteCustomTone = (id: string) => {
         setCustomTones((prev) => {
             const next = prev.filter(t => t.id !== id);
-            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
+            syncToDatabase({ customTones: next });
             return next;
         });
     };
@@ -229,7 +231,8 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
     const toggleCustomToneActivation = (id: string) => {
         setCustomTones((prev) => {
             const next = prev.map(t => t.id === id ? { ...t, isActive: !t.isActive } : t);
-            localStorage.setItem("editor_custom_tones", JSON.stringify(next));
+            localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
+            syncToDatabase({ customTones: next });
             return next;
         });
     };
@@ -245,7 +248,8 @@ export const EditorSettingsProvider = ({ children }: { children: React.ReactNode
             deleteCustomTone,
             toggleCustomToneActivation,
             isSettingsDialogOpen,
-            setIsSettingsDialogOpen
+            setIsSettingsDialogOpen,
+            isLoadingSettings,
         }}>
             {children}
         </EditorSettingsContext.Provider>
