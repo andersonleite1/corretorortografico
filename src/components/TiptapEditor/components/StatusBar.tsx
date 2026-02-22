@@ -4,6 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { Toolbar } from "./ui/Toolbar";
 import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
+import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 
 const StatusBar = () => {
   const {
@@ -16,6 +17,7 @@ const StatusBar = () => {
     draftActions,
   } =
     useTiptapContext();
+  const { buttonVisibility } = useEditorSettings();
   const counter = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -58,24 +60,30 @@ const StatusBar = () => {
   return (
     <div className="rte-status-bar">
       <Toolbar dense>
-        <MenuButton
-          icon="SourceCode"
-          text={messages.statusBar.source}
-          active={isSourceMode}
-          onClick={toggleSourceMode}
-        />
-        <MenuButton
-          icon={isFullScreen ? "Minimize" : "Maximize"}
-          text={messages.statusBar.fullscreen}
-          active={isFullScreen}
-          onClick={toggleFullScreen}
-        />
-        <span
-          className="rte-word-count hidden sm:inline"
-          onClick={toggleFullScreen}
-        >
-          {messages.statusBar.toggleHint}
-        </span>
+        {buttonVisibility.sourceCode && (
+          <MenuButton
+            icon="SourceCode"
+            text={messages.statusBar.source}
+            active={isSourceMode}
+            onClick={toggleSourceMode}
+          />
+        )}
+        {buttonVisibility.fullScreen && (
+          <MenuButton
+            icon={isFullScreen ? "Minimize" : "Maximize"}
+            text={messages.statusBar.fullscreen}
+            active={isFullScreen}
+            onClick={toggleFullScreen}
+          />
+        )}
+        {buttonVisibility.fullScreen && (
+          <span
+            className="rte-word-count hidden sm:inline"
+            onClick={toggleFullScreen}
+          >
+            {messages.statusBar.toggleHint}
+          </span>
+        )}
         {draftActions?.savingStatus && draftActions.savingStatus !== "idle" && (
           <div className="flex items-center gap-2 px-3 py-1 ml-4 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider animate-in fade-in duration-300">
             <div className={clsx(

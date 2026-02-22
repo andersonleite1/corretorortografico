@@ -194,12 +194,30 @@ export const SettingsDialog = () => {
                     )}
 
                     {activeTab === "general" && (
-                        <div className="space-y-6 animate-in fade-in duration-300 flex flex-col items-center justify-center py-12 text-center">
-                            <Icon name="Settings" size={48} className="text-gray-300 dark:text-gray-700 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Configurações Gerais</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
-                                As configurações gerais estarão disponíveis em breve.
-                            </p>
+                        <div className="space-y-6 animate-in fade-in duration-300">
+                            <div className="border-b border-gray-100 dark:border-white/5 pb-2">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Configurações Gerais</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Selecione quais elementos do rodapé você deseja exibir.</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {["sourceCode", "fullScreen"].map((id) => (
+                                    <label
+                                        key={id}
+                                        className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={buttonVisibility[id as ToolbarButtonId]}
+                                            onChange={() => toggleButtonVisibility(id as ToolbarButtonId)}
+                                            className="w-5 h-5 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 bg-white dark:bg-black/20 dark:border-white/10 cursor-pointer"
+                                        />
+                                        <span className="text-[15px] font-medium text-gray-700 dark:text-gray-300 select-none">
+                                            {TOOLBAR_BUTTON_LABELS[id as ToolbarButtonId]}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

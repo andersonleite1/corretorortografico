@@ -8,7 +8,7 @@ export type ToolbarButtonId =
     | "lineHeight" | "link" | "table" | "codeBlock" | "insert" | "heading"
     | "fontFamily" | "fontSize" | "languageTool" | "languageToolSidebar"
     | "browserSpellcheck" | "export" | "preview" | "documents" | "drafts"
-    | "importPdf" | "copyEditor" | "clearEditor";
+    | "importPdf" | "copyEditor" | "clearEditor" | "sourceCode" | "fullScreen";
 
 export type ToneId =
     | "formal" | "casual" | "academic" | "creative" | "simplified" | "romantic"
@@ -29,7 +29,7 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     lineHeight: true, link: true, table: true, codeBlock: true, insert: true, heading: true,
     fontFamily: true, fontSize: true, languageTool: true, languageToolSidebar: true,
     browserSpellcheck: true, export: true, preview: true, documents: true, drafts: true,
-    importPdf: true, copyEditor: true, clearEditor: true
+    importPdf: true, copyEditor: true, clearEditor: true, sourceCode: true, fullScreen: true
 };
 
 export const DEFAULT_TONES: Record<ToneId, boolean> = {
@@ -68,7 +68,9 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
     drafts: "Rascunhos",
     importPdf: "Importar PDF",
     copyEditor: "Copiar Texto",
-    clearEditor: "Limpar Editor"
+    clearEditor: "Limpar Editor",
+    sourceCode: "Código-fonte",
+    fullScreen: "Tela cheia"
 };
 
 export const TONE_LABELS: Record<ToneId, string> = {
