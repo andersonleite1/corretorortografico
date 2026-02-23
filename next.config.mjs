@@ -46,11 +46,6 @@ const nextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
-      {
-        protocol: "http",
-        hostname: "http2.mlstatic.com",
-        pathname: "/**",
-      },
     ],
   },
   async headers() {
@@ -80,7 +75,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.accounts.dev; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://api.openai.com https://languagetool.editordetexto.cloud https://api.editordetexto.cloud https://res.cloudinary.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com http2.mlstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.accounts.dev; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://api.openai.com https://languagetool.editordetexto.cloud https://api.editordetexto.cloud https://res.cloudinary.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
           }
         ]
       },

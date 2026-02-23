@@ -3,7 +3,6 @@
 import EditForm from "./_components/EditForm";
 import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
 import { HomeContent } from "@/data/home";
-import { useMercadoLivreProductGroups } from "@/hooks/useMercadoLivreProducts";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
 
@@ -16,7 +15,6 @@ type Props = {
 
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
-  const { smartphoneProducts, othersProducts } = useMercadoLivreProductGroups();
   const { isSidebarOpen, isLTSidebarOpen } = useSidebar();
 
   // Base width: 56rem (896px)
