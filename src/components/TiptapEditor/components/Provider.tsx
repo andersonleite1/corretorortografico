@@ -18,7 +18,7 @@ import { getEditorMessages, type EditorMessages } from "../i18n/messages";
 import SideBar from "./SideBar";
 import LanguageToolSidebar from "./LanguageToolSidebar";
 import { useSidebar } from "@/components/providers/SidebarProvider";
-import { EditorSettingsProvider } from "@/components/providers/EditorSettingsProvider";
+import { EditorSettingsProvider, useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { SettingsDialog } from "@/components/shared/SettingsDialog";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -115,10 +115,14 @@ export const TiptapProvider = ({
   const router = useRouter();
   const documentId = searchParams.get("docId");
 
-  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen, isMobile } = useSidebar();
+  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen, isMobile, setIsDocumentsDialogOpen } = useSidebar();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
+
+  // Ref to hold setIsSettingsDialogOpen from EditorSettingsProvider context
+  // (populated by SettingsShortcutBridge rendered inside EditorSettingsProvider)
+  const setIsSettingsDialogOpenRef = useRef<((open: boolean) => void) | null>(null);
 
 
   const handleSaveDocument = useCallback(async () => {
@@ -165,15 +169,82 @@ export const TiptapProvider = ({
 
   // Update shortcuts extension options
   useEffect(() => {
-    if (editor) {
-      editor.setOptions({
-        shortcuts: {
-          onSave: handleSaveDocument,
-          onSaveDraft: draftActions?.onSaveDraft,
+    if (!editor) return;
+    editor.setOptions({
+      shortcuts: {
+        // Arquivo e Controle
+        onSave: handleSaveDocument,
+        onSaveDraft: draftActions?.onSaveDraft,
+        onOpenDocuments: () => setIsDocumentsDialogOpen(true),
+        onCopyAll: () => {
+          if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(editor.getText()).catch(console.error);
+          }
         },
-      } as any);
-    }
-  }, [editor, handleSaveDocument, draftActions?.onSaveDraft]);
+        onClearEditor: exportActions?.onClear ?? undefined,
+        onImportPdf: undefined, // ImportPdfButton manages its own dialog state
+        onExport: exportActions?.onExportPdf ?? exportActions?.onExportDoc ?? undefined,
+        onPreview: exportActions?.onPreviewPost ?? exportActions?.onPreviewPdf ?? undefined,
+        onOpenSettings: () => setIsSettingsDialogOpenRef.current?.(true),
+        onAiRewrite: undefined, // AiRewriteButton manages its own popover state
+        onInsertImage: undefined,
+        onInsertTable: undefined,
+      },
+    } as any);
+  }, [
+    editor,
+    handleSaveDocument,
+    draftActions?.onSaveDraft,
+    exportActions?.onClear,
+    exportActions?.onExportPdf,
+    exportActions?.onExportDoc,
+    exportActions?.onPreviewPost,
+    exportActions?.onPreviewPdf,
+    setIsDocumentsDialogOpen,
+  ]);
+
+  // Global keydown listener for browser-intercepted shortcuts
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleGlobalKeydown = (e: KeyboardEvent) => {
+      const isMod = e.metaKey || e.ctrlKey;
+
+      // Ctrl/Cmd + O → Meus Documentos (prevents OS file-open dialog)
+      if (isMod && !e.shiftKey && e.key === "o") {
+        e.preventDefault();
+        setIsDocumentsDialogOpen(true);
+        return;
+      }
+
+      // Ctrl/Cmd + P → Exportar (prevents browser print dialog)
+      if (isMod && !e.shiftKey && e.key === "p") {
+        e.preventDefault();
+        const action = exportActions?.onExportPdf ?? exportActions?.onExportDoc;
+        action?.();
+        return;
+      }
+
+      // F7 → LanguageTool Toggle
+      if (!isMod && !e.shiftKey && e.key === "F7") {
+        e.preventDefault();
+        (editor.commands as any).setLanguageToolEnabled?.(
+          !((editor.storage as any).languageTool?.enabled)
+        );
+        return;
+      }
+
+      // Shift + F7 → LanguageTool Sidebar
+      if (!isMod && e.shiftKey && e.key === "F7") {
+        e.preventDefault();
+        setIsLTSidebarOpen(!isLTSidebarOpen);
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeydown);
+    return () => window.removeEventListener("keydown", handleGlobalKeydown);
+  }, [editor, exportActions, isLTSidebarOpen, setIsLTSidebarOpen, setIsDocumentsDialogOpen]);
 
   // Auto-save document every 30 seconds
   useEffect(() => {
@@ -267,6 +338,7 @@ export const TiptapProvider = ({
       >
         {editorContent}
         <SettingsDialog />
+        <SettingsShortcutBridge setterRef={setIsSettingsDialogOpenRef} />
         {showSuccess && (
           <SaveNotification
             message={documentId ? "Documento atualizado" : "Documento salvo"}
@@ -276,6 +348,13 @@ export const TiptapProvider = ({
       </TiptapContext.Provider>
     </EditorSettingsProvider>
   );
+};
+
+/** Small bridge rendered inside EditorSettingsProvider to expose setIsSettingsDialogOpen to Provider effects */
+const SettingsShortcutBridge = ({ setterRef }: { setterRef: React.MutableRefObject<((open: boolean) => void) | null> }) => {
+  const { setIsSettingsDialogOpen } = useEditorSettings();
+  setterRef.current = setIsSettingsDialogOpen;
+  return null;
 };
 
 export default TiptapProvider;

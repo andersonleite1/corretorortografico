@@ -62,7 +62,8 @@ import {
   TbChevronRight,
   TbSquareCheck,
   TbSquare,
-  TbSettings
+  TbSettings,
+  TbKeyboard
 } from "react-icons/tb";
 import { MdHistory } from "react-icons/md";
 import { RiTextSpacing } from "react-icons/ri";
@@ -152,6 +153,7 @@ export const icons = {
   CheckboxEmpty: TbSquare,
   History: MdHistory,
   Settings: TbSettings,
+  Keyboard: TbKeyboard,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

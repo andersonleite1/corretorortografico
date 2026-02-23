@@ -1,10 +1,11 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import clsx from "clsx";
 import { useEditorState } from "@tiptap/react";
 import { Toolbar } from "./ui/Toolbar";
 import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
+import { ShortcutsDialog } from "@/components/shared/ShortcutsDialog";
 
 const StatusBar = () => {
   const {
@@ -15,9 +16,11 @@ const StatusBar = () => {
     toggleSourceMode,
     messages,
     draftActions,
+    isMobile,
   } =
     useTiptapContext();
   const { buttonVisibility } = useEditorSettings();
+  const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const counter = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -66,6 +69,15 @@ const StatusBar = () => {
             text={messages.statusBar.source}
             active={isSourceMode}
             onClick={toggleSourceMode}
+          />
+        )}
+        {/* Shortcuts Dialog Button — only visible on desktop, before fullscreen */}
+        {!isMobile && (
+          <MenuButton
+            icon="Keyboard"
+            tooltip="Atalhos de Teclado"
+            active={isShortcutsDialogOpen}
+            onClick={() => setIsShortcutsDialogOpen(true)}
           />
         )}
         {buttonVisibility.fullScreen && (
@@ -122,6 +134,12 @@ const StatusBar = () => {
           </span>
         )}
       </div>
+
+      {/* Shortcuts Dialog */}
+      <ShortcutsDialog
+        isOpen={isShortcutsDialogOpen}
+        onClose={() => setIsShortcutsDialogOpen(false)}
+      />
     </div>
   );
 };
