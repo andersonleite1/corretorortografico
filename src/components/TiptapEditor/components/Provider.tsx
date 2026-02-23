@@ -68,8 +68,6 @@ type TiptapContextType = {
   setIsSidebarOpen: (value: boolean) => void;
   isLTSidebarOpen: boolean;
   setIsLTSidebarOpen: (value: boolean) => void;
-  isBrowserSpellcheckEnabled: boolean;
-  setIsBrowserSpellcheckEnabled: (value: boolean) => void;
   onSaveDocument: () => void;
   isSaving: boolean;
   isMobile: boolean;
@@ -108,7 +106,6 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [isBrowserSpellcheckEnabled, setIsBrowserSpellcheckEnabled] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const searchParams = useSearchParams();
@@ -116,6 +113,7 @@ export const TiptapProvider = ({
   const documentId = searchParams.get("docId");
 
   const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen, isMobile, setIsDocumentsDialogOpen } = useSidebar();
+  const { buttonVisibility } = useEditorSettings();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
@@ -123,6 +121,18 @@ export const TiptapProvider = ({
   // Ref to hold setIsSettingsDialogOpen from EditorSettingsProvider context
   // (populated by SettingsShortcutBridge rendered inside EditorSettingsProvider)
   const setIsSettingsDialogOpenRef = useRef<((open: boolean) => void) | null>(null);
+
+  // Sync spellcheck attribute with settings
+  useEffect(() => {
+    if (!editor) return;
+    editor.setOptions({
+      editorProps: {
+        attributes: {
+          spellcheck: buttonVisibility.browserSpellcheck ? "true" : "false",
+        },
+      },
+    });
+  }, [editor, buttonVisibility.browserSpellcheck]);
 
 
   const handleSaveDocument = useCallback(async () => {
@@ -320,17 +330,6 @@ export const TiptapProvider = ({
           setIsSidebarOpen,
           isLTSidebarOpen,
           setIsLTSidebarOpen,
-          isBrowserSpellcheckEnabled,
-          setIsBrowserSpellcheckEnabled: (value: boolean) => {
-            setIsBrowserSpellcheckEnabled(value);
-            editor.setOptions({
-              editorProps: {
-                attributes: {
-                  spellcheck: value ? "true" : "false",
-                },
-              },
-            });
-          },
           onSaveDocument: handleSaveDocument,
           isSaving,
           isMobile,

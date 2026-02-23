@@ -72,7 +72,7 @@ const StatusBar = () => {
           />
         )}
         {/* Shortcuts Dialog Button — only visible on desktop, before fullscreen */}
-        {!isMobile && (
+        {!isMobile && buttonVisibility.shortcuts && (
           <MenuButton
             icon="Keyboard"
             tooltip="Atalhos de Teclado"

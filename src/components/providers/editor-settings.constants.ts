@@ -12,7 +12,7 @@ export type ToolbarButtonId =
     | "fontFamily" | "fontSize" | "languageTool" | "languageToolSidebar"
     | "browserSpellcheck" | "export" | "preview" | "documents" | "drafts"
     | "importPdf" | "copyEditor" | "clearEditor" | "sourceCode" | "fullScreen"
-    | "aiRewrite";
+    | "aiRewrite" | "shortcuts";
 
 export type ToneId =
     | "formal" | "casual" | "academic" | "creative" | "simplified" | "romantic"
@@ -32,9 +32,9 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
     textColor: true, textHighlight: true, align: true, bulletList: true, orderedList: true,
     lineHeight: true, link: true, table: true, codeBlock: true, insert: true, heading: true,
     fontFamily: true, fontSize: true, languageTool: true, languageToolSidebar: true,
-    browserSpellcheck: true, export: true, preview: true, documents: true, drafts: true,
+    browserSpellcheck: false, export: true, preview: true, documents: true, drafts: true,
     importPdf: true, copyEditor: true, clearEditor: true, sourceCode: true, fullScreen: true,
-    aiRewrite: true
+    aiRewrite: true, shortcuts: true
 };
 
 export const DEFAULT_TONES: Record<ToneId, boolean> = {
@@ -76,7 +76,8 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
     clearEditor: "Limpar Editor",
     sourceCode: "Código-fonte",
     fullScreen: "Tela cheia",
-    aiRewrite: "Reescrever IA"
+    aiRewrite: "Reescrever IA",
+    shortcuts: "Teclas de atalho"
 };
 
 export const TONE_LABELS: Record<ToneId, string> = {
