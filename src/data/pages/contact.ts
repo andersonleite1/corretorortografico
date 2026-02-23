@@ -2,6 +2,20 @@ import { Metadata } from "next";
 
 import { i18n, Locale } from "../../../i18n-config";
 
+const BASE_URL = "https://editordetexto.online";
+
+const CONTACT_PATHS: Record<Locale, string> = {
+  pt: "/contato",
+  en: "/en/contact",
+  es: "/es/contato",
+};
+
+const HREF_LANG_MAP: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+  es: "es",
+};
+
 export type ContactFormContent = {
   nameLabel: string;
   emailLabel: string;
@@ -97,8 +111,23 @@ export function getContactContent(locale: string): ContactPageContent {
 
 export function buildContactMetadata(locale: string): Metadata {
   const content = getContactContent(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+
+  const languages = Object.fromEntries(
+    i18n.locales.map((loc) => [
+      HREF_LANG_MAP[loc] ?? loc,
+      `${BASE_URL}${CONTACT_PATHS[loc]}`,
+    ])
+  );
+
+  languages["x-default"] = `${BASE_URL}${CONTACT_PATHS[i18n.defaultLocale]}`;
+
   return {
     title: content.metadata.title,
     description: content.metadata.description,
+    alternates: {
+      canonical: `${BASE_URL}${CONTACT_PATHS[normalizedLocale]}`,
+      languages,
+    },
   };
 }

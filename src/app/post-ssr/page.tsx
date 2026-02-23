@@ -8,6 +8,15 @@ import Image from "next/image";
 
 import { getPost } from "@/services/post";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
+
+export function generateMetadata(): Metadata {
+  return {
+    alternates: {
+      canonical: "https://editordetexto.online/post-ssr",
+    },
+  };
+}
 
 export default async function PostPage() {
   const post = await getPost();

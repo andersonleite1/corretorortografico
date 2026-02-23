@@ -2,6 +2,20 @@ import { Metadata } from "next";
 
 import { i18n, Locale } from "../../../i18n-config";
 
+const BASE_URL = "https://editordetexto.online";
+
+const TERMS_PATHS: Record<Locale, string> = {
+  pt: "/termos",
+  en: "/en/terms",
+  es: "/es/termos",
+};
+
+const HREF_LANG_MAP: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+  es: "es",
+};
+
 export type TermsSection = {
   title: string;
   paragraphs: string[];
@@ -154,8 +168,23 @@ export function getTermsContent(locale: string): TermsPageContent {
 
 export function buildTermsMetadata(locale: string): Metadata {
   const content = getTermsContent(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+
+  const languages = Object.fromEntries(
+    i18n.locales.map((loc) => [
+      HREF_LANG_MAP[loc] ?? loc,
+      `${BASE_URL}${TERMS_PATHS[loc]}`,
+    ])
+  );
+
+  languages["x-default"] = `${BASE_URL}${TERMS_PATHS[i18n.defaultLocale]}`;
+
   return {
     title: content.metadata.title,
     description: content.metadata.description,
+    alternates: {
+      canonical: `${BASE_URL}${TERMS_PATHS[normalizedLocale]}`,
+      languages,
+    },
   };
 }
