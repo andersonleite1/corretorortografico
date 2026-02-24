@@ -1,5 +1,6 @@
 .ProseMirror-selectednode {
   @at-root {
+
     &:has(iframe),
     img#{&} {
       box-shadow:
@@ -19,6 +20,7 @@
 
   // Editable content styles
   &[contenteditable="true"] {
+
     .ProseMirror-selectednode:has(iframe),
     img.ProseMirror-selectednode,
     img:has(+ figcaption.ProseMirror-selectednode) {
@@ -33,7 +35,7 @@
   }
 
   // Element spacing
-  & > * {
+  &>* {
     margin-top: 1.25rem;
 
     &:first-child {
@@ -171,45 +173,54 @@
 
   // LanguageTool highlights
   .lt-error {
-    text-decoration: underline wavy rgba(34, 197, 94, 0.85); // Default green
+    text-decoration: underline wavy rgba(245, 158, 11, 0.85); // Default to orange (Grammar)
     text-decoration-thickness: 1.5px;
     text-decoration-skip-ink: auto;
     cursor: pointer;
 
-    &.lt-type-misspelling {
+    &.lt-type-misspelling,
+    &.lt-type-unclassified {
       text-decoration-color: rgba(239, 68, 68, 0.85); // Red for spelling
     }
 
     &.lt-type-grammar,
-    &.lt-type-duplication {
-      text-decoration-color: rgba(59, 130, 246, 0.85); // Blue for grammar
+    &.lt-type-duplication,
+    &.lt-type-concordance,
+    &.lt-type-other,
+    &.lt-type-uncategorized {
+      text-decoration-color: rgba(245, 158, 11, 0.85); // Orange for grammar
     }
 
     &.lt-type-style,
-    &.lt-type-typographical {
-      text-decoration-color: rgba(245, 158, 11, 0.85); // Yellow/Amber for style
+    &.lt-type-typographical,
+    &.lt-type-non-conformance-with-house-style {
+      text-decoration-color: rgba(139, 92, 246, 0.85); // Purple for style
     }
 
-    &.lt-type-unclassifiable,
-    &.lt-type-other {
+    &.lt-type-unclassifiable {
       text-decoration-color: rgba(107, 114, 128, 0.85); // Gray for others
     }
 
     &:hover {
-      background-color: rgba(34, 197, 94, 0.08);
+      background-color: rgba(245, 158, 11, 0.08); // Default hover
 
-      &.lt-type-misspelling {
+      &.lt-type-misspelling,
+      &.lt-type-unclassified {
         background-color: rgba(239, 68, 68, 0.08);
       }
 
       &.lt-type-grammar,
-      &.lt-type-duplication {
-        background-color: rgba(59, 130, 246, 0.08);
+      &.lt-type-duplication,
+      &.lt-type-concordance,
+      &.lt-type-other,
+      &.lt-type-uncategorized {
+        background-color: rgba(245, 158, 11, 0.08);
       }
 
       &.lt-type-style,
-      &.lt-type-typographical {
-        background-color: rgba(245, 158, 11, 0.08);
+      &.lt-type-typographical,
+      &.lt-type-non-conformance-with-house-style {
+        background-color: rgba(139, 92, 246, 0.08);
       }
     }
   }
