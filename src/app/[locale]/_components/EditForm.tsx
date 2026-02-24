@@ -13,6 +13,8 @@ import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 import { DraftComparison } from "@/components/Drafts/DraftComparison";
 import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
+import { BugReportDialog } from "@/components/shared/BugReportDialog";
+import { FaBug } from "react-icons/fa";
 
 
 interface PostForm {
@@ -51,6 +53,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
+  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
 
   const showNotification = (message: string, type: "success" | "error" | "info" = "success") => {
     setNotification({ message, type });
@@ -585,6 +588,20 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         />
       </div>
 
+      {/* ── Botão Reportar Problema ── */}
+      <div className="flex justify-center pb-2">
+        <button
+          id="bug-report-open-btn"
+          type="button"
+          onClick={() => setIsBugReportOpen(true)}
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-200 active:scale-95"
+          aria-label="Reportar um problema"
+        >
+          <FaBug className="text-xs" />
+          Reportar Problema
+        </button>
+      </div>
+
       {isPreviewOpen && pdfPreview && (
         <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="w-full max-w-5xl h-[85vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700 flex flex-col overflow-hidden">
@@ -753,6 +770,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           onClose={() => setNotification(null)}
         />
       )}
+
+      {/* ── Diálogo de Reporte de Problemas ── */}
+      <BugReportDialog
+        isOpen={isBugReportOpen}
+        onClose={() => setIsBugReportOpen(false)}
+      />
     </div>
   );
 }

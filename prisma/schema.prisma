@@ -97,6 +97,32 @@ model Draft {
 }
 
 
+/// Relatórios de bugs submetidos por usuários.
+model BugReport {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  /// Descrição breve obrigatória
+  description       String
+  /// Informações adicionais (opcional)
+  additionalInfo    String?
+  /// Se o usuário solicitou notificação por email
+  wantsNotification Boolean  @default(false)
+  /// Email para notificação (apenas se wantsNotification = true)
+  notificationEmail String?
+  /// ID do usuário autenticado (opcional – pode ser anônimo)
+  userId            String?
+  /// User-Agent do navegador
+  userAgent         String?
+  /// URL da página onde o problema ocorreu
+  pageUrl           String?
+  /// Status do relatório: open | in_progress | resolved | closed
+  status            String   @default("open")
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("bug_reports")
+}
+
 model AiUsage {
   id         String   @id @default(cuid())
   createdAt  DateTime @default(now())
