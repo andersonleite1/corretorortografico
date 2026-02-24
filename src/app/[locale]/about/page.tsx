@@ -1,32 +1,32 @@
-import {Metadata} from "next";
-import {notFound} from "next/navigation";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import AboutPageContent from "../sobre/AboutPageContent";
-import {buildAboutMetadata} from "@/data/pages/about";
-import {Locale} from "../../../../i18n-config";
+import AboutPageContent from "./AboutPageContent";
+import { buildAboutMetadata } from "@/data/pages/about";
+import { i18n, Locale } from "../../../../i18n-config";
 
-const ABOUT_EN_LOCALE: Locale[] = ["en"];
+const ABOUT_SUPPORTED_LOCALES: readonly Locale[] = i18n.locales;
 
 type PageParams = {
-  params: {locale: Locale};
+  params: { locale: Locale };
 };
 
 export function generateStaticParams() {
-  return ABOUT_EN_LOCALE.map((locale) => ({locale}));
+  return ABOUT_SUPPORTED_LOCALES.map((locale) => ({ locale }));
 }
 
-export function generateMetadata({params}: PageParams): Metadata {
-  const locale = ABOUT_EN_LOCALE.includes(params.locale)
+export function generateMetadata({ params }: PageParams): Metadata {
+  const locale = ABOUT_SUPPORTED_LOCALES.includes(params.locale)
     ? params.locale
-    : ABOUT_EN_LOCALE[0];
+    : i18n.defaultLocale;
 
   return buildAboutMetadata(locale);
 }
 
-export default function AboutEnPage({params}: PageParams) {
-  const {locale} = params;
+export default function AboutPage({ params }: PageParams) {
+  const { locale } = params;
 
-  if (!ABOUT_EN_LOCALE.includes(locale)) {
+  if (!ABOUT_SUPPORTED_LOCALES.includes(locale)) {
     notFound();
   }
 

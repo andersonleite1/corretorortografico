@@ -48,6 +48,50 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/sobre",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/es/sobre",
+        destination: "/es/about",
+        permanent: true,
+      },
+      {
+        source: "/contato",
+        destination: "/contact",
+        permanent: true,
+      },
+      {
+        source: "/es/contato",
+        destination: "/es/contact",
+        permanent: true,
+      },
+      {
+        source: "/privacidade",
+        destination: "/privacy",
+        permanent: true,
+      },
+      {
+        source: "/es/privacidade",
+        destination: "/es/privacy",
+        permanent: true,
+      },
+      {
+        source: "/termos",
+        destination: "/terms",
+        permanent: true,
+      },
+      {
+        source: "/es/termos",
+        destination: "/es/terms",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

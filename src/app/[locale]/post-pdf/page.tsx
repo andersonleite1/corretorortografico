@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 
-import PostContent from "../../components/shared/PostContent";
+import PostContent from "../../../components/shared/PostContent";
 import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 
 import { getPost } from "@/services/post";
