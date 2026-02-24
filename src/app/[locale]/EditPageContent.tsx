@@ -1,7 +1,7 @@
 "use client";
 
 import EditForm from "./_components/EditForm";
-import AtalhosAccordion from "@/components/AtalhosAccordion/atalhos-accordion";
+
 import { HomeContent } from "@/data/home";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
@@ -75,7 +75,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
           dangerouslySetInnerHTML={{ __html: article.finalNoteHtml }}
         ></p>
 
-        <AtalhosAccordion locale={content.locale} />
+
       </section>
       <section
         id="faq"
