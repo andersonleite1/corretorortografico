@@ -91,6 +91,21 @@ src/
 
 ---
 
+### Testes
+
+O projeto utiliza **Vitest** com **React Testing Library** para garantir a qualidade do código.
+
+- Executar todos os testes:
+  ```bash
+  npm test
+  ```
+- Abrir interface visual do Vitest:
+  ```bash
+  npx vitest --ui
+  ```
+
+---
+
 ## 🌎 Internacionalização (i18n)
 
 O projeto utiliza uma estrutura robusta de i18n. Para adicionar ou modificar traduções, consulte:
