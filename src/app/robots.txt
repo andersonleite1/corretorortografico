@@ -1,5 +1,4 @@
 User-Agent: *
 Allow: /
 Disallow: /private/
-Disallow: /post-pdf/
 Sitemap: https://editordetexto.online/sitemap.xml

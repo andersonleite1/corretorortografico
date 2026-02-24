@@ -59,8 +59,6 @@ const localizedRoutes: LocalizedRoute[] = [
   },
 ];
 
-const standaloneRoutes = [{ path: "/post-ssr", priority: 0.6, changeFrequency: "monthly" as const }];
-
 const toAbsoluteUrl = (path: string) => `${baseUrl}${path}`;
 
 const buildAlternates = (paths: LocalizedRoute["paths"]) => {
@@ -93,7 +91,7 @@ const buildAlternates = (paths: LocalizedRoute["paths"]) => {
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  const localizedEntries = localizedRoutes.flatMap(({ paths, priority, changeFrequency }) => {
+  return localizedRoutes.flatMap(({ paths, priority, changeFrequency }) => {
     const alternates = buildAlternates(paths);
 
     return Object.values(paths)
@@ -106,13 +104,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ...(alternates && { alternates: { languages: alternates } }),
       }));
   });
-
-  const staticEntries = standaloneRoutes.map(({ path, priority, changeFrequency }) => ({
-    url: toAbsoluteUrl(path),
-    lastModified,
-    priority,
-    changeFrequency,
-  }));
-
-  return [...localizedEntries, ...staticEntries];
 }
