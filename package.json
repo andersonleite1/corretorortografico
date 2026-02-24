@@ -12,6 +12,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
     "db:push": "ln -sf .env.local .env && npx prisma db push && rm .env"
   },
   "dependencies": {
@@ -94,6 +96,7 @@
     "@types/react-dom": "^18.2.4",
     "@vitest/ui": "^4.0.18",
     "autoprefixer": "^10.4.20",
+    "cypress": "^15.10.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.17",
     "jsdom": "^28.1.0",
