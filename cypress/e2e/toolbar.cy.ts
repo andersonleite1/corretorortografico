@@ -67,17 +67,13 @@ describe('Editor Toolbar E2E', () => {
         cy.contains('Pré-visualizar post').should('be.visible');
     });
 
-    it('should open Documents sidebar', () => {
+    it('should NOT see Documents button when not logged in', () => {
         // There are two buttons for Documents, one with text "Documentos" and one icon-only
-        cy.contains('button', 'Documentos').should('be.visible').click();
-        // Sidebar usually has a heading or specific structure
-        cy.contains('Meus Documentos').should('be.visible');
+        cy.contains('button', 'Documentos').should('not.exist');
     });
 
-    it('should open Drafts dropdown', () => {
-        cy.contains('button', 'Rascunhos').should('be.visible').click();
-        cy.contains('Histórico de Versões').should('be.visible');
-        cy.contains('Criar Nova Versão').should('be.visible');
+    it('should NOT see Drafts button when not logged in', () => {
+        cy.contains('button', 'Rascunhos').should('not.exist');
     });
 
     it('should clear the editor content', () => {
@@ -86,6 +82,16 @@ describe('Editor Toolbar E2E', () => {
 
         // Check if content is cleared
         getEditor().should('have.text', '');
+    });
+
+    it('should see LanguageTool sidebar open by default on desktop', () => {
+        // On desktop, the sidebar should be visible
+        cy.contains('button', 'Resumo').should('be.visible');
+    });
+
+    it('should close LanguageTool sidebar when clicking the close button', () => {
+        cy.get('button[title="Fechar"]').should('be.visible').click();
+        cy.contains('h3', 'Corretor').should('not.exist');
     });
 
     it('should open Bug Report dialog', () => {

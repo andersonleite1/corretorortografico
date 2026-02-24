@@ -41,6 +41,9 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
             const storedLT = localStorage.getItem("rte-lt-sidebar-open");
             if (storedLT === "true" && window.innerWidth >= 1024) {
                 setIsLTSidebarOpen(true);
+            } else if (storedLT === null && window.innerWidth >= 1024) {
+                // Open by default for new users on desktop
+                setIsLTSidebarOpen(true);
             }
         }
 

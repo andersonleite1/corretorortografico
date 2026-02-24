@@ -74,16 +74,23 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="rte-lt-sidebar animate-in slide-in-from-right duration-300">
-            <div className="rte-lt-sidebar__tabs">
+        <div className="rte-lt-sidebar animate-in slide-in-from-right duration-300 relative">
+            <button
+                onClick={() => setIsLTSidebarOpen(false)}
+                className="absolute top-3.5 right-3.5 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 transition-colors z-10"
+                title="Fechar"
+            >
+                <Icon name="Close" size={14} />
+            </button>
+            <div className="rte-lt-sidebar__tabs pr-10">
                 <button
-                    className={clsx("rte-lt-sidebar__tab", activeTab === "resumo" && "rte-lt-sidebar__tab--active")}
+                    className={clsx("rte-lt-sidebar__tab whitespace-nowrap", activeTab === "resumo" && "rte-lt-sidebar__tab--active")}
                     onClick={() => setActiveTab("resumo")}
                 >
                     Resumo
                 </button>
                 <button
-                    className={clsx("rte-lt-sidebar__tab", activeTab === "detalhes" && "rte-lt-sidebar__tab--active")}
+                    className={clsx("rte-lt-sidebar__tab whitespace-nowrap", activeTab === "detalhes" && "rte-lt-sidebar__tab--active")}
                     onClick={() => setActiveTab("detalhes")}
                 >
                     Dados detalhados

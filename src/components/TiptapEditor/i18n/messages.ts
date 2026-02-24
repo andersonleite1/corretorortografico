@@ -40,6 +40,9 @@ export type EditorMessages = {
     copyEditor: string;
     save: string;
   };
+  auth: {
+    loginRequired: string;
+  };
   insert: {
     quote: string;
     codeBlock: string;
@@ -204,6 +207,9 @@ export const editorMessages = withDefault({
       copyEditor: "Copiar conteúdo",
       save: "Salvar documento",
     },
+    auth: {
+      loginRequired: "Recurso disponível para usuários logados",
+    },
     insert: {
       quote: "Citação",
       codeBlock: "Bloco de código",
@@ -364,6 +370,9 @@ export const editorMessages = withDefault({
       copyEditor: "Copy content",
       save: "Save document",
     },
+    auth: {
+      loginRequired: "Feature available for logged in users",
+    },
     insert: {
       quote: "Quote",
       codeBlock: "Code block",
@@ -523,6 +532,9 @@ export const editorMessages = withDefault({
       clearEditor: "Limpiar contenido",
       copyEditor: "Copiar conteúdo",
       save: "Guardar documento",
+    },
+    auth: {
+      loginRequired: "Recurso disponible para usuarios logueados",
     },
     insert: {
       quote: "Cita",

@@ -7,9 +7,11 @@ import {
 import { useTiptapContext } from "../Provider";
 import Icon from "../ui/Icon";
 import { FaHistory, FaPlus, FaTrash, FaEye } from "react-icons/fa";
+import { useAuth } from "@clerk/nextjs";
 
 const DraftsDropdown = () => {
   const { draftActions, messages } = useTiptapContext();
+  const { isSignedIn } = useAuth();
   const orderedDrafts = useMemo(() => {
     const baseDrafts = draftActions?.drafts ?? [];
     return [...baseDrafts].reverse();
@@ -35,7 +37,7 @@ const DraftsDropdown = () => {
     [draftActions]
   );
 
-  if (!draftActions) {
+  if (!draftActions || !isSignedIn) {
     return null;
   }
 
