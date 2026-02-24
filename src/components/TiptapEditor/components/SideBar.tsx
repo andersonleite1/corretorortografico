@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { Icon } from "./ui/Icon";

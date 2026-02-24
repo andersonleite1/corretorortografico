@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTiptapContext } from "./Provider";
 import { Icon } from "./ui/Icon";
 import clsx from "clsx";

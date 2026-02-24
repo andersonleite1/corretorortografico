@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/ai/rewrite/route'
+import { auth } from '@clerk/nextjs/server'
 
 // Mock the clerk auth
 vi.mock('@clerk/nextjs/server', () => ({
-    auth: () => ({ userId: 'test_user_id' }),
+    auth: vi.fn().mockResolvedValue({ userId: 'test_user_id' }),
 }))
 
 // Mock the database
@@ -17,10 +18,27 @@ vi.mock('@/lib/db', () => ({
 
 // Mock the AI rate limit
 vi.mock('@/lib/ai-rate-limit', () => ({
-    checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: false }), // we will mock allowed: false to test bounds
+    checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: false }),
 }))
 
 describe('POST /api/ai/rewrite', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+    })
+
+    it('should reject request when user is not authenticated', async () => {
+        // Mock auth failure
+        (auth as any).mockResolvedValueOnce({ userId: null })
+
+        const mockRequest = new Request('http://localhost:3000/api/ai/rewrite', {
+            method: 'POST',
+            body: JSON.stringify({ action: 'improve', text: 'hello' })
+        })
+
+        const response = await POST(mockRequest)
+        expect(response.status).toBe(401)
+    })
+
     it('should reject request when rate limit exceeded', async () => {
         const mockRequest = new Request('http://localhost:3000/api/ai/rewrite', {
             method: 'POST',
