@@ -24,18 +24,19 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
-  const { locales, defaultLocale } = i18nConfig;
+  const acceptLanguage = request.headers.get("accept-language");
+  if (!acceptLanguage) return i18nConfig.defaultLocale;
 
-  const negotiatorHeaders: Record<string, string> = {};
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
+  // Basic parsing for Edge Runtime compatibility (avoids negotiator dependency)
+  const preferredLocales = acceptLanguage
+    .split(",")
+    .map((lang) => lang.split(";")[0].trim().split("-")[0]); // Use 'pt' instead of 'pt-BR' to match i18n-config
 
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages(locales);
-
-  return match(languages, locales, defaultLocale);
+  return match(preferredLocales, i18nConfig.locales, i18nConfig.defaultLocale);
 }
 
 function i18nMiddleware(request: NextRequest) {
-  const { pathname, basePath } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   if (
     PUBLIC_FILE.test(pathname) ||
@@ -46,63 +47,52 @@ function i18nMiddleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let response;
-  let nextLocale;
-
   const { locales, defaultLocale } = i18n;
-
-  const pathLocale = locales.find(
+  const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  if (pathLocale) {
-    const isDefaultLocale = pathLocale === defaultLocale;
-    if (isDefaultLocale) {
-      let pathWithoutLocale = pathname.slice(`/${pathLocale}`.length) || "/";
-      if (request.nextUrl.search) pathWithoutLocale += request.nextUrl.search;
-
-      const url = basePath + pathWithoutLocale;
-
-      response = NextResponse.redirect(new URL(url, request.url));
+  if (pathnameHasLocale) {
+    if (pathname.startsWith(`/${defaultLocale}/`) || pathname === `/${defaultLocale}`) {
+      const newPath = pathname === `/${defaultLocale}`
+        ? "/"
+        : pathname.replace(`/${defaultLocale}/`, "/");
+      return NextResponse.redirect(new URL(newPath, request.url));
     }
-
-    nextLocale = pathLocale;
-  } else {
-    const isFirstVisit = !request.cookies.has("NEXT_LOCALE");
-
-    const locale = isFirstVisit ? getLocale(request, i18n) : defaultLocale;
-
-    let newPath = `/${locale}${pathname}`;
-    if (request.nextUrl.search) newPath += request.nextUrl.search;
-
-    const url = basePath + newPath;
-
-    response =
-      locale === defaultLocale
-        ? NextResponse.rewrite(new URL(url, request.url))
-        : NextResponse.redirect(new URL(url, request.url));
-    nextLocale = locale;
+    return NextResponse.next();
   }
 
-  if (!response) response = NextResponse.next();
+  const locale = request.cookies.get("NEXT_LOCALE")?.value || getLocale(request, i18n);
 
-  if (nextLocale) response.cookies.set("NEXT_LOCALE", nextLocale);
+  if (locale === defaultLocale) {
+    return NextResponse.rewrite(new URL(`/${defaultLocale}${pathname}`, request.url));
+  }
 
-  return response;
+  return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
 }
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isProtectedRoute(request)) {
-    await auth.protect();
+export default clerkMiddleware(async (authProxy, request) => {
+  try {
+    const isProtected = isProtectedRoute(request);
+
+    if (isProtected) {
+      const authData = await authProxy();
+      if (!authData.userId) {
+        return authData.redirectToSignIn();
+      }
+    }
+
+    return i18nMiddleware(request);
+  } catch (error) {
+    console.error("[MIDDLEWARE_ERROR]", error);
+    // Em caso de erro crítico no middleware, deixe passar ou redirecione para erro
+    return NextResponse.next();
   }
-  return i18nMiddleware(request);
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };
