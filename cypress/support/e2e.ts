@@ -19,8 +19,12 @@ import "./commands";
 // Add Vercel protection bypass header if secret is available
 const bypassSecret = Cypress.env("VERCEL_AUTOMATION_BYPASS_SECRET");
 if (bypassSecret) {
-  Cypress.on("window:before:load", (win) => {
-    // This handles headers for visit() and other window-based requests
+  // Use intercept to add the header to every request to the baseUrl
+  beforeEach(() => {
+    cy.intercept("**", (req) => {
+      req.headers["x-vercel-protection-bypass"] = bypassSecret;
+      req.headers["x-vercel-set-bypass-cookie"] = "true";
+    });
   });
 
   // For cy.request()
