@@ -6,11 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { i18n, Locale } from "../../../i18n-config";
 import ThemeSwitcher from "./ThemeSwitcher";
-import {
-  SignedIn,
-  SignedOut,
-  useAuth,
-} from "@clerk/nextjs";
+import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import { Menu } from "lucide-react";
 import MobileMenu from "./MobileMenu";
@@ -36,25 +32,36 @@ const Header = ({ userButton }: HeaderProps) => {
   const { locales, defaultLocale } = i18n;
   const { isLoaded } = useAuth();
 
-  const segments = useMemo(() => pathname.split("/").filter(Boolean), [pathname]);
+  const segments = useMemo(
+    () => pathname.split("/").filter(Boolean),
+    [pathname],
+  );
   const currentLocale = useMemo<Locale>(() => {
     const potential = segments[0] as Locale | undefined;
     return locales.includes(potential as Locale) ? potential! : defaultLocale;
   }, [segments, locales, defaultLocale]);
 
   const [theme, setTheme] = useState("light");
-  const [authModal, setAuthModal] = useState<{ isOpen: boolean; view: "sign-in" | "sign-up" }>({
+  const [authModal, setAuthModal] = useState<{
+    isOpen: boolean;
+    view: "sign-in" | "sign-up";
+  }>({
     isOpen: false,
     view: "sign-in",
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    const currentTheme = document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
     setTheme(currentTheme);
   }, []);
 
   const switchLocale = (nextLocale: Locale) => {
+    // Persiste o idioma em um cookie para o Middleware respeitar a escolha do usuário
+    document.cookie = `NEXT_LOCALE=${nextLocale}; path=/; max-age=31536000; SameSite=Lax`;
+
     if (nextLocale === currentLocale) return;
 
     const pathSegments = [...segments];
@@ -64,7 +71,9 @@ const Header = ({ userButton }: HeaderProps) => {
 
     const nextPath =
       nextLocale === defaultLocale
-        ? restPath ? `/${restPath}` : "/"
+        ? restPath
+          ? `/${restPath}`
+          : "/"
         : `/${[nextLocale, ...restSegments].join("/")}`;
 
     router.push(nextPath || "/");
@@ -99,10 +108,11 @@ const Header = ({ userButton }: HeaderProps) => {
                         key={locale}
                         type="button"
                         onClick={() => switchLocale(locale as Locale)}
-                        className={`px-3 py-1 rounded-full transition ${isActive
-                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                          : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                          }`}
+                        className={`px-3 py-1 rounded-full transition ${
+                          isActive
+                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                            : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                        }`}
                       >
                         {locale.toUpperCase()}
                       </button>
@@ -117,21 +127,23 @@ const Header = ({ userButton }: HeaderProps) => {
                   <>
                     <SignedOut>
                       <button
-                        onClick={() => setAuthModal({ isOpen: true, view: "sign-in" })}
+                        onClick={() =>
+                          setAuthModal({ isOpen: true, view: "sign-in" })
+                        }
                         className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
                       >
                         Entrar
                       </button>
                       <button
-                        onClick={() => setAuthModal({ isOpen: true, view: "sign-up" })}
+                        onClick={() =>
+                          setAuthModal({ isOpen: true, view: "sign-up" })
+                        }
                         className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
                       >
                         Começar agora
                       </button>
                     </SignedOut>
-                    <SignedIn>
-                      {userButton}
-                    </SignedIn>
+                    <SignedIn>{userButton}</SignedIn>
                   </>
                 )}
                 <ThemeSwitcher />
