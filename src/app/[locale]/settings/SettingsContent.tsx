@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { CREDIT_CARD, PACKAGE, USER_ICON } from "@/components/TiptapEditor/icons"; // Using existing icons if possible, or fallback
 
 export function SettingsContent({ user, plan }: { user: any, plan: string }) {
     const [loading, setLoading] = useState(false);

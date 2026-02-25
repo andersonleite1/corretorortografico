@@ -3,30 +3,30 @@ import { PLAN_BY_PRICE_ID } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import type Stripe from "stripe";
+import type { Stripe } from "stripe";
 
 // CRÍTICO: Desabilitar o body parser para verificar a assinatura (Next.js automatically does this for API routes with `req.text()`)
 export const runtime = "nodejs";
 
 async function handleSubscriptionUpsert(
-    subscription: Stripe.Subscription,
+    stripeSub: Stripe.Subscription,
     userId?: string
 ) {
-    const priceId = subscription.items.data[0]?.price.id;
+    const priceId = stripeSub.items.data[0]?.price.id;
     const plan = PLAN_BY_PRICE_ID[priceId] ?? "free";
 
     const data = {
-        stripeSubscriptionId: subscription.id,
+        stripeSubscriptionId: stripeSub.id,
         stripePriceId: priceId,
-        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        status: subscription.status,
+        stripeCurrentPeriodEnd: new Date((stripeSub.items.data[0]?.current_period_end ?? 0) * 1000),
+        status: stripeSub.status,
         plan,
     };
 
     // Buscar userId via metadata da subscription ou do Customer
     let targetUserId = userId;
     if (!targetUserId) {
-        const customer = await stripe.customers.retrieve(subscription.customer as string) as Stripe.Customer;
+        const customer = await stripe.customers.retrieve(stripeSub.customer as string) as Stripe.Customer;
         // @ts-ignore - metadata isn't always typed as we expect but we set it
         targetUserId = customer.metadata?.userId;
 
@@ -37,7 +37,7 @@ async function handleSubscriptionUpsert(
     }
 
     if (!targetUserId) {
-        console.error("userId não encontrado para subscription:", subscription.id);
+        console.error("userId não encontrado para subscription:", stripeSub.id);
         return;
     }
 
@@ -104,18 +104,20 @@ export async function POST(req: Request) {
         // ⚠️ Pagamento falhou
         case "invoice.payment_failed": {
             const invoice = event.data.object as Stripe.Invoice;
-            const subId = invoice.subscription as string;
-            await db.subscription.updateMany({
-                where: { stripeSubscriptionId: subId },
-                data: { status: "past_due" },
-            });
+            const subId = (invoice as any).subscription || invoice.parent?.subscription_details?.subscription;
+            if (subId) {
+                await db.subscription.updateMany({
+                    where: { stripeSubscriptionId: subId as string },
+                    data: { status: "past_due" },
+                });
+            }
             // TODO: Enviar email de alerta ao usuário
             break;
         }
 
         // 🛒 Checkout concluído — garante criação da subscription
         case "checkout.session.completed": {
-            const session = event.data.object as Stripe.CheckoutSession;
+            const session = event.data.object as Stripe.Checkout.Session;
             if (session.mode === "subscription" && session.subscription) {
                 const sub = await stripe.subscriptions.retrieve(session.subscription as string);
                 await handleSubscriptionUpsert(sub, session.metadata?.userId);

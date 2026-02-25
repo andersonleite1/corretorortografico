@@ -1,20 +1,22 @@
 import React, { useCallback } from "react";
 import clsx from "clsx";
 import { useTiptapContext } from "../Provider";
+import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import Tooltip from "../ui/Tooltip";
 import Icon from "../ui/Icon";
 
 const BrowserSpellcheckButton = () => {
     const {
-        isBrowserSpellcheckEnabled,
-        setIsBrowserSpellcheckEnabled,
         messages,
         contentElement
     } = useTiptapContext();
+    const { buttonVisibility, toggleButtonVisibility } = useEditorSettings();
+
+    const isBrowserSpellcheckEnabled = buttonVisibility.browserSpellcheck;
 
     const handleToggle = useCallback(() => {
-        setIsBrowserSpellcheckEnabled(!isBrowserSpellcheckEnabled);
-    }, [isBrowserSpellcheckEnabled, setIsBrowserSpellcheckEnabled]);
+        toggleButtonVisibility("browserSpellcheck");
+    }, [toggleButtonVisibility]);
 
     const tooltipLabel = isBrowserSpellcheckEnabled
         ? messages.browserSpellcheck.disableTooltip

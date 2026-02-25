@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/bug-reports/route'
+import { NextRequest } from 'next/server'
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
 const { mockBugReportCreate, mockUserFindUnique } = vi.hoisted(() => ({
@@ -30,7 +31,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('persiste dados válidos e retorna 201', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -58,7 +59,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('retorna 400 quando a descrição está vazia', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -72,7 +73,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('retorna 400 quando wantsNotification=true mas notificationEmail está ausente', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -87,7 +88,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('aceita report sem informações adicionais (campo opcional)', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -101,7 +102,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('salva o e-mail de notificação quando wantsNotification=true e e-mail válido', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -124,7 +125,7 @@ describe('POST /api/bug-reports', () => {
     })
 
     it('retorna 400 quando o e-mail de notificação é inválido', async () => {
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -141,7 +142,7 @@ describe('POST /api/bug-reports', () => {
     it('retorna 500 quando o banco de dados lança um erro', async () => {
         mockBugReportCreate.mockRejectedValue(new Error('DB connection failed'))
 
-        const req = new Request('http://localhost/api/bug-reports', {
+        const req = new NextRequest('http://localhost/api/bug-reports', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -25,7 +25,7 @@ const mockEditorSettings = {
     toggleButtonVisibility: mockToggleButtonVisibility,
     activeTones: { ...DEFAULT_TONES },
     toggleToneActivation: mockToggleToneActivation,
-    customTones: [],
+    customTones: [] as any[],
     addCustomTone: mockAddCustomTone,
     deleteCustomTone: mockDeleteCustomTone,
     toggleCustomToneActivation: mockToggleCustomToneActivation,

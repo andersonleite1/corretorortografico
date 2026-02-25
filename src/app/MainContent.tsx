@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import { DocumentsDialog } from "@/components/shared/DocumentsDialog";
-import { Locale } from "../../../i18n-config";
+import { Locale } from "../../i18n-config";
 
 interface MainContentProps {
     children: React.ReactNode;

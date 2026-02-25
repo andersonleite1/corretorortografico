@@ -13,9 +13,7 @@ import { useEditorSettings, ToneId, TONE_LABELS, TONE_ICONS } from "@/components
 import { useAuth } from "@clerk/nextjs";
 import Tooltip from "../ui/Tooltip";
 
-interface Props { }
-
-export function AiBubbleMenu({ }: Props) {
+export function AiBubbleMenu() {
     const { editor, userPlan } = useTiptapContext();
     const { isSignedIn } = useAuth();
     const { activeTones, customTones } = useEditorSettings();

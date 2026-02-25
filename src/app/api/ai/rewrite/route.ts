@@ -71,7 +71,7 @@ export async function POST(req: Request) {
         const { text, tone, customInstructions, language } = schema.parse(body);
 
         // Determinar o prompt de estilo
-        let stylePrompt = TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] || "mantendo o sentido original";
+        const stylePrompt = TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] || "mantendo o sentido original";
 
         // Se houver instruções customizadas, elas têm prioridade ou complementam
         const extraPrompt = customInstructions ? `\nInstruções específicas do usuário a seguir: ${customInstructions}` : `\nEstilo solicitado: ${stylePrompt}`;

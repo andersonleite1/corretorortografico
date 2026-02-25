@@ -12,7 +12,6 @@ export function createMockEditor(overrides: Record<string, any> = {}) {
             focus: vi.fn().mockReturnThis(),
             deleteRange: vi.fn().mockReturnThis(),
             insertContent: vi.fn().mockReturnThis(),
-            setContent: vi.fn().mockReturnThis(),
             run: vi.fn(),
         },
         chain: vi.fn().mockReturnValue({
