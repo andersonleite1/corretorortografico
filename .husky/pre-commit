@@ -1,0 +1,2 @@
+npm test -- --run
+./scripts/pre-commit.sh

@@ -14,7 +14,8 @@
     "test": "vitest",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
-    "db:push": "ln -sf .env.local .env && npx prisma db push && rm .env"
+    "db:push": "ln -sf .env.local .env && npx prisma db push && rm .env",
+    "prepare": "husky"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.30",
@@ -97,7 +98,10 @@
     "cypress": "^15.10.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.17",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
+    "lint-staged": "^16.2.7",
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.4.49",
     "prisma": "^5.16.1",
@@ -106,5 +110,14 @@
     "tailwindcss": "^3.4.15",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "next lint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

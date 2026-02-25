@@ -14,4 +14,24 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
+
+// Add Vercel protection bypass header if secret is available
+const bypassSecret = Cypress.env("VERCEL_AUTOMATION_BYPASS_SECRET");
+if (bypassSecret) {
+  Cypress.on("window:before:load", (win) => {
+    // This handles headers for visit() and other window-based requests
+  });
+
+  // For cy.request()
+  Cypress.Commands.overwrite("request", (originalFn, ...args) => {
+    const options = args[0];
+    if (typeof options === "object") {
+      options.headers = {
+        ...options.headers,
+        "x-vercel-protection-bypass": bypassSecret,
+      };
+    }
+    return originalFn(...args);
+  });
+}
