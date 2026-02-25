@@ -11,6 +11,7 @@ function logError(msg: string) {
 }
 
 export const runtime = "nodejs"; // Prisma padrão requer Node.js
+export const dynamic = "force-dynamic";
 
 const schema = z.object({
     text: z.string().min(1).max(5000),

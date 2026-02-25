@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const seoSchema = z.object({
     readabilityScore: z.number().min(0).max(100),

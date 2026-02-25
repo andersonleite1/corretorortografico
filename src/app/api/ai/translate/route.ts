@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const SUPPORTED_LANGUAGES = ["Portuguese", "English", "Spanish", "French", "German", "Italian", "pt-BR", "en-US", "es-ES"];
 
