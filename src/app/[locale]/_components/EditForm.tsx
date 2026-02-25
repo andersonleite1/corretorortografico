@@ -1,21 +1,66 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
+import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
-import { SaveNotification } from "@/components/shared/SaveNotification";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaBug } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
-import { DraftComparison } from "@/components/Drafts/DraftComparison";
-import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
-import { BugReportDialog } from "@/components/shared/BugReportDialog";
-import { FaBug } from "react-icons/fa";
 
+const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[480px] bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-md border border-[#d1d9e0] dark:border-[#3d444d]" />
+  ),
+});
+
+const TiptapRenderer = dynamic(
+  () => import("@/components/TiptapRenderer/ClientRenderer"),
+  {
+    ssr: false,
+  },
+);
+
+const BugReportDialog = dynamic(
+  () =>
+    import("@/components/shared/BugReportDialog").then(
+      (mod) => mod.BugReportDialog,
+    ),
+  {
+    ssr: false,
+  },
+);
+
+const DraftComparison = dynamic(
+  () =>
+    import("@/components/Drafts/DraftComparison").then(
+      (mod) => mod.DraftComparison,
+    ),
+  {
+    ssr: false,
+  },
+);
+
+const SaveNotification = dynamic(
+  () =>
+    import("@/components/shared/SaveNotification").then(
+      (mod) => mod.SaveNotification,
+    ),
+  {
+    ssr: false,
+  },
+);
 
 interface PostForm {
   title: string;
@@ -27,6 +72,8 @@ interface EditFormProps {
   userPlan: "free" | "pro" | "team";
 }
 
+import type { TiptapEditorRef } from "@/components/TiptapEditor";
+
 export default function EditForm({ locale, userPlan }: EditFormProps) {
   const editorRef = useRef<TiptapEditorRef>(null);
   const router = useRouter();
@@ -34,9 +81,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const docId = searchParams.get("docId");
   const [isLoading, setIsLoading] = useState(true);
   const { control, reset, watch, getValues } = useForm<PostForm>();
-  const { form: formMessages } = useMemo(() => getEditMessages(locale), [locale]);
+  const { form: formMessages } = useMemo(
+    () => getEditMessages(locale),
+    [locale],
+  );
 
-  const [drafts, setDrafts] = useState<{ id: string; title: string; content: string; date: string }[]>([]);
+  const [drafts, setDrafts] = useState<
+    { id: string; title: string; content: string; date: string }[]
+  >([]);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<{
     url: string;
@@ -47,15 +99,23 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isPostPreviewOpen, setIsPostPreviewOpen] = useState(false);
   const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
-  const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{ content: any, id: string } | null>(null);
-  const [draftSavingStatus, setDraftSavingStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{
+    content: any;
+    id: string;
+  } | null>(null);
+  const [draftSavingStatus, setDraftSavingStatus] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
   const [notification, setNotification] = useState<{
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
   const [isBugReportOpen, setIsBugReportOpen] = useState(false);
 
-  const showNotification = (message: string, type: "success" | "error" | "info" = "success") => {
+  const showNotification = (
+    message: string,
+    type: "success" | "error" | "info" = "success",
+  ) => {
     setNotification({ message, type });
   };
 
@@ -110,7 +170,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       showNotification(formMessages.modal.pdfSuccess);
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
-      showNotification(error instanceof Error ? error.message : formMessages.modal.pdfError, "error");
+      showNotification(
+        error instanceof Error ? error.message : formMessages.modal.pdfError,
+        "error",
+      );
     } finally {
       setIsExportingPDF(false);
     }
@@ -134,7 +197,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       setIsPreviewOpen(true);
     } catch (error) {
       console.error("Erro ao gerar prévia do PDF:", error);
-      showNotification(error instanceof Error ? error.message : formMessages.modal.pdfError, "error");
+      showNotification(
+        error instanceof Error ? error.message : formMessages.modal.pdfError,
+        "error",
+      );
     } finally {
       setIsExportingPDF(false);
     }
@@ -179,7 +245,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const { title, content } = getValues();
     const plainText =
       editorInstance?.getText?.().trim() ||
-      content?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() ||
+      content
+        ?.replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim() ||
       "";
 
     if (!plainText) {
@@ -261,7 +330,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
-    [editorRef.current]
+    [editorRef.current],
   );
 
   useEffect(() => {
@@ -274,7 +343,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         const localData = JSON.parse(localDataStr);
         // Se o docId bater ou for nulo (pra docs novos) e o timestamp local for maior
         const isSameDoc = localData.docId === docId;
-        const serverUpdateAt = serverData?.updatedAt ? new Date(serverData.updatedAt).getTime() : 0;
+        const serverUpdateAt = serverData?.updatedAt
+          ? new Date(serverData.updatedAt).getTime()
+          : 0;
         const localUpdatedAt = localData.lastSaved || 0;
 
         if (isSameDoc && localUpdatedAt > serverUpdateAt) {
@@ -295,7 +366,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         })
         .then((doc) => {
           let content = doc.content;
-          if (typeof content === "string" && (content.startsWith("{") || content.startsWith("["))) {
+          if (
+            typeof content === "string" &&
+            (content.startsWith("{") || content.startsWith("["))
+          ) {
             try {
               content = JSON.parse(content);
             } catch (e) {
@@ -303,23 +377,33 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             }
           }
 
-          const recovered = checkRecovery({ title: doc.title, content, updatedAt: doc.updatedAt });
+          const recovered = checkRecovery({
+            title: doc.title,
+            content,
+            updatedAt: doc.updatedAt,
+          });
           reset({ title: recovered.title, content: recovered.content });
-          editorRef.current?.getInstance()?.commands.setContent(recovered.content);
+          editorRef.current
+            ?.getInstance()
+            ?.commands.setContent(recovered.content);
           setIsLoading(false);
         })
         .catch((error) => {
           console.error(error);
           getPost().then((post) => {
             reset({ ...post });
-            editorRef.current?.getInstance()?.commands.setContent(post.content || "");
+            editorRef.current
+              ?.getInstance()
+              ?.commands.setContent(post.content || "");
             setIsLoading(false);
           });
         });
     } else {
       getPost().then((post) => {
         reset({ ...post });
-        editorRef.current?.getInstance()?.commands.setContent(post.content || "");
+        editorRef.current
+          ?.getInstance()
+          ?.commands.setContent(post.content || "");
         setIsLoading(false);
       });
     }
@@ -339,20 +423,22 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     return () => subscription.unsubscribe();
   }, [watch, docId, getWordCount]);
 
-
-
   // Carrega os rascunhos ao iniciar
   useEffect(() => {
     if (docId) {
       fetch(`/api/documents/${docId}/drafts`)
         .then((res) => res.json())
         .then((data) => {
-          setDrafts(data.map((d: any) => ({
-            id: d.id,
-            title: d.title,
-            content: d.content,
-            date: new Date(d.createdAt).toLocaleString(locale === 'pt' ? 'pt-BR' : 'en-US')
-          })));
+          setDrafts(
+            data.map((d: any) => ({
+              id: d.id,
+              title: d.title,
+              content: d.content,
+              date: new Date(d.createdAt).toLocaleString(
+                locale === "pt" ? "pt-BR" : "en-US",
+              ),
+            })),
+          );
         })
         .catch(console.error);
     } else {
@@ -384,7 +470,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       if (!isExplicit) setDraftSavingStatus("saving");
 
       const content = watch("content");
-      const stringifiedContent = typeof content === "object" ? JSON.stringify(content) : content;
+      const stringifiedContent =
+        typeof content === "object" ? JSON.stringify(content) : content;
 
       const res = await fetch(`/api/documents/${docId}/drafts`, {
         method: "POST",
@@ -394,8 +481,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         body: JSON.stringify({
           title: watch("title"),
           content: stringifiedContent,
-          isExplicitSave: isExplicit
-        })
+          isExplicitSave: isExplicit,
+        }),
       });
 
       if (res.ok) {
@@ -410,12 +497,16 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         // Refresh drafts list
         const draftsRes = await fetch(`/api/documents/${docId}/drafts`);
         const data = await draftsRes.json();
-        setDrafts(data.map((d: any) => ({
-          id: d.id,
-          title: d.title,
-          content: d.content,
-          date: new Date(d.createdAt).toLocaleString(locale === 'pt' ? 'pt-BR' : 'en-US')
-        })));
+        setDrafts(
+          data.map((d: any) => ({
+            id: d.id,
+            title: d.title,
+            content: d.content,
+            date: new Date(d.createdAt).toLocaleString(
+              locale === "pt" ? "pt-BR" : "en-US",
+            ),
+          })),
+        );
         if (isExplicit) showNotification(formMessages.modal.draftSaved);
       } else {
         const errorText = await res.text();
@@ -426,7 +517,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       if (!isExplicit) {
         setDraftSavingStatus("error");
       } else {
-        showNotification(error instanceof Error ? error.message : "Erro ao salvar rascunho", "error");
+        showNotification(
+          error instanceof Error ? error.message : "Erro ao salvar rascunho",
+          "error",
+        );
       }
     }
   };
@@ -450,7 +544,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
     let content = draft.content;
     // Ensure content is parsed if it's a stringified JSON
-    if (typeof content === 'string' && (content.startsWith('{') || content.startsWith('['))) {
+    if (
+      typeof content === "string" &&
+      (content.startsWith("{") || content.startsWith("["))
+    ) {
       try {
         content = JSON.parse(content);
       } catch (e) {
@@ -476,17 +573,16 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     // Nota: Precisamos da rota de DELETE ou apenas filtramos se for via API
     // Por simplicidade neste MVP, vamos focar no salvamento/comparação.
     // Mas vamos implementar o filtro local para UX imediata.
-    setDrafts(prev => prev.filter(d => d.id !== draftId));
+    setDrafts((prev) => prev.filter((d) => d.id !== draftId));
   };
 
   const handleCompareDraft = (draftId: string) => {
-    const draft = drafts.find(d => d.id === draftId);
+    const draft = drafts.find((d) => d.id === draftId);
     if (draft) {
       setSelectedDraftForComparison({ content: draft.content, id: draft.id });
       setIsComparisonOpen(true);
     }
   };
-
 
   if (isLoading) {
     const toolbarItems = Array.from({ length: 6 });
@@ -572,7 +668,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                   isExportingPdf: isExportingPDF,
                 }}
                 draftActions={{
-                  drafts: drafts.map(({ id, title, date }) => ({ id, title, date })),
+                  drafts: drafts.map(({ id, title, date }) => ({
+                    id,
+                    title,
+                    date,
+                  })),
                   onSaveDraft: () => handleSaveDraft(true),
                   onLoadDraft: handleLoadDraft,
                   onDeleteDraft: handleDeleteDraft,
@@ -674,7 +774,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                         {formMessages.postPreview.htmlCode}
                       </div>
                       <pre className="p-6 bg-gray-900 text-green-400 rounded-xl overflow-x-auto font-mono text-sm leading-relaxed border border-gray-700">
-                        <code>{editorRef.current?.getInstance()?.getHTML() || watch("content")}</code>
+                        <code>
+                          {editorRef.current?.getInstance()?.getHTML() ||
+                            watch("content")}
+                        </code>
                       </pre>
                     </div>
                   ) : (
@@ -687,8 +790,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                           {watch("title")?.charAt(0) || "P"}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-gray-200">User</p>
-                          <p className="text-xs">{new Date().toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US')}</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-200">
+                            User
+                          </p>
+                          <p className="text-xs">
+                            {new Date().toLocaleDateString(
+                              locale === "pt" ? "pt-BR" : "en-US",
+                            )}
+                          </p>
                         </div>
                         <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1" />
                         <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">
@@ -696,7 +805,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                         </span>
                       </div>
                       <TiptapRenderer>
-                        {editorRef.current?.getInstance()?.getHTML() || watch("content")}
+                        {editorRef.current?.getInstance()?.getHTML() ||
+                          watch("content")}
                       </TiptapRenderer>
                     </div>
                   )}
@@ -712,7 +822,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 onClick={() => setIsPreviewHtmlMode(!isPreviewHtmlMode)}
                 className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-500/25 active:scale-95"
               >
-                {isPreviewHtmlMode ? formMessages.postPreview.blogPreview : formMessages.postPreview.viewHtml}
+                {isPreviewHtmlMode
+                  ? formMessages.postPreview.blogPreview
+                  : formMessages.postPreview.viewHtml}
               </button>
               <button
                 onClick={handleDownloadHtml}

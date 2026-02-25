@@ -1,12 +1,25 @@
 "use client";
 
-import EditForm from "./_components/EditForm";
-
+import dynamic from "next/dynamic";
 import { HomeContent } from "@/data/home";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
 
 import "./style.scss";
+
+const EditForm = dynamic(() => import("./_components/EditForm"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col gap-6 order-2 min-w-full h-screen prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
+      <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+      <div className="w-full h-11 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
+      <div className="flex flex-col gap-4">
+        <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+        <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[480px]" />
+      </div>
+    </div>
+  ),
+});
 
 type Props = {
   content: HomeContent;
@@ -30,10 +43,12 @@ export default function EditPageContent({ content, userPlan }: Props) {
   }
 
   return (
-    <div className={clsx(
-      "w-full mx-auto py-10 px-3 md:px-6 sm:px-0 transition-all duration-300 ease-in-out",
-      maxWidthClass
-    )}>
+    <div
+      className={clsx(
+        "w-full mx-auto py-10 px-3 md:px-6 sm:px-0 transition-all duration-300 ease-in-out",
+        maxWidthClass,
+      )}
+    >
       <EditForm locale={content.locale} userPlan={userPlan} />
       <section className="order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-3 sm:px-4 md:px-8 pt-0 pb-4">
         <h1 className="text-4xl font-semibold text-center text-gray-900 dark:text-gray-100">
@@ -64,7 +79,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
                     <li key={i}>
                       <strong>{point.highlight}</strong> {point.text}
                     </li>
-                  )
+                  ),
                 )}
               </ul>
             )}
@@ -74,8 +89,6 @@ export default function EditPageContent({ content, userPlan }: Props) {
           className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: article.finalNoteHtml }}
         ></p>
-
-
       </section>
       <section
         id="faq"
