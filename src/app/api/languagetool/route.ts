@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { LanguageToolResponse } from "@/types/languageTool";
 
 const MAX_TEXT_LENGTH = 20000;

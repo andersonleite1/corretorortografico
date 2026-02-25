@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const BugReportSchema = z.object({
     description: z.string().min(1, "Descrição é obrigatória").max(500),
     additionalInfo: z.string().max(2000).optional().nullable(),

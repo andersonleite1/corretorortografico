@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { getCurrentUser, getUserPlan } from "@/lib/auth";
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 const documentSchema = z.object({

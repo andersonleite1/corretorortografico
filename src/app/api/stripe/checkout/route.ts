@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PLAN_BY_PRICE_ID } from "@/lib/stripe";
 
+export const dynamic = "force-dynamic";
+
 const VALID_PRICE_IDS = Object.keys(PLAN_BY_PRICE_ID);
 
 const schema = z.object({

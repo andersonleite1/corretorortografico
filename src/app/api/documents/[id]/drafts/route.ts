@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { z } from "zod";
 
 const draftSchema = z.object({

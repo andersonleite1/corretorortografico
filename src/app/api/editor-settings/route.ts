@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+
+export const dynamic = "force-dynamic";
 import {
     DEFAULT_SETTINGS,
     DEFAULT_TONES,

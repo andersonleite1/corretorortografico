@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+import { auth } from "@clerk/nextjs/server";
 import DOMPurify from 'isomorphic-dompurify';
 
 const ipRateLimitMap = new Map<string, { count: number, resetTime: number }>();
