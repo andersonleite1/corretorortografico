@@ -14,6 +14,7 @@
     "test": "vitest",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
+    "test:e2e:ci": "start-server-and-test start http://localhost:3000 test:e2e",
     "db:push": "ln -sf .env.local .env && npx prisma db push && rm .env",
     "prepare": "husky"
   },
@@ -107,6 +108,7 @@
     "prisma": "^5.16.1",
     "sass": "^1.80.6",
     "shiki": "^1.24.4",
+    "start-server-and-test": "^2.1.5",
     "tailwindcss": "^3.4.15",
     "typescript": "^5",
     "vitest": "^4.0.18"

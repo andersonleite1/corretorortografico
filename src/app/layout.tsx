@@ -21,6 +21,8 @@ import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
 
+import { CookieConsent } from "@/components/shared/CookieConsent";
+
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
   description:
@@ -46,8 +48,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = cookies();
-  const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as Locale | undefined;
-  const locale = storedLocale && i18n.locales.includes(storedLocale) ? storedLocale : i18n.defaultLocale;
+  const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as
+    | Locale
+    | undefined;
+  const locale =
+    storedLocale && i18n.locales.includes(storedLocale)
+      ? storedLocale
+      : i18n.defaultLocale;
   const faqSchema = getHomeFaqSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
@@ -56,9 +63,16 @@ export default async function RootLayout({
   return (
     <ClerkThemeProvider locale={locale}>
       <SidebarProvider>
-        <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
+        <html
+          lang={locale}
+          className={`${fontMono.variable} ${fontSans.variable}`}
+        >
           <Head>
-            <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
+            <link
+              rel="preconnect"
+              href="https://www.clarity.ms"
+              crossOrigin=""
+            />
             <script type="application/ld+json">
               {JSON.stringify({
                 "@context": "https://schema.org",
@@ -120,6 +134,7 @@ export default async function RootLayout({
               {children}
             </MainContent>
             <Toaster richColors position="top-right" />
+            <CookieConsent locale={locale} />
           </body>
         </html>
       </SidebarProvider>
