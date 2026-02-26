@@ -2,7 +2,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import { db } from "./db";
 
 export async function syncUserWithDb() {
-    const user = await currentUser();
+    let user;
+    try {
+        user = await currentUser();
+    } catch (error) {
+        console.warn("[syncUserWithDb] Clerk auth error (likely running outside middleware context):", error);
+        return null;
+    }
 
     if (!user) {
         return null;

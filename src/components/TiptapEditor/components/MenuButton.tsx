@@ -87,7 +87,15 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
         }
         onFocusCapture={(e) => e.stopPropagation()}
         data-active={(editor.isEditable && active) || undefined}
-        aria-label={typeof tooltip === "string" ? tooltip : text}
+        aria-label={
+          hideText
+            ? typeof tooltip === "string"
+              ? tooltip
+              : text
+            : typeof tooltip === "string" && tooltip !== text
+              ? `${tooltip} ${text}`
+              : text
+        }
         disabled={!editor.isEditable || disabled}
         {...props}
       >

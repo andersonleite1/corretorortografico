@@ -1,16 +1,17 @@
 describe("Text Editor E2E", () => {
   beforeEach(() => {
-    // We assume the default locale is 'pt' or it redirects to it
+    // Visit the root page which will rewrite to /pt internally without a hard redirect if possible
+    // or just let the middleware handle it naturally.
     cy.visit("/");
+
+    // Explicitly wait for the editor to be ready
+    // We use a long timeout because dynamic imports can be slow in development
+    cy.get(".tiptap", { timeout: 20000 }).should("exist");
   });
 
   it("should load the editor page correctly", () => {
     // Check if the title input exists
     cy.get('input[type="text"]').should("be.visible");
-
-    // Check if the Tiptap editor is present
-    // Tiptap usually renders a div with the class .tiptap or .ProseMirror
-    cy.get(".tiptap").should("exist");
   });
 
   it("should allow typing in the title", () => {

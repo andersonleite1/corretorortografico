@@ -1,9 +1,9 @@
 describe('Editor Toolbar E2E', () => {
     beforeEach(() => {
-        // Visit Portuguese version specifically to use exact labels
-        cy.visit('/pt');
-        // Wait for the editor to be ready
-        cy.get('.tiptap').should('exist');
+        // Visit the root page
+        cy.visit('/');
+        // Wait for the editor to be ready with a longer timeout
+        cy.get('.tiptap', { timeout: 20000 }).should('exist');
     });
 
     const getEditor = () => cy.get('.tiptap').first();

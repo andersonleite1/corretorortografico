@@ -58,7 +58,8 @@ export default async function RootLayout({
   const faqSchema = getHomeFaqSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
-  await syncUserWithDb();
+  // Removido o await para não bloquear o rendering inicial do layout
+  syncUserWithDb();
 
   return (
     <ClerkThemeProvider locale={locale}>

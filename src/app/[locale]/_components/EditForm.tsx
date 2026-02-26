@@ -695,7 +695,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           type="button"
           onClick={() => setIsBugReportOpen(true)}
           className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-200 active:scale-95"
-          aria-label="Reportar um problema"
+          aria-label="Reportar Problema"
         >
           <FaBug className="text-xs" />
           Reportar Problema
