@@ -7,7 +7,7 @@ type Props = {
 
 export default function LandingPricing({ data }: Props) {
     return (
-        <section className="landing-pricing" aria-labelledby="pricing-heading">
+        <section id="pricing" className="landing-pricing" aria-labelledby="pricing-heading">
             <div className="landing-section__inner">
                 <p className="landing-eyebrow">{data.eyebrow}</p>
                 <h2 id="pricing-heading" className="landing-heading">

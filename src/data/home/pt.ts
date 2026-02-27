@@ -227,6 +227,11 @@ const pt: HomeContent = {
     heading: "Pronto para escrever mais rápido e com muito mais qualidade?",
     ctaLabel: "Criar Minha Conta Grátis",
     ctaHref: "/sign-up",
+    loggedIn: {
+      heading: "Compare nossos planos e escolha o melhor para você",
+      ctaLabel: "Ver Planos",
+      ctaHref: "#pricing",
+    },
   },
 };
 

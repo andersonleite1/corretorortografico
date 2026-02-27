@@ -86,6 +86,11 @@ export type CtaContent = {
   heading: string;
   ctaLabel: string;
   ctaHref: string;
+  loggedIn?: {
+    heading: string;
+    ctaLabel: string;
+    ctaHref: string;
+  };
 };
 
 export type HomeContent = {

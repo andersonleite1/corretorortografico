@@ -217,6 +217,11 @@ const en: HomeContent = {
     heading: "Ready to write faster and with much more quality?",
     ctaLabel: "Create My Free Account",
     ctaHref: "/sign-up",
+    loggedIn: {
+      heading: "Compare our plans and choose the best one for you",
+      ctaLabel: "View Plans",
+      ctaHref: "#pricing",
+    },
   },
 };
 
