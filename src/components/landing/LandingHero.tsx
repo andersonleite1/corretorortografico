@@ -24,13 +24,13 @@ export default function LandingHero({ data }: Props) {
                 <div className="landing-hero__visual" aria-hidden="true">
                     <div className="landing-hero__screenshot-wrap">
                         <Image
-                            src="/editor-screenshot.jpg"
-                            alt="Interface do editor de texto online com modo escuro e barra de revisão gramatical"
+                            src="/macbook-mockup.png"
+                            alt="Mockup de um MacBook Pro mostrando a interface do editor de texto online"
                             width={960}
-                            height={600}
+                            height={960}
                             priority
                             className="landing-hero__screenshot"
-                            quality={85}
+                            quality={90}
                         />
                     </div>
                 </div>

@@ -113,7 +113,7 @@ const pt: HomeContent = {
     ],
   },
   hero: {
-    headline: "Onde a Escrita Profissional Encontra a Inteligência Artificial.",
+    headline: "Sua mente cria, nossa IA aperfeiçoa.",
     subheadline:
       "Transforme suas ideias em documentos impecáveis com um editor de texto avançado, revisor gramatical analítico e reescrita inteligente por IA — tudo em um só lugar.",
     ctaLabel: "Começar a Escrever Grátis",

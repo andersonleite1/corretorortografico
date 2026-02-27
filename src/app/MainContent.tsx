@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import { DocumentsDialog } from "@/components/shared/DocumentsDialog";
+import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { Locale } from "../../i18n-config";
 
 interface MainContentProps {
@@ -28,6 +29,7 @@ export const MainContent = ({ children, userButton, locale }: MainContentProps) 
                 isOpen={isDocumentsDialogOpen}
                 onClose={() => setIsDocumentsDialogOpen(false)}
             />
+            <ScrollToTop />
         </>
     );
 };
