@@ -35,9 +35,67 @@ export type SeoContent = {
   openGraphDescription?: string;
 };
 
+// --- New Landing Page Sections ---
+
+export type HeroContent = {
+  headline: string;
+  subheadline: string;
+  ctaLabel: string;
+  ctaHref: string;
+  microcopy: string;
+};
+
+export type ProblemContent = {
+  eyebrow: string;
+  heading: string;
+  pains: { icon: string; title: string; description: string }[];
+};
+
+export type FeaturePillar = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+export type FeaturesContent = {
+  eyebrow: string;
+  heading: string;
+  pillars: FeaturePillar[];
+};
+
+export type PricingTier = {
+  name: string;
+  focus: string;
+  price: string | null;
+  priceNote?: string;
+  badge?: string;
+  items: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  highlighted: boolean;
+  comingSoon?: boolean;
+};
+
+export type PricingContent = {
+  eyebrow: string;
+  heading: string;
+  tiers: PricingTier[];
+};
+
+export type CtaContent = {
+  heading: string;
+  ctaLabel: string;
+  ctaHref: string;
+};
+
 export type HomeContent = {
   locale: Locale;
   seo: SeoContent;
   article: ArticleContent;
   faq: FaqContent;
+  hero?: HeroContent;
+  problem?: ProblemContent;
+  features?: FeaturesContent;
+  pricing?: PricingContent;
+  cta?: CtaContent;
 };

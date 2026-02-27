@@ -90,7 +90,133 @@ const en: HomeContent = {
         answer:
           "Absolutely. The interface is optimized for Android and iOS browsers, so you can capture ideas anywhere.",
       },
+      {
+        question: "Is my data secure?",
+        answer:
+          "Yes. We use Clerk for secure authentication and Prisma with an encrypted database to store your documents. Your texts are never read or shared with third parties.",
+      },
+      {
+        question: "Can I export to Word (.docx)?",
+        answer:
+          "Yes! The editor offers native export to .docx (Word), as well as PDF, TXT, and HTML. Just click 'Export' and choose your preferred format.",
+      },
     ],
+  },
+  hero: {
+    headline: "Where Professional Writing Meets Artificial Intelligence.",
+    subheadline:
+      "Transform your ideas into impeccable documents with an advanced text editor, analytical grammar checker, and intelligent AI rewriting — all in one place.",
+    ctaLabel: "Start Writing for Free",
+    ctaHref: "#editor",
+    microcopy: "No credit card required · Available in PT, EN and ES",
+  },
+  problem: {
+    eyebrow: "The problem",
+    heading: "Tired of switching between different tools?",
+    pains: [
+      {
+        icon: "⏳",
+        title: "Time wasted on formatting",
+        description:
+          "Hours lost adjusting margins, fonts, and styles instead of focusing on what really matters: the content.",
+      },
+      {
+        icon: "📝",
+        title: "Grammar insecurity",
+        description:
+          "Sending emails, reports, or posts with grammar mistakes damages your professional image and credibility.",
+      },
+      {
+        icon: "🎯",
+        title: "Wrong tone for the audience",
+        description:
+          "Adapting the same text for a corporate email, blog post, or WhatsApp message takes unnecessary energy and time.",
+      },
+    ],
+  },
+  features: {
+    eyebrow: "Features",
+    heading: "Everything you need to write better, in one place",
+    pillars: [
+      {
+        icon: "✍️",
+        title: "Writing Without Barriers",
+        description:
+          "Advanced Rich Text formatting with support for tables, lists, code blocks with Syntax Highlighting, and much more. Writing text online has never been so fluid and professional.",
+      },
+      {
+        icon: "🔍",
+        title: "Analytical and Smart Review",
+        description:
+          "Integration with LanguageTool for real-time grammar corrections in PT, EN, and ES. Over 10 AI rewriting tones to instantly adapt your text — plus the ability to create custom tones.",
+      },
+      {
+        icon: "☁️",
+        title: "Portability and Flow",
+        description:
+          "Automatic cloud saving, multi-language support, and direct export to PDF, DOCX, TXT, and HTML. Access your documents from any device, anytime.",
+      },
+    ],
+  },
+  pricing: {
+    eyebrow: "Pricing",
+    heading: "Simple plans, professional results",
+    tiers: [
+      {
+        name: "FREE",
+        focus: "For those just getting started",
+        price: null,
+        items: [
+          "Full Rich Text formatting",
+          "5 AI rewrites per day",
+          "5 rewriting tones",
+          "1 document saved in the cloud",
+          "PDF and DOCX export",
+          "No credit card required",
+        ],
+        ctaLabel: "Start for Free",
+        ctaHref: "/sign-up",
+        highlighted: false,
+      },
+      {
+        name: "PRO",
+        focus: "For content professionals",
+        price: "$5",
+        priceNote: "/month",
+        badge: "Most Popular",
+        items: [
+          "Everything in Free",
+          "500 AI rewrites per month",
+          "Customizable rewriting tones",
+          "50 cloud documents",
+          "Advanced grammar review",
+          "Priority support",
+        ],
+        ctaLabel: "Get PRO",
+        ctaHref: "/sign-up",
+        highlighted: true,
+      },
+      {
+        name: "TEAM",
+        focus: "For teams and companies",
+        price: "—",
+        items: [
+          "Everything in Pro",
+          "Shared documents",
+          "User management",
+          "Advanced integrations",
+        ],
+        ctaLabel: "Coming soon",
+        ctaHref: "#",
+        highlighted: false,
+        comingSoon: true,
+      },
+    ],
+  },
+  cta: {
+    heading: "Ready to write faster and with much more quality?",
+    ctaLabel: "Create My Free Account",
+    ctaHref: "/sign-up",
   },
 };
 

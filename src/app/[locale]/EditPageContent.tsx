@@ -6,6 +6,11 @@ import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
 
 import "./style.scss";
+import LandingHero from "@/components/landing/LandingHero";
+import LandingProblem from "@/components/landing/LandingProblem";
+import LandingFeatures from "@/components/landing/LandingFeatures";
+import LandingPricing from "@/components/landing/LandingPricing";
+import LandingCTA from "@/components/landing/LandingCTA";
 
 const EditForm = dynamic(() => import("./_components/EditForm"), {
   ssr: false,
@@ -153,6 +158,13 @@ export default function EditPageContent({ content, userPlan }: Props) {
           </div>
         </div>
       </section>
+
+      {/* ── New landing sections – below editor + SEO content ─────────────── */}
+      {content.hero && <LandingHero data={content.hero} />}
+      {content.problem && <LandingProblem data={content.problem} />}
+      {content.features && <LandingFeatures data={content.features} />}
+      {content.pricing && <LandingPricing data={content.pricing} />}
+      {content.cta && <LandingCTA data={content.cta} />}
     </div>
   );
 }

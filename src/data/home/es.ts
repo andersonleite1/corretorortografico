@@ -98,7 +98,133 @@ const es: HomeContent = {
         answer:
           "Sí. Está optimizado para navegadores en Android e iOS para que puedas escribir en cualquier lugar.",
       },
+      {
+        question: "¿Mis datos están seguros?",
+        answer:
+          "Sí. Usamos Clerk para la autenticación segura y Prisma con base de datos cifrada para guardar tus documentos. Tus textos nunca son leídos ni compartidos con terceros.",
+      },
+      {
+        question: "¿Puedo exportar a Word (.docx)?",
+        answer:
+          "Sí. El editor ofrece exportación nativa a .docx (Word), además de PDF, TXT y HTML. Solo haz clic en 'Exportar' y elige el formato que prefieras.",
+      },
     ],
+  },
+  hero: {
+    headline: "Donde la Escritura Profesional se Encuentra con la Inteligencia Artificial.",
+    subheadline:
+      "Transforma tus ideas en documentos impecables con un editor de texto avanzado, corrector gramatical analítico y reescritura inteligente con IA — todo en un solo lugar.",
+    ctaLabel: "Empezar a Escribir Gratis",
+    ctaHref: "#editor",
+    microcopy: "Sin tarjeta de crédito · Disponible en PT, EN y ES",
+  },
+  problem: {
+    eyebrow: "El problema",
+    heading: "¿Cansado de cambiar entre diferentes herramientas?",
+    pains: [
+      {
+        icon: "⏳",
+        title: "Tiempo perdido con el formato",
+        description:
+          "Horas perdidas ajustando márgenes, fuentes y estilos en lugar de centrarte en lo que realmente importa: el contenido.",
+      },
+      {
+        icon: "📝",
+        title: "Inseguridad gramatical",
+        description:
+          "Enviar correos, informes o publicaciones con errores gramaticales daña tu imagen profesional y credibilidad.",
+      },
+      {
+        icon: "🎯",
+        title: "Tono incorrecto para la audiencia",
+        description:
+          "Adaptar el mismo texto para un correo corporativo, entrada de blog o mensaje de WhatsApp consume energía y tiempo innecesarios.",
+      },
+    ],
+  },
+  features: {
+    eyebrow: "Funcionalidades",
+    heading: "Todo lo que necesitas para escribir mejor, en un solo lugar",
+    pillars: [
+      {
+        icon: "✍️",
+        title: "Escritura Sin Barreras",
+        description:
+          "Formato Rich Text avanzado con soporte para tablas, listas, bloques de código con Syntax Highlighting y mucho más. Escribir texto online nunca fue tan fluido y profesional.",
+      },
+      {
+        icon: "🔍",
+        title: "Revisión Analítica e Inteligente",
+        description:
+          "Integración con LanguageTool para correcciones gramaticales en tiempo real en PT, EN y ES. Más de 10 tonos de reescritura con IA para adaptar tu texto al instante, con la posibilidad de crear tonos personalizados.",
+      },
+      {
+        icon: "☁️",
+        title: "Portabilidad y Fluidez",
+        description:
+          "Guardado automático en la nube, soporte multiidioma y exportación directa a PDF, DOCX, TXT y HTML. Accede a tus documentos desde cualquier dispositivo, en cualquier momento.",
+      },
+    ],
+  },
+  pricing: {
+    eyebrow: "Precios",
+    heading: "Planes simples, resultados profesionales",
+    tiers: [
+      {
+        name: "FREE",
+        focus: "Para quienes están empezando",
+        price: null,
+        items: [
+          "Formato Rich Text completo",
+          "5 reescrituras con IA por día",
+          "5 tonos de reescritura",
+          "1 documento en la nube",
+          "Exportación PDF y DOCX",
+          "Sin tarjeta de crédito",
+        ],
+        ctaLabel: "Empezar Gratis",
+        ctaHref: "/sign-up",
+        highlighted: false,
+      },
+      {
+        name: "PRO",
+        focus: "Para profesionales del contenido",
+        price: "$5",
+        priceNote: "/mes",
+        badge: "Más Popular",
+        items: [
+          "Todo del plan Free",
+          "500 reescrituras con IA/mes",
+          "Tonos de reescritura personalizables",
+          "50 documentos en la nube",
+          "Revisión gramatical avanzada",
+          "Soporte prioritario",
+        ],
+        ctaLabel: "Obtener PRO",
+        ctaHref: "/sign-up",
+        highlighted: true,
+      },
+      {
+        name: "TEAM",
+        focus: "Para equipos y empresas",
+        price: "—",
+        items: [
+          "Todo del plan Pro",
+          "Documentos compartidos",
+          "Gestión de usuarios",
+          "Integraciones avanzadas",
+        ],
+        ctaLabel: "Próximamente",
+        ctaHref: "#",
+        highlighted: false,
+        comingSoon: true,
+      },
+    ],
+  },
+  cta: {
+    heading: "¿Listo para escribir más rápido y con mucha más calidad?",
+    ctaLabel: "Crear Mi Cuenta Gratis",
+    ctaHref: "/sign-up",
   },
 };
 
