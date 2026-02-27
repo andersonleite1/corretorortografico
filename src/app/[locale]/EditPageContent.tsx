@@ -55,7 +55,9 @@ export default function EditPageContent({ content, userPlan }: Props) {
       )}
     >
       {/* ── Editor ─────────────────────────────────────────────────────────── */}
-      <EditForm locale={content.locale} userPlan={userPlan} />
+      <div className="landing-editor-section">
+        <EditForm locale={content.locale} userPlan={userPlan} />
+      </div>
 
       {/* ── New landing sections ────────────────────────────────────────────── */}
       {content.hero && <LandingHero data={content.hero} />}
