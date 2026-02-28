@@ -124,12 +124,16 @@ model BugReport {
 }
 
 model AiUsage {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  userId     String
-  feature    String
-  tokensUsed Int      @default(0)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  userId           String
+  feature          String
+  tokensUsed       Int      @default(0)
+  // Dashboard metrics
+  wordCount        Int      @default(0)
+  processingTimeMs Int      @default(0)
+  toneUsed         String?
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, feature, createdAt])
   @@index([userId, createdAt])

@@ -2,12 +2,11 @@ import { db } from "@/lib/db";
 import { getCurrentUser, getUserPlan } from "@/lib/auth";
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
-import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 const documentSchema = z.object({
-    id: z.string().cuid().optional(),
-    title: z.string().max(500).optional(),
+    id: z.string().cuid().nullable().optional(),
+    title: z.string().max(500).nullable().optional(),
     content: z.string().min(1, "Conteúdo é obrigatório").max(500000, "Conteúdo excede o limite máximo permitido (500KB)")
 });
 
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
 
         const parseResult = documentSchema.safeParse(body);
         if (!parseResult.success) {
-            return new NextResponse(parseResult.error.issues.map((e: any) => e.message).join(", "), { status: 400 });
+            return new NextResponse(parseResult.error.issues.map((e: z.ZodIssue) => e.message).join(", "), { status: 400 });
         }
 
         const { id, title, content } = parseResult.data;

@@ -9,7 +9,9 @@ import ThemeSwitcher from "./ThemeSwitcher";
 import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import { Menu } from "lucide-react";
-import MobileMenu from "./MobileMenu";
+const MobileMenu = dynamic(() => import("./MobileMenu"), {
+  ssr: false,
+});
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -98,6 +100,15 @@ const Header = ({ userButton }: HeaderProps) => {
           </div>
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
+              <SignedIn>
+                <Link
+                  href={`/${currentLocale}/dashboard`}
+                  className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                >
+                  <span>📊</span>
+                  <span>Dashboard</span>
+                </Link>
+              </SignedIn>
               <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                 <span>Idioma</span>
                 <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60">
@@ -108,11 +119,10 @@ const Header = ({ userButton }: HeaderProps) => {
                         key={locale}
                         type="button"
                         onClick={() => switchLocale(locale as Locale)}
-                        className={`px-3 py-1 rounded-full transition ${
-                          isActive
-                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                            : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                        }`}
+                        className={`px-3 py-1 rounded-full transition ${isActive
+                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                          : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                          }`}
                       >
                         {locale.toUpperCase()}
                       </button>

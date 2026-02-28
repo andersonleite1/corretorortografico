@@ -14,14 +14,16 @@ import { SidebarProvider } from "@/components/providers/SidebarProvider";
 import { syncUserWithDb } from "@/lib/sync-user";
 
 import "@/styles/globals.scss";
-import Head from "next/head";
-import Script from "next/script";
 import { getHomeFaqSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
 
-import { CookieConsent } from "@/components/shared/CookieConsent";
+import dynamic from "next/dynamic";
+const CookieConsent = dynamic(() => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent), {
+  ssr: false,
+});
+import { Analytics } from "@/components/shared/Analytics";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -111,29 +113,7 @@ export default async function RootLayout({
             />
           </head>
           <body>
-            <Script
-              src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-              strategy="lazyOnload"
-            />
-            <Script id="google-analytics" strategy="lazyOnload">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-XFE7CNSV4S');
-              `}
-            </Script>
-            <Script
-              id="ms-clarity"
-              strategy="lazyOnload"
-              dangerouslySetInnerHTML={{
-                __html: `(function(c,l,a,r,i,t,y){
-                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                })(window, document, "clarity", "script", "sc6j3d7url");`,
-              }}
-            />
+            <Analytics />
             <MainContent userButton={<UserButton />} locale={locale}>
               {children}
             </MainContent>

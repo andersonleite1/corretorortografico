@@ -106,7 +106,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{
-    content: string | Record<string, any>;
+    content: string | Record<string, unknown>;
     id: string;
   } | null>(null);
   const [draftSavingStatus, setDraftSavingStatus] = useState<
@@ -341,7 +341,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    const checkRecovery = (serverData: { title?: string; content?: any; updatedAt?: string | number | Date }) => {
+    const checkRecovery = (serverData: { title?: string; content?: unknown; updatedAt?: string | number | Date }) => {
       const localDataStr = localStorage.getItem("post");
       if (!localDataStr) return serverData;
 
@@ -378,7 +378,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           ) {
             try {
               content = JSON.parse(content);
-            } catch (_e) {
+            } catch {
               // Fallback
             }
           }
@@ -485,7 +485,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           "x-diagnose": "true",
         },
         body: JSON.stringify({
-          title: watch("title"),
+          title: watch("title") || undefined,
           content: stringifiedContent,
           isExplicitSave: isExplicit,
         }),
@@ -533,7 +533,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   // Auto-save draft on content change (throttled by the API)
   useEffect(() => {
-    const subscription = watch((_values, { name, type }) => {
+    const subscription = watch((_values, { name: _name, type }) => {
       // name === "content" ensures we don't save on title changes redundantely or vice-versa if handled elsewhere
       // but usually we want both. The important thing is THAT it reacts to changes.
       if (type === "change") {
@@ -556,7 +556,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     ) {
       try {
         content = JSON.parse(content);
-      } catch (_e) {
+      } catch {
         // Fallback to string if parsing fails
       }
     }

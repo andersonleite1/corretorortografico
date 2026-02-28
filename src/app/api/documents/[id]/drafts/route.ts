@@ -1,12 +1,11 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 import { z } from "zod";
 
 const draftSchema = z.object({
-    title: z.string().max(500).optional(),
+    title: z.string().max(500).nullable().optional(),
     content: z.string().min(1, "O conteúdo não pode estar vazio").max(500000, "O conteúdo excede o limite máximo de caracteres permitidos"),
     isExplicitSave: z.boolean().optional().default(false),
 });
@@ -157,9 +156,10 @@ export async function POST(
         });
 
         return NextResponse.json(draft);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("[DRAFTS_POST] Error detail:", error);
-        const status = error.message === "Content is required" ? 400 : 500;
-        return NextResponse.json({ error: error.message || "Internal Error" }, { status });
+        const message = error instanceof Error ? error.message : "Internal Error";
+        const status = message === "Content is required" ? 400 : 500;
+        return NextResponse.json({ error: message }, { status });
     }
 }

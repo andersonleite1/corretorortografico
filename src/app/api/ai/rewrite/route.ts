@@ -78,6 +78,9 @@ export async function POST(req: Request) {
         const extraPrompt = customInstructions ? `\nInstruções específicas do usuário a seguir: ${customInstructions}` : `\nEstilo solicitado: ${stylePrompt}`;
 
         // 5. Chamada IA com streaming
+        const startTime = Date.now();
+        const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+
         const result = await streamText({
             model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
             system: "Você é um assistente de escrita. Sua tarefa é reescrever o texto fornecido pelo usuário, mantendo o sentido original, mas ajustando o tom conforme solicitado. Retorne APENAS o texto reescrito, sem comentários, explicações ou aspas.",
@@ -87,16 +90,30 @@ export async function POST(req: Request) {
             }],
             onFinish: async ({ usage }) => {
                 try {
-                    await db.aiUsage.create({ data: { userId: user.id, feature: "rewrite", tokensUsed: usage.totalTokens } });
-                } catch (e: any) {
-                    logError(`Usage record error: ${e.message}`);
+                    const processingTimeMs = Date.now() - startTime;
+                    await db.aiUsage.create({
+                        data: {
+                            userId: user.id,
+                            feature: "rewrite",
+                            tokensUsed: usage.totalTokens,
+                            wordCount,
+                            processingTimeMs,
+                            toneUsed: tone,
+                        },
+                    });
+                } catch (e: unknown) {
+                    if (e instanceof Error) {
+                        logError(`Usage record error: ${e.message}`);
+                    }
                 }
             },
         });
 
         return result.toTextStreamResponse();
-    } catch (error: any) {
-        logError(`${error.message}\n${error.stack}`);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            logError(`${error.message}\n${error.stack}`);
+        }
         return NextResponse.json({
             error: "Erro interno no servidor",
         }, { status: 500 });

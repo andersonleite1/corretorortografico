@@ -88,11 +88,9 @@ type TiptapProviderProps = {
   userPlan?: "free" | "pro" | "team";
   documentTitle?: string;
 };
-
 export const TiptapProvider = ({
   children,
   editorOptions,
-  editorProps,
   slotBefore,
   slotAfter,
   exportActions,
@@ -151,7 +149,7 @@ export const TiptapProvider = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: documentId,
+          id: documentId || undefined,
           content: stringifiedContent,
           title: documentTitle || "Sem título",
         }),
@@ -169,9 +167,13 @@ export const TiptapProvider = ({
       if (!documentId && savedDoc.id) {
         router.push(`/${normalizedLocale}?docId=${savedDoc.id}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Erro ao salvar o documento");
+      if (error instanceof Error) {
+        toast.error(error.message || "Erro ao salvar o documento");
+      } else {
+        toast.error("Erro ao salvar o documento");
+      }
     } finally {
       setIsSaving(false);
     }
