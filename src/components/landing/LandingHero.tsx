@@ -30,7 +30,7 @@ export default function LandingHero({ data }: Props) {
                             height={960}
                             priority
                             className="landing-hero__screenshot"
-                            quality={90}
+                            quality={80}
                         />
                     </div>
                 </div>

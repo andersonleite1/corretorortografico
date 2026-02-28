@@ -7,7 +7,7 @@ export type UseTiptapEditorOptions = UseEditorOptions & {
   ref?: Ref<TiptapEditorRef>;
   placeholder?: {
     paragraph?: string;
-    imageCapton?: string;
+    imageCaption?: string;
   };
 };
 
@@ -34,12 +34,24 @@ export default function useTiptapEditor({
     forceUpdate();
   }, [editor, editorOptions.editable]);
 
+  const prevPlaceholderRef = useRef<any>(null);
+
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || !placeholder) return;
+
+    // Evita loop de renderização se o placeholder for o mesmo
+    if (
+      prevPlaceholderRef.current?.paragraph === placeholder.paragraph &&
+      prevPlaceholderRef.current?.imageCaption === placeholder.imageCaption
+    ) {
+      return;
+    }
+
     // @ts-ignore
     editor.setOptions({ editorProps: { placeholder } });
+    prevPlaceholderRef.current = placeholder;
     forceUpdate();
-  }, [editor, placeholder]);
+  }, [editor, placeholder, forceUpdate]);
 
   useEffect(() => {
     return () => {

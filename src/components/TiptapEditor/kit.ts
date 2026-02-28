@@ -79,7 +79,7 @@ const createExtensionKit = (locale?: Locale) => [
   LanguageTool.configure({
     checkDelay: 1000,
     minChars: 15,
-    enabled: true,
+    enabled: false,
     language: resolveLanguageToolCode(locale),
   }),
 ];

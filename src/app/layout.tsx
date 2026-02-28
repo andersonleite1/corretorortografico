@@ -56,6 +56,33 @@ export default async function RootLayout({
       ? storedLocale
       : i18n.defaultLocale;
   const faqSchema = getHomeFaqSchema(locale);
+  const webAppSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Editor de Texto Online",
+    url: "https://editordetexto.online",
+    description:
+      "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
+    applicationCategory: "Utility",
+    operatingSystem: "All",
+    creator: {
+      "@type": "Organization",
+      name: "Editor de Texto Online",
+    },
+    featureList: [
+      "Edição de texto avançada",
+      "Exportação para PDF e DOCX",
+      "Interface minimalista e intuitiva",
+      "Compatível com dispositivos móveis",
+    ],
+    keywords: [
+      "editor de texto online",
+      "escrever textos online",
+      "ferramenta gratuita para textos",
+      "exportar textos para PDF",
+      "editor de documentos online",
+    ],
+  };
 
   // Sincroniza o usuário com o banco de dados (Fallback)
   // Removido o await para não bloquear o rendering inicial do layout
@@ -68,45 +95,21 @@ export default async function RootLayout({
           lang={locale}
           className={`${fontMono.variable} ${fontSans.variable}`}
         >
-          <Head>
+          <head>
             <link
               rel="preconnect"
               href="https://www.clarity.ms"
               crossOrigin=""
             />
-            <script type="application/ld+json">
-              {JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "WebApplication",
-                name: "Editor de Texto Online",
-                url: "https://editordetexto.online",
-                description:
-                  "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-                applicationCategory: "Utility",
-                operatingSystem: "All",
-                creator: {
-                  "@type": "Organization",
-                  name: "Editor de Texto Online",
-                },
-                featureList: [
-                  "Edição de texto avançada",
-                  "Exportação para PDF e DOCX",
-                  "Interface minimalista e intuitiva",
-                  "Compatível com dispositivos móveis",
-                ],
-                keywords: [
-                  "editor de texto online",
-                  "escrever textos online",
-                  "ferramenta gratuita para textos",
-                  "exportar textos para PDF",
-                  "editor de documentos online",
-                ],
-              })}
-            </script>
-            <script type="application/ld+json">
-              {JSON.stringify(faqSchema)}
-            </script>
-          </Head>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
+          </head>
           <body>
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"

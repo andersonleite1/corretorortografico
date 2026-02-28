@@ -3,23 +3,26 @@
 import React, { forwardRef, useCallback, useEffect, useMemo } from "react";
 import { Content, type Editor } from "@tiptap/react";
 
+import dynamic from "next/dynamic";
 import TiptapProvider, { type ExportActions, type DraftActions } from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
-import MenuBar from "./MenuBar";
-import StatusBar from "./StatusBar";
-import Resizer from "./Resizer";
+const MenuBar = dynamic(() => import("./MenuBar"), { ssr: false });
+const StatusBar = dynamic(() => import("./StatusBar"), { ssr: false });
+const Resizer = dynamic(() => import("./Resizer"), { ssr: false });
 
-import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu, AiBubbleMenu } from "./menus";
+const LinkMenu = dynamic(() => import("./menus/LinkMenu").then(mod => mod.LinkMenu), { ssr: false });
+const ImageMenu = dynamic(() => import("./menus/ImageMenu").then(mod => mod.ImageMenu), { ssr: false });
+const CodeBlockMenu = dynamic(() => import("./menus/CodeBlockMenu").then(mod => mod.CodeBlockMenu), { ssr: false });
+const TableMenu = dynamic(() => import("./menus/TableMenu"), { ssr: false });
+const LanguageToolMenu = dynamic(() => import("./menus/LanguageToolMenu"), { ssr: false });
+const AiBubbleMenu = dynamic(() => import("./menus/AiBubbleMenu").then(mod => mod.AiBubbleMenu), { ssr: false });
 
 import getExtensionKit from "../kit";
-
 import { cssVar } from "../utils/cssVar";
-import { throttle } from "../utils/throttle";
 import { type Locale } from "../../../../i18n-config";
 
 import "../styles/index.scss";
-import TableMenu from "@/components/TiptapEditor/components/menus/TableMenu";
 
 export type TiptapEditorRef = {
   getInstance: () => Editor | null;

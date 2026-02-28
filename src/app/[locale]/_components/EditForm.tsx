@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 
 import dynamic from "next/dynamic";
@@ -86,6 +87,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     [locale],
   );
 
+  const editorPlaceholder = useMemo(() => ({
+    paragraph: formMessages.placeholders.content,
+    imageCaption: formMessages.placeholders.imageCaption,
+  }), [formMessages.placeholders.content, formMessages.placeholders.imageCaption]);
+
   const [drafts, setDrafts] = useState<
     { id: string; title: string; content: string; date: string }[]
   >([]);
@@ -100,7 +106,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{
-    content: any;
+    content: string | Record<string, any>;
     id: string;
   } | null>(null);
   const [draftSavingStatus, setDraftSavingStatus] = useState<
@@ -330,12 +336,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   const getWordCount = useCallback(
     () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
-    [editorRef.current],
+    [],
   );
 
   useEffect(() => {
     setIsLoading(true);
-    const checkRecovery = (serverData: any) => {
+    const checkRecovery = (serverData: { title?: string; content?: any; updatedAt?: string | number | Date }) => {
       const localDataStr = localStorage.getItem("post");
       if (!localDataStr) return serverData;
 
@@ -372,7 +378,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           ) {
             try {
               content = JSON.parse(content);
-            } catch (e) {
+            } catch (_e) {
               // Fallback
             }
           }
@@ -430,7 +436,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         .then((res) => res.json())
         .then((data) => {
           setDrafts(
-            data.map((d: any) => ({
+            data.map((d: { id: string; title: string; content: string; createdAt: string | number | Date }) => ({
               id: d.id,
               title: d.title,
               content: d.content,
@@ -448,7 +454,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }, [docId, locale]);
 
   // Função para salvar o rascunho atual
-  const handleSaveDraft = async (isExplicit = false) => {
+  const handleSaveDraft = useCallback(async (isExplicit = false) => {
     if (!docId) {
       // Fallback para localStorage se não houver docId
       const current = {
@@ -493,12 +499,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           }, 3000);
         }
 
-        const newDraft = await res.json();
+        await res.json();
         // Refresh drafts list
         const draftsRes = await fetch(`/api/documents/${docId}/drafts`);
         const data = await draftsRes.json();
         setDrafts(
-          data.map((d: any) => ({
+          data.map((d: { id: string; title: string; content: string; createdAt: string | number | Date }) => ({
             id: d.id,
             title: d.title,
             content: d.content,
@@ -523,11 +529,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         );
       }
     }
-  };
+  }, [docId, drafts, formMessages, locale, watch]);
 
   // Auto-save draft on content change (throttled by the API)
   useEffect(() => {
-    const subscription = watch((values, { name, type }) => {
+    const subscription = watch((_values, { name, type }) => {
       // name === "content" ensures we don't save on title changes redundantely or vice-versa if handled elsewhere
       // but usually we want both. The important thing is THAT it reacts to changes.
       if (type === "change") {
@@ -550,7 +556,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     ) {
       try {
         content = JSON.parse(content);
-      } catch (e) {
+      } catch (_e) {
         // Fallback to string if parsing fails
       }
     }
@@ -585,42 +591,124 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   if (isLoading) {
-    const toolbarItems = Array.from({ length: 6 });
     return (
-      <div className="flex flex-col gap-6 order-2 min-w-full h-screen prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-4 md:px-8 animate-pulse">
-        <div>
-          <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-          <div className="w-full h-11 bg-gray-100 dark:bg-gray-700 rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
-        </div>
+      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 animate-pulse">
+        {/* ── Title input skeleton ── */}
+        <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
-        <div className="flex flex-col gap-4">
-          <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
-          <div className="w-full rounded-md shadow border border-[#d1d9e0] dark:border-[#3d444d] bg-gray-100/70 dark:bg-[#111625] min-h-[480px]">
-            <div className="h-12 border-b border-[#d1d9e0] dark:border-[#3d444d] px-4 flex items-center gap-3">
-              {toolbarItems.map((_, index) => (
-                <span
-                  key={index}
-                  className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded"
-                />
-              ))}
-              <span className="ml-auto h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+        {/* ── Editor container skeleton ── */}
+        <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden">
+          {/* Toolbar row 1: undo/redo/save + basic formatting */}
+          <div className="h-[44px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-700" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-14 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-700" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="ml-auto h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+          </div>
+
+          {/* Toolbar row 2: paragraph/font/size/spell/export */}
+          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+            <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-700" />
+            <span className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            <span className="ml-auto h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+          </div>
+
+          {/* Toolbar row 3: view/docs/drafts/AI */}
+          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+            <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+            <span className="ml-auto h-7 w-32 bg-gray-200 dark:bg-gray-700 rounded-full" />
+          </div>
+
+          {/* Editor body: text area + sidebar */}
+          <div className="flex">
+            {/* Main text area */}
+            <div className="flex-1 min-h-[320px] p-5">
+              <div className="h-4 w-3/4 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
+              <div className="h-4 w-full bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
+              <div className="h-4 w-5/6 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
+              <div className="h-4 w-2/3 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
             </div>
-            <div className="bg-gray-100 dark:bg-gray-700 min-h-[268px]" />
-            <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-              <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
-              <div className="flex items-center gap-3">
+
+            {/* Sidebar skeleton */}
+            <div className="hidden md:flex flex-col w-[319px] border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
+              {/* Tabs */}
+              <div className="flex gap-3 border-b border-[#d1d9e0] dark:border-[#3d444d] pb-3">
                 <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
-                <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
               </div>
+              {/* Stats cards */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <span className="h-4 w-6 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <span className="h-4 w-6 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <span className="h-4 w-6 bg-gray-200 dark:bg-gray-700 rounded" />
+                </div>
+              </div>
+              {/* Metrics grid */}
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="h-14 bg-gray-100 dark:bg-gray-700/50 rounded-lg" />
+                <div className="h-14 bg-gray-100 dark:bg-gray-700/50 rounded-lg" />
+                <div className="h-14 bg-gray-100 dark:bg-gray-700/50 rounded-lg" />
+                <div className="h-14 bg-gray-100 dark:bg-gray-700/50 rounded-lg" />
+              </div>
+              {/* CTA button */}
+              <div className="mt-auto h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
           </div>
+
+          {/* Footer */}
+          <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+              <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
+              <span className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+              <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+              <span className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* ── "Reportar Problema" button skeleton ── */}
+        <div className="flex justify-center pb-2">
+          <span className="h-9 w-40 bg-gray-100 dark:bg-gray-700/50 rounded-full border border-gray-200 dark:border-white/10" />
         </div>
       </div>
     );
   }
 
+
   return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 min-h-screen pb-12">
+    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 pb-6">
       <div>
         <Controller
           control={control}
@@ -640,51 +728,50 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         <Controller
           control={control}
           name="content"
-          render={({ field }) => (
-            <div
-              className="w-full rounded-[2rem]"
-              style={{ "--rte-radius": "2rem" } as CSSProperties}
-            >
-              <TiptapEditor
-                ref={editorRef}
-                ssr={true}
-                output="json"
-                locale={locale}
-                placeholder={{
-                  paragraph: formMessages.placeholders.content,
-                  imageCaption: formMessages.placeholders.imageCaption,
-                }}
-                contentMinHeight={320}
-                contentMaxHeight={440}
-                onContentChange={field.onChange}
-                initialContent={field.value}
-                exportActions={{
-                  onExportDoc: handleSaveDOC,
-                  onExportPdf: handleExportToPDF,
-                  onExportTxt: handleExportToTxt,
-                  onPreviewPdf: handlePreviewPdf,
-                  onPreviewPost: handlePreviewPost,
-                  onClear: handleClear,
-                  isExportingPdf: isExportingPDF,
-                }}
-                draftActions={{
-                  drafts: drafts.map(({ id, title, date }) => ({
-                    id,
-                    title,
-                    date,
-                  })),
-                  onSaveDraft: () => handleSaveDraft(true),
-                  onLoadDraft: handleLoadDraft,
-                  onDeleteDraft: handleDeleteDraft,
-                  onCompareDraft: handleCompareDraft,
-                  savingStatus: draftSavingStatus,
-                }}
-                userPlan={userPlan}
-                documentTitle={watch("title")}
-                aria-label={formMessages.aria.content}
-              />
-            </div>
-          )}
+          render={({ field }) => {
+            return (
+              <div
+                className="w-full rounded-[2rem]"
+                style={{ "--rte-radius": "2rem", minHeight: "480px" } as CSSProperties}
+              >
+                <TiptapEditor
+                  ref={editorRef}
+                  ssr={true}
+                  output="json"
+                  locale={locale}
+                  placeholder={editorPlaceholder}
+                  contentMinHeight={320}
+                  contentMaxHeight={440}
+                  onContentChange={field.onChange}
+                  initialContent={field.value}
+                  exportActions={{
+                    onExportDoc: handleSaveDOC,
+                    onExportPdf: handleExportToPDF,
+                    onExportTxt: handleExportToTxt,
+                    onPreviewPdf: handlePreviewPdf,
+                    onPreviewPost: handlePreviewPost,
+                    onClear: handleClear,
+                    isExportingPdf: isExportingPDF,
+                  }}
+                  draftActions={{
+                    drafts: drafts.map(({ id, title, date }) => ({
+                      id,
+                      title,
+                      date,
+                    })),
+                    onSaveDraft: () => handleSaveDraft(true),
+                    onLoadDraft: handleLoadDraft,
+                    onDeleteDraft: handleDeleteDraft,
+                    onCompareDraft: handleCompareDraft,
+                    savingStatus: draftSavingStatus,
+                  }}
+                  userPlan={userPlan}
+                  documentTitle={watch("title")}
+                  aria-label={formMessages.aria.content}
+                />
+              </div>
+            );
+          }}
         />
       </div>
 
@@ -866,10 +953,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
               {formMessages.loading.label}
             </h4>
-            <img
+            <Image
               src="/loading.gif"
               alt={formMessages.loading.alt}
               className="w-20 h-20 drop-shadow-md"
+              width={80}
+              height={80}
             />
           </div>
         </div>
