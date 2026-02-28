@@ -12,6 +12,8 @@ import { Menu } from "lucide-react";
 const MobileMenu = dynamic(() => import("./MobileMenu"), {
   ssr: false,
 });
+import Tooltip from "../TiptapEditor/components/ui/Tooltip";
+import { getHeaderContent } from "@/data/header";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -52,6 +54,11 @@ const Header = ({ userButton }: HeaderProps) => {
     view: "sign-in",
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const headerContent = useMemo(
+    () => getHeaderContent(currentLocale),
+    [currentLocale],
+  );
 
   useEffect(() => {
     const currentTheme = document.documentElement.classList.contains("dark")
@@ -110,25 +117,26 @@ const Header = ({ userButton }: HeaderProps) => {
                 </Link>
               </SignedIn>
               <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                <span>Idioma</span>
-                <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60">
-                  {locales.map((locale) => {
-                    const isActive = locale === currentLocale;
-                    return (
-                      <button
-                        key={locale}
-                        type="button"
-                        onClick={() => switchLocale(locale as Locale)}
-                        className={`px-3 py-1 rounded-full transition ${isActive
-                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                          : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                          }`}
-                      >
-                        {locale.toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
+                <Tooltip content={headerContent.selectLanguage} portal>
+                  <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60 transition-colors hover:border-neutral-400 dark:hover:border-neutral-600">
+                    {locales.map((locale) => {
+                      const isActive = locale === currentLocale;
+                      return (
+                        <button
+                          key={locale}
+                          type="button"
+                          onClick={() => switchLocale(locale as Locale)}
+                          className={`px-3 py-1 rounded-full transition ${isActive
+                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                            : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                            }`}
+                        >
+                          {locale.toUpperCase()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </Tooltip>
               </div>
               <div className="flex gap-4 items-center min-w-[140px] justify-end">
                 {!isLoaded ? (

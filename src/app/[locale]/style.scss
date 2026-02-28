@@ -533,6 +533,7 @@
     flex-direction: column;
     gap: 0;
     position: relative;
+    text-align: left;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     will-change: transform;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
