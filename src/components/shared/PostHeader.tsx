@@ -10,13 +10,27 @@ interface PostHeaderProps {
   readingTime: number;
 }
 
-const PostHeader = ({ title, author, cover, createdAt, readingTime }: PostHeaderProps) => {
+const PostHeader = ({
+  title,
+  author,
+  cover,
+  createdAt,
+  readingTime,
+}: PostHeaderProps) => {
   return (
     <div className="lg:max-w-[45rem] mx-auto">
-      <h1 className="text-3xl leading-snug md:text-4xl md:leading-normal font-bold">{title}</h1>
+      <h1 className="text-3xl leading-snug md:text-4xl md:leading-normal font-bold">
+        {title}
+      </h1>
 
       <div className="flex items-center mt-6 gap-4">
-        <Image src={"/avatar.jpg"} width={50} height={50} alt="" className="rounded-full" />
+        <Image
+          src={"/avatar.jpg"}
+          width={50}
+          height={50}
+          alt=""
+          className="rounded-full"
+        />
         <div className="">
           <div className="font-semibold mb-3">
             By <u>{author}</u>

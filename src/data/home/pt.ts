@@ -20,7 +20,8 @@ const pt: HomeContent = {
       "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
   },
   article: {
-    title: "Editor de Texto Online: Escreva, Edite e Exporte Seus Textos Gratuitamente",
+    title:
+      "Editor de Texto Online: Escreva, Edite e Exporte Seus Textos Gratuitamente",
     introHtml:
       "Bem-vindo ao <strong>Editor de Texto Online</strong>, a ferramenta perfeita para quem deseja escrever, editar e exportar textos com praticidade e eficiência. Seja você um estudante, profissional ou escritor casual, nosso editor oferece todas as funcionalidades que você precisa para criar conteúdos incríveis sem nenhum custo.",
     sections: [
@@ -118,7 +119,8 @@ const pt: HomeContent = {
       "Transforme suas ideias em documentos impecáveis com um editor de texto avançado, revisor gramatical analítico e reescrita inteligente por IA — tudo em um só lugar.",
     ctaLabel: "Começar a Escrever Grátis",
     ctaHref: "#editor",
-    microcopy: "Sem necessidade de cartão de crédito · Disponível em PT, EN e ES",
+    microcopy:
+      "Sem necessidade de cartão de crédito · Disponível em PT, EN e ES",
   },
   problem: {
     eyebrow: "O problema",

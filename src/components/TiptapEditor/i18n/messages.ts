@@ -659,6 +659,7 @@ export const editorMessages = withDefault({
 });
 
 export const getEditorMessages = (locale?: Locale): EditorMessages => {
-  const normalized = locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
+  const normalized =
+    locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
   return editorMessages[normalized];
 };

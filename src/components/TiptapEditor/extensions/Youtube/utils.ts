@@ -37,8 +37,9 @@ export function getEmbedYoutubeUrl({
   }
 
   const outputUrl =
-    (nocookie ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/") +
-    matches[1];
+    (nocookie
+      ? "https://www.youtube-nocookie.com/embed/"
+      : "https://www.youtube.com/embed/") + matches[1];
 
   const params = [];
 

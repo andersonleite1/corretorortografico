@@ -6,15 +6,15 @@
 
 ## Por que Clerk em vez de NextAuth.js?
 
-| Critério | NextAuth.js | Clerk (Recomendado) |
-| :--- | :--- | :--- |
-| Setup | ~2-4 horas | ~30 minutos |
-| UI pronta | ❌ (manual) | ✅ Componentes embutidos |
-| Magic Link | Configuração manual | ✅ Nativo |
-| MFA | Manual | ✅ Nativo |
-| Webhooks | Manual | ✅ Dashboard |
-| Gestão de Usuários | Manual | ✅ Dashboard completo |
-| Custo | Grátis | Grátis até 10k MAU |
+| Critério           | NextAuth.js         | Clerk (Recomendado)      |
+| :----------------- | :------------------ | :----------------------- |
+| Setup              | ~2-4 horas          | ~30 minutos              |
+| UI pronta          | ❌ (manual)         | ✅ Componentes embutidos |
+| Magic Link         | Configuração manual | ✅ Nativo                |
+| MFA                | Manual              | ✅ Nativo                |
+| Webhooks           | Manual              | ✅ Dashboard             |
+| Gestão de Usuários | Manual              | ✅ Dashboard completo    |
+| Custo              | Grátis              | Grátis até 10k MAU       |
 
 > Para um SaaS com foco em time-to-market, Clerk é superior. Para controle total, use NextAuth.js.
 
@@ -191,10 +191,10 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Rotas que requerem autenticação
 const isProtectedRoute = createRouteMatcher([
-  "/editor(.*)",     // Editor principal
-  "/(.*)",  // Painel do usuário
-  "/settings(.*)",   // Configurações
-  "/api/ai(.*)",     // APIs de IA (verificadas também no handler)
+  "/editor(.*)", // Editor principal
+  "/(.*)", // Painel do usuário
+  "/settings(.*)", // Configurações
+  "/api/ai(.*)", // APIs de IA (verificadas também no handler)
   "/api/documents(.*)",
 ]);
 
@@ -377,7 +377,10 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

@@ -18,7 +18,9 @@ const HeadingDropdown = () => {
       const { editor } = ctx;
       if (editor.isActive("paragraph")) return "p" as Heading;
 
-      const headingLevel = HEADING_LEVELS.find((level) => editor.isActive("heading", { level }));
+      const headingLevel = HEADING_LEVELS.find((level) =>
+        editor.isActive("heading", { level }),
+      );
       if (headingLevel) return `h${headingLevel}` as Heading;
 
       return null;
@@ -48,7 +50,7 @@ const HeadingDropdown = () => {
         label: h4,
       },
     ],
-    [paragraph, h1, h2, h3, h4]
+    [paragraph, h1, h2, h3, h4],
   );
 
   const onSelect = useCallback(
@@ -63,10 +65,11 @@ const HeadingDropdown = () => {
         editor.chain().focus().setParagraph().run();
       }
     },
-    [editor]
+    [editor],
   );
 
-  const currentLabel = options.find((item) => item.value === current)?.label || menu;
+  const currentLabel =
+    options.find((item) => item.value === current)?.label || menu;
 
   return (
     <MenuButton

@@ -12,7 +12,7 @@ const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
       "rte-toolbar",
       dense && "rte-toolbar--dense",
       vertical && "rte-toolbar--vertical",
-      className
+      className,
     );
 
     return (
@@ -20,7 +20,7 @@ const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>(
         {children}
       </div>
     );
-  }
+  },
 );
 
 Toolbar.displayName = "Toolbar";
@@ -34,11 +34,11 @@ const ToolbarDivider = forwardRef<HTMLDivElement, ToolbarDividerProps>(
     const dividerClassName = clsx(
       "bg-neutral-200 dark:bg-neutral-800 rte-toolbar__divider",
       horizontal && "rte-toolbar__divider--horizontal",
-      className
+      className,
     );
 
     return <div className={dividerClassName} ref={ref} {...rest} />;
-  }
+  },
 );
 
 ToolbarDivider.displayName = "Toolbar.Divider";

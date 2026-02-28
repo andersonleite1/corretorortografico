@@ -16,13 +16,23 @@ const YoutubeButton = () => {
   });
 
   const handleClick = () => {
-    const src = prompt("Embed Youtube Video", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    const src = prompt(
+      "Embed Youtube Video",
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    );
     if (src) {
       editor.chain().focus().embedYoutube({ src }).run();
     }
   };
 
-  return <MenuButton icon="Youtube" tooltip="Youtube" onClick={handleClick} {...state} />;
+  return (
+    <MenuButton
+      icon="Youtube"
+      tooltip="Youtube"
+      onClick={handleClick}
+      {...state}
+    />
+  );
 };
 
 export default YoutubeButton;

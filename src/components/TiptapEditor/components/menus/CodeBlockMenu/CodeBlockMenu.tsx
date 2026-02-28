@@ -16,7 +16,8 @@ export const CodeBlockMenu = () => {
   const language = useEditorState({
     editor,
     selector: (ctx) => {
-      if (ctx.editor.isActive("codeBlock")) return ctx.editor.getAttributes("codeBlock").language;
+      if (ctx.editor.isActive("codeBlock"))
+        return ctx.editor.getAttributes("codeBlock").language;
       return null;
     },
   });
@@ -26,8 +27,9 @@ export const CodeBlockMenu = () => {
   }, []);
 
   const handleSelect = useCallback(
-    (value: string) => editor.commands.updateAttributes("codeBlock", { language: value }),
-    [editor]
+    (value: string) =>
+      editor.commands.updateAttributes("codeBlock", { language: value }),
+    [editor],
   );
 
   const handleCopy = useCallback(() => {
@@ -78,7 +80,11 @@ export const CodeBlockMenu = () => {
           tooltip={messages.codeBlock.copy}
           onClick={handleCopy}
         />
-        <MenuButton icon="Trash" tooltip={messages.codeBlock.delete} onClick={handleDelete} />
+        <MenuButton
+          icon="Trash"
+          tooltip={messages.codeBlock.delete}
+          onClick={handleDelete}
+        />
       </Toolbar>
     </BubbleMenu>
   );

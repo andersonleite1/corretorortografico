@@ -7,15 +7,24 @@ import clsx from "clsx";
 
 import "./style.scss";
 import LandingHero from "@/components/landing/LandingHero";
-const LandingProblem = dynamic(() => import("@/components/landing/LandingProblem"), {
-  ssr: true,
-});
-const LandingFeatures = dynamic(() => import("@/components/landing/LandingFeatures"), {
-  ssr: true,
-});
-const LandingPricing = dynamic(() => import("@/components/landing/LandingPricing"), {
-  ssr: true,
-});
+const LandingProblem = dynamic(
+  () => import("@/components/landing/LandingProblem"),
+  {
+    ssr: true,
+  },
+);
+const LandingFeatures = dynamic(
+  () => import("@/components/landing/LandingFeatures"),
+  {
+    ssr: true,
+  },
+);
+const LandingPricing = dynamic(
+  () => import("@/components/landing/LandingPricing"),
+  {
+    ssr: true,
+  },
+);
 const LandingCTA = dynamic(() => import("@/components/landing/LandingCTA"), {
   ssr: true,
 });

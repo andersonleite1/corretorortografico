@@ -43,7 +43,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
     locale: "pt",
     metadata: {
       title: "Fale conosco | Editor de Texto Online",
-      description: "Fale conosco e converse com a equipe do Editor de Texto Online",
+      description:
+        "Fale conosco e converse com a equipe do Editor de Texto Online",
     },
     heroTitle: "Fale diretamente com nossa equipe",
     heroSubtitle: "Fale diretamente",
@@ -56,7 +57,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
       messageLabel: "Mensagem",
       submitLabel: "Enviar Mensagem",
     },
-    altContactPrefix: "Você também pode entrar em contato diretamente pelo e-mail:",
+    altContactPrefix:
+      "Você também pode entrar em contato diretamente pelo e-mail:",
     altContactEmailLabel: "contato@editordetexto.online",
   },
   en: {
@@ -83,7 +85,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
     locale: "es",
     metadata: {
       title: "Hable con nosotros | Editor de Texto en Línea",
-      description: "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
+      description:
+        "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
     },
     heroTitle: "Hable directamente con nuestro equipo",
     heroSubtitle: "Hable directamente",
@@ -117,7 +120,7 @@ export function buildContactMetadata(locale: string): Metadata {
     i18n.locales.map((loc) => [
       HREF_LANG_MAP[loc] ?? loc,
       `${BASE_URL}${CONTACT_PATHS[loc]}`,
-    ])
+    ]),
   );
 
   languages["x-default"] = `${BASE_URL}${CONTACT_PATHS[i18n.defaultLocale]}`;

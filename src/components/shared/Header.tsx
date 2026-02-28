@@ -126,10 +126,11 @@ const Header = ({ userButton }: HeaderProps) => {
                           key={locale}
                           type="button"
                           onClick={() => switchLocale(locale as Locale)}
-                          className={`px-3 py-1 rounded-full transition ${isActive
-                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                            : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                            }`}
+                          className={`px-3 py-1 rounded-full transition ${
+                            isActive
+                              ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                              : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                          }`}
                         >
                           {locale.toUpperCase()}
                         </button>

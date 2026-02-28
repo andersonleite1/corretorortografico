@@ -1,6 +1,5 @@
 .ProseMirror-selectednode {
   @at-root {
-
     &:has(iframe),
     img#{&} {
       box-shadow:
@@ -20,7 +19,6 @@
 
   // Editable content styles
   &[contenteditable="true"] {
-
     .ProseMirror-selectednode:has(iframe),
     img.ProseMirror-selectednode,
     img:has(+ figcaption.ProseMirror-selectednode) {
@@ -35,7 +33,7 @@
   }
 
   // Element spacing
-  &>* {
+  & > * {
     margin-top: 1.25rem;
 
     &:first-child {

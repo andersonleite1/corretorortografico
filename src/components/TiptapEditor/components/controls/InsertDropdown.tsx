@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import MenuButton from "../MenuButton";
 import { DropdownMenuItem } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
@@ -11,7 +11,10 @@ const InsertDropdown = () => {
   const insertBlockquote = () => editor.chain().focus().setBlockquote().run();
 
   const insertYoutube = () => {
-    const src = prompt(messages.insert.youtubePrompt, messages.insert.youtubePlaceholder);
+    const src = prompt(
+      messages.insert.youtubePrompt,
+      messages.insert.youtubePlaceholder,
+    );
     if (src) {
       editor.chain().focus().embedYoutube({ src }).run();
     }

@@ -23,14 +23,18 @@ export const savePost = (data: any, docId?: string | null) => {
 
   try {
     // If it's a string, we check trim. If it's an object (JSON), we assume it's valid if it exists.
-    const hasContent = typeof data?.content === 'string' ? data.content.trim() : !!data?.content;
+    const hasContent =
+      typeof data?.content === "string" ? data.content.trim() : !!data?.content;
     const value = hasContent ? { ...mock, ...data } : mock;
 
-    localStorage.setItem("post", JSON.stringify({
-      ...value,
-      docId: docId || null,
-      lastSaved: new Date().getTime()
-    }));
+    localStorage.setItem(
+      "post",
+      JSON.stringify({
+        ...value,
+        docId: docId || null,
+        lastSaved: new Date().getTime(),
+      }),
+    );
   } catch (error) {
     console.error("Error saving to localStorage:", error);
   }

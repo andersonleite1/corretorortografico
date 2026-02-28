@@ -64,10 +64,7 @@ export function buildHomeMetadata(locale: string): Metadata {
   const seo = getHomeSeo(locale);
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const languages = Object.fromEntries(
-    i18n.locales.map((loc) => [
-      hrefLangMap[loc] ?? loc,
-      getLocaleUrl(loc),
-    ])
+    i18n.locales.map((loc) => [hrefLangMap[loc] ?? loc, getLocaleUrl(loc)]),
   );
 
   languages["x-default"] = BASE_URL;

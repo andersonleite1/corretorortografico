@@ -15,7 +15,8 @@ const LanguageToolToggleButton = () => {
       const storage = (ctx.editor.storage as any).languageTool;
       return {
         active: storage?.enabled ?? false,
-        disabled: typeof ctx.editor.commands.setLanguageToolEnabled !== "function",
+        disabled:
+          typeof ctx.editor.commands.setLanguageToolEnabled !== "function",
       };
     },
   });
@@ -32,7 +33,8 @@ const LanguageToolToggleButton = () => {
 
   // 4. O handleToggle agora atualiza o estado local (otimista)
   const handleToggle = useCallback(() => {
-    if (tiptapState.disabled) { // Verificamos a desabilitação pelo Tiptap
+    if (tiptapState.disabled) {
+      // Verificamos a desabilitação pelo Tiptap
       return;
     }
 
@@ -46,7 +48,6 @@ const LanguageToolToggleButton = () => {
     editor.commands.setLanguageToolEnabled?.(next);
 
     // Não precisamos mais da transação falsa, pois o setIsActive já força o re-render
-
   }, [editor, isActive, tiptapState.disabled]); // Depende do 'isActive' local
 
   // 5. O resto do componente usa o estado local 'isActive' para a UI

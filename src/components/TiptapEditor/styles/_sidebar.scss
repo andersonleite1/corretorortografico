@@ -1,55 +1,55 @@
 .rte-sidebar {
-    width: 260px;
-    background-color: $bg-color;
+  width: 260px;
+  background-color: $bg-color;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  align-self: stretch;
+  border-right: 1px solid $border-color;
+  border-top-left-radius: $radius;
+  border-bottom-left-radius: $radius;
+
+  &__header {
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
     display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    overflow: hidden;
-    align-self: stretch;
-    border-right: 1px solid $border-color;
-    border-top-left-radius: $radius;
-    border-bottom-left-radius: $radius;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    &__header {
-        padding: 1rem;
-        border-bottom: 1px solid $border-color;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    &__content {
-        flex: 1;
-        overflow-y: auto;
-        max-height: $editor-max-height;
-        @include custom-scrollbar;
-    }
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    max-height: $editor-max-height;
+    @include custom-scrollbar;
+  }
 }
 
 .rte-editor--with-sidebar {
-    flex-direction: row !important;
+  flex-direction: row !important;
 
-    .rte-editor__main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
+  .rte-editor__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 }
 
 @media (max-width: 768px) {
-    .rte-sidebar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 60;
-        box-shadow: $shadow-2;
-    }
+  .rte-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 60;
+    box-shadow: $shadow-2;
+  }
 
-    .rte-editor--with-sidebar {
-        .rte-editor__main {
-            width: 100%;
-        }
+  .rte-editor--with-sidebar {
+    .rte-editor__main {
+      width: 100%;
     }
+  }
 }

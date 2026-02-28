@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { toast } from "sonner";
+
 import Icon from "../ui/Icon";
 
 import MenuButton from "../MenuButton";
@@ -36,9 +36,12 @@ const ImportPdfButton = () => {
             <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-110 duration-300">
               <Icon name="FilePdf" size={32} className="text-blue-500" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Recurso em Desenvolvimento</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+              Recurso em Desenvolvimento
+            </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed text-sm">
-              Este recurso está em desenvolvimento e em breve estará disponível para ser utilizado.
+              Este recurso está em desenvolvimento e em breve estará disponível
+              para ser utilizado.
             </p>
             <button
               onClick={() => setIsDialogOpen(false)}

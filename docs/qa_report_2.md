@@ -1,4 +1,5 @@
 # Relatório de Qualidade (QA) — Editor de Texto — v2
+
 **Data:** 2026-02-22  
 **Analista:** Antigravity (Agente QA)  
 **Versão do sistema:** `0.1.0` (pré-produção — branch `feat/v2`)  
@@ -28,22 +29,22 @@ A análise estática desta segunda rodada identificou **12 novos problemas** nã
 
 ## 1. Confirmação de Correções do Relatório Anterior
 
-| ID Original | Descrição | Status |
-|---|---|---|
-| CRÍTICO-01 | Chave de API hardcoded (`PDF_API_KEY`) | ✅ CORRIGIDO |
-| CRÍTICO-02 | Imagens sem autenticação | ✅ CORRIGIDO |
-| CRÍTICO-03 | Rate limit de IA desabilitado | ✅ CORRIGIDO |
-| ALTO-04 | Stack trace exposto na resposta de erro | ✅ CORRIGIDO |
-| ALTO-05 | Endpoint de diagnóstico `x-diagnose` exposto | ✅ CORRIGIDO |
-| MÉDIO-06 | Log com `fs.appendFileSync` | ✅ CORRIGIDO → `console.error` |
-| MÉDIO-07 | Paginação sem limite máximo em documentos | ✅ CORRIGIDO → `Math.min(..., 100)` |
-| MÉDIO-08 | Validação ausente nas configurações do editor | ✅ CORRIGIDO → Zod |
-| MÉDIO-09 | Webhook Clerk sem try/catch | ✅ CORRIGIDO |
-| BAIXO-10 | `STRIPE_WEBHOOK_SECRET` com `!` non-null | ✅ CORRIGIDO |
-| BUG-01 | Race condition em rascunhos | ✅ CORRIGIDO → `db.$transaction` |
-| BUG-02 | Cache de `getUserPlan` sem invalidação | ✅ CORRIGIDO → parâmetro `forceRefresh` |
-| BUG-03 | SEO hardcoded em `gpt-4o` | ✅ CORRIGIDO → `process.env.AI_MODEL` |
-| BUG-04 | Prompt Injection via parâmetro `to` | ✅ CORRIGIDO → allowlist de idiomas |
+| ID Original | Descrição                                     | Status                                  |
+| ----------- | --------------------------------------------- | --------------------------------------- |
+| CRÍTICO-01  | Chave de API hardcoded (`PDF_API_KEY`)        | ✅ CORRIGIDO                            |
+| CRÍTICO-02  | Imagens sem autenticação                      | ✅ CORRIGIDO                            |
+| CRÍTICO-03  | Rate limit de IA desabilitado                 | ✅ CORRIGIDO                            |
+| ALTO-04     | Stack trace exposto na resposta de erro       | ✅ CORRIGIDO                            |
+| ALTO-05     | Endpoint de diagnóstico `x-diagnose` exposto  | ✅ CORRIGIDO                            |
+| MÉDIO-06    | Log com `fs.appendFileSync`                   | ✅ CORRIGIDO → `console.error`          |
+| MÉDIO-07    | Paginação sem limite máximo em documentos     | ✅ CORRIGIDO → `Math.min(..., 100)`     |
+| MÉDIO-08    | Validação ausente nas configurações do editor | ✅ CORRIGIDO → Zod                      |
+| MÉDIO-09    | Webhook Clerk sem try/catch                   | ✅ CORRIGIDO                            |
+| BAIXO-10    | `STRIPE_WEBHOOK_SECRET` com `!` non-null      | ✅ CORRIGIDO                            |
+| BUG-01      | Race condition em rascunhos                   | ✅ CORRIGIDO → `db.$transaction`        |
+| BUG-02      | Cache de `getUserPlan` sem invalidação        | ✅ CORRIGIDO → parâmetro `forceRefresh` |
+| BUG-03      | SEO hardcoded em `gpt-4o`                     | ✅ CORRIGIDO → `process.env.AI_MODEL`   |
+| BUG-04      | Prompt Injection via parâmetro `to`           | ✅ CORRIGIDO → allowlist de idiomas     |
 
 ---
 
@@ -62,6 +63,7 @@ productionBrowserSourceMaps: true,
 **Impacto:** Information Disclosure grave (CWE-200); facilita a identificação de superfícies de ataque, lógica de autorização e endpoints internos. O Sentry (`hideSourceMaps: true`) está configurado corretamente no plugin, mas a opção do Next.js **sobrescreve** essa proteção, carregando os mapas para o bundle público.
 
 **Correção:**
+
 ```diff
 - productionBrowserSourceMaps: true,
 + productionBrowserSourceMaps: false,
@@ -80,6 +82,7 @@ productionBrowserSourceMaps: true,
 **Impacto:** Risco de Negação de Serviço (DoS) acidental ou proposital; uso não autorizado da API por sites de terceiros (scraping de backend); custos operacionais de infraestrutura não controlados para um recurso aberto.
 
 **Correção:**
+
 - Implementar **Rate Limiting por IP** para usuários anônimos (ex.: máx 10 req/min).
 - Validar os headers de `Origin` e `Referer` para garantir que a chamada partiu do domínio oficial.
 - Monitorar o uso de recursos do serviço `languagetool.editordetexto.cloud`.
@@ -92,17 +95,19 @@ productionBrowserSourceMaps: true,
 
 ```ts
 const response = await fetch("https://api.editordetexto.cloud/api/pdf/html", {
-    body: htmlDocument, // Conteúdo HTML enviado pelo cliente sem sanitização
+  body: htmlDocument, // Conteúdo HTML enviado pelo cliente sem sanitização
 });
 ```
 
 **Problema:** O conteúdo HTML enviado pelo usuário é encaminhado diretamente como corpo da requisição ao serviço de PDF. Se o serviço remoto renderiza o HTML (ex.: Puppeteer/Chrome headless), tags como `<script>`, `<iframe>`, `<object>` ou `<link>` com URLs internas podem ser usadas para:
+
 1. **SSRF (Server-Side Request Forgery):** Forçar o servidor de PDF a fazer requisições para endereços internos (ex.: `http://169.254.169.254` — metadados de cloud).
 2. **Exfiltração de dados** via recursos carregados durante a renderização do PDF.
 
 **Impacto:** Severo se o serviço remoto renderizar recursos externos durante a geração do PDF. Depende da configuração do serviço `api.editordetexto.cloud`.
 
 **Correção:**
+
 - Sanitizar o HTML antes de enviar (ex.: remover tags `<script>`, `<iframe>`, `<object>`, atributos `onclick`, `onerror` etc.) usando uma biblioteca como `DOMPurify` no lado servidor ou `sanitize-html`.
 - Adicionar autenticação no endpoint: atualmente **não verificado antes do proxy** (a rota não está protegida no middleware).
 
@@ -114,8 +119,8 @@ const response = await fetch("https://api.editordetexto.cloud/api/pdf/html", {
 
 ```ts
 const used = await db.aiUsage.count({
-    where: { userId, createdAt: { gte: since } },
-    // ← sem filtro por 'feature'
+  where: { userId, createdAt: { gte: since } },
+  // ← sem filtro por 'feature'
 });
 ```
 
@@ -126,11 +131,13 @@ Adicionalmente, usuários Pro têm `limit: Infinity` — não há nenhum tipo de
 **Impacto:** UX pobre (usuário consome limite acidentalmente); custo descontrolado para planos Pro em caso de abuso.
 
 **Correção:**
+
 ```ts
 const used = await db.aiUsage.count({
-    where: { userId, feature, createdAt: { gte: since } },
+  where: { userId, feature, createdAt: { gte: since } },
 });
 ```
+
 - Adicionar índice no schema: `@@index([userId, feature, createdAt])`.
 - Para planos Pro: considerar um soft limit alto (ex.: 500/dia) com alertas ao ultrapassar.
 
@@ -154,12 +161,15 @@ await db.aiUsage.create({ data: { ..., tokensUsed: 500 } }); // Hardcoded 500 to
 **Impacto:** Custo OpenAI ilimitado para usuários Pro; métricas de uso incorretas no banco.
 
 **Correção:**
+
 ```ts
 const rateLimit = await checkAiRateLimit(user.id, user.subscription.plan);
 // ...
 onFinish: async ({ usage }) => {
-    await db.aiUsage.create({ data: { userId: user.id, feature: "seo", tokensUsed: usage.totalTokens } });
-}
+  await db.aiUsage.create({
+    data: { userId: user.id, feature: "seo", tokensUsed: usage.totalTokens },
+  });
+};
 ```
 
 ---
@@ -173,6 +183,7 @@ onFinish: async ({ usage }) => {
 ```
 
 **Problema:** A política CSP para `connect-src` não inclui os domínios:
+
 - `https://api.openai.com` (chamadas de IA via `@ai-sdk/openai`)
 - `https://languagetool.editordetexto.cloud` (verificação gramatical)
 - `https://api.editordetexto.cloud` (proxy de PDF)
@@ -181,6 +192,7 @@ onFinish: async ({ usage }) => {
 Em browsers modernos, conexões não autorizadas pela CSP são **bloqueadas silenciosamente**, o que pode causar falhas difíceis de diagnosticar em produção.
 
 **Correção:** Adicionar os domínios ausentes à diretiva `connect-src` e `img-src`:
+
 ```
 connect-src 'self' https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://api.openai.com https://languagetool.editordetexto.cloud https://api.editordetexto.cloud https://res.cloudinary.com;
 img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com http2.mlstatic.com;
@@ -194,9 +206,9 @@ img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com http
 
 ```ts
 const { resources } = await cloudinary.search
-    .expression('resource_type:image')
-    .sort_by('created_at', 'desc')
-    .execute();
+  .expression("resource_type:image")
+  .sort_by("created_at", "desc")
+  .execute();
 ```
 
 **Problema:** A busca retorna **todas** as imagens do Cloudinary sem filtrar pelo usuário autenticado. Se dois usuários fizerem upload de imagens, o `GET /api/images` retornará as imagens de ambos para qualquer usuário autenticado.
@@ -204,10 +216,13 @@ const { resources } = await cloudinary.search
 **Impacto:** Exposição cross-tenant de imagens privadas; violação de privacidade de dados.
 
 **Correção:** Usar `folder` ou tags por `userId` no Cloudinary:
+
 ```ts
 .expression(`resource_type:image AND tags=${userId}`)
 ```
+
 E no upload, adicionar a tag do usuário:
+
 ```ts
 { tags: [userId], ... }
 ```
@@ -225,10 +240,11 @@ const signature = (await headers()).get("stripe-signature")!;
 **Problema:** O uso de `!` (non-null assertion) suprime a verificação de TypeScript. Se o header `stripe-signature` estiver ausente (ex.: requisição direta sem ser do Stripe), a chamada a `stripe.webhooks.constructEvent` lançará um erro genérico pouco descritivo no catch.
 
 **Correção:**
+
 ```ts
 const signature = (await headers()).get("stripe-signature");
 if (!signature) {
-    return new NextResponse("Header stripe-signature ausente.", { status: 400 });
+  return new NextResponse("Header stripe-signature ausente.", { status: 400 });
 }
 ```
 
@@ -245,11 +261,12 @@ const body = await req.json();
 const { id, title, content } = body;
 
 if (!content) {
-    return new NextResponse("Conteúdo é obrigatório", { status: 400 });
+  return new NextResponse("Conteúdo é obrigatório", { status: 400 });
 }
 ```
 
 **Problema:** Não há limite de tamanho para o campo `content`. Um cliente mal-intencionado pode enviar um payload de conteúdo de dezenas de megabytes, causando:
+
 - Sobrecarga de memória no processo Next.js.
 - Rows gigantescos no PostgreSQL que afetam performance de queries.
 - Potencial DoS (esgotamento de memória).
@@ -257,11 +274,12 @@ if (!content) {
 Adicionalmente, o campo `title` não é validado (comprimento máximo).
 
 **Correção:** Adicionar validação com Zod:
+
 ```ts
 const schema = z.object({
-    id: z.string().cuid().optional(),
-    title: z.string().max(500).optional(),
-    content: z.string().min(1).max(500_000), // ex.: 500KB de HTML
+  id: z.string().cuid().optional(),
+  title: z.string().max(500).optional(),
+  content: z.string().min(1).max(500_000), // ex.: 500KB de HTML
 });
 ```
 
@@ -281,6 +299,7 @@ const schema = z.object({
 **Problema:** Em caso de falha ao deletar o usuário do banco de dados, o handler retorna HTTP `200`. O Clerk interpretará isso como sucesso e **não fará reenvio do webhook**, deixando o banco de dados com um usuário "fantasma" (orfão) que deveria ter sido deletado.
 
 **Correção:** Retornar `500` para erros de banco, permitindo que o Clerk reenvie o evento:
+
 ```ts
 return new NextResponse("Erro ao deletar usuário.", { status: 500 });
 ```
@@ -298,6 +317,7 @@ reactStrictMode: false,
 **Problema:** O `StrictMode` do React renderiza componentes duas vezes em desenvolvimento para detectar side effects não puros, refs legadas e uso de APIs deprecadas. Com ele desabilitado, bugs sutis de ciclo de vida podem passar despercebidos em desenvolvimento e só aparecer em produção.
 
 **Recomendação:** Reabilitar e corrigir quaisquer warnings que surjam:
+
 ```diff
 - reactStrictMode: false,
 + reactStrictMode: true,
@@ -310,26 +330,34 @@ reactStrictMode: false,
 **Arquivo:** `src/app/api/images/route.ts` — Linhas 50–57
 
 ```ts
-const file = formData.get('file') as File | null;
+const file = formData.get("file") as File | null;
 // Sem verificação de tipo MIME
 // Sem verificação de tamanho
 const bytes = await file.arrayBuffer();
 ```
 
 **Problema:** Embora a autenticação tenha sido adicionada, o endpoint ainda não valida:
+
 1. **Tipo MIME:** Qualquer arquivo pode ser enviado (PDFs, executáveis, SVGs com scripts).
 2. **Tamanho do arquivo:** Sem limite, permitindo uploads de arquivos grandes que esgotam memória ou cota do Cloudinary.
 
 **Correção:**
+
 ```ts
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
 if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: 'Tipo de arquivo não permitido.' }, { status: 400 });
+  return NextResponse.json(
+    { error: "Tipo de arquivo não permitido." },
+    { status: 400 },
+  );
 }
 if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: 'Arquivo muito grande (máx. 5 MB).' }, { status: 400 });
+  return NextResponse.json(
+    { error: "Arquivo muito grande (máx. 5 MB)." },
+    { status: 400 },
+  );
 }
 ```
 
@@ -339,30 +367,30 @@ if (file.size > MAX_SIZE) {
 
 ### Pontos Fortes ✅ (confirmados após correções)
 
-| Área | Avaliação |
-|------|-----------|
-| Rate Limiting de IA | Reabilitado em `/api/ai/rewrite` e `/api/ai/translate` |
-| Paginação de documentos e rascunhos | Implementada com limite máximo de 100 |
-| Transação no sistema de rascunhos | `db.$transaction` evita race conditions |
-| Streaming de IA | `streamText` não bloqueia o servidor |
-| Webhook Stripe | Idempotente com `upsert` |
-| Security Headers | HSTS, CSP, X-Frame-Options configurados |
-| Sentry integrado | Monitoramento de erros configurado |
-| Testes automatizados | 3 testes passando (Vitest) |
+| Área                                | Avaliação                                              |
+| ----------------------------------- | ------------------------------------------------------ |
+| Rate Limiting de IA                 | Reabilitado em `/api/ai/rewrite` e `/api/ai/translate` |
+| Paginação de documentos e rascunhos | Implementada com limite máximo de 100                  |
+| Transação no sistema de rascunhos   | `db.$transaction` evita race conditions                |
+| Streaming de IA                     | `streamText` não bloqueia o servidor                   |
+| Webhook Stripe                      | Idempotente com `upsert`                               |
+| Security Headers                    | HSTS, CSP, X-Frame-Options configurados                |
+| Sentry integrado                    | Monitoramento de erros configurado                     |
+| Testes automatizados                | 3 testes passando (Vitest)                             |
 
 ### Riscos de Escalabilidade Restantes ⚠️
 
-| Área | Risco | Severidade |
-|------|-------|------------|
-| **Source maps em produção** | Bundle público expõe código-fonte | 🟠 Alto |
-| **LanguageTool sem autenticação** | Consumo ilimitado por anônimos | 🟠 Alto |
-| **Imagens sem isolamento por usuário** | All users ver imagens de todos | 🟠 Alto |
-| **SEO sem rate limit** | Custo OpenAI ilimitado para Pro | 🟡 Médio |
-| **Sem índice em `AiUsage.feature`** | Full table scan em queries por feature | 🟡 Médio |
-| **Sem fila para chamadas de IA** | Pico de uso pode sobrecarregar OpenAI | 🟡 Médio |
-| **Sem cache de configurações** | Query ao banco em cada carregamento | 🟡 Médio |
-| **Sem connection pooling** | Risco de esgotamento de conexões Postgres em escala | 🟡 Médio |
-| **Conteúdo de documento sem limite de tamanho** | Payloads gigantescos podem causar OOM | 🟠 Alto |
+| Área                                            | Risco                                               | Severidade |
+| ----------------------------------------------- | --------------------------------------------------- | ---------- |
+| **Source maps em produção**                     | Bundle público expõe código-fonte                   | 🟠 Alto    |
+| **LanguageTool sem autenticação**               | Consumo ilimitado por anônimos                      | 🟠 Alto    |
+| **Imagens sem isolamento por usuário**          | All users ver imagens de todos                      | 🟠 Alto    |
+| **SEO sem rate limit**                          | Custo OpenAI ilimitado para Pro                     | 🟡 Médio   |
+| **Sem índice em `AiUsage.feature`**             | Full table scan em queries por feature              | 🟡 Médio   |
+| **Sem fila para chamadas de IA**                | Pico de uso pode sobrecarregar OpenAI               | 🟡 Médio   |
+| **Sem cache de configurações**                  | Query ao banco em cada carregamento                 | 🟡 Médio   |
+| **Sem connection pooling**                      | Risco de esgotamento de conexões Postgres em escala | 🟡 Médio   |
+| **Conteúdo de documento sem limite de tamanho** | Payloads gigantescos podem causar OOM               | 🟠 Alto    |
 
 ### Recomendações de Longo Prazo
 
@@ -384,20 +412,20 @@ Tests:      3 passed
 Coverage:   ~2% (estimado) — apenas 2 rotas de 9+ endpoints testados
 ```
 
-| Área | Cobertura |
-|------|-----------|
-| `/api/ai/rewrite` | ✅ 1 teste (rate limit) |
-| `/api/documents` GET | ✅ 2 testes (auth + paginação) |
-| `/api/documents` POST | ❌ Sem testes |
-| `/api/ai/translate` | ❌ Sem testes |
-| `/api/ai/seo` | ❌ Sem testes |
-| `/api/images` | ❌ Sem testes |
-| `/api/editor-settings` | ❌ Sem testes |
-| `/api/webhooks/clerk` | ❌ Sem testes |
-| `/api/webhooks/stripe` | ❌ Sem testes |
-| `/api/pdf/export` | ❌ Sem testes |
-| `/api/languagetool` | ❌ Sem testes |
-| Middleware | ❌ Sem testes |
+| Área                   | Cobertura                      |
+| ---------------------- | ------------------------------ |
+| `/api/ai/rewrite`      | ✅ 1 teste (rate limit)        |
+| `/api/documents` GET   | ✅ 2 testes (auth + paginação) |
+| `/api/documents` POST  | ❌ Sem testes                  |
+| `/api/ai/translate`    | ❌ Sem testes                  |
+| `/api/ai/seo`          | ❌ Sem testes                  |
+| `/api/images`          | ❌ Sem testes                  |
+| `/api/editor-settings` | ❌ Sem testes                  |
+| `/api/webhooks/clerk`  | ❌ Sem testes                  |
+| `/api/webhooks/stripe` | ❌ Sem testes                  |
+| `/api/pdf/export`      | ❌ Sem testes                  |
+| `/api/languagetool`    | ❌ Sem testes                  |
+| Middleware             | ❌ Sem testes                  |
 
 ### Problemas nos Testes Existentes
 
@@ -408,6 +436,7 @@ Coverage:   ~2% (estimado) — apenas 2 rotas de 9+ endpoints testados
 ### Recomendação
 
 Priorizar testes para:
+
 - Webhooks (Clerk + Stripe) — lógica crítica de negócio
 - Rate limiting de IA — impacto financeiro direto
 - Autenticação e autorização — segurança
@@ -427,7 +456,7 @@ Priorizar testes para:
 ### ✅ Issues de Alta Prioridade (Resolvidos)
 
 - [x] **SEC-N03:** Sanitizar HTML com `isomorphic-dompurify` ou `sanitize-html` antes do fetch de PDF no `export/route.ts`
-- [x] **SEC-N04:** Modificar contagem de rate limit de IA (`checkAiRateLimit`) para ser por *feature* (`rewrite`, `translate`, `seo`) - *Nota: Modificado para limite de requisições globais por mês, validado com o negócio.*
+- [x] **SEC-N04:** Modificar contagem de rate limit de IA (`checkAiRateLimit`) para ser por _feature_ (`rewrite`, `translate`, `seo`) - _Nota: Modificado para limite de requisições globais por mês, validado com o negócio._
 - [x] **SEC-N05:** Implementar `checkAiRateLimit` na rota `/api/ai/seo`
 - [x] **BUG-N02:** Retornar status 500 no erro de deleção de usuário em `clerk/route.ts`
 - [x] **BUG-N04:** Adicionar validação de MIME type e tamanho (ex: 5MB) no upload de `/api/images`
@@ -436,7 +465,7 @@ Priorizar testes para:
 
 ### ✅ Melhorias Recomendadas (Resolvidas)
 
-- [x] **SEC-N02:** Implementar Rate Limiting por IP no endpoint `/api/languagetool` (Aberto por design - *Implementado bloqueio por Origin*)
+- [x] **SEC-N02:** Implementar Rate Limiting por IP no endpoint `/api/languagetool` (Aberto por design - _Implementado bloqueio por Origin_)
 - [x] **SEC-N06:** Completar CSP com domínios de OpenAI, LanguageTool, Cloudinary
 - [x] **SEC-N08:** Remover non-null assertion `!` em `stripe-signature`
 - [x] **BUG-N03:** Reabilitar `reactStrictMode: true`
@@ -450,27 +479,27 @@ Priorizar testes para:
 
 ### Quadro Geral de Prontidão para MVP
 
-| # | Critério | Status | Observação |
-|---|----------|--------|------------|
-| 1 | Autenticação implementada | ✅ | Clerk integrado corretamente |
-| 2 | Autorização por recurso | ✅ | `userId` verificado nas queries de documentos |
-| 3 | Webhooks validados | ✅ | Svix (Clerk) e Stripe assinatura verificados |
-| 4 | Pagamento funcional | ✅ | Checkout + Portal + Webhook do Stripe |
-| 5 | Rate limiting de IA | ⚠️ | Ativo em `rewrite` e `translate`, **ausente em `seo`** |
-| 6 | Segredos de API seguros | ✅ | Nenhuma chave hardcoded encontrada |
-| 7 | Endpoints de API autenticados | ✅ | `/api/languagetool` aberto por design; outros protegidos |
-| 8 | Informações de debug removidas | ✅ | Stack trace e endpoint de diagnóstico removidos |
-| 9 | Testes automatizados | ⚠️ | 3 testes passando, cobertura ~2% |
-| 10 | Logging estruturado | ⚠️ | `console.error` — adequado para Vercel/serverless |
-| 11 | Variáveis de ambiente documentadas | ✅ | `.env.example` completo |
-| 12 | Schema de banco migrado | ✅ | Prisma schema bem estruturado |
-| 13 | i18n implementado | ✅ | Middleware de locale presente |
-| 14 | SEO básico | ✅ | Sitemap e robots.txt configurados |
-| 15 | Security Headers | ✅ | HSTS, CSP, X-Frame-Options configurados |
-| 16 | Monitoramento de erros | ✅ | Sentry integrado |
-| 17 | Source Maps em produção | ❌ | `productionBrowserSourceMaps: true` — bloqueador |
-| 18 | Isolamento de dados multi-tenant | ⚠️ | Imagens Cloudinary compartilhadas entre usuários |
+| #   | Critério                           | Status | Observação                                               |
+| --- | ---------------------------------- | ------ | -------------------------------------------------------- |
+| 1   | Autenticação implementada          | ✅     | Clerk integrado corretamente                             |
+| 2   | Autorização por recurso            | ✅     | `userId` verificado nas queries de documentos            |
+| 3   | Webhooks validados                 | ✅     | Svix (Clerk) e Stripe assinatura verificados             |
+| 4   | Pagamento funcional                | ✅     | Checkout + Portal + Webhook do Stripe                    |
+| 5   | Rate limiting de IA                | ⚠️     | Ativo em `rewrite` e `translate`, **ausente em `seo`**   |
+| 6   | Segredos de API seguros            | ✅     | Nenhuma chave hardcoded encontrada                       |
+| 7   | Endpoints de API autenticados      | ✅     | `/api/languagetool` aberto por design; outros protegidos |
+| 8   | Informações de debug removidas     | ✅     | Stack trace e endpoint de diagnóstico removidos          |
+| 9   | Testes automatizados               | ⚠️     | 3 testes passando, cobertura ~2%                         |
+| 10  | Logging estruturado                | ⚠️     | `console.error` — adequado para Vercel/serverless        |
+| 11  | Variáveis de ambiente documentadas | ✅     | `.env.example` completo                                  |
+| 12  | Schema de banco migrado            | ✅     | Prisma schema bem estruturado                            |
+| 13  | i18n implementado                  | ✅     | Middleware de locale presente                            |
+| 14  | SEO básico                         | ✅     | Sitemap e robots.txt configurados                        |
+| 15  | Security Headers                   | ✅     | HSTS, CSP, X-Frame-Options configurados                  |
+| 16  | Monitoramento de erros             | ✅     | Sentry integrado                                         |
+| 17  | Source Maps em produção            | ❌     | `productionBrowserSourceMaps: true` — bloqueador         |
+| 18  | Isolamento de dados multi-tenant   | ⚠️     | Imagens Cloudinary compartilhadas entre usuários         |
 
 ---
 
-*Relatório gerado em análise estática de código — 2026-02-22. Recomenda-se complementar com testes de integração, penetration testing e revisão manual dos fluxos de pagamento antes do lançamento em produção.*
+_Relatório gerado em análise estática de código — 2026-02-22. Recomenda-se complementar com testes de integração, penetration testing e revisão manual dos fluxos de pagamento antes do lançamento em produção._

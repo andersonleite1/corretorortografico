@@ -14,7 +14,11 @@ interface UseTocOptions {
 }
 
 export default function useToc(options: UseTocOptions) {
-  const { containerSelector, headingSelector = "h2, h3, h4", observerOptions } = options;
+  const {
+    containerSelector,
+    headingSelector = "h2, h3, h4",
+    observerOptions,
+  } = options;
 
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);

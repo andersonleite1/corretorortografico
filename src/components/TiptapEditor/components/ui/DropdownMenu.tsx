@@ -43,7 +43,11 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={clsx("rte-dropdown__item", inset && "rte-dropdown-item-inset", className)}
+    className={clsx(
+      "rte-dropdown__item",
+      inset && "rte-dropdown-item-inset",
+      className,
+    )}
     {...props}
   />
 ));
@@ -65,7 +69,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     </DropdownMenuPrimitive.ItemIndicator>
   </DropdownMenuPrimitive.CheckboxItem>
 ));
-DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
+DropdownMenuCheckboxItem.displayName =
+  DropdownMenuPrimitive.CheckboxItem.displayName;
 
 const DropdownMenuRadioItem = DropdownMenuPrimitive.DropdownMenuRadioItem;
 

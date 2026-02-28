@@ -30,7 +30,7 @@ const TableMenu = () => {
       const command = `add${type}${position}` as const;
       return () => editor.chain().focus()[command]().run();
     },
-    [editor]
+    [editor],
   );
 
   const deleteRowOrColumn = useCallback(
@@ -38,7 +38,7 @@ const TableMenu = () => {
       const command = `delete${type}` as const;
       return () => editor.chain().focus()[command]().run();
     },
-    [editor]
+    [editor],
   );
 
   const toggleHeader = useCallback(
@@ -46,12 +46,21 @@ const TableMenu = () => {
       const command = `toggleHeader${type}` as const;
       return () => editor.chain().focus()[command]().run();
     },
-    [editor]
+    [editor],
   );
 
-  const mergeCells = useCallback(() => editor.chain().focus().mergeCells().run(), [editor]);
-  const splitCell = useCallback(() => editor.chain().focus().splitCell().run(), [editor]);
-  const deleteTable = useCallback(() => editor.chain().focus().deleteTable().run(), [editor]);
+  const mergeCells = useCallback(
+    () => editor.chain().focus().mergeCells().run(),
+    [editor],
+  );
+  const splitCell = useCallback(
+    () => editor.chain().focus().splitCell().run(),
+    [editor],
+  );
+  const deleteTable = useCallback(
+    () => editor.chain().focus().deleteTable().run(),
+    [editor],
+  );
 
   return (
     <BubbleMenu
@@ -91,8 +100,16 @@ const TableMenu = () => {
           tooltip={messages.table.addColumnRight}
           onClick={addRowOrColumn("Column", "After")}
         />
-        <MenuButton icon="SplitCell" tooltip={messages.table.splitCell} onClick={splitCell} />
-        <MenuButton icon="MergeCell" tooltip={messages.table.mergeCells} onClick={mergeCells} />
+        <MenuButton
+          icon="SplitCell"
+          tooltip={messages.table.splitCell}
+          onClick={splitCell}
+        />
+        <MenuButton
+          icon="MergeCell"
+          tooltip={messages.table.mergeCells}
+          onClick={mergeCells}
+        />
       </Toolbar>
       <Toolbar style={{ justifyContent: "center" }}>
         <MenuButton
@@ -115,7 +132,11 @@ const TableMenu = () => {
           tooltip={messages.table.deleteColumn}
           onClick={deleteRowOrColumn("Column")}
         />
-        <MenuButton icon="Trash" tooltip={messages.table.deleteTable} onClick={deleteTable} />
+        <MenuButton
+          icon="Trash"
+          tooltip={messages.table.deleteTable}
+          onClick={deleteTable}
+        />
       </Toolbar>
     </BubbleMenu>
   );

@@ -87,10 +87,13 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     [locale],
   );
 
-  const editorPlaceholder = useMemo(() => ({
-    paragraph: formMessages.placeholders.content,
-    imageCaption: formMessages.placeholders.imageCaption,
-  }), [formMessages.placeholders.content, formMessages.placeholders.imageCaption]);
+  const editorPlaceholder = useMemo(
+    () => ({
+      paragraph: formMessages.placeholders.content,
+      imageCaption: formMessages.placeholders.imageCaption,
+    }),
+    [formMessages.placeholders.content, formMessages.placeholders.imageCaption],
+  );
 
   const [drafts, setDrafts] = useState<
     { id: string; title: string; content: string; date: string }[]
@@ -341,7 +344,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    const checkRecovery = (serverData: { title?: string; content?: unknown; updatedAt?: string | number | Date }) => {
+    const checkRecovery = (serverData: {
+      title?: string;
+      content?: unknown;
+      updatedAt?: string | number | Date;
+    }) => {
       const localDataStr = localStorage.getItem("post");
       if (!localDataStr) return serverData;
 
@@ -436,14 +443,21 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         .then((res) => res.json())
         .then((data) => {
           setDrafts(
-            data.map((d: { id: string; title: string; content: string; createdAt: string | number | Date }) => ({
-              id: d.id,
-              title: d.title,
-              content: d.content,
-              date: new Date(d.createdAt).toLocaleString(
-                locale === "pt" ? "pt-BR" : "en-US",
-              ),
-            })),
+            data.map(
+              (d: {
+                id: string;
+                title: string;
+                content: string;
+                createdAt: string | number | Date;
+              }) => ({
+                id: d.id,
+                title: d.title,
+                content: d.content,
+                date: new Date(d.createdAt).toLocaleString(
+                  locale === "pt" ? "pt-BR" : "en-US",
+                ),
+              }),
+            ),
           );
         })
         .catch(console.error);
@@ -454,82 +468,92 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }, [docId, locale]);
 
   // Função para salvar o rascunho atual
-  const handleSaveDraft = useCallback(async (isExplicit = false) => {
-    if (!docId) {
-      // Fallback para localStorage se não houver docId
-      const current = {
-        id: uuidv4(),
-        title: watch("title") || formMessages.defaults.draftTitle,
-        content: watch("content") || "",
-        date: new Date().toLocaleString(formMessages.dateLocale),
-      };
+  const handleSaveDraft = useCallback(
+    async (isExplicit = false) => {
+      if (!docId) {
+        // Fallback para localStorage se não houver docId
+        const current = {
+          id: uuidv4(),
+          title: watch("title") || formMessages.defaults.draftTitle,
+          content: watch("content") || "",
+          date: new Date().toLocaleString(formMessages.dateLocale),
+        };
 
-      let updatedDrafts = [...drafts, current];
-      if (updatedDrafts.length > 10) updatedDrafts = updatedDrafts.slice(-10);
-      localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
-      setDrafts(updatedDrafts);
-      if (isExplicit) showNotification(formMessages.modal.draftSaved);
-      return;
-    }
-
-    try {
-      if (!isExplicit) setDraftSavingStatus("saving");
-
-      const content = watch("content");
-      const stringifiedContent =
-        typeof content === "object" ? JSON.stringify(content) : content;
-
-      const res = await fetch(`/api/documents/${docId}/drafts`, {
-        method: "POST",
-        headers: {
-          "x-diagnose": "true",
-        },
-        body: JSON.stringify({
-          title: watch("title") || undefined,
-          content: stringifiedContent,
-          isExplicitSave: isExplicit,
-        }),
-      });
-
-      if (res.ok) {
-        if (!isExplicit) {
-          setDraftSavingStatus("saved");
-          setTimeout(() => {
-            setDraftSavingStatus("idle");
-          }, 3000);
-        }
-
-        await res.json();
-        // Refresh drafts list
-        const draftsRes = await fetch(`/api/documents/${docId}/drafts`);
-        const data = await draftsRes.json();
-        setDrafts(
-          data.map((d: { id: string; title: string; content: string; createdAt: string | number | Date }) => ({
-            id: d.id,
-            title: d.title,
-            content: d.content,
-            date: new Date(d.createdAt).toLocaleString(
-              locale === "pt" ? "pt-BR" : "en-US",
-            ),
-          })),
-        );
+        let updatedDrafts = [...drafts, current];
+        if (updatedDrafts.length > 10) updatedDrafts = updatedDrafts.slice(-10);
+        localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
+        setDrafts(updatedDrafts);
         if (isExplicit) showNotification(formMessages.modal.draftSaved);
-      } else {
-        const errorText = await res.text();
-        throw new Error(errorText || "Error saving draft");
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      if (!isExplicit) {
-        setDraftSavingStatus("error");
-      } else {
-        showNotification(
-          error instanceof Error ? error.message : "Erro ao salvar rascunho",
-          "error",
-        );
+
+      try {
+        if (!isExplicit) setDraftSavingStatus("saving");
+
+        const content = watch("content");
+        const stringifiedContent =
+          typeof content === "object" ? JSON.stringify(content) : content;
+
+        const res = await fetch(`/api/documents/${docId}/drafts`, {
+          method: "POST",
+          headers: {
+            "x-diagnose": "true",
+          },
+          body: JSON.stringify({
+            title: watch("title") || undefined,
+            content: stringifiedContent,
+            isExplicitSave: isExplicit,
+          }),
+        });
+
+        if (res.ok) {
+          if (!isExplicit) {
+            setDraftSavingStatus("saved");
+            setTimeout(() => {
+              setDraftSavingStatus("idle");
+            }, 3000);
+          }
+
+          await res.json();
+          // Refresh drafts list
+          const draftsRes = await fetch(`/api/documents/${docId}/drafts`);
+          const data = await draftsRes.json();
+          setDrafts(
+            data.map(
+              (d: {
+                id: string;
+                title: string;
+                content: string;
+                createdAt: string | number | Date;
+              }) => ({
+                id: d.id,
+                title: d.title,
+                content: d.content,
+                date: new Date(d.createdAt).toLocaleString(
+                  locale === "pt" ? "pt-BR" : "en-US",
+                ),
+              }),
+            ),
+          );
+          if (isExplicit) showNotification(formMessages.modal.draftSaved);
+        } else {
+          const errorText = await res.text();
+          throw new Error(errorText || "Error saving draft");
+        }
+      } catch (error) {
+        console.error(error);
+        if (!isExplicit) {
+          setDraftSavingStatus("error");
+        } else {
+          showNotification(
+            error instanceof Error ? error.message : "Erro ao salvar rascunho",
+            "error",
+          );
+        }
       }
-    }
-  }, [docId, drafts, formMessages, locale, watch]);
+    },
+    [docId, drafts, formMessages, locale, watch],
+  );
 
   // Auto-save draft on content change (throttled by the API)
   useEffect(() => {
@@ -706,7 +730,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     );
   }
 
-
   return (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 pb-6">
       <div>
@@ -732,7 +755,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             return (
               <div
                 className="w-full rounded-[2rem]"
-                style={{ "--rte-radius": "2rem", minHeight: "480px" } as CSSProperties}
+                style={
+                  {
+                    "--rte-radius": "2rem",
+                    minHeight: "480px",
+                  } as CSSProperties
+                }
               >
                 <TiptapEditor
                   ref={editorRef}

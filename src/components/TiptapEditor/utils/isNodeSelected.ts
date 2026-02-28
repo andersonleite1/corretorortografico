@@ -5,6 +5,7 @@ export const isNodeSelected = (editor: Editor) => {
   const customNodes = [CodeBlock.name, ImageFigure.name, Link.name];
 
   return (
-    customNodes.some((type) => editor.isActive(type)) || isNodeSelection(editor.state.selection)
+    customNodes.some((type) => editor.isActive(type)) ||
+    isNodeSelection(editor.state.selection)
   );
 };

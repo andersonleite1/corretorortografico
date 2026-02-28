@@ -35,8 +35,14 @@ export const highlightStyle = HighlightStyle.define([
   { tag: [t.standard(t.tagName), t.tagName], class: "cm-tag" },
   { tag: [t.comment, t.bracket], class: "cm-comment" },
   { tag: [t.className, t.propertyName], class: "cm-class" },
-  { tag: [t.variableName, t.attributeName, t.number, t.operator], class: "cm-variable" },
-  { tag: [t.keyword, t.typeName, t.typeOperator, t.typeName], class: "cm-keyword" },
+  {
+    tag: [t.variableName, t.attributeName, t.number, t.operator],
+    class: "cm-variable",
+  },
+  {
+    tag: [t.keyword, t.typeName, t.typeOperator, t.typeName],
+    class: "cm-keyword",
+  },
   { tag: [t.string, t.meta, t.regexp], class: "cm-string" },
   { tag: [t.name, t.quote], class: "cm-name" },
   { tag: [t.heading, t.strong], class: "cm-heading", fontWeight: "bold" },
@@ -48,4 +54,7 @@ export const highlightStyle = HighlightStyle.define([
   { tag: t.invalid, class: "cm-invalid" },
 ]);
 
-export const theme: Extension = [themeConfig, syntaxHighlighting(highlightStyle)];
+export const theme: Extension = [
+  themeConfig,
+  syntaxHighlighting(highlightStyle),
+];

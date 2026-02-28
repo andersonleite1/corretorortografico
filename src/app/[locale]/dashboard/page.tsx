@@ -7,20 +7,21 @@ import DashboardContent from "./DashboardContent";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-    title: "Dashboard | Editor de Texto IA",
-    description: "Visualize suas métricas de produtividade e o tempo economizado com a IA.",
+  title: "Dashboard | Editor de Texto IA",
+  description:
+    "Visualize suas métricas de produtividade e o tempo economizado com a IA.",
 };
 
 export default async function DashboardPage() {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) redirect("/sign-in");
+  const { userId: clerkId } = await auth();
+  if (!clerkId) redirect("/sign-in");
 
-    const user = await db.user.findUnique({
-        where: { clerkId },
-        select: { id: true, name: true, email: true },
-    });
+  const user = await db.user.findUnique({
+    where: { clerkId },
+    select: { id: true, name: true, email: true },
+  });
 
-    if (!user) redirect("/");
+  if (!user) redirect("/");
 
-    return <DashboardContent userName={user.name ?? user.email} />;
+  return <DashboardContent userName={user.name ?? user.email} />;
 }

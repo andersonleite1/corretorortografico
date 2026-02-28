@@ -20,7 +20,9 @@ const ColorPicker = (props: ColorPickerProps) => {
 
   const normalizeColor = (color: string): string => {
     const normalized = color.startsWith("#") ? color : `#${color}`;
-    return normalized.length === 4 ? `${normalized}${normalized.slice(1)}` : normalized;
+    return normalized.length === 4
+      ? `${normalized}${normalized.slice(1)}`
+      : normalized;
   };
 
   const isColorEqual = (a: string, b: string): boolean =>

@@ -1,14 +1,21 @@
 "use client";
 
 // Componente de menu do LanguageTool
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { BubbleMenu } from "../BubbleMenu";
 import { useTiptapContext } from "../Provider";
 import { useEditorState } from "@tiptap/react";
 import { Icon } from "../ui/Icon";
 
 const LanguageToolMenuComponent = () => {
-  const { editor, contentElement, messages } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
   const showDialogRef = useRef(false);
@@ -29,13 +36,20 @@ const LanguageToolMenuComponent = () => {
 
   const findErrorElement = useCallback((e: MouseEvent): HTMLElement | null => {
     const raw = e.target as Node | null;
-    const elem = (raw && (raw as any).nodeType === 3 ? (raw as any).parentElement : (raw as Element | null));
+    const elem =
+      raw && (raw as any).nodeType === 3
+        ? (raw as any).parentElement
+        : (raw as Element | null);
     let el = elem?.closest?.(".lt-error") as HTMLElement | null;
     if (!el && (e as any).composedPath) {
       const path = (e as any).composedPath() as Array<EventTarget>;
       for (const t of path) {
         const et = t as Element;
-        if (et && (et as any).classList && (et as any).classList.contains("lt-error")) {
+        if (
+          et &&
+          (et as any).classList &&
+          (et as any).classList.contains("lt-error")
+        ) {
           el = et as HTMLElement;
           break;
         }
@@ -84,8 +98,7 @@ const LanguageToolMenuComponent = () => {
         editor?.view?.dispatch(editor.view.state.tr);
       }
     };
-    const handleLeave = () => {
-    };
+    const handleLeave = () => {};
     dom.addEventListener("mousemove", handleMove, { passive: true });
     dom.addEventListener("mouseleave", handleLeave, { passive: true });
     return () => {
@@ -93,7 +106,6 @@ const LanguageToolMenuComponent = () => {
       dom.removeEventListener("mousemove", handleMove as any);
       dom.removeEventListener("mouseleave", handleLeave as any);
     };
-
   }, [editor, findErrorElement, hoveredEl]);
 
   const getActiveIssue = useCallback(() => {
@@ -133,7 +145,11 @@ const LanguageToolMenuComponent = () => {
   }, [hoveredIssueId, ltState.issues, getActiveIssue]);
 
   const shouldShow = useCallback(() => {
-    return Boolean(ltState.enabled && !suppressAutoOpenRef.current && (showDialogRef.current || hoveredEl));
+    return Boolean(
+      ltState.enabled &&
+      !suppressAutoOpenRef.current &&
+      (showDialogRef.current || hoveredEl),
+    );
   }, [ltState.enabled, hoveredEl]);
 
   const getReferencedVirtualElement = useCallback(() => {
@@ -147,13 +163,17 @@ const LanguageToolMenuComponent = () => {
   const applyReplacement = useCallback(
     (text: string) => {
       if (!issue) return;
-      editor.commands.applyLanguageToolSuggestion({ from: issue.from, to: issue.to, text });
+      editor.commands.applyLanguageToolSuggestion({
+        from: issue.from,
+        to: issue.to,
+        text,
+      });
       editor.commands.ignoreLanguageToolIssue?.(issue.id);
       showDialogRef.current = false;
       setHoveredEl(null);
       setHoveredIssueId(null);
     },
-    [editor, issue]
+    [editor, issue],
   );
 
   const ignoreIssue = useCallback(() => {
@@ -206,7 +226,8 @@ const LanguageToolMenuComponent = () => {
 
         <div className="lt-menu-card__body">
           <div className="lt-menu-card__title">
-            {(issue && (issue.ruleDescription || issue.typeName)) || messages.languageTool.fallbackRule}
+            {(issue && (issue.ruleDescription || issue.typeName)) ||
+              messages.languageTool.fallbackRule}
           </div>
           <p className="lt-menu-card__message">
             {issue?.message || messages.languageTool.empty}
@@ -222,15 +243,22 @@ const LanguageToolMenuComponent = () => {
                 {rep}
               </button>
             ))}
-            {issue && (!issue.replacements || issue.replacements.length === 0) && (
-              <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>
-                {messages.languageTool.noSuggestions}
-              </span>
-            )}
+            {issue &&
+              (!issue.replacements || issue.replacements.length === 0) && (
+                <span
+                  className="rte-label"
+                  style={{ color: "var(--rte-muted-fg)" }}
+                >
+                  {messages.languageTool.noSuggestions}
+                </span>
+              )}
           </div>
 
           <div className="lt-menu-card__actions">
-            <button className="lt-menu-card__action-btn lt-menu-card__action-btn--ignore" onClick={ignoreIssue}>
+            <button
+              className="lt-menu-card__action-btn lt-menu-card__action-btn--ignore"
+              onClick={ignoreIssue}
+            >
               <Icon name="Trash" size={14} />
               {messages.languageTool.ignore}
             </button>

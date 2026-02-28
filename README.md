@@ -25,12 +25,14 @@ Um editor de texto WYSIWYG moderno, robusto e altamente customizável construíd
 ## 🛠️ Tech Stack
 
 ### Core
+
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
 - **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
 - **UI & Styling**: [Tailwind CSS](https://tailwindcss.com/) + [SCSS](https://sass-lang.com/)
 - **Componentes**: [Radix UI](https://www.radix-ui.com/) (Dropdown, Popover, Tooltip)
 
 ### Editor & Ferramentas
+
 - **Engine do Editor**: [Tiptap](https://tiptap.dev/) / [ProseMirror](https://prosemirror.net/)
 - **Edição de Código**: [CodeMirror 6](https://codemirror.net/)
 - **Upload de Imagens**: [Cloudinary](https://cloudinary.com/)
@@ -61,23 +63,27 @@ src/
 ## 🏁 Introdução
 
 ### Pré-requisitos
+
 - Node.js 18.x ou superior
 - NPM ou Yarn
 
 ### Instalação
 
 1. Clone o repositório:
+
    ```bash
    git clone https://github.com/andersonleite1/editordetexto.git
    cd editordetexto
    ```
 
 2. Instale as dependências:
+
    ```bash
    npm install
    ```
 
 3. Configure as variáveis de ambiente:
+
    ```bash
    cp .env.example .env.local
    # Adicione suas credenciais do Cloudinary no .env.local
@@ -109,6 +115,7 @@ O projeto utiliza **Vitest** com **React Testing Library** para garantir a quali
 ## 🌎 Internacionalização (i18n)
 
 O projeto utiliza uma estrutura robusta de i18n. Para adicionar ou modificar traduções, consulte:
+
 - `src/app/[locale]/` para rotas específicas.
 - `i18n-config.ts` para definições de locales disponíveis (`pt`, `en`, `es`).
 
@@ -139,4 +146,5 @@ Contribuições são o que tornam a comunidade open source um lugar incrível pa
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ---
+
 <p align="center">Desenvolvido com ❤️ por Anderson Leite</p>

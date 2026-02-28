@@ -12,14 +12,13 @@ import UnderlineButton from "./controls/UnderlineButton";
 import SaveButton from "./controls/SaveButton";
 import AlignPopover from "./controls/AlignPopover";
 import HeadingDropdown from "./controls/HeadingDropdown";
-import BlockquoteButton from "./controls/BlockquoteButton";
+
 import BulletListButton from "./controls/BulletListButton";
 import OrderedListButton from "./controls/OrderedList";
 import MoreMarkDropdown from "./controls/MoreMarkPopover";
 import LinkButton from "./controls/LinkButton";
 import CodeBlockButton from "./controls/CodeBlockButton";
-import ImageButton from "./controls/ImageButton2";
-import YoutubeButton from "./controls/YoutubeButton";
+
 import TextColorButton from "./controls/TextColorButton";
 import TextHighlightButton from "./controls/TextHighlightButton";
 import InsertDropdown from "./controls/InsertDropdown";
@@ -44,11 +43,14 @@ const MenuBar = () => {
   const { buttonVisibility } = useEditorSettings();
 
   const showExport = Boolean(
-    exportActions?.onExportDoc || exportActions?.onExportPdf || exportActions?.onExportTxt
+    exportActions?.onExportDoc ||
+    exportActions?.onExportPdf ||
+    exportActions?.onExportTxt,
   );
-  const showPreview = Boolean(exportActions?.onPreviewPdf || exportActions?.onPreviewPost);
+  const showPreview = Boolean(
+    exportActions?.onPreviewPdf || exportActions?.onPreviewPost,
+  );
   const showDrafts = Boolean(draftActions);
-  const hasExtraMenus = showExport || showPreview || showDrafts;
 
   return (
     <div className="rte-menu-bar">
@@ -104,7 +106,9 @@ const MenuBar = () => {
         {buttonVisibility.importPdf && <ImportPdfButton />}
 
         {buttonVisibility.copyEditor && <CopyEditorButton />}
-        {exportActions?.onClear && buttonVisibility.clearEditor && <ClearEditorButton />}
+        {exportActions?.onClear && buttonVisibility.clearEditor && (
+          <ClearEditorButton />
+        )}
         <SettingsButton />
 
         <ToolbarDivider />

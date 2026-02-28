@@ -9,27 +9,35 @@ import { DocumentsDialog } from "@/components/shared/DocumentsDialog";
 import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { Locale } from "../../i18n-config";
 
+import { EditorSettingsProvider } from "@/components/providers/EditorSettingsProvider";
+import { SettingsDialog } from "@/components/shared/SettingsDialog";
+
 interface MainContentProps {
-    children: React.ReactNode;
-    userButton: React.ReactNode;
-    locale: Locale;
+  children: React.ReactNode;
+  userButton: React.ReactNode;
+  locale: Locale;
 }
 
-export const MainContent = ({ children, userButton, locale }: MainContentProps) => {
-    const { isDocumentsDialogOpen, setIsDocumentsDialogOpen } = useSidebar();
+export const MainContent = ({
+  children,
+  userButton,
+  locale,
+}: MainContentProps) => {
+  const { isDocumentsDialogOpen, setIsDocumentsDialogOpen } = useSidebar();
 
-    return (
-        <>
-            <Header userButton={userButton} />
-            <main>{children}</main>
-            <SpeedInsights />
-            <Analytics />
-            <Footer initialLocale={locale} />
-            <DocumentsDialog
-                isOpen={isDocumentsDialogOpen}
-                onClose={() => setIsDocumentsDialogOpen(false)}
-            />
-            <ScrollToTop />
-        </>
-    );
+  return (
+    <EditorSettingsProvider>
+      <Header userButton={userButton} />
+      <main>{children}</main>
+      <SpeedInsights />
+      <Analytics />
+      <Footer initialLocale={locale} />
+      <DocumentsDialog
+        isOpen={isDocumentsDialogOpen}
+        onClose={() => setIsDocumentsDialogOpen(false)}
+      />
+      <ScrollToTop />
+      <SettingsDialog />
+    </EditorSettingsProvider>
+  );
 };

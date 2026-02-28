@@ -31,7 +31,8 @@ const languageToolCodeByLocale: Record<Locale, string> = {
 };
 
 const resolveLanguageToolCode = (locale?: Locale) => {
-  const normalized = (locale && languageToolCodeByLocale[locale]) ? locale : i18n.defaultLocale;
+  const normalized =
+    locale && languageToolCodeByLocale[locale] ? locale : i18n.defaultLocale;
   return languageToolCodeByLocale[normalized];
 };
 
@@ -46,7 +47,7 @@ const createExtensionKit = (locale?: Locale) => [
     includeChildren: true,
     showOnlyCurrent: true,
     placeholder: ({ editor, node }) => {
-      // @ts-ignore
+      // @ts-expect-error - placeholder is a custom extension property
       const placeholder = editor.options.editorProps["placeholder"];
       switch (node.type.name) {
         case ImageCaption.name:

@@ -182,7 +182,7 @@ export function buildAboutMetadata(locale: string): Metadata {
     i18n.locales.map((loc) => [
       HREF_LANG_MAP[loc] ?? loc,
       `${BASE_URL}${ABOUT_PATHS[loc]}`,
-    ])
+    ]),
   );
 
   languages["x-default"] = `${BASE_URL}${ABOUT_PATHS[i18n.defaultLocale]}`;

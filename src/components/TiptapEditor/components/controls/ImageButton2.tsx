@@ -1,13 +1,13 @@
-import React, {ChangeEvent, Fragment, useCallback, useRef, useState} from "react";
+import React from "react";
 import MenuButton from "../MenuButton";
-import {useEditorState} from "@tiptap/react";
-import {useTiptapContext} from "../Provider";
+import { useEditorState } from "@tiptap/react";
+import { useTiptapContext } from "../Provider";
 import Dialog from "@/components/TiptapEditor/components/ui/Dialog";
 import MediaLibrary from "@/components/MediaLibrary";
 import useModal from "@/components/TiptapEditor/hooks/useModal";
 
 const ImageButton = () => {
-  const {editor, messages} = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
     selector: (ctx) => {
@@ -18,25 +18,32 @@ const ImageButton = () => {
     },
   });
 
-  const {open, handleOpen, handleClose} = useModal();
-
+  const { open, handleOpen, handleClose } = useModal();
 
   return (
     <>
-      <MenuButton icon="Image" tooltip={messages.toolbar.image} {...state} onClick={handleOpen}/>
+      <MenuButton
+        icon="Image"
+        tooltip={messages.toolbar.image}
+        {...state}
+        onClick={handleOpen}
+      />
       <Dialog open={open} onOpenChange={handleClose}>
-        <MediaLibrary onClose={handleClose} onInsert={(image)=>{
-          editor
-            .chain()
-            .focus()
-            .insertImage({
-              src: image.url,
-              width: image.width,
-              height: image.height,
-            })
-            .run();
-          handleClose();
-        }}/>
+        <MediaLibrary
+          onClose={handleClose}
+          onInsert={(image) => {
+            editor
+              .chain()
+              .focus()
+              .insertImage({
+                src: image.url,
+                width: image.width,
+                height: image.height,
+              })
+              .run();
+            handleClose();
+          }}
+        />
       </Dialog>
     </>
   );

@@ -14,12 +14,14 @@ export const LinkMenu = () => {
   const link = useEditorState({
     editor,
     selector: (context) => {
-      const storage =
-        (
-          context.editor.storage as unknown as Record<string, LinkEditorStorage | undefined>
-        ).link ?? {
-         mode: 0,
-       };
+      const storage = (
+        context.editor.storage as unknown as Record<
+          string,
+          LinkEditorStorage | undefined
+        >
+      ).link ?? {
+        mode: 0,
+      };
       mode.current = storage.mode;
 
       if (!context.editor.isActive("link")) return null;

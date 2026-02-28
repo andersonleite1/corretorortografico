@@ -5,9 +5,8 @@ type SkeletonProps = {
   className?: string;
 };
 
-const mergeClasses = (
-  ...classes: Array<string | undefined | null | false>
-) => classes.filter(Boolean).join(" ");
+const mergeClasses = (...classes: Array<string | undefined | null | false>) =>
+  classes.filter(Boolean).join(" ");
 
 const SkeletonLine = ({ className }: SkeletonProps) => (
   <div
@@ -40,10 +39,7 @@ const SkeletonParagraph = ({
       <SkeletonLine
         // eslint-disable-next-line react/no-array-index-key
         key={index}
-        className={mergeClasses(
-          index === rows - 1 ? "w-5/6" : "w-full",
-          "h-4",
-        )}
+        className={mergeClasses(index === rows - 1 ? "w-5/6" : "w-full", "h-4")}
       />
     ))}
   </div>
@@ -54,7 +50,6 @@ const MobileCarouselSkeleton = () => (
     <SkeletonBlock className="h-48 rounded-[2.5rem]" />
   </div>
 );
-
 
 const EditorSkeleton = () => (
   <div className="w-full rounded-[2.5rem] border border-slate-200 bg-white/80 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">

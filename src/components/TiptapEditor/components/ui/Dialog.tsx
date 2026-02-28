@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DialogProps {
   children: React.ReactNode;
@@ -7,20 +8,36 @@ interface DialogProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const Dialog = ({ children, open,  onOpenChange }: DialogProps) => {
+const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
   const onDismiss = () => {
     onOpenChange?.(false);
   };
 
-  if (!open) return;
-
   return createPortal(
-    <div role="dialog" className="rte-dialog" onClick={onDismiss}>
-      <div className="rte-dialog__content" onClick={(e) => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>,
-    document.querySelector("body")!
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          role="dialog"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex flex-col items-center bg-black/20 dark:bg-black/40 backdrop-blur-md px-4 py-8 overflow-y-auto"
+          onClick={onDismiss}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+            className="relative bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-2xl rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)] border border-white/20 dark:border-white/5 my-auto w-full max-w-fit overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.querySelector("body")!,
   );
 };
 

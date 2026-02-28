@@ -8,7 +8,9 @@ import MoonIcon from "../../assets/moon.svg";
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(
-    typeof window !== "undefined" ? window.localStorage.getItem("theme") === "dark" : false
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("theme") === "dark"
+      : false,
   );
 
   useEffect(() => {
@@ -25,8 +27,8 @@ const ThemeSwitcher = () => {
   return (
     <button
       onClick={() => {
-        setIsDarkMode(!isDarkMode)
-        window.location.reload()
+        setIsDarkMode(!isDarkMode);
+        window.location.reload();
       }}
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >

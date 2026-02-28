@@ -6,9 +6,17 @@ const en: HomeContent = {
     title: "Online Text Editor: Write, Format, and Publish Faster",
     description:
       "Use a modern online text editor optimized for writing blog posts, essays, newsletters, and code-friendly snippets without leaving the browser.",
-    keywords: ["online text editor", "free online text editor", "write text online", "best online text editor", "blog post editor", "plain text editor"],
+    keywords: [
+      "online text editor",
+      "free online text editor",
+      "write text online",
+      "best online text editor",
+      "blog post editor",
+      "plain text editor",
+    ],
     openGraphTitle: "Online Text Editor: Write, Format, and Publish Faster",
-    openGraphDescription: "Draft, format, and export content directly from the browser with a lightweight online text editor—no installs or logins required.",
+    openGraphDescription:
+      "Draft, format, and export content directly from the browser with a lightweight online text editor—no installs or logins required.",
   },
   article: {
     title: "Write, Edit, and Export Content with the Online Text Editor",
@@ -38,7 +46,8 @@ const en: HomeContent = {
       },
       {
         title: "Everything you need to write well",
-        description: "From basic formatting to advanced export flows, the online editor adapts to your writing routine:",
+        description:
+          "From basic formatting to advanced export flows, the online editor adapts to your writing routine:",
         points: [
           "Structure and format paragraphs effortlessly with familiar keyboard shortcuts;",
           "Preview how the copy will look once published on a blog or CMS;",

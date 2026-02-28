@@ -20,9 +20,15 @@ import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
 
 import dynamic from "next/dynamic";
-const CookieConsent = dynamic(() => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent), {
-  ssr: false,
-});
+const CookieConsent = dynamic(
+  () =>
+    import("@/components/shared/CookieConsent").then(
+      (mod) => mod.CookieConsent,
+    ),
+  {
+    ssr: false,
+  },
+);
 import { Analytics } from "@/components/shared/Analytics";
 
 export const metadata: Metadata = {

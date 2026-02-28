@@ -99,29 +99,30 @@ const nextConfig = {
         headers: [
           {
             key: "X-DNS-Prefetch-Control",
-            value: "on"
+            value: "on",
           },
           {
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload"
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           {
             key: "X-Frame-Options",
-            value: "SAMEORIGIN"
+            value: "SAMEORIGIN",
           },
           {
             key: "X-Content-Type-Options",
-            value: "nosniff"
+            value: "nosniff",
           },
           {
             key: "Referrer-Policy",
-            value: "origin-when-cross-origin"
+            value: "origin-when-cross-origin",
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://*.vercel-scripts.com https://www.googletagmanager.com https://*.clarity.ms; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://api.stripe.com https://api.openai.com https://languagetool.editordetexto.cloud https://api.editordetexto.cloud https://res.cloudinary.com https://vitals.vercel-analytics.com https://*.clarity.ms https://www.google-analytics.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.clerk.accounts.dev https://vercel.live;"
-          }
-        ]
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://*.vercel-scripts.com https://www.googletagmanager.com https://*.clarity.ms; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://api.stripe.com https://api.openai.com https://languagetool.editordetexto.cloud https://api.editordetexto.cloud https://res.cloudinary.com https://vitals.vercel-analytics.com https://*.clarity.ms https://www.google-analytics.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.clerk.accounts.dev https://vercel.live;",
+          },
+        ],
       },
       {
         source: "/:all*(svg|jpg|jpeg|png|gif|ico|webp|woff2)",

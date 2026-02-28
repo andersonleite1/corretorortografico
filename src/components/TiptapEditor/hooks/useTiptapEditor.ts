@@ -1,5 +1,5 @@
 import { Ref, useEffect, useImperativeHandle, useRef } from "react";
-import { Editor, useEditor, type UseEditorOptions } from "@tiptap/react";
+import { useEditor, type UseEditorOptions } from "@tiptap/react";
 import useForceUpdate from "./useForceUpdate";
 import { TiptapEditorRef } from "../components/Editor";
 
@@ -24,7 +24,7 @@ export default function useTiptapEditor({
     () => ({
       getInstance: () => editor,
     }),
-    [editor]
+    [editor],
   );
 
   useEffect(() => {
@@ -32,9 +32,11 @@ export default function useTiptapEditor({
     if (!editor || editor.isEditable === isEditable) return;
     editor.setOptions({ editable: Boolean(isEditable) });
     forceUpdate();
-  }, [editor, editorOptions.editable]);
+  }, [editor, editorOptions.editable, forceUpdate]);
 
-  const prevPlaceholderRef = useRef<any>(null);
+  const prevPlaceholderRef = useRef<
+    UseTiptapEditorOptions["placeholder"] | null
+  >(null);
 
   useEffect(() => {
     if (!editor || !placeholder) return;
@@ -47,7 +49,7 @@ export default function useTiptapEditor({
       return;
     }
 
-    // @ts-ignore
+    // @ts-expect-error - placeholder is a custom property in editorProps
     editor.setOptions({ editorProps: { placeholder } });
     prevPlaceholderRef.current = placeholder;
     forceUpdate();
@@ -57,7 +59,7 @@ export default function useTiptapEditor({
     return () => {
       editor?.destroy();
     };
-  }, []);
+  }, [editor]);
 
   return editor;
 }

@@ -9,7 +9,8 @@ const defaultLanguage = "pt-BR";
 
 export async function POST(request: NextRequest) {
   // --- Proteção contra Abuso (Origin Check) ---
-  const origin = request.headers.get("origin") || request.headers.get("referer");
+  const origin =
+    request.headers.get("origin") || request.headers.get("referer");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   // Verifica se a requisição originou de dentro da própria aplicação
@@ -25,10 +26,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const text = typeof body?.text === "string" ? body.text : "";
-    const requestedLanguage = typeof body?.language === "string" ? body.language : defaultLanguage;
-    const language = supportedLanguages.has(requestedLanguage) ? requestedLanguage : defaultLanguage;
+    const requestedLanguage =
+      typeof body?.language === "string" ? body.language : defaultLanguage;
+    const language = supportedLanguages.has(requestedLanguage)
+      ? requestedLanguage
+      : defaultLanguage;
     if (!text.trim()) {
-      return respond({ error: "Texto inválido para análise." }, { status: 400 });
+      return respond(
+        { error: "Texto inválido para análise." },
+        { status: 400 },
+      );
     }
 
     const trimmedText =
@@ -54,7 +61,7 @@ export async function POST(request: NextRequest) {
           error: "Falha ao consultar LanguageTool.",
           details,
         },
-        { status: ltResponse.status }
+        { status: ltResponse.status },
       );
     }
 
@@ -64,12 +71,12 @@ export async function POST(request: NextRequest) {
       matches: data.matches ?? [],
       language: data.language?.code ?? language,
     });
-  } catch (error) {
+  } catch (_error) {
     return respond(
       {
         error: "Erro inesperado ao consultar LanguageTool.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

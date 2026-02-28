@@ -1,14 +1,14 @@
 import React from "react";
 import MenuButton from "../MenuButton";
-import {useEditorState} from "@tiptap/react";
-import {useTiptapContext} from "../Provider";
+import { useEditorState } from "@tiptap/react";
+import { useTiptapContext } from "../Provider";
 import TableBuilder from "@/components/TiptapEditor/components/TableBuilder";
 
 const TableButton = () => {
-  const {editor, messages} = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
   const state = useEditorState({
     editor,
-    selector: (ctx) => {
+    selector: (_ctx) => {
       return {
         // disabled: !ctx.editor.can().insertTable(),
       };
@@ -24,7 +24,13 @@ const TableButton = () => {
       {...state}
     >
       <TableBuilder
-        onCreate={({rows, cols}) => editor.chain().insertTable({rows, cols, withHeaderRow: false}).focus().run()}
+        onCreate={({ rows, cols }) =>
+          editor
+            .chain()
+            .insertTable({ rows, cols, withHeaderRow: false })
+            .focus()
+            .run()
+        }
       />
     </MenuButton>
   );

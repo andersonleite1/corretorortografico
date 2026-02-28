@@ -1,0 +1,37 @@
+#!/bin/sh
+# ─── PRE-PUSH PIPELINE ───────────────────────────────────────────────────────
+# Executa testes e verificações pesadas antes de permitir o push.
+
+export NODE_OPTIONS="--max-old-space-size=4096"
+
+echo ""
+echo "🚀 Iniciando pipeline de pré-push (Testes)..."
+echo "──────────────────────────────────────────────────────────────────────────"
+
+# Etapa 1: TypeScript type check
+echo ""
+echo "🔷  [1/2] TypeScript — verificação de tipos"
+echo "──────────────────────────────────────────────────────────────────────────"
+npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ Erro no TypeScript. Push cancelado."
+  exit 1
+fi
+echo "✅ TypeScript OK"
+
+# Etapa 2: Testes unitários
+echo ""
+echo "🧪  [2/2] Testes Unitários"
+echo "──────────────────────────────────────────────────────────────────────────"
+npm run test:unit
+if [ $? -ne 0 ]; then
+  echo "❌ Testes falharam. Push cancelado."
+  exit 1
+fi
+echo "✅ Testes unitários OK"
+
+echo ""
+echo "══════════════════════════════════════════════════════════════════════════"
+echo "✨ Tudo OK! Realizando push... 🚀"
+echo "══════════════════════════════════════════════════════════════════════════"
+echo ""

@@ -11,7 +11,10 @@ export const getNodeContainer = (editor: Editor, selector: string) => {
   const node = (view.nodeDOM(from) || view.domAtPos(from).node) as HTMLElement;
   let container: HTMLElement | null = node;
 
-  while (container && container?.nodeName.toLocaleLowerCase() !== selector.toLocaleLowerCase()) {
+  while (
+    container &&
+    container?.nodeName.toLocaleLowerCase() !== selector.toLocaleLowerCase()
+  ) {
     container = container.parentElement;
   }
 

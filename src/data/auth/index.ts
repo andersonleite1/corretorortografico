@@ -5,18 +5,18 @@ import pt from "./pt";
 import { AuthContent } from "./types";
 
 const contentMap: Record<Locale, AuthContent> = {
-    pt,
-    en,
-    es,
+  pt,
+  en,
+  es,
 };
 
 export function getAuthContent(locale: string): AuthContent {
-    const normalized = (locale ?? i18n.defaultLocale) as Locale;
-    if (contentMap[normalized]) {
-        return contentMap[normalized];
-    }
+  const normalized = (locale ?? i18n.defaultLocale) as Locale;
+  if (contentMap[normalized]) {
+    return contentMap[normalized];
+  }
 
-    return contentMap[i18n.defaultLocale];
+  return contentMap[i18n.defaultLocale];
 }
 
 export type { AuthContent } from "./types";

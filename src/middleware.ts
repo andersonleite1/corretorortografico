@@ -7,13 +7,13 @@ const PUBLIC_FILE = /\.[^/]+$/;
 
 // Rotas que requerem autenticação
 const isProtectedRoute = createRouteMatcher([
-  "/:locale/editor(.*)",     // Editor principal (com locale)
-  "/editor(.*)",             // Editor principal (sem locale)
-  "/:locale/settings(.*)",   // Configurações
+  "/:locale/editor(.*)", // Editor principal (com locale)
+  "/editor(.*)", // Editor principal (sem locale)
+  "/:locale/settings(.*)", // Configurações
   "/settings(.*)",
-  "/api/ai(.*)",             // APIs de IA
+  "/api/ai(.*)", // APIs de IA
   "/api/documents(.*)",
-  "/api/editor-settings(.*)",  // Configurações do editor (multi-tenant)
+  "/api/editor-settings(.*)", // Configurações do editor (multi-tenant)
   "/api/images(.*)",
 ]);
 
@@ -27,8 +27,12 @@ function getLocale(request: NextRequest): string {
   if (!acceptLanguage) return defaultLocale;
 
   // Parsing simples: pega o primeiro idioma suportado no header ou o default
-  const languages = acceptLanguage.split(",").map((l) => l.split(";")[0].trim().split("-")[0]);
-  const matched = languages.find((lang) => (locales as readonly string[]).includes(lang));
+  const languages = acceptLanguage
+    .split(",")
+    .map((l) => l.split(";")[0].trim().split("-")[0]);
+  const matched = languages.find((lang) =>
+    (locales as readonly string[]).includes(lang),
+  );
 
   return matched || defaultLocale;
 }
@@ -54,13 +58,19 @@ function i18nMiddleware(request: NextRequest) {
 
   // Verifica se o pathname já começa com um locale suportado
   const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
   if (pathnameHasLocale) {
     // Normalização: se é o default locale na URL, remove (canonical URL)
-    if (pathname.startsWith(`/${defaultLocale}/`) || pathname === `/${defaultLocale}`) {
-      const newPath = pathname === `/${defaultLocale}` ? "/" : pathname.replace(`/${defaultLocale}/`, "/");
+    if (
+      pathname.startsWith(`/${defaultLocale}/`) ||
+      pathname === `/${defaultLocale}`
+    ) {
+      const newPath =
+        pathname === `/${defaultLocale}`
+          ? "/"
+          : pathname.replace(`/${defaultLocale}/`, "/");
       const url = new URL(newPath, request.url);
       url.search = request.nextUrl.search; // Preserva query params
       return NextResponse.redirect(url);
@@ -70,9 +80,10 @@ function i18nMiddleware(request: NextRequest) {
 
   // Se não tem locale, resolve qual usar
   const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
-  const locale = cookieLocale && locales.includes(cookieLocale as any)
-    ? cookieLocale
-    : getLocale(request);
+  const locale =
+    cookieLocale && locales.includes(cookieLocale as any)
+      ? cookieLocale
+      : getLocale(request);
 
   // Redireciona para o locale correto
   // Se for o default locale, faz rewrite (não aparece na URL)

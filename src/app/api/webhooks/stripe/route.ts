@@ -9,125 +9,137 @@ import type { Stripe } from "stripe";
 export const runtime = "nodejs";
 
 async function handleSubscriptionUpsert(
-    stripeSub: Stripe.Subscription,
-    userId?: string
+  stripeSub: Stripe.Subscription,
+  userId?: string,
 ) {
-    const priceId = stripeSub.items.data[0]?.price.id;
-    const plan = PLAN_BY_PRICE_ID[priceId] ?? "free";
+  const priceId = stripeSub.items.data[0]?.price.id;
+  const plan = PLAN_BY_PRICE_ID[priceId] ?? "free";
 
-    const data = {
-        stripeSubscriptionId: stripeSub.id,
-        stripePriceId: priceId,
-        stripeCurrentPeriodEnd: new Date((stripeSub.items.data[0]?.current_period_end ?? 0) * 1000),
-        status: stripeSub.status,
-        plan,
-    };
+  const data = {
+    stripeSubscriptionId: stripeSub.id,
+    stripePriceId: priceId,
+    stripeCurrentPeriodEnd: new Date(
+      (stripeSub.items.data[0]?.current_period_end ?? 0) * 1000,
+    ),
+    status: stripeSub.status,
+    plan,
+  };
 
-    // Buscar userId via metadata da subscription ou do Customer
-    let targetUserId = userId;
-    if (!targetUserId) {
-        const customer = await stripe.customers.retrieve(stripeSub.customer as string) as Stripe.Customer;
-        // @ts-ignore - metadata isn't always typed as we expect but we set it
-        targetUserId = customer.metadata?.userId;
-
-        if (!targetUserId) {
-            const user = await db.user.findUnique({ where: { stripeCustomerId: customer.id } });
-            targetUserId = user?.id;
-        }
-    }
+  // Buscar userId via metadata da subscription ou do Customer
+  let targetUserId = userId;
+  if (!targetUserId) {
+    const customer = (await stripe.customers.retrieve(
+      stripeSub.customer as string,
+    )) as Stripe.Customer;
+    targetUserId = customer.metadata?.userId;
 
     if (!targetUserId) {
-        console.error("userId não encontrado para subscription:", stripeSub.id);
-        return;
+      const user = await db.user.findUnique({
+        where: { stripeCustomerId: customer.id },
+      });
+      targetUserId = user?.id;
     }
+  }
 
-    await db.subscription.upsert({
-        where: { userId: targetUserId },
-        create: { userId: targetUserId, ...data },
-        update: data,
-    });
+  if (!targetUserId) {
+    console.error("userId não encontrado para subscription:", stripeSub.id);
+    return;
+  }
 
-    console.log(`✅ Subscription atualizada: userId=${targetUserId}, plano=${plan}`);
+  await db.subscription.upsert({
+    where: { userId: targetUserId },
+    create: { userId: targetUserId, ...data },
+    update: data,
+  });
+
+  console.log(
+    `✅ Subscription atualizada: userId=${targetUserId}, plano=${plan}`,
+  );
 }
 
 export async function POST(req: Request) {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    if (!webhookSecret) {
-        console.error("STRIPE_WEBHOOK_SECRET is not set");
-        return new NextResponse("Configuração do servidor ausente.", { status: 500 });
+  if (!webhookSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET is not set");
+    return new NextResponse("Configuração do servidor ausente.", {
+      status: 500,
+    });
+  }
+
+  const body = await req.text();
+  const signature = (await headers()).get("stripe-signature");
+
+  if (!signature) {
+    console.error("Missing stripe-signature header");
+    return NextResponse.json(
+      { error: "Missing stripe-signature header" },
+      { status: 400 },
+    );
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err: any) {
+    console.error("Webhook inválido:", err.message);
+    return new NextResponse("Webhook inválido.", { status: 400 });
+  }
+
+  // ===== Tratar eventos =====
+  switch (event.type) {
+    // ✅ Assinatura criada ou atualizada
+    case "customer.subscription.created":
+    case "customer.subscription.updated": {
+      const sub = event.data.object as Stripe.Subscription;
+      const userId = sub.metadata?.userId;
+      await handleSubscriptionUpsert(sub, userId);
+      break;
     }
 
-    const body = await req.text();
-    const signature = (await headers()).get("stripe-signature");
-
-    if (!signature) {
-        console.error('Missing stripe-signature header');
-        return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+    // ❌ Assinatura cancelada
+    case "customer.subscription.deleted": {
+      const sub = event.data.object as Stripe.Subscription;
+      await db.subscription.updateMany({
+        where: { stripeSubscriptionId: sub.id },
+        data: { status: "canceled", plan: "free" },
+      });
+      console.log(`🗑️ Subscription cancelada: ${sub.id}`);
+      break;
     }
 
-    let event: Stripe.Event;
+    // ⚠️ Pagamento falhou
+    case "invoice.payment_failed": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subId =
+        (invoice as any).subscription ||
+        invoice.parent?.subscription_details?.subscription;
+      if (subId) {
+        await db.subscription.updateMany({
+          where: { stripeSubscriptionId: subId as string },
+          data: { status: "past_due" },
+        });
+      }
+      // TODO: Enviar email de alerta ao usuário
+      break;
+    }
 
-    try {
-        event = stripe.webhooks.constructEvent(
-            body,
-            signature,
-            webhookSecret
+    // 🛒 Checkout concluído — garante criação da subscription
+    case "checkout.session.completed": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      if (session.mode === "subscription" && session.subscription) {
+        const sub = await stripe.subscriptions.retrieve(
+          session.subscription as string,
         );
-    } catch (err: any) {
-        console.error("Webhook inválido:", err.message);
-        return new NextResponse("Webhook inválido.", { status: 400 });
+        await handleSubscriptionUpsert(sub, session.metadata?.userId);
+      }
+      break;
     }
 
-    // ===== Tratar eventos =====
-    switch (event.type) {
-        // ✅ Assinatura criada ou atualizada
-        case "customer.subscription.created":
-        case "customer.subscription.updated": {
-            const sub = event.data.object as Stripe.Subscription;
-            const userId = sub.metadata?.userId;
-            await handleSubscriptionUpsert(sub, userId);
-            break;
-        }
+    default:
+      console.log(`Evento Stripe não tratado: ${event.type}`);
+  }
 
-        // ❌ Assinatura cancelada
-        case "customer.subscription.deleted": {
-            const sub = event.data.object as Stripe.Subscription;
-            await db.subscription.updateMany({
-                where: { stripeSubscriptionId: sub.id },
-                data: { status: "canceled", plan: "free" },
-            });
-            console.log(`🗑️ Subscription cancelada: ${sub.id}`);
-            break;
-        }
-
-        // ⚠️ Pagamento falhou
-        case "invoice.payment_failed": {
-            const invoice = event.data.object as Stripe.Invoice;
-            const subId = (invoice as any).subscription || invoice.parent?.subscription_details?.subscription;
-            if (subId) {
-                await db.subscription.updateMany({
-                    where: { stripeSubscriptionId: subId as string },
-                    data: { status: "past_due" },
-                });
-            }
-            // TODO: Enviar email de alerta ao usuário
-            break;
-        }
-
-        // 🛒 Checkout concluído — garante criação da subscription
-        case "checkout.session.completed": {
-            const session = event.data.object as Stripe.Checkout.Session;
-            if (session.mode === "subscription" && session.subscription) {
-                const sub = await stripe.subscriptions.retrieve(session.subscription as string);
-                await handleSubscriptionUpsert(sub, session.metadata?.userId);
-            }
-            break;
-        }
-
-        default:
-            console.log(`Evento Stripe não tratado: ${event.type}`);
-    }
-
-    return new NextResponse("OK", { status: 200 });
+  return new NextResponse("OK", { status: 200 });
 }

@@ -1,3 +1,3 @@
 export interface HeaderContent {
-    selectLanguage: string;
+  selectLanguage: string;
 }

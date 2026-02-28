@@ -1,11 +1,8 @@
 import React, { useCallback, useMemo } from "react";
 import MenuButton from "../MenuButton";
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "../ui/DropdownMenu";
+import { DropdownMenuItem, DropdownMenuSeparator } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
-import Icon from "../ui/Icon";
+
 import { FaHistory, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { useAuth } from "@clerk/nextjs";
 
@@ -25,7 +22,7 @@ const DraftsDropdown = () => {
     (id: string) => {
       draftActions?.onLoadDraft?.(id);
     },
-    [draftActions]
+    [draftActions],
   );
 
   const handleDelete = useCallback(
@@ -34,7 +31,7 @@ const DraftsDropdown = () => {
       event.stopPropagation();
       draftActions?.onDeleteDraft?.(id);
     },
-    [draftActions]
+    [draftActions],
   );
 
   if (!draftActions || !isSignedIn) {
@@ -73,7 +70,9 @@ const DraftsDropdown = () => {
       <div className="max-h-[300px] overflow-y-auto">
         {orderedDrafts.length === 0 ? (
           <div className="px-3 py-8 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.drafts.empty}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {messages.drafts.empty}
+            </p>
           </div>
         ) : (
           orderedDrafts.map((draft) => (

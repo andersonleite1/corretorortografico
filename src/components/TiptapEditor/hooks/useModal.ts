@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 export default function useModal() {
   const [open, setOpen] = useState(false);
@@ -13,7 +13,7 @@ export default function useModal() {
     setOpen(false);
     document.documentElement.style.overflow = "";
     document.body.style.paddingRight = "";
-  }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

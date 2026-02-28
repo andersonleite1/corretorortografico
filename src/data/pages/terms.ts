@@ -80,7 +80,8 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
     locale: "en",
     metadata: {
       title: "Terms of Use | Online Text Editor",
-      description: "Terms and conditions for using the Online Text Editor platform.",
+      description:
+        "Terms and conditions for using the Online Text Editor platform.",
     },
     title: "Terms of Use",
     introHtml:
@@ -120,7 +121,8 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
     locale: "es",
     metadata: {
       title: "Términos de Uso | Editor de Texto en Línea",
-      description: "Términos y condiciones de uso del Editor de Texto en Línea.",
+      description:
+        "Términos y condiciones de uso del Editor de Texto en Línea.",
     },
     title: "Términos de Uso",
     introHtml:
@@ -174,7 +176,7 @@ export function buildTermsMetadata(locale: string): Metadata {
     i18n.locales.map((loc) => [
       HREF_LANG_MAP[loc] ?? loc,
       `${BASE_URL}${TERMS_PATHS[loc]}`,
-    ])
+    ]),
   );
 
   languages["x-default"] = `${BASE_URL}${TERMS_PATHS[i18n.defaultLocale]}`;

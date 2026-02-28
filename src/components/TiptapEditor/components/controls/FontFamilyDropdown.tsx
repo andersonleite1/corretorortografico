@@ -11,15 +11,18 @@ const FontFamilyDropdown = () => {
 
   const currentFont = useEditorState({
     editor,
-    selector: ({ editor }) => editor.getAttributes("textStyle").fontFamily as string | undefined,
+    selector: ({ editor }) =>
+      editor.getAttributes("textStyle").fontFamily as string | undefined,
   });
 
   const options = useMemo(
     () =>
       FONT_FAMILY_OPTIONS.map((option, index) =>
-        index === 0 ? { ...option, label: messages.fontFamily.default } : option
+        index === 0
+          ? { ...option, label: messages.fontFamily.default }
+          : option,
       ),
-    [messages.fontFamily.default]
+    [messages.fontFamily.default],
   );
   const normalizedCurrent = currentFont ?? "";
 
@@ -39,7 +42,7 @@ const FontFamilyDropdown = () => {
 
       chain.setFontFamily(value).run();
     },
-    [editor]
+    [editor],
   );
 
   if (!editor) return null;

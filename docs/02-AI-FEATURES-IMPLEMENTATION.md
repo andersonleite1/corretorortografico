@@ -11,6 +11,7 @@ npm install ai @ai-sdk/openai zod
 ```
 
 ### `.env.local`
+
 ```env
 OPENAI_API_KEY=sk-proj-xxx
 AI_MODEL=gpt-4o-mini
@@ -50,21 +51,33 @@ const TONE_PROMPTS = {
 export async function POST(req: Request) {
   // 1. Autenticação
   const { userId: clerkId } = await auth();
-  if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  if (!clerkId)
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
 
   // 2. Buscar usuário e plano
   const user = await db.user.findUnique({
     where: { clerkId },
     include: { subscription: true },
   });
-  if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+  if (!user)
+    return NextResponse.json(
+      { error: "Usuário não encontrado." },
+      { status: 404 },
+    );
 
   // 3. Rate Limiting
-  const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "free");
+  const rateLimit = await checkAiRateLimit(
+    user.id,
+    user.subscription?.plan ?? "free",
+  );
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "Limite de uso gratuito atingido.", message: `${rateLimit.used}/${rateLimit.limit} usos hoje. Faça upgrade para Pro.`, upgradeUrl: "/pricing" },
-      { status: 429 }
+      {
+        error: "Limite de uso gratuito atingido.",
+        message: `${rateLimit.used}/${rateLimit.limit} usos hoje. Faça upgrade para Pro.`,
+        upgradeUrl: "/pricing",
+      },
+      { status: 429 },
     );
   }
 
@@ -74,14 +87,23 @@ export async function POST(req: Request) {
   // 5. Chamada IA com streaming
   const result = await streamText({
     model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
-    system: "Você é um assistente de escrita. Responda APENAS com o texto reescrito, sem explicações.",
-    messages: [{
-      role: "user",
-      content: `Reescreva ${TONE_PROMPTS[tone]}. Idioma: ${language}.\n\nTexto:\n${text}`,
-    }],
+    system:
+      "Você é um assistente de escrita. Responda APENAS com o texto reescrito, sem explicações.",
+    messages: [
+      {
+        role: "user",
+        content: `Reescreva ${TONE_PROMPTS[tone]}. Idioma: ${language}.\n\nTexto:\n${text}`,
+      },
+    ],
     maxTokens: 2000,
     onFinish: async ({ usage }) => {
-      await db.aiUsage.create({ data: { userId: user.id, feature: "rewrite", tokensUsed: usage.totalTokens } });
+      await db.aiUsage.create({
+        data: {
+          userId: user.id,
+          feature: "rewrite",
+          tokensUsed: usage.totalTokens,
+        },
+      });
     },
   });
 
@@ -103,7 +125,8 @@ const PLAN_LIMITS = { free: 5, pro: Infinity, team: Infinity } as const;
 export async function checkAiRateLimit(userId: string, plan: string) {
   const limit = PLAN_LIMITS[plan as keyof typeof PLAN_LIMITS] ?? 5;
 
-  if (limit === Infinity) return { allowed: true, used: 0, limit: -1, remaining: -1 };
+  if (limit === Infinity)
+    return { allowed: true, used: 0, limit: -1, remaining: -1 };
 
   const since = new Date();
   since.setHours(0, 0, 0, 0); // Reseta à meia-noite
@@ -112,7 +135,12 @@ export async function checkAiRateLimit(userId: string, plan: string) {
     where: { userId, createdAt: { gte: since } },
   });
 
-  return { allowed: used < limit, used, limit, remaining: Math.max(0, limit - used) };
+  return {
+    allowed: used < limit,
+    used,
+    limit,
+    remaining: Math.max(0, limit - used),
+  };
 }
 ```
 
@@ -228,28 +256,53 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   const { userId: clerkId } = await auth();
-  if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  if (!clerkId)
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
 
-  const user = await db.user.findUnique({ where: { clerkId }, include: { subscription: true } });
-  if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+  const user = await db.user.findUnique({
+    where: { clerkId },
+    include: { subscription: true },
+  });
+  if (!user)
+    return NextResponse.json(
+      { error: "Usuário não encontrado." },
+      { status: 404 },
+    );
 
-  const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "free");
+  const rateLimit = await checkAiRateLimit(
+    user.id,
+    user.subscription?.plan ?? "free",
+  );
   if (!rateLimit.allowed) {
-    return NextResponse.json({ error: "Limite atingido.", upgradeUrl: "/pricing" }, { status: 429 });
+    return NextResponse.json(
+      { error: "Limite atingido.", upgradeUrl: "/pricing" },
+      { status: 429 },
+    );
   }
 
-  const { content, to } = z.object({
-    content: z.string().min(1).max(10000),
-    to: z.string().min(2),
-  }).parse(await req.json());
+  const { content, to } = z
+    .object({
+      content: z.string().min(1).max(10000),
+      to: z.string().min(2),
+    })
+    .parse(await req.json());
 
   const result = await streamText({
     model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
-    system: "Tradutor profissional. Preserve toda a formatação HTML. Retorne APENAS o HTML traduzido.",
-    messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }],
+    system:
+      "Tradutor profissional. Preserve toda a formatação HTML. Retorne APENAS o HTML traduzido.",
+    messages: [
+      { role: "user", content: `Traduza para "${to}":\n\n${content}` },
+    ],
     maxTokens: 4000,
     onFinish: async ({ usage }) => {
-      await db.aiUsage.create({ data: { userId: user.id, feature: "translate", tokensUsed: usage.totalTokens } });
+      await db.aiUsage.create({
+        data: {
+          userId: user.id,
+          feature: "translate",
+          tokensUsed: usage.totalTokens,
+        },
+      });
     },
   });
 
@@ -275,23 +328,43 @@ export const runtime = "nodejs";
 
 const seoSchema = z.object({
   readabilityScore: z.number().min(0).max(100),
-  readabilityLevel: z.enum(["Muito Fácil", "Fácil", "Médio", "Difícil", "Muito Difícil"]),
+  readabilityLevel: z.enum([
+    "Muito Fácil",
+    "Fácil",
+    "Médio",
+    "Difícil",
+    "Muito Difícil",
+  ]),
   sentiment: z.enum(["Positivo", "Neutro", "Negativo"]),
-  keyDensity: z.array(z.object({ word: z.string(), count: z.number(), percentage: z.number() })),
-  suggestions: z.array(z.object({ type: z.enum(["warning", "tip", "error"]), message: z.string() })),
+  keyDensity: z.array(
+    z.object({ word: z.string(), count: z.number(), percentage: z.number() }),
+  ),
+  suggestions: z.array(
+    z.object({
+      type: z.enum(["warning", "tip", "error"]),
+      message: z.string(),
+    }),
+  ),
   seoTitle: z.string(),
   metaDescription: z.string().max(160),
 });
 
 export async function POST(req: Request) {
   const { userId: clerkId } = await auth();
-  if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  if (!clerkId)
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
 
-  const user = await db.user.findUnique({ where: { clerkId }, include: { subscription: true } });
+  const user = await db.user.findUnique({
+    where: { clerkId },
+    include: { subscription: true },
+  });
 
   // SEO é exclusivo para Pro
   if (!user?.subscription || user.subscription.plan === "free") {
-    return NextResponse.json({ error: "SEO é exclusivo Pro+.", upgradeUrl: "/pricing" }, { status: 403 });
+    return NextResponse.json(
+      { error: "SEO é exclusivo Pro+.", upgradeUrl: "/pricing" },
+      { status: 403 },
+    );
   }
 
   const { content, title } = await req.json();
@@ -302,7 +375,9 @@ export async function POST(req: Request) {
     prompt: `Analise o seguinte artigo e retorne análise SEO completa.\nTítulo: ${title ?? "Sem título"}\n\n${content}`,
   });
 
-  await db.aiUsage.create({ data: { userId: user.id, feature: "seo", tokensUsed: 500 } });
+  await db.aiUsage.create({
+    data: { userId: user.id, feature: "seo", tokensUsed: 500 },
+  });
 
   return NextResponse.json(object);
 }

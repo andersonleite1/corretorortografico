@@ -13,7 +13,13 @@ interface LinkEditProps {
   onApply: (url: string, text?: string) => void;
 }
 
-const LinkEdit = ({ initialUrl, initialText, isCreate, onApply, onCancel }: LinkEditProps) => {
+const LinkEdit = ({
+  initialUrl,
+  initialText,
+  isCreate,
+  onApply,
+  onCancel,
+}: LinkEditProps) => {
   const [url, setUrl] = useState(initialUrl || "");
   const [text, setText] = useState(initialText || "");
   const [canSubmit, setCanSubmit] = useState(isCreate);

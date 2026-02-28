@@ -3,10 +3,12 @@
 Este guia detalha os passos necessários no Dashboard do Stripe para conectar a aplicação e habilitar o sistema de assinaturas.
 
 ## 1. Criar Conta e Ativar Modo de Teste
+
 1. Acesse [stripe.com](https://stripe.com) e crie sua conta.
 2. No Dashboard, ative a chave **"Test mode"** (Modo de teste) no canto superior direito para não usar dinheiro real.
 
 ## 2. Criar Produtos e Preços
+
 A aplicação espera dois planos: **Pro** e **Team**.
 
 1. Vá para **Product Catalog** -> **Add Product**.
@@ -22,6 +24,7 @@ A aplicação espera dois planos: **Pro** e **Team**.
    - **Importante:** Salve o produto e copie o **API ID**.
 
 ## 3. Configurar o Portal do Cliente (Billing Portal)
+
 Isso permite que os usuários gerenciem cartões e cancelem assinaturas sem código adicional.
 
 1. Vá em **Settings** (ícone de engrenagem) -> **Billing** -> **Customer portal**.
@@ -29,12 +32,13 @@ Isso permite que os usuários gerenciem cartões e cancelem assinaturas sem cód
 3. Salve as mudanças.
 
 ## 4. Configurar Webhooks
+
 Os webhooks informam sua aplicação quando um pagamento é aprovado ou uma assinatura é cancelada.
 
 1. Vá em **Developers** -> **Webhooks**.
 2. Clique em **Add endpoint**.
 3. **Endpoint URL:** `https://seu-dominio.com/api/webhooks/stripe`
-   - *Para testes locais, veja a seção abaixo sobre Stripe CLI.*
+   - _Para testes locais, veja a seção abaixo sobre Stripe CLI._
 4. **Select events:** Adicione os seguintes eventos:
    - `checkout.session.completed`
    - `customer.subscription.created`
@@ -44,6 +48,7 @@ Os webhooks informam sua aplicação quando um pagamento é aprovado ou uma assi
 5. Após criar, copie a **Signing secret** (começa com `whsec_...`).
 
 ## 5. Atualizar o `.env.local`
+
 Copie as chaves para o seu arquivo `.env.local`:
 
 ```env
@@ -64,6 +69,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ---
 
 ## 🛠️ Testando Localmente (Recomendado)
+
 Para testar os webhooks sem publicar o site, use o **Stripe CLI**:
 
 1. [Instale o Stripe CLI](https://stripe.com/docs/stripe-cli).

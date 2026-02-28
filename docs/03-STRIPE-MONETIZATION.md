@@ -11,6 +11,7 @@ npm install stripe @stripe/stripe-js
 ```
 
 ### `.env.local`
+
 ```env
 # ===== STRIPE =====
 STRIPE_SECRET_KEY=sk_test_xxx               # Chave secreta (nunca exponha!)
@@ -32,10 +33,10 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000   # Em produção: https://seudominio.
 1. Acesse [dashboard.stripe.com/products](https://.stripe.com/products)
 2. Crie dois produtos:
 
-| Produto | Nome | Preço | Periodicidade | Metadata |
-| :--- | :---: | :---: | :---: | :--- |
-| **Pro Creator** | Pro Creator | $12 | Mensal | `plan=pro` |
-| **Team Business** | Team Business | $25/usuário | Mensal | `plan=team` |
+| Produto           |     Nome      |    Preço    | Periodicidade | Metadata    |
+| :---------------- | :-----------: | :---------: | :-----------: | :---------- |
+| **Pro Creator**   |  Pro Creator  |     $12     |    Mensal     | `plan=pro`  |
+| **Team Business** | Team Business | $25/usuário |    Mensal     | `plan=team` |
 
 3. Copie os **Price IDs** (ex: `price_1abc...`) para o `.env.local`
 
@@ -80,10 +81,15 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   const { userId: clerkId } = await auth();
-  if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  if (!clerkId)
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
 
   const user = await db.user.findUnique({ where: { clerkId } });
-  if (!user) return NextResponse.json({ error: "Usuário não encontrado." }, { status: 404 });
+  if (!user)
+    return NextResponse.json(
+      { error: "Usuário não encontrado." },
+      { status: 404 },
+    );
 
   const { priceId } = schema.parse(await req.json());
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
@@ -145,7 +151,7 @@ export const runtime = "nodejs";
 
 async function handleSubscriptionUpsert(
   subscription: Stripe.Subscription,
-  userId?: string
+  userId?: string,
 ) {
   const priceId = subscription.items.data[0]?.price.id;
   const plan = PLAN_BY_PRICE_ID[priceId] ?? "free";
@@ -161,8 +167,12 @@ async function handleSubscriptionUpsert(
   // Buscar userId via metadata da subscription ou do Customer
   let targetUserId = userId;
   if (!targetUserId) {
-    const customer = await stripe.customers.retrieve(subscription.customer as string) as Stripe.Customer;
-    const user = await db.user.findUnique({ where: { stripeCustomerId: customer.id } });
+    const customer = (await stripe.customers.retrieve(
+      subscription.customer as string,
+    )) as Stripe.Customer;
+    const user = await db.user.findUnique({
+      where: { stripeCustomerId: customer.id },
+    });
     targetUserId = user?.id;
   }
 
@@ -177,7 +187,9 @@ async function handleSubscriptionUpsert(
     update: data,
   });
 
-  console.log(`✅ Subscription atualizada: userId=${targetUserId}, plano=${plan}`);
+  console.log(
+    `✅ Subscription atualizada: userId=${targetUserId}, plano=${plan}`,
+  );
 }
 
 export async function POST(req: Request) {
@@ -190,7 +202,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET!,
     );
   } catch (err) {
     console.error("Webhook inválido:", err);
@@ -235,7 +247,9 @@ export async function POST(req: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.CheckoutSession;
       if (session.mode === "subscription" && session.subscription) {
-        const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+        const sub = await stripe.subscriptions.retrieve(
+          session.subscription as string,
+        );
         await handleSubscriptionUpsert(sub, session.metadata?.userId);
       }
       break;
@@ -265,12 +279,16 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
   const { userId: clerkId } = await auth();
-  if (!clerkId) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  if (!clerkId)
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
 
   const user = await db.user.findUnique({ where: { clerkId } });
 
   if (!user?.stripeCustomerId) {
-    return NextResponse.json({ error: "Nenhuma assinatura ativa." }, { status: 404 });
+    return NextResponse.json(
+      { error: "Nenhuma assinatura ativa." },
+      { status: 404 },
+    );
   }
 
   const session = await stripe.billingPortal.sessions.create({
@@ -301,19 +319,19 @@ async function handleManageSubscription() {
 
 ## 💰 3.7 Lógica de Planos — Comparativo
 
-| Recurso | Free | Pro ($12/mês) | Team ($25/user) |
-| :--- | :---: | :---: | :---: |
-| Editor WYSIWYG | ✅ | ✅ | ✅ |
-| Exportação PDF/TXT | ✅ | ✅ | ✅ |
-| Rascunhos (local) | ✅ 10 rascunhos | ✅ Ilimitado | ✅ Ilimitado |
-| Modo Fonte (CodeMirror) | ✅ | ✅ + Prettier | ✅ + API Access |
-| **IA: Reescrita de Tom** | 5×/dia | ✅ Ilimitado | ✅ |
-| **IA: Tradução Neural** | ❌ | ✅ | ✅ |
-| **IA: Análise SEO** | ❌ | ✅ | ✅ |
-| **IA: Transcrição de Áudio** | ❌ | ✅ | ✅ |
-| Sync em Nuvem | ❌ | ✅ | ✅ |
-| Colaboração em Tempo Real | ❌ | ❌ | ✅ |
-| Suporte | Comunidade | Prioritário | Gerente de Contas |
+| Recurso                      |      Free       | Pro ($12/mês) |  Team ($25/user)  |
+| :--------------------------- | :-------------: | :-----------: | :---------------: |
+| Editor WYSIWYG               |       ✅        |      ✅       |        ✅         |
+| Exportação PDF/TXT           |       ✅        |      ✅       |        ✅         |
+| Rascunhos (local)            | ✅ 10 rascunhos | ✅ Ilimitado  |   ✅ Ilimitado    |
+| Modo Fonte (CodeMirror)      |       ✅        | ✅ + Prettier |  ✅ + API Access  |
+| **IA: Reescrita de Tom**     |     5×/dia      | ✅ Ilimitado  |        ✅         |
+| **IA: Tradução Neural**      |       ❌        |      ✅       |        ✅         |
+| **IA: Análise SEO**          |       ❌        |      ✅       |        ✅         |
+| **IA: Transcrição de Áudio** |       ❌        |      ✅       |        ✅         |
+| Sync em Nuvem                |       ❌        |      ✅       |        ✅         |
+| Colaboração em Tempo Real    |       ❌        |      ❌       |        ✅         |
+| Suporte                      |   Comunidade    |  Prioritário  | Gerente de Contas |
 
 ---
 

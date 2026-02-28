@@ -1,7 +1,5 @@
 import { i18n, type Locale } from "../../../i18n-config";
 
-
-
 export type EditPageMessages = {
   form: {
     labels: {
@@ -53,7 +51,6 @@ export type EditPageMessages = {
     pdfLang: string;
     dateLocale: string;
   };
-
 };
 
 const editMessages: Record<Locale, EditPageMessages> = {
@@ -64,7 +61,8 @@ const editMessages: Record<Locale, EditPageMessages> = {
         content: "Conteúdo",
       },
       placeholders: {
-        title: "Digite o título da postagem ou nome do arquivo que será exportado...",
+        title:
+          "Digite o título da postagem ou nome do arquivo que será exportado...",
         content: "Digite seu conteúdo aqui...",
         imageCaption: "Digite a legenda da imagem (opcional)",
       },
@@ -108,7 +106,6 @@ const editMessages: Record<Locale, EditPageMessages> = {
       pdfLang: "pt-BR",
       dateLocale: "pt-BR",
     },
-
   },
   en: {
     form: {
@@ -161,7 +158,6 @@ const editMessages: Record<Locale, EditPageMessages> = {
       pdfLang: "en",
       dateLocale: "en-US",
     },
-
   },
   es: {
     form: {
@@ -170,7 +166,8 @@ const editMessages: Record<Locale, EditPageMessages> = {
         content: "Contenido",
       },
       placeholders: {
-        title: "Escribe el título o el nombre del archivo que vas a exportar...",
+        title:
+          "Escribe el título o el nombre del archivo que vas a exportar...",
         content: "Empieza a escribir tu contenido aquí...",
         imageCaption: "Agrega el pie de foto (opcional)",
       },
@@ -214,11 +211,11 @@ const editMessages: Record<Locale, EditPageMessages> = {
       pdfLang: "es",
       dateLocale: "es-ES",
     },
-
   },
 };
 
 export const getEditMessages = (locale?: Locale): EditPageMessages => {
-  const normalized = locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
+  const normalized =
+    locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
   return editMessages[normalized];
 };

@@ -63,7 +63,9 @@ import {
   TbSquareCheck,
   TbSquare,
   TbSettings,
-  TbKeyboard
+  TbKeyboard,
+  TbInfoCircle,
+  TbAlertTriangle,
 } from "react-icons/tb";
 import { MdHistory } from "react-icons/md";
 import { RiTextSpacing } from "react-icons/ri";
@@ -154,6 +156,8 @@ export const icons = {
   History: MdHistory,
   Settings: TbSettings,
   Keyboard: TbKeyboard,
+  Info: TbInfoCircle,
+  Alert: TbAlertTriangle,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { html } from "@codemirror/lang-html";
@@ -10,7 +10,7 @@ interface UseCodeMirrorProps {
   onChange?: (content: string) => void;
 }
 
-export function useCodeMirror({ initialContent, onChange }: UseCodeMirrorProps) {
+export function useCodeMirror({ initialContent }: UseCodeMirrorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -54,7 +54,6 @@
     &:has(.cm-editor) {
       padding-inline: 1rem;
     }
-
   }
 }
 
@@ -213,11 +212,13 @@ div:has(.lt-menu-card) {
 .rte-heading-dropdown {
   min-width: 10rem;
 
-  @each $heading, $size in ("p": "sm", "h1": "2xl", "h2": "xl", "h3": "lg", "h4": "base") {
+  @each $heading,
+    $size in ("p": "sm", "h1": "2xl", "h2": "xl", "h3": "lg", "h4": "base")
+  {
     [data-heading="#{$heading}"] {
       @include font-size($size);
 
-      @if $heading !="p" {
+      @if $heading != "p" {
         font-weight: bold;
       }
     }

@@ -13,11 +13,17 @@ export const components: Partial<Components> = {
   h2: (props) => <HeadingWithAnchor level={2} {...props} />,
   h3: (props) => <HeadingWithAnchor level={3} {...props} />,
   h4: (props) => <HeadingWithAnchor level={4} {...props} />,
-  img: ({ src, alt, width, height, ...props }: any) => {
-    const finalWidth = width || props["data-width"];
-    const finalHeight = height || props["data-height"];
+  img: ({
+    src,
+    alt,
+    width,
+    height,
+    ...props
+  }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+    const finalWidth = width || (props as any)["data-width"];
+    const finalHeight = height || (props as any)["data-height"];
 
-    if (finalWidth && finalHeight) {
+    if (src && finalWidth && finalHeight) {
       return (
         <Image
           src={src}
@@ -36,6 +42,7 @@ export const components: Partial<Components> = {
         alt={alt || ""}
         className="mx-auto rounded-lg"
         loading="lazy"
+        {...props}
       />
     );
   },
@@ -58,7 +65,7 @@ export const components: Partial<Components> = {
     return (
       <div className="relative group not-prose rounded-lg overflow-hidden border border-[#d1d9e0] dark:border-[#3d444d]">
         <CopyButton code={String(code)} />
-        <pre {...(props as any)}>{children}</pre>
+        <pre {...props}>{children}</pre>
       </div>
     );
   },
@@ -71,15 +78,22 @@ export const components: Partial<Components> = {
       <code {...props}>{children}</code>
     );
   },
-  table: (props: any) => (
-    <table className="not-prose w-full table-auto border-collapse mx-auto text-sm" {...props} />
+  table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
+    <table
+      className="not-prose w-full table-auto border-collapse mx-auto text-sm"
+      {...props}
+    />
   ),
-  tr: (props: any) => (
+  tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => (
     <tr
       className="border-b last:border-b-0 border-b-[#d1d9e0] dark:border-b-[#3d444d]"
       {...props}
     />
   ),
-  td: (props: any) => <td className="px-2.5 py-3.5" {...props} />,
-  th: (props: any) => <td className="px-2.5 py-3.5 font-bold" {...props} />,
+  td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+    <td className="px-2.5 py-3.5" {...props} />
+  ),
+  th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+    <td className="px-2.5 py-3.5 font-bold" {...props} />
+  ),
 };

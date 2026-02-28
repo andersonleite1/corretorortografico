@@ -1,4 +1,8 @@
-import { ExtendedRegExpMatchArray, isNodeActive, textblockTypeInputRule } from "@tiptap/react";
+import {
+  ExtendedRegExpMatchArray,
+  isNodeActive,
+  textblockTypeInputRule,
+} from "@tiptap/react";
 import { CodeBlockLowlight as TiptapCodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { findLanguage, loadLanguage } from "../../utils/codeLanguageLoader";
 import { LowlightPlugin } from "./lowlight-plugin";

@@ -10,12 +10,16 @@ import Script from "./script";
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
 
-const MediaLibrary = ({ children, onClose, onInsert, onOpen, options = {} }: MediaLibraryProps) => {
+const MediaLibrary = ({
+  children,
+  onClose,
+  onInsert,
+  onOpen,
+  options = {},
+}: MediaLibraryProps) => {
   const cloudinary: any = useRef();
   const widget: any = useRef();
   const widgetContainerRef: any = useRef();
-
-  const [isScriptLoading, setIsScriptLoading] = useState(true);
 
   useEffect(() => {
     function destroy() {
@@ -34,8 +38,6 @@ const MediaLibrary = ({ children, onClose, onInsert, onOpen, options = {} }: Med
   }, []);
 
   function handleOnLoad() {
-    setIsScriptLoading(false);
-
     // Store the Cloudinary window instance to a ref when the page renders
 
     if (!cloudinary.current && typeof window) {

@@ -20,7 +20,7 @@ const TiptapRenderer = ({ children }: TiptapRendererProps) => {
         setContent(output.result);
       })();
     },
-    [children]
+    [children],
   );
 
   return Content;

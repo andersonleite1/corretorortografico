@@ -14,7 +14,8 @@ const es: HomeContent = {
       "editor de blog online",
       "editor web para textos",
     ],
-    openGraphTitle: "Editor de texto online: escribe, formatea y publica más rápido",
+    openGraphTitle:
+      "Editor de texto online: escribe, formatea y publica más rápido",
     openGraphDescription:
       "Organiza ideas, limpia el formato y exporta archivos PDF o DOCX con un editor de texto online ligero y sin instalaciones.",
   },
@@ -46,7 +47,8 @@ const es: HomeContent = {
       },
       {
         title: "Funciones principales",
-        description: "El editor ofrece lo esencial para trabajar con textos profesionales o personales en línea:",
+        description:
+          "El editor ofrece lo esencial para trabajar con textos profesionales o personales en línea:",
         points: [
           "Formatea títulos, listas y párrafos en segundos con atajos conocidos;",
           "Visualiza la apariencia final antes de publicar en un blog o intranet;",
@@ -111,7 +113,8 @@ const es: HomeContent = {
     ],
   },
   hero: {
-    headline: "Donde la Escritura Profesional se Encuentra con la Inteligencia Artificial.",
+    headline:
+      "Donde la Escritura Profesional se Encuentra con la Inteligencia Artificial.",
     subheadline:
       "Transforma tus ideas en documentos impecables con un editor de texto avanzado, corrector gramatical analítico y reescritura inteligente con IA — todo en un solo lugar.",
     ctaLabel: "Empezar a Escribir Gratis",

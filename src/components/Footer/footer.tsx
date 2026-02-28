@@ -4,7 +4,14 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { FaStripe, FaCcVisa, FaCcMastercard, FaInstagram, FaYoutube, FaLinkedin } from "react-icons/fa";
+import {
+  FaStripe,
+  FaCcVisa,
+  FaCcMastercard,
+  FaInstagram,
+  FaYoutube,
+  FaLinkedin,
+} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 import { getFooterContent } from "@/data/footer";
@@ -42,7 +49,8 @@ const Footer = ({ initialLocale }: FooterProps) => {
   }, [pathname, locales, fallbackLocale]);
 
   const content = getFooterContent(currentLocale);
-  const localePrefix = currentLocale === defaultLocale ? "" : `/${currentLocale}`;
+  const localePrefix =
+    currentLocale === defaultLocale ? "" : `/${currentLocale}`;
   const homeHref = currentLocale === defaultLocale ? "/" : `/${currentLocale}`;
   const currentYear = new Date().getFullYear();
 
@@ -51,20 +59,49 @@ const Footer = ({ initialLocale }: FooterProps) => {
       <div className="w-full max-w-screen-xl mx-auto p-4 md:py-8">
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 mb-6 sm:mb-0">
-            <Link href={homeHref} className="flex items-center space-x-3 rtl:space-x-reverse">
-              <span className="self-center text-2xl font-semibold whitespace-nowrap">{content.brandName}</span>
+            <Link
+              href={homeHref}
+              className="flex items-center space-x-3 rtl:space-x-reverse"
+            >
+              <span className="self-center text-2xl font-semibold whitespace-nowrap">
+                {content.brandName}
+              </span>
             </Link>
             <div className="flex items-center gap-4 text-gray-400">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-[#E4405F] transition-colors" title="Instagram">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#E4405F] transition-colors"
+                title="Instagram"
+              >
                 <FaInstagram size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF0000] transition-colors" title="YouTube">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#FF0000] transition-colors"
+                title="YouTube"
+              >
                 <FaYoutube size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" title="X (Twitter)">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+                title="X (Twitter)"
+              >
                 <FaXTwitter size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-[#0077B5] transition-colors" title="LinkedIn">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#0077B5] transition-colors"
+                title="LinkedIn"
+              >
                 <FaLinkedin size={20} />
               </a>
             </div>
@@ -83,7 +120,9 @@ const Footer = ({ initialLocale }: FooterProps) => {
               })}
             </ul>
             <p className="text-xs text-gray-500 italic">
-              {currentLocale === 'pt' ? 'Suas informações estão seguras e criptografadas.' : 'Your information is secure and encrypted.'}
+              {currentLocale === "pt"
+                ? "Suas informações estão seguras e criptografadas."
+                : "Your information is secure and encrypted."}
             </p>
           </div>
         </div>

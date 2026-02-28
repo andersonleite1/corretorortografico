@@ -5,18 +5,18 @@ import pt from "./pt";
 import { HeaderContent } from "./types";
 
 const contentMap: Record<Locale, HeaderContent> = {
-    pt,
-    en,
-    es,
+  pt,
+  en,
+  es,
 };
 
 export function getHeaderContent(locale: string): HeaderContent {
-    const normalized = (locale ?? i18n.defaultLocale) as Locale;
-    if (contentMap[normalized]) {
-        return contentMap[normalized];
-    }
+  const normalized = (locale ?? i18n.defaultLocale) as Locale;
+  if (contentMap[normalized]) {
+    return contentMap[normalized];
+  }
 
-    return contentMap[i18n.defaultLocale];
+  return contentMap[i18n.defaultLocale];
 }
 
 export type { HeaderContent } from "./types";

@@ -1,12 +1,14 @@
-import {BackHomeButton} from "@/components/shared/BackHomeButton";
-import {getContactContent} from "@/data/pages/contact";
-import {Locale} from "../../../../i18n-config";
+import { BackHomeButton } from "@/components/shared/BackHomeButton";
+import { getContactContent } from "@/data/pages/contact";
+import { Locale } from "../../../../i18n-config";
 
 type ContactPageContentProps = {
   locale: Locale;
 };
 
-export default function ContactPageContent({locale}: ContactPageContentProps) {
+export default function ContactPageContent({
+  locale,
+}: ContactPageContentProps) {
   const content = getContactContent(locale);
 
   return (
@@ -58,7 +60,10 @@ export default function ContactPageContent({locale}: ContactPageContentProps) {
             </div>
 
             <div>
-              <label htmlFor="mensagem" className="mb-2 block text-sm font-medium">
+              <label
+                htmlFor="mensagem"
+                className="mb-2 block text-sm font-medium"
+              >
                 {content.form.messageLabel}
               </label>
               <textarea

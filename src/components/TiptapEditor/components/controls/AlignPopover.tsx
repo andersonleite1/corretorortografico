@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Toolbar } from "../ui/Toolbar";
 import MenuButton from "../MenuButton";
@@ -19,8 +19,10 @@ const AlignPopover = () => {
     editor,
     selector: (ctx) => {
       if (ctx.editor.isActive({ textAlign: "right" })) return "AlignRight";
-      else if (ctx.editor.isActive({ textAlign: "center" })) return "AlignCenter";
-      else if (ctx.editor.isActive({ textAlign: "justify" })) return "AlignJustify";
+      else if (ctx.editor.isActive({ textAlign: "center" }))
+        return "AlignCenter";
+      else if (ctx.editor.isActive({ textAlign: "justify" }))
+        return "AlignJustify";
       return "AlignLeft";
     },
   });
@@ -28,7 +30,12 @@ const AlignPopover = () => {
   const isDisabled = !editor.isEditable || !editor.can().setTextAlign("left");
 
   return (
-    <MenuButton type="popover" icon={current} tooltip={messages.toolbar.align} disabled={isDisabled}>
+    <MenuButton
+      type="popover"
+      icon={current}
+      tooltip={messages.toolbar.align}
+      disabled={isDisabled}
+    >
       <PopoverClose asChild>
         <Toolbar dense={true}>
           <AlignLeftButton />

@@ -63,7 +63,7 @@ const toAbsoluteUrl = (path: string) => `${baseUrl}${path}`;
 
 const buildAlternates = (paths: LocalizedRoute["paths"]) => {
   const entries = Object.entries(paths).filter(
-    (entry): entry is [Locale, string] => Boolean(entry[1])
+    (entry): entry is [Locale, string] => Boolean(entry[1]),
   );
 
   if (entries.length <= 1) {

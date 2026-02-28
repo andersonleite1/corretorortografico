@@ -1,4 +1,5 @@
 # Relatório de Qualidade (QA) — Editor de Texto
+
 **Data:** 2026-02-22  
 **Analista:** Antigravity (Agente QA)  
 **Versão do sistema:** `0.1.0` (pré-produção)  
@@ -29,7 +30,8 @@ O sistema foi analisado de forma estática (revisão de código), cobrindo rotas
 **Arquivo:** `src/app/api/pdf/export/route.ts` — Linha 6
 
 ```ts
-const apiKey = process.env.NEXT_PUBLIC_PDF_API_KEY || "3xEt7CBU1XydZFeA4foiNgSGJOfCcwab";
+const apiKey =
+  process.env.NEXT_PUBLIC_PDF_API_KEY || "3xEt7CBU1XydZFeA4foiNgSGJOfCcwab";
 ```
 
 **Problema:** Uma chave de API real está embutida diretamente no código como fallback. Qualquer pessoa com acesso ao repositório (ou ao bundle do cliente se esse código vazar) obtém a chave. A variável usa prefixo `NEXT_PUBLIC_`, o que pode expô-la ao bundle do cliente.
@@ -37,6 +39,7 @@ const apiKey = process.env.NEXT_PUBLIC_PDF_API_KEY || "3xEt7CBU1XydZFeA4foiNgSGJ
 **Impacto:** Comprometimento da chave de API; custos não autorizados na API remota de PDF.
 
 **Correção:**
+
 - Remover o valor hardcoded; usar somente `process.env.NEXT_PUBLIC_PDF_API_KEY`.
 - Renomear para `PDF_API_KEY` (sem `NEXT_PUBLIC_`) pois é usada exclusivamente no servidor.
 - Retornar `500` com mensagem genérica quando a chave estiver ausente.
@@ -54,12 +57,14 @@ export async function POST(req: Request) { ... }
 ```
 
 **Problema:** Qualquer usuário anônimo pode:
+
 - Listar **todas** as imagens do Cloudinary (GET).
 - Fazer upload de arquivos arbitrários para o Cloudinary (POST) sem autenticação, sem validação de tipo, sem limite de tamanho.
 
 **Impacto:** Exposição de conteúdo privado; esgotamento de cota/crédito do Cloudinary; possível upload de conteúdo malicioso.
 
 **Correção:**
+
 - Adicionar verificação de autenticação via Clerk em ambos os handlers.
 - Adicionar validação de tipo MIME (apenas `image/jpeg`, `image/png`, `image/webp`).
 - Limitar o tamanho máximo do arquivo (ex.: 5 MB).
@@ -92,11 +97,14 @@ const rateLimit = await checkAiRateLimit(user.id, user.subscription?.plan ?? "fr
 **Arquivo:** `src/app/api/ai/rewrite/route.ts` — Linhas 105–109
 
 ```ts
-return NextResponse.json({
+return NextResponse.json(
+  {
     error: "Erro interno no servidor debug",
     message: error.message,
-    stack: error.stack   // ← stack trace exposto!
-}, { status: 500 });
+    stack: error.stack, // ← stack trace exposto!
+  },
+  { status: 500 },
+);
 ```
 
 **Problema:** Em caso de erro, o servidor retorna o stack trace completo na resposta HTTP, visível para qualquer cliente. Isso pode revelar caminhos de arquivo internos, versões de dependências e estrutura do código — informação valiosa para atacantes.
@@ -123,7 +131,7 @@ if (req.headers.get("x-diagnose") === "true") {
 }
 ```
 
-**Problema:** Qualquer requisição com o header `x-diagnose: true` retorna informações estruturais internas do banco de dados sem qualquer verificação de autenticação ou autorização (a verificação de auth ocorre *após* esse bloco).
+**Problema:** Qualquer requisição com o header `x-diagnose: true` retorna informações estruturais internas do banco de dados sem qualquer verificação de autenticação ou autorização (a verificação de auth ocorre _após_ esse bloco).
 
 **Impacto:** Information Disclosure sobre o schema interno; endpoint de debug em código de produção.
 
@@ -161,6 +169,7 @@ const skip = (page - 1) * limit;
 **Problema:** Um cliente malicioso pode enviar `?limit=100000` e forçar uma query retornando todos os documentos de um usuário, causando sobrecarga no banco e na memória.
 
 **Correção:**
+
 ```ts
 const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 100);
 ```
@@ -194,7 +203,7 @@ const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 100);
 **Arquivo:** `src/app/api/webhooks/stripe/route.ts` — Linha 63
 
 ```ts
-process.env.STRIPE_WEBHOOK_SECRET!
+process.env.STRIPE_WEBHOOK_SECRET!;
 ```
 
 **Problema:** O uso de `!` (non-null assertion) silencia a verificação de TypeScript. Se a variável não estiver configurada, `stripe.webhooks.constructEvent` lançará um erro pouco descritivo.
@@ -210,6 +219,7 @@ process.env.STRIPE_WEBHOOK_SECRET!
 **Arquivo:** `src/app/api/documents/[id]/drafts/route.ts` — Linhas 79–94
 
 **Problema:** A lógica de throttling/criação de rascunho usa duas queries separadas sem transação:
+
 1. `findFirst` para buscar o rascunho mais recente.
 2. `update` ou `create` condicionalmente.
 
@@ -252,7 +262,7 @@ model: openai("gpt-4o"),  // Hardcoded, ignora AI_MODEL env var
 **Arquivo:** `src/app/api/ai/translate/route.ts` — Linha 33
 
 ```ts
-messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
+messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }];
 ```
 
 **Problema:** O parâmetro `to` (idioma alvo) é inserido diretamente no prompt sem sanitização. Um usuário poderia enviar `to = 'português" e ignore as instruções anteriores e...'` para tentar manipular o comportamento do modelo (Prompt Injection).
@@ -265,26 +275,26 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 
 ### Pontos Fortes ✅
 
-| Área | Avaliação |
-|------|-----------|
+| Área                               | Avaliação                                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Banco de dados (Prisma/PostgreSQL) | Índices definidos nas tabelas críticas (`userId`, `documentId + createdAt`, `userId + createdAt`) |
-| Paginação de documentos | Implementada com `skip/take` |
-| Multi-tenancy | Corretamente isolado por `userId` em todas as queries |
-| Streaming de IA | Usa `streamText` — não bloqueia o servidor enquanto aguarda a resposta da OpenAI |
-| Webhook Stripe | Idempotente com `upsert` |
-| Cache de requisições | `react/cache` evita múltiplos fetches do mesmo usuário no mesmo request |
+| Paginação de documentos            | Implementada com `skip/take`                                                                      |
+| Multi-tenancy                      | Corretamente isolado por `userId` em todas as queries                                             |
+| Streaming de IA                    | Usa `streamText` — não bloqueia o servidor enquanto aguarda a resposta da OpenAI                  |
+| Webhook Stripe                     | Idempotente com `upsert`                                                                          |
+| Cache de requisições               | `react/cache` evita múltiplos fetches do mesmo usuário no mesmo request                           |
 
 ### Riscos de Escalabilidade ⚠️
 
-| Área | Risco | Severidade |
-|------|-------|-----------|
-| **Rate limiting de IA desabilitado** | Custo OpenAI cresce linearmente com usuários sem controle | 🔴 Crítico |
-| **Sem paginação em rascunhos** | `db.draft.findMany` retorna todos os rascunhos sem limite | 🟠 Alto |
-| **Sem cache de configurações do editor** | Cada carregamento do editor faz uma query ao banco | 🟡 Médio |
-| **Sem CDN para Cloudinary** | Imagens são servidas diretamente; sem invalidação programática | 🟡 Médio |
-| **Arquivo de log em disco** | `fs.appendFileSync` bloqueante e não escalável horizontalmente | 🟡 Médio |
-| **Sem fila para chamadas de IA** | Picos de uso podem sobrecarregar a API OpenAI sem backoff | 🟡 Médio |
-| **Sem índice em `AiUsage.feature`** | Queries de rate-limit por feature farão full scan em tabelas grandes | 🟡 Médio |
+| Área                                     | Risco                                                                | Severidade |
+| ---------------------------------------- | -------------------------------------------------------------------- | ---------- |
+| **Rate limiting de IA desabilitado**     | Custo OpenAI cresce linearmente com usuários sem controle            | 🔴 Crítico |
+| **Sem paginação em rascunhos**           | `db.draft.findMany` retorna todos os rascunhos sem limite            | 🟠 Alto    |
+| **Sem cache de configurações do editor** | Cada carregamento do editor faz uma query ao banco                   | 🟡 Médio   |
+| **Sem CDN para Cloudinary**              | Imagens são servidas diretamente; sem invalidação programática       | 🟡 Médio   |
+| **Arquivo de log em disco**              | `fs.appendFileSync` bloqueante e não escalável horizontalmente       | 🟡 Médio   |
+| **Sem fila para chamadas de IA**         | Picos de uso podem sobrecarregar a API OpenAI sem backoff            | 🟡 Médio   |
+| **Sem índice em `AiUsage.feature`**      | Queries de rate-limit por feature farão full scan em tabelas grandes | 🟡 Médio   |
 
 ### Recomendações de Longo Prazo
 
@@ -299,23 +309,23 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 
 ### Critérios Avaliados
 
-| # | Critério | Status | Observação |
-|---|----------|--------|-----------|
-| 1 | Autenticação implementada | ✅ | Clerk integrado corretamente |
-| 2 | Autorização por recurso | ✅ | `userId` verificado em todas as queries de documentos |
-| 3 | Webhooks validados | ✅ | Svix (Clerk) e Stripe assinatura verificados |
-| 4 | Pagamento funcional | ✅ | Checkout + Portal + Webhook do Stripe implementados |
-| 5 | Rate limiting de IA | ❌ | **Desabilitado** — impede lançamento seguro |
-| 6 | Segredos de API seguros | ❌ | Chave hardcoded no código |
-| 7 | Endpoint de imagens autenticado | ❌ | Acesso público não intencional |
-| 8 | Informações de debug removidas | ❌ | Stack trace e endpoint de diagnóstico expostos |
-| 9 | Testes automatizados | ❌ | Nenhum teste encontrado no projeto |
-| 10 | Logging estruturado | ⚠️ | Apenas `console.log/error` |
-| 11 | Variáveis de ambiente documentadas | ⚠️ | `.env.example` existe mas incompleto (falta `OPENAI_API_KEY`, `DATABASE_URL`, `STRIPE_WEBHOOK_SECRET`, etc.) |
-| 12 | Schema de banco migrado | ✅ | Prisma schema bem estruturado |
-| 13 | i18n implementado | ✅ | Middleware de locale presente |
-| 14 | SEO básico | ✅ | Sitemap e robots.txt configurados |
-| 15 | CORS / Headers de segurança | ✅ | HSTS, CSP, X-Frame-Options configurados |
+| #   | Critério                           | Status | Observação                                                                                                   |
+| --- | ---------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| 1   | Autenticação implementada          | ✅     | Clerk integrado corretamente                                                                                 |
+| 2   | Autorização por recurso            | ✅     | `userId` verificado em todas as queries de documentos                                                        |
+| 3   | Webhooks validados                 | ✅     | Svix (Clerk) e Stripe assinatura verificados                                                                 |
+| 4   | Pagamento funcional                | ✅     | Checkout + Portal + Webhook do Stripe implementados                                                          |
+| 5   | Rate limiting de IA                | ❌     | **Desabilitado** — impede lançamento seguro                                                                  |
+| 6   | Segredos de API seguros            | ❌     | Chave hardcoded no código                                                                                    |
+| 7   | Endpoint de imagens autenticado    | ❌     | Acesso público não intencional                                                                               |
+| 8   | Informações de debug removidas     | ❌     | Stack trace e endpoint de diagnóstico expostos                                                               |
+| 9   | Testes automatizados               | ❌     | Nenhum teste encontrado no projeto                                                                           |
+| 10  | Logging estruturado                | ⚠️     | Apenas `console.log/error`                                                                                   |
+| 11  | Variáveis de ambiente documentadas | ⚠️     | `.env.example` existe mas incompleto (falta `OPENAI_API_KEY`, `DATABASE_URL`, `STRIPE_WEBHOOK_SECRET`, etc.) |
+| 12  | Schema de banco migrado            | ✅     | Prisma schema bem estruturado                                                                                |
+| 13  | i18n implementado                  | ✅     | Middleware de locale presente                                                                                |
+| 14  | SEO básico                         | ✅     | Sitemap e robots.txt configurados                                                                            |
+| 15  | CORS / Headers de segurança        | ✅     | HSTS, CSP, X-Frame-Options configurados                                                                      |
 
 ---
 
@@ -352,4 +362,4 @@ messages: [{ role: "user", content: `Traduza para "${to}":\n\n${content}` }]
 
 ---
 
-*Relatório gerado em análise estática de código. Recomenda-se complementar com testes de integração e penetration testing antes do lançamento.*
+_Relatório gerado em análise estática de código. Recomenda-se complementar com testes de integração e penetration testing antes do lançamento._

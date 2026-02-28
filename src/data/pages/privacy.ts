@@ -40,11 +40,12 @@ const privacyContentMap: Record<Locale, PrivacyPageContent> = {
     locale: "pt",
     metadata: {
       title: "Política de Privacidade | Editor de Texto Online",
-      description: "Política de Privacidade do Editor de Texto Online, em conformidade com a LGPD.",
+      description:
+        "Política de Privacidade do Editor de Texto Online, em conformidade com a LGPD.",
     },
     title: "Política de Privacidade",
     introHtml:
-      'No <strong>Editor de Texto Online</strong> (https://editordetexto.online/), sua privacidade é uma prioridade. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD).',
+      "No <strong>Editor de Texto Online</strong> (https://editordetexto.online/), sua privacidade é uma prioridade. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD).",
     sections: [
       {
         title: "1. Informações coletadas",
@@ -58,7 +59,11 @@ const privacyContentMap: Record<Locale, PrivacyPageContent> = {
           "Não vendemos, trocamos ou alugamos dados pessoais a terceiros.",
           "Podemos utilizar serviços de terceiros que processam informações técnicas de navegação, como:",
         ],
-        list: ["Vercel (hospedagem e analytics).", "Cloudinary (armazenamento temporário de imagens enviadas pelo usuário, quando aplicável).", "Serviços de estatísticas/análises."],
+        list: [
+          "Vercel (hospedagem e analytics).",
+          "Cloudinary (armazenamento temporário de imagens enviadas pelo usuário, quando aplicável).",
+          "Serviços de estatísticas/análises.",
+        ],
       },
       {
         title: "3. Cookies",
@@ -86,7 +91,8 @@ const privacyContentMap: Record<Locale, PrivacyPageContent> = {
     locale: "en",
     metadata: {
       title: "Privacy Policy | Online Text Editor",
-      description: "Privacy policy for Online Text Editor, written in compliance with data protection best practices.",
+      description:
+        "Privacy policy for Online Text Editor, written in compliance with data protection best practices.",
     },
     title: "Privacy Policy",
     introHtml:
@@ -136,7 +142,8 @@ const privacyContentMap: Record<Locale, PrivacyPageContent> = {
     locale: "es",
     metadata: {
       title: "Política de Privacidad | Editor de Texto en Línea",
-      description: "Política de privacidad del Editor de Texto en Línea en conformidad con la LGPD.",
+      description:
+        "Política de privacidad del Editor de Texto en Línea en conformidad con la LGPD.",
     },
     title: "Política de Privacidad",
     introHtml:
@@ -200,7 +207,7 @@ export function buildPrivacyMetadata(locale: string): Metadata {
     i18n.locales.map((loc) => [
       HREF_LANG_MAP[loc] ?? loc,
       `${BASE_URL}${PRIVACY_PATHS[loc]}`,
-    ])
+    ]),
   );
 
   languages["x-default"] = `${BASE_URL}${PRIVACY_PATHS[i18n.defaultLocale]}`;

@@ -18,7 +18,10 @@ export const ImageMenu = () => {
   const image = useEditorState({
     editor,
     selector: (ctx) => {
-      if (!ctx.editor.isActive("image") && !ctx.editor.isActive("imageFigure")) {
+      if (
+        !ctx.editor.isActive("image") &&
+        !ctx.editor.isActive("imageFigure")
+      ) {
         return null;
       }
 
@@ -55,7 +58,8 @@ export const ImageMenu = () => {
     return editor
       .chain()
       .command(({ commands }) => {
-        if (image?.pos && selection.from !== image.pos) return commands.setNodeSelection(image.pos);
+        if (image?.pos && selection.from !== image.pos)
+          return commands.setNodeSelection(image.pos);
         return true;
       })
       .updateAttributes("image", { [name]: value })
@@ -65,7 +69,11 @@ export const ImageMenu = () => {
 
   // Toggle caption between figure and image
   const toggleCaption = () =>
-    editor.chain().focus()[image?.hasCaption ? "figureToImage" : "imageToFigure"]().run();
+    editor
+      .chain()
+      .focus()
+      [image?.hasCaption ? "figureToImage" : "imageToFigure"]()
+      .run();
 
   // Toggle alt text edit form
   const toggleEditAltText = () => {
@@ -83,7 +91,8 @@ export const ImageMenu = () => {
 
   // Download image with proper filename
   const downloadImage = useCallback(async () => {
-    if (!image?.src) return console.error("No image source available for download.");
+    if (!image?.src)
+      return console.error("No image source available for download.");
 
     try {
       const res = await fetch(image.src);
@@ -110,7 +119,9 @@ export const ImageMenu = () => {
     <BubbleMenu
       editor={editor}
       pluginKey="image-bubble"
-      shouldShow={({ editor }) => editor.isActive("imageFigure") || editor.isActive("image")}
+      shouldShow={({ editor }) =>
+        editor.isActive("imageFigure") || editor.isActive("image")
+      }
       updateDelay={100}
       appendTo={() =>
         (contentElement.current as HTMLElement | null) ??
@@ -154,8 +165,16 @@ export const ImageMenu = () => {
           <ToolbarDivider />
           <SizeDropdown value={image?.width} onChange={setSize} />
           <ToolbarDivider />
-          <MenuButton icon="Download" tooltip={messages.general.download} onClick={downloadImage} />
-          <MenuButton icon="Trash" tooltip={messages.general.delete} onClick={removeImage} />
+          <MenuButton
+            icon="Download"
+            tooltip={messages.general.download}
+            onClick={downloadImage}
+          />
+          <MenuButton
+            icon="Trash"
+            tooltip={messages.general.delete}
+            onClick={removeImage}
+          />
         </Toolbar>
       )}
     </BubbleMenu>
@@ -164,7 +183,9 @@ export const ImageMenu = () => {
 
 export default ImageMenu;
 
-const getImageOrFigureNode = (selection: Selection): { node: Node | null; pos: number | null } => {
+const getImageOrFigureNode = (
+  selection: Selection,
+): { node: Node | null; pos: number | null } => {
   let node: Node | null = null;
   let pos: number | null = null;
 

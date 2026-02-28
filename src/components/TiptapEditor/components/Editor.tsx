@@ -4,19 +4,36 @@ import React, { forwardRef, useCallback, useEffect, useMemo } from "react";
 import { Content, type Editor } from "@tiptap/react";
 
 import dynamic from "next/dynamic";
-import TiptapProvider, { type ExportActions, type DraftActions } from "./Provider";
+import TiptapProvider, {
+  type ExportActions,
+  type DraftActions,
+} from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
 const MenuBar = dynamic(() => import("./MenuBar"), { ssr: false });
 const StatusBar = dynamic(() => import("./StatusBar"), { ssr: false });
 const Resizer = dynamic(() => import("./Resizer"), { ssr: false });
 
-const LinkMenu = dynamic(() => import("./menus/LinkMenu").then(mod => mod.LinkMenu), { ssr: false });
-const ImageMenu = dynamic(() => import("./menus/ImageMenu").then(mod => mod.ImageMenu), { ssr: false });
-const CodeBlockMenu = dynamic(() => import("./menus/CodeBlockMenu").then(mod => mod.CodeBlockMenu), { ssr: false });
+const LinkMenu = dynamic(
+  () => import("./menus/LinkMenu").then((mod) => mod.LinkMenu),
+  { ssr: false },
+);
+const ImageMenu = dynamic(
+  () => import("./menus/ImageMenu").then((mod) => mod.ImageMenu),
+  { ssr: false },
+);
+const CodeBlockMenu = dynamic(
+  () => import("./menus/CodeBlockMenu").then((mod) => mod.CodeBlockMenu),
+  { ssr: false },
+);
 const TableMenu = dynamic(() => import("./menus/TableMenu"), { ssr: false });
-const LanguageToolMenu = dynamic(() => import("./menus/LanguageToolMenu"), { ssr: false });
-const AiBubbleMenu = dynamic(() => import("./menus/AiBubbleMenu").then(mod => mod.AiBubbleMenu), { ssr: false });
+const LanguageToolMenu = dynamic(() => import("./menus/LanguageToolMenu"), {
+  ssr: false,
+});
+const AiBubbleMenu = dynamic(
+  () => import("./menus/AiBubbleMenu").then((mod) => mod.AiBubbleMenu),
+  { ssr: false },
+);
 
 import getExtensionKit from "../kit";
 import { cssVar } from "../utils/cssVar";
@@ -75,7 +92,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       userPlan = "free",
       documentTitle,
     },
-    ref
+    ref,
   ) => {
     const isEditable = !readonly && !disabled;
     const displayBubbleMenu = isEditable && hideBubbleMenu;
@@ -83,10 +100,14 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
     const handleUpdate = useCallback(
       (editor: Editor) => {
         const content =
-          output === "html" ? (editor.isEmpty ? "" : editor.getHTML()) : editor.getJSON();
+          output === "html"
+            ? editor.isEmpty
+              ? ""
+              : editor.getHTML()
+            : editor.getJSON();
         onContentChange?.(content);
       },
-      [onContentChange, output]
+      [onContentChange, output],
     );
 
     const extensions = useMemo(() => getExtensionKit(locale), [locale]);
@@ -140,7 +161,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         <Resizer />
       </TiptapProvider>
     );
-  }
+  },
 );
 
 TiptapEditor.displayName = "TiptapEditor";

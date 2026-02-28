@@ -1,7 +1,7 @@
 import { HeaderContent } from "./types";
 
 const pt: HeaderContent = {
-    selectLanguage: "Selecionar idioma",
+  selectLanguage: "Selecionar idioma",
 };
 
 export default pt;

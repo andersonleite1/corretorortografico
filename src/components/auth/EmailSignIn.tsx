@@ -1,379 +1,403 @@
 "use client";
 
 import { useSignIn } from "@clerk/nextjs";
-import { useState } from "react";
-import { Loader2, Mail, KeyRound, Lock, Eye, EyeOff, X } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Icon } from "../TiptapEditor/components/ui/Icon";
 import { i18n, Locale } from "../../../i18n-config";
 import { getAuthContent } from "@/data/auth";
-import { useMemo } from "react";
 
 interface EmailSignInProps {
-    onClose?: () => void;
-    onSignUpClick?: () => void;
+  onClose?: () => void;
+  onSignUpClick?: () => void;
 }
 
 type SignInStep = "email" | "code" | "password";
 
-export default function EmailSignIn({ onClose, onSignUpClick }: EmailSignInProps) {
-    const { isLoaded, signIn, setActive } = useSignIn();
-    const router = useRouter();
-    const pathname = usePathname() || "/";
-    const { locales, defaultLocale } = i18n;
+export default function EmailSignIn({
+  onClose,
+  onSignUpClick,
+}: EmailSignInProps) {
+  const { isLoaded, signIn, setActive } = useSignIn();
+  const router = useRouter();
+  const pathname = usePathname() || "/";
+  const { locales, defaultLocale } = i18n;
 
-    const currentLocale = useMemo<Locale>(() => {
-        const segments = pathname.split("/").filter(Boolean);
-        const potential = segments[0] as Locale | undefined;
-        return locales.includes(potential as Locale) ? potential! : defaultLocale;
-    }, [pathname, locales, defaultLocale]);
+  const currentLocale = useMemo<Locale>(() => {
+    const segments = pathname.split("/").filter(Boolean);
+    const potential = segments[0] as Locale | undefined;
+    return locales.includes(potential as Locale) ? potential! : defaultLocale;
+  }, [pathname, locales, defaultLocale]);
 
-    const authContent = getAuthContent(currentLocale);
+  const authContent = useMemo(
+    () => getAuthContent(currentLocale),
+    [currentLocale],
+  );
 
-    const [emailAddress, setEmailAddress] = useState("");
-    const [password, setPassword] = useState("");
-    const [code, setCode] = useState("");
-    const [step, setStep] = useState<SignInStep>("email");
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<SignInStep>("email");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const getFriendlyErrorMessage = (err: any) => {
-        const errorItem = err.errors?.[0];
-        if (!errorItem) return authContent.errors.unexpected;
+  const getFriendlyErrorMessage = (err: any) => {
+    const errorItem = err.errors?.[0];
+    if (!errorItem) return authContent.errors.unexpected;
 
-        const code = errorItem.code;
+    const code = errorItem.code;
 
-        switch (code) {
-            case "form_identifier_not_found":
-                return authContent.errors.identifier_not_found;
-            case "form_password_incorrect":
-                return authContent.errors.password_incorrect;
-            case "form_code_incorrect":
-                return authContent.errors.code_incorrect;
-            case "form_identifier_invalid":
-                return authContent.errors.identifier_invalid;
-            case "verification_strategy_not_valid":
-                return authContent.errors.invalid_strategy;
-            default:
-                // Handle the case from the screenshot which might be another code or longMessage fallback
-                if (errorItem.longMessage?.includes("verification strategy is not valid")) {
-                    return authContent.errors.invalid_strategy;
-                }
-                return errorItem.longMessage || authContent.errors.unexpected;
+    switch (code) {
+      case "form_identifier_not_found":
+        return authContent.errors.identifier_not_found;
+      case "form_password_incorrect":
+        return authContent.errors.password_incorrect;
+      case "form_code_incorrect":
+        return authContent.errors.code_incorrect;
+      case "form_identifier_invalid":
+        return authContent.errors.identifier_invalid;
+      case "verification_strategy_not_valid":
+        return authContent.errors.invalid_strategy;
+      default:
+        if (
+          errorItem.longMessage?.includes("verification strategy is not valid")
+        ) {
+          return authContent.errors.invalid_strategy;
         }
-    };
-
-    if (!isLoaded) return null;
-
-    async function handleEmailSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-
-        try {
-            await signIn!.create({
-                identifier: emailAddress,
-            });
-
-            // Default strategy: email_code
-            const factor = signIn!.supportedFirstFactors?.find(
-                (f: any) => f.strategy === "email_code"
-            ) as any;
-
-            await signIn!.prepareFirstFactor({
-                strategy: "email_code",
-                emailAddressId: factor?.emailAddressId,
-            } as any);
-
-            setStep("code");
-        } catch (err: any) {
-            console.error("Sign-in error:", JSON.stringify(err, null, 2));
-            setError(getFriendlyErrorMessage(err));
-        } finally {
-            setLoading(false);
-        }
+        return errorItem.longMessage || authContent.errors.unexpected;
     }
+  };
 
-    async function handleCodeVerify(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  if (!isLoaded) return null;
 
-        try {
-            const result = await signIn!.attemptFirstFactor({
-                strategy: "email_code",
-                code: code.replace(/\s/g, ""),
-            });
+  async function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-            if (result.status === "complete") {
-                await setActive!({ session: result.createdSessionId });
-                router.push("/");
-                if (onClose) onClose();
-            } else {
-                setError("Não foi possível completar o acesso. Verifique os dados.");
-            }
-        } catch (err: any) {
-            console.error("Code verify error:", JSON.stringify(err, null, 2));
-            setError(getFriendlyErrorMessage(err));
-        } finally {
-            setLoading(false);
-        }
+    try {
+      await signIn!.create({
+        identifier: emailAddress,
+      });
+
+      const factor = signIn!.supportedFirstFactors?.find(
+        (f: any) => f.strategy === "email_code",
+      ) as any;
+
+      await signIn!.prepareFirstFactor({
+        strategy: "email_code",
+        emailAddressId: factor?.emailAddressId,
+      } as any);
+
+      setStep("code");
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
+  }
 
-    async function handlePasswordSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  async function handleCodeVerify(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-        try {
-            const result = await signIn!.attemptFirstFactor({
-                strategy: "password",
-                password,
-            });
+    try {
+      const result = await signIn!.attemptFirstFactor({
+        strategy: "email_code",
+        code: code.replace(/\s/g, ""),
+      });
 
-            if (result.status === "complete") {
-                await setActive!({ session: result.createdSessionId });
-                router.push("/");
-                if (onClose) onClose();
-            } else {
-                setError("Não foi possível completar o acesso. Verifique sua senha.");
-            }
-        } catch (err: any) {
-            console.error("Password submit error:", JSON.stringify(err, null, 2));
-            setError(getFriendlyErrorMessage(err));
-        } finally {
-            setLoading(false);
-        }
+      if (result.status === "complete") {
+        await setActive!({ session: result.createdSessionId });
+        router.push("/");
+        if (onClose) onClose();
+      } else {
+        setError("Não foi possível completar o acesso.");
+      }
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const switchToPassword = async () => {
-        setError("");
-        setStep("password");
-    };
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    const switchToCode = async () => {
-        setError("");
-        setLoading(true);
-        try {
-            const factor = signIn!.supportedFirstFactors?.find(
-                (f: any) => f.strategy === "email_code"
-            ) as any;
+    try {
+      const result = await signIn!.attemptFirstFactor({
+        strategy: "password",
+        password,
+      });
 
-            await signIn!.prepareFirstFactor({
-                strategy: "email_code",
-                emailAddressId: factor?.emailAddressId,
-            } as any);
-            setStep("code");
-        } catch (err: any) {
-            setError(getFriendlyErrorMessage(err));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Step 1: Email Input
-    if (step === "email") {
-        return (
-            <div className="w-full max-w-md bg-white border border-neutral-200 rounded-3xl shadow-2xl relative animate-in fade-in zoom-in duration-300 pb-16">
-                {onClose && (
-                    <button
-                        onClick={onClose}
-                        className="absolute right-5 top-5 text-neutral-400 hover:text-neutral-600 transition-colors z-[60]"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                )}
-
-                <div className="p-8 pb-4">
-                    <div className="text-center space-y-1 mb-8">
-                        <h1 className="text-xl font-bold text-neutral-900 tracking-tight">
-                            Entrar na sua conta
-                        </h1>
-                        <p className="text-sm text-neutral-600">Entre com o seu e-mail para acessar.</p>
-                    </div>
-
-                    <form onSubmit={handleEmailSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-xs font-medium text-neutral-700 uppercase tracking-wider">
-                                Endereço de e-mail
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                placeholder="nome@exemplo.com"
-                                value={emailAddress}
-                                onChange={(e) => setEmailAddress(e.target.value)}
-                                required
-                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-full text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-600 transition-all text-sm"
-                            />
-                        </div>
-
-                        {error && (
-                            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-2xl border border-red-100">
-                                {error}
-                            </p>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-black hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99]"
-                        >
-                            {loading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                "Continuar"
-                            )}
-                        </button>
-                    </form>
-                </div>
-
-                <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                    <p className="text-sm text-neutral-500 pointer-events-auto">
-                        Não possui uma conta?{" "}
-                        <button
-                            onClick={onSignUpClick}
-                            className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
-                        >
-                            Criar conta
-                        </button>
-                    </p>
-                </div>
-            </div>
-        );
+      if (result.status === "complete") {
+        await setActive!({ session: result.createdSessionId });
+        router.push("/");
+        if (onClose) onClose();
+      } else {
+        setError("Não foi possível completar o acesso. Verifique sua senha.");
+      }
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
+  }
 
-    // Step 2 & 3: Code/Password Verification
-    return (
-        <div className="w-full max-w-md p-8 bg-white border border-neutral-200 rounded-3xl shadow-2xl text-center space-y-6 relative animate-in fade-in zoom-in duration-300">
-            {onClose && (
-                <button
-                    onClick={onClose}
-                    className="absolute right-5 top-5 text-neutral-400 hover:text-neutral-600 transition-colors z-[60]"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-            )}
+  const switchToPassword = () => setStep("password");
 
-            <div className="flex justify-center">
-                <div className="p-4 bg-emerald-50 rounded-full ring-1 ring-emerald-100">
-                    {step === "code" ? (
-                        <KeyRound className="w-12 h-12 text-emerald-600" />
-                    ) : (
-                        <Lock className="w-12 h-12 text-emerald-600" />
-                    )}
-                </div>
-            </div>
+  const switchToCode = async () => {
+    setLoading(true);
+    try {
+      const factor = signIn!.supportedFirstFactors?.find(
+        (f: any) => f.strategy === "email_code",
+      ) as any;
+      await signIn!.prepareFirstFactor({
+        strategy: "email_code",
+        emailAddressId: factor?.emailAddressId,
+      } as any);
+      setStep("code");
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className="space-y-1">
-                <h2 className="text-xl font-bold text-neutral-900 tracking-tight">
-                    {step === "code" ? "Verifique seu e-mail" : "Digite sua senha"}
-                </h2>
-                <p className="text-sm text-neutral-600">
-                    {step === "code"
-                        ? <>Enviamos um código para <span className="font-semibold text-neutral-900">{emailAddress}</span></>
-                        : <>Acesse sua conta com sua senha para <span className="font-semibold text-neutral-900">{emailAddress}</span></>
-                    }
-                </p>
-            </div>
-
-            <form onSubmit={step === "code" ? handleCodeVerify : handlePasswordSubmit} className="space-y-6 text-left">
-                {step === "code" ? (
-                    <div className="space-y-2">
-                        <label htmlFor="code" className="text-xs font-medium text-neutral-700 uppercase tracking-wider">
-                            Código de Verificação
-                        </label>
-                        <input
-                            id="code"
-                            type="text"
-                            placeholder="Inserir código"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-full text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-600 transition-all text-sm text-center tracking-[0.5em] font-mono"
-                        />
-                    </div>
-                ) : (
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="text-xs font-medium text-neutral-700 uppercase tracking-wider">
-                            Senha
-                        </label>
-                        <div className="relative">
-                            <input
-                                id="password"
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Sua senha"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-full text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-600 transition-all text-sm"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors"
-                            >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {error && (
-                    <p className="text-sm text-red-600 bg-red-50 p-3 rounded-2xl border border-red-100">
-                        {error}
-                    </p>
-                )}
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full flex items-center justify-center px-4 py-3 bg-black hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-full shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99]"
-                >
-                    {loading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                        step === "code" ? "Verificar código" : "Entrar"
-                    )}
-                </button>
-            </form>
-
-            <div className="space-y-4 pt-2">
-                {step === "code" ? (
-                    <button
-                        type="button"
-                        onClick={switchToPassword}
-                        className="text-xs font-medium text-neutral-500 hover:text-neutral-700 transition-colors flex items-center justify-center gap-2 mx-auto"
-                    >
-                        <Lock className="w-3 h-3" />
-                        Prefiro usar uma senha
-                    </button>
-                ) : (
-                    <button
-                        type="button"
-                        onClick={switchToCode}
-                        disabled={loading}
-                        className="text-xs font-medium text-neutral-500 hover:text-neutral-700 transition-colors flex items-center justify-center gap-2 mx-auto"
-                    >
-                        <KeyRound className="w-3 h-3" />
-                        Usar código de verificação
-                    </button>
-                )}
-
-                <div className="flex flex-col gap-2 border-t border-neutral-100 pt-4">
-                    <button
-                        onClick={() => {
-                            setStep("email");
-                            setCode("");
-                            setPassword("");
-                            setError("");
-                        }}
-                        className="text-emerald-600 hover:text-emerald-700 text-sm font-medium transition-colors"
-                    >
-                        Usar outro e-mail
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="flex flex-col">
+      {/* Header */}
+      <div className="px-8 py-8 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Acessar Conta
+          </h2>
+          <p className="text-sm font-medium text-gray-400 dark:text-gray-500 mt-1 uppercase tracking-widest leading-relaxed">
+            Login • Sync • Cloud
+          </p>
         </div>
-    );
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 dark:text-gray-500 transition-all active:scale-90"
+          >
+            <Icon name="Close" size={24} />
+          </button>
+        )}
+      </div>
+
+      {/* Content Area with Transitions */}
+      <div className="p-8">
+        <AnimatePresence mode="wait">
+          {step === "email" ? (
+            <motion.form
+              key="email-step"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              onSubmit={handleEmailSubmit}
+              className="space-y-8"
+            >
+              <div className="space-y-4">
+                <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1">
+                  Endereço de e-mail
+                </label>
+                <div className="relative group">
+                  <input
+                    type="email"
+                    placeholder="Ex: seuemail@exemplo.com"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    required
+                    className="w-full px-5 py-4 bg-gray-50/50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl text-[15px] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-700 font-medium"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-red-50 dark:bg-red-500/10 p-4 rounded-2xl border border-red-100 dark:border-red-500/10 flex gap-3"
+                >
+                  <Icon
+                    name="Alert"
+                    size={18}
+                    className="text-red-500 shrink-0"
+                  />
+                  <p className="text-xs font-bold text-red-600 dark:text-red-400 italic leading-relaxed">
+                    {error}
+                  </p>
+                </motion.div>
+              )}
+
+              <div className="pt-4 flex flex-col gap-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 bg-blue-500 text-white font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Continuar"
+                  )}
+                </button>
+
+                <p className="text-center text-[13px] font-medium text-gray-500 dark:text-gray-400">
+                  Não tem uma conta?{" "}
+                  <button
+                    type="button"
+                    onClick={onSignUpClick}
+                    className="text-blue-500 hover:text-blue-600 font-bold underline decoration-2 underline-offset-4"
+                  >
+                    Criar Cadastro
+                  </button>
+                </p>
+              </div>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="verify-step"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              onSubmit={
+                step === "code" ? handleCodeVerify : handlePasswordSubmit
+              }
+              className="space-y-8"
+            >
+              <div className="flex flex-col items-center text-center space-y-4 mb-2">
+                <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+                  <Icon
+                    name={step === "code" ? "Keyboard" : "Settings"}
+                    size={32}
+                    className="text-blue-500"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    {step === "code"
+                      ? "Verifique seu e-mail"
+                      : "Confirme sua senha"}
+                  </h3>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
+                    {emailAddress}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1">
+                  {step === "code" ? "Código de Verificação" : "Sua Senha"}
+                </label>
+                <div className="relative group">
+                  <input
+                    type={
+                      step === "code"
+                        ? "text"
+                        : showPassword
+                          ? "text"
+                          : "password"
+                    }
+                    value={step === "code" ? code : password}
+                    onChange={(e) =>
+                      step === "code"
+                        ? setCode(e.target.value)
+                        : setPassword(e.target.value)
+                    }
+                    required
+                    placeholder={
+                      step === "code" ? "••••••" : "Sua senha segura"
+                    }
+                    className={`w-full px-5 py-4 bg-gray-50/50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl text-[15px] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-700 font-medium ${step === "code" ? "tracking-[0.5em] text-center font-mono" : ""}`}
+                  />
+                  {step === "password" && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                    >
+                      <Icon name="Eye" size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-red-50 dark:bg-red-500/10 p-4 rounded-2xl border border-red-100 dark:border-red-500/10 flex gap-3"
+                >
+                  <Icon
+                    name="Alert"
+                    size={18}
+                    className="text-red-500 shrink-0"
+                  />
+                  <p className="text-xs font-bold text-red-600 dark:text-red-400 italic leading-relaxed">
+                    {error}
+                  </p>
+                </motion.div>
+              )}
+
+              <div className="pt-4 flex flex-col gap-6">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 bg-blue-500 text-white font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Acessar Conta"
+                  )}
+                </button>
+
+                <div className="flex flex-col gap-3 border-t border-gray-100 dark:border-white/5 pt-6">
+                  <button
+                    type="button"
+                    onClick={step === "code" ? switchToPassword : switchToCode}
+                    className="text-xs font-bold text-blue-500 hover:text-blue-600 flex items-center justify-center gap-2"
+                  >
+                    <Icon
+                      name={step === "code" ? "Settings" : "Keyboard"}
+                      size={14}
+                    />
+                    {step === "code"
+                      ? "Usar Senha de Acesso"
+                      : "Usar Código por E-mail"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep("email");
+                      setCode("");
+                      setPassword("");
+                      setError("");
+                    }}
+                    className="text-xs font-bold text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                  >
+                    Usar outro e-mail
+                  </button>
+                </div>
+              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Footer microcopy */}
+      <div className="px-8 py-5 bg-gray-50/50 dark:bg-black/10 border-t border-gray-100 dark:border-white/5 text-center">
+        <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+          Seguro • Privado • Codificado
+        </p>
+      </div>
+    </div>
+  );
 }

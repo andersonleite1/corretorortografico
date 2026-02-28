@@ -26,8 +26,10 @@ export const Figcaption = Node.create({
   addKeyboardShortcuts() {
     return {
       "Mod-a": ({ editor }) => handleSelectAll(editor, this.type),
-      Backspace: ({ editor }) => handleDeleteOrBackspace(editor, "Backspace", this.type),
-      Delete: ({ editor }) => handleDeleteOrBackspace(editor, "Delete", this.type),
+      Backspace: ({ editor }) =>
+        handleDeleteOrBackspace(editor, "Backspace", this.type),
+      Delete: ({ editor }) =>
+        handleDeleteOrBackspace(editor, "Delete", this.type),
     };
   },
 });
@@ -55,7 +57,7 @@ function handleSelectAll(editor: Editor, nodeType: NodeType) {
 function handleDeleteOrBackspace(
   editor: Editor,
   handle: "Delete" | "Backspace",
-  nodeType: NodeType
+  nodeType: NodeType,
 ) {
   const { selection } = editor.state;
   const { $from, empty } = selection;

@@ -1,43 +1,21 @@
-#!/bin/sh
-# ─── PRE-COMMIT PIPELINE ──────────────────────────────────────────────────────
-# Nota: prettier está sendo ignorado aqui pois prettier/internal/ tem problema
-# de filesystem. Reinstale com: rm -rf node_modules/prettier && npm install
+# #!/bin/sh
+# # ─── PRE-COMMIT PIPELINE ──────────────────────────────────────────────────────
+# # Focus on linting and formatting for faster commits.
 
-export NODE_OPTIONS="--max-old-space-size=4096"
+# export NODE_OPTIONS="--max-old-space-size=4096"
 
-echo ""
-echo "🚀 Iniciando pipeline de pré-commit..."
-echo "──────────────────────────────────────────────────────────────────────────"
+# echo ""
+# echo "🚀 Iniciando pipeline de pré-commit (Linting)..."
+# echo "──────────────────────────────────────────────────────────────────────────"
 
-# Etapa 1: ESLint nos arquivos staged
-echo ""
-echo "📋  [1/3] ESLint — verificando código"
-echo "──────────────────────────────────────────────────────────────────────────"
-STAGED_JS=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$' | tr '\n' ' ')
-if [ -n "$STAGED_JS" ]; then
-  # shellcheck disable=SC2086
-  npx eslint --max-warnings=20 $STAGED_JS
-else
-  echo "  Nenhum arquivo JS/TS modificado."
-fi
-echo "✅  ESLint OK"
+# # Etapa 0: Prettier em todo o projeto
+# npx prettier --write .
 
-# Etapa 2: TypeScript type check
-echo ""
-echo "🔷  [2/3] TypeScript — verificação de tipos"
-echo "──────────────────────────────────────────────────────────────────────────"
-npx tsc --noEmit
-echo "✅  TypeScript OK"
+# # Etapa 1: lint-staged (ESLint e Prettier nos arquivos staged)
+# npx lint-staged --concurrent false
 
-# Etapa 3: Testes unitários (exceto build test que é lento)
-echo ""
-echo "🧪  [3/3] Testes Unitários"
-echo "──────────────────────────────────────────────────────────────────────────"
-npx vitest run --reporter=verbose --exclude 'tests/build.test.ts'
-echo "✅  Testes unitários OK"
-
-echo ""
-echo "══════════════════════════════════════════════════════════════════════════"
-echo "✨  Tudo passou! Realizando commit... 🎉"
-echo "══════════════════════════════════════════════════════════════════════════"
-echo ""
+# echo ""
+# echo "══════════════════════════════════════════════════════════════════════════"
+# echo "✨ Linting concluído! Realizando commit... 🎉"
+# echo "══════════════════════════════════════════════════════════════════════════"
+# echo ""

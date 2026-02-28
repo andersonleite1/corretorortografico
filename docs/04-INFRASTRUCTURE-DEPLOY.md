@@ -8,27 +8,27 @@
 
 Acesse: **Vercel Dashboard → Seu Projeto → Settings → Environment Variables**
 
-| Variável | Environments | Descrição |
-| :--- | :---: | :--- |
-| `DATABASE_URL` | All | Connection string do banco (Neon) |
-| `DIRECT_URL` | All | URL direta para Prisma Migrations |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | All | Chave pública do Clerk |
-| `CLERK_SECRET_KEY` | All | Chave secreta do Clerk |
-| `CLERK_WEBHOOK_SECRET` | All | Secret do webhook Clerk |
-| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | All | `/sign-in` |
-| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | All | `/sign-up` |
-| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | All | `/editor` |
-| `STRIPE_SECRET_KEY` | All | Chave secreta Stripe |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | All | Chave pública Stripe |
-| `STRIPE_WEBHOOK_SECRET` | All | Secret do webhook Stripe |
-| `STRIPE_PRO_PRICE_ID` | All | Price ID plano Pro |
-| `NEXT_PUBLIC_APP_URL` | Production | `https://seudominio.com` |
-| `NEXT_PUBLIC_APP_URL` | Preview | `https://seuapp.vercel.app` |
-| `OPENAI_API_KEY` | All | Chave da API OpenAI |
-| `AI_MODEL` | All | `gpt-4o-mini` |
-| `CLOUDINARY_CLOUD_NAME` | All | Cloud name Cloudinary |
-| `CLOUDINARY_API_KEY` | All | API Key Cloudinary |
-| `CLOUDINARY_API_SECRET` | All | API Secret Cloudinary |
+| Variável                              | Environments | Descrição                         |
+| :------------------------------------ | :----------: | :-------------------------------- |
+| `DATABASE_URL`                        |     All      | Connection string do banco (Neon) |
+| `DIRECT_URL`                          |     All      | URL direta para Prisma Migrations |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   |     All      | Chave pública do Clerk            |
+| `CLERK_SECRET_KEY`                    |     All      | Chave secreta do Clerk            |
+| `CLERK_WEBHOOK_SECRET`                |     All      | Secret do webhook Clerk           |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL`       |     All      | `/sign-in`                        |
+| `NEXT_PUBLIC_CLERK_SIGN_UP_URL`       |     All      | `/sign-up`                        |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` |     All      | `/editor`                         |
+| `STRIPE_SECRET_KEY`                   |     All      | Chave secreta Stripe              |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`  |     All      | Chave pública Stripe              |
+| `STRIPE_WEBHOOK_SECRET`               |     All      | Secret do webhook Stripe          |
+| `STRIPE_PRO_PRICE_ID`                 |     All      | Price ID plano Pro                |
+| `NEXT_PUBLIC_APP_URL`                 |  Production  | `https://seudominio.com`          |
+| `NEXT_PUBLIC_APP_URL`                 |   Preview    | `https://seuapp.vercel.app`       |
+| `OPENAI_API_KEY`                      |     All      | Chave da API OpenAI               |
+| `AI_MODEL`                            |     All      | `gpt-4o-mini`                     |
+| `CLOUDINARY_CLOUD_NAME`               |     All      | Cloud name Cloudinary             |
+| `CLOUDINARY_API_KEY`                  |     All      | API Key Cloudinary                |
+| `CLOUDINARY_API_SECRET`               |     All      | API Secret Cloudinary             |
 
 > ⚠️ **NUNCA** commite o arquivo `.env.local` no git. Confirme que ele está no `.gitignore`.
 
@@ -111,7 +111,10 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
         ],
       },
     ];
@@ -141,6 +144,7 @@ npx @sentry/wizard@latest -i nextjs
 ```
 
 Isso configura o Sentry automaticamente. Adicione no `.env.local`:
+
 ```env
 SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 SENTRY_AUTH_TOKEN=xxx  # Para source maps
@@ -213,8 +217,16 @@ export const metadata: Metadata = {
     default: "EditorTexto Pro — Editor com IA para Criadores de Conteúdo",
     template: "%s | EditorTexto Pro",
   },
-  description: "Editor de texto WYSIWYG profissional com Inteligência Artificial. Reescreva, traduza e analise SEO do seu conteúdo. Grátis para começar.",
-  keywords: ["editor de texto", "IA", "inteligência artificial", "WYSIWYG", "SEO", "escrita assistida"],
+  description:
+    "Editor de texto WYSIWYG profissional com Inteligência Artificial. Reescreva, traduza e analise SEO do seu conteúdo. Grátis para começar.",
+  keywords: [
+    "editor de texto",
+    "IA",
+    "inteligência artificial",
+    "WYSIWYG",
+    "SEO",
+    "escrita assistida",
+  ],
   authors: [{ name: "EditorTexto Pro" }],
   creator: "EditorTexto Pro",
 
@@ -225,8 +237,16 @@ export const metadata: Metadata = {
     url: process.env.NEXT_PUBLIC_APP_URL,
     siteName: "EditorTexto Pro",
     title: "EditorTexto Pro — Editor com IA para Criadores de Conteúdo",
-    description: "Escreva mais rápido e melhor com IA. Exportação para PDF, DOCX. Grátis para começar.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "EditorTexto Pro" }],
+    description:
+      "Escreva mais rápido e melhor com IA. Exportação para PDF, DOCX. Grátis para começar.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "EditorTexto Pro",
+      },
+    ],
   },
 
   // Twitter Card
@@ -244,7 +264,12 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large" },
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+    },
   },
 };
 ```
@@ -258,10 +283,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
 
   return [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${baseUrl}/editor`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.8 },
-    { url: `${baseUrl}/sign-in`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.5 },
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/pricing`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/editor`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/sign-in`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
   ];
 }
 ```
@@ -327,6 +372,7 @@ vercel --prod
 ```
 
 **OU** conecte o repositório GitHub diretamente:
+
 1. Acesse [vercel.com/new](https://vercel.com/new)
 2. Importe o repositório do GitHub
 3. Configure as variáveis de ambiente
@@ -350,6 +396,7 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 ## ✅ 4.9 Checklist Completo de Pré-Lançamento
 
 ### 🔐 Segurança
+
 - [ ] Todas as variáveis de ambiente configuradas no Vercel
 - [ ] `.env.local` no `.gitignore` (**nunca commitar!**)
 - [ ] Headers de segurança em `next.config.mjs`
@@ -357,12 +404,14 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 - [ ] Rate limiting nas APIs de IA
 
 ### 🗄️ Banco de Dados
+
 - [ ] `npx prisma db push` executado no banco de produção
 - [ ] Backup automático habilitado (Neon faz isso por padrão)
 - [ ] Testar criação de usuário via webhook Clerk
 - [ ] Testar criação de subscription via webhook Stripe
 
 ### 💳 Pagamentos
+
 - [ ] Testar checkout com cartão `4242 4242 4242 4242` (Stripe Test)
 - [ ] Testar pagamento recusado com `4000 0000 0000 0002`
 - [ ] Verificar Portal do Assinante
@@ -370,6 +419,7 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 - [ ] Ativar modo **Live** no Stripe (quando pronto para produção real)
 
 ### 🤖 IA
+
 - [ ] Rate limit de 5 requisições/dia funcionando no plano Free
 - [ ] Erro com `upgradeUrl` retornado corretamente ao limite
 - [ ] Streaming funcionando corretamente no edge
@@ -377,6 +427,7 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 - [ ] Budget Alert configurado na OpenAI ($50/mês como limite)
 
 ### 🔍 SEO & Performance
+
 - [ ] Lighthouse Score > 90 (Performance, Accessibility, SEO)
 - [ ] OG Image gerada corretamente (testar em [opengraph.xyz](https://opengraph.xyz))
 - [ ] Sitemap acessível em `/sitemap.xml`
@@ -385,6 +436,7 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 - [ ] Analytics (Vercel Analytics já instalado no projeto ✅)
 
 ### 📱 UI/UX
+
 - [ ] Testar fluxo completo: cadastro → editor → checkout → IA
 - [ ] Página de preços (`/pricing`) funcionando
 - [ ] Redirecionamento para `/sign-in` em rotas protegidas
@@ -392,6 +444,7 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 - [ ] Testar em mobile (responsividade)
 
 ### 🚀 Deploy Final
+
 - [ ] Variáveis de ambiente em produção no Vercel
 - [ ] Build de produção sem erros: `npm run build`
 - [ ] Webhook Stripe no modo **Live** apontando para URL de produção
@@ -405,23 +458,26 @@ No `package.json`, adicione o comando que inclui as migrações do Prisma:
 ### Estratégia de Lançamento (Semanas 1-4)
 
 **Semana 1:** Beta fechado
+
 - Convide 20-50 usuários beta manualmente
 - Colete feedback com Typeform ou Google Forms
 
 **Semana 2:** Product Hunt
+
 - Prepare assets: ícone 120x120px, screenshots, tagline de 60 chars
 - Lance numa terça-feira às 12:01 PST (horário de São Francisco)
 
 **Semana 3-4:** SEO + Conteúdo
+
 - Escreva 3 artigos sobre "editor de texto com IA para [nicho]"
 - Construa backlinks em comunidades (Hacker News, Reddit r/productivity)
 
 ### Métricas a Monitorar (KPIs)
 
-| Métrica | Ferramenta | Meta Mês 1 |
-| :--- | :---: | :---: |
-| MRR (Monthly Recurring Revenue) | Stripe Dashboard | $500 |
-| Usuários Ativos | Posthog / Vercel Analytics | 500 MAU |
-| Taxa de Conversão Free→Pro | Posthog Funnels | 3-5% |
-| Uso de IA por Usuário | DB (AiUsage) | 3 usos/semana |
-| Churn Rate | Stripe | < 5%/mês |
+| Métrica                         |         Ferramenta         |  Meta Mês 1   |
+| :------------------------------ | :------------------------: | :-----------: |
+| MRR (Monthly Recurring Revenue) |      Stripe Dashboard      |     $500      |
+| Usuários Ativos                 | Posthog / Vercel Analytics |    500 MAU    |
+| Taxa de Conversão Free→Pro      |      Posthog Funnels       |     3-5%      |
+| Uso de IA por Usuário           |        DB (AiUsage)        | 3 usos/semana |
+| Churn Rate                      |           Stripe           |   < 5%/mês    |

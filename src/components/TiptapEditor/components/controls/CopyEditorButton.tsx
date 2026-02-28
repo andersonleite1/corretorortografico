@@ -11,7 +11,11 @@ const CopyEditorButton = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCopy = useCallback(async () => {
-    if (!editor || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+    if (
+      !editor ||
+      typeof navigator === "undefined" ||
+      !navigator.clipboard?.writeText
+    ) {
       return;
     }
 
@@ -56,7 +60,7 @@ const CopyEditorButton = () => {
               <Icon name="Check" size={16} />
               <span>{messages.notifications.copySuccess}</span>
             </div>,
-            toastContainer
+            toastContainer,
           )
         : null}
     </>

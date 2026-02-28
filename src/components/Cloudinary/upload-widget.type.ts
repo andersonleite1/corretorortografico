@@ -75,10 +75,10 @@ export type UploadWidgetError =
 
 export type UploadWidgetEventCallback = (
   results: UploadWidgetResults,
-  widget: UploadWidgetInstance
+  widget: UploadWidgetInstance,
 ) => void;
 
 export type UploadWidgetEventCallbackError = (
   error: UploadWidgetError,
-  widget: UploadWidgetInstance
+  widget: UploadWidgetInstance,
 ) => void;

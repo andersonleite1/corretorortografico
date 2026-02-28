@@ -10,7 +10,9 @@ import React, {
   useState,
 } from "react";
 import { EditorContent, type Editor } from "@tiptap/react";
-import useTiptapEditor, { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
+import useTiptapEditor, {
+  type UseTiptapEditorOptions,
+} from "../hooks/useTiptapEditor";
 import clsx from "clsx";
 import CodeMirrorEditor from "@/components/SourceEditor/Editor";
 import { type Locale, i18n } from "../../../../i18n-config";
@@ -18,8 +20,7 @@ import { getEditorMessages, type EditorMessages } from "../i18n/messages";
 import SideBar from "./SideBar";
 import LanguageToolSidebar from "./LanguageToolSidebar";
 import { useSidebar } from "@/components/providers/SidebarProvider";
-import { EditorSettingsProvider, useEditorSettings } from "@/components/providers/EditorSettingsProvider";
-import { SettingsDialog } from "@/components/shared/SettingsDialog";
+import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SaveNotification from "@/components/shared/SaveNotification";
@@ -110,15 +111,18 @@ export const TiptapProvider = ({
   const router = useRouter();
   const documentId = searchParams.get("docId");
 
-  const { isSidebarOpen, setIsSidebarOpen, isLTSidebarOpen, setIsLTSidebarOpen, isMobile, setIsDocumentsDialogOpen } = useSidebar();
-  const { buttonVisibility } = useEditorSettings();
+  const {
+    isSidebarOpen,
+    setIsSidebarOpen,
+    isLTSidebarOpen,
+    setIsLTSidebarOpen,
+    isMobile,
+    setIsDocumentsDialogOpen,
+  } = useSidebar();
+  const { buttonVisibility, setIsSettingsDialogOpen } = useEditorSettings();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
-
-  // Ref to hold setIsSettingsDialogOpen from EditorSettingsProvider context
-  // (populated by SettingsShortcutBridge rendered inside EditorSettingsProvider)
-  const setIsSettingsDialogOpenRef = useRef<((open: boolean) => void) | null>(null);
 
   // Sync spellcheck attribute with settings
   useEffect(() => {
@@ -131,7 +135,6 @@ export const TiptapProvider = ({
       },
     });
   }, [editor, buttonVisibility.browserSpellcheck]);
-
 
   const handleSaveDocument = useCallback(async () => {
     if (userPlan === "free") {
@@ -189,15 +192,24 @@ export const TiptapProvider = ({
         onSaveDraft: draftActions?.onSaveDraft,
         onOpenDocuments: () => setIsDocumentsDialogOpen(true),
         onCopyAll: () => {
-          if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-            navigator.clipboard.writeText(editor.getText()).catch(console.error);
+          if (
+            typeof navigator !== "undefined" &&
+            navigator.clipboard?.writeText
+          ) {
+            navigator.clipboard
+              .writeText(editor.getText())
+              .catch(console.error);
           }
         },
         onClearEditor: exportActions?.onClear ?? undefined,
         onImportPdf: undefined, // ImportPdfButton manages its own dialog state
-        onExport: exportActions?.onExportPdf ?? exportActions?.onExportDoc ?? undefined,
-        onPreview: exportActions?.onPreviewPost ?? exportActions?.onPreviewPdf ?? undefined,
-        onOpenSettings: () => setIsSettingsDialogOpenRef.current?.(true),
+        onExport:
+          exportActions?.onExportPdf ?? exportActions?.onExportDoc ?? undefined,
+        onPreview:
+          exportActions?.onPreviewPost ??
+          exportActions?.onPreviewPdf ??
+          undefined,
+        onOpenSettings: () => setIsSettingsDialogOpen(true),
         onAiRewrite: undefined, // AiRewriteButton manages its own popover state
         onInsertImage: undefined,
         onInsertTable: undefined,
@@ -213,6 +225,7 @@ export const TiptapProvider = ({
     exportActions?.onPreviewPost,
     exportActions?.onPreviewPdf,
     setIsDocumentsDialogOpen,
+    setIsSettingsDialogOpen,
   ]);
 
   // Global keydown listener for browser-intercepted shortcuts
@@ -241,7 +254,7 @@ export const TiptapProvider = ({
       if (!isMod && !e.shiftKey && e.key === "F7") {
         e.preventDefault();
         (editor.commands as any).setLanguageToolEnabled?.(
-          !((editor.storage as any).languageTool?.enabled)
+          !(editor.storage as any).languageTool?.enabled,
         );
         return;
       }
@@ -256,7 +269,13 @@ export const TiptapProvider = ({
 
     window.addEventListener("keydown", handleGlobalKeydown);
     return () => window.removeEventListener("keydown", handleGlobalKeydown);
-  }, [editor, exportActions, isLTSidebarOpen, setIsLTSidebarOpen, setIsDocumentsDialogOpen]);
+  }, [
+    editor,
+    exportActions,
+    isLTSidebarOpen,
+    setIsLTSidebarOpen,
+    setIsDocumentsDialogOpen,
+  ]);
 
   // Auto-save document every 30 seconds
   useEffect(() => {
@@ -287,20 +306,29 @@ export const TiptapProvider = ({
   };
 
   const editorContent = (
-    <div className={clsx(
-      "rte-editor",
-      isFullScreen && "rte-editor--fullscreen",
-      isSidebarOpen && "rte-editor--with-sidebar",
-      isLTSidebarOpen && "rte-editor--with-lt-sidebar"
-    )}>
+    <div
+      className={clsx(
+        "rte-editor",
+        isFullScreen && "rte-editor--fullscreen",
+        isSidebarOpen && "rte-editor--with-sidebar",
+        isLTSidebarOpen && "rte-editor--with-lt-sidebar",
+      )}
+    >
       <SideBar isOpen={isSidebarOpen} />
       <div className="rte-editor__main">
         {slotBefore}
-        <div className="rte-editor__container" onMouseDown={focusEditorViaContainer}>
+        <div
+          className="rte-editor__container"
+          onMouseDown={focusEditorViaContainer}
+        >
           {isSourceMode ? (
             <CodeMirrorEditor initialContent={editor.getHTML() || ""} />
           ) : (
-            <EditorContent ref={contentElement} editor={editor} className="rte-editor__content" />
+            <EditorContent
+              ref={contentElement}
+              editor={editor}
+              className="rte-editor__content"
+            />
           )}
         </div>
         {children}
@@ -311,51 +339,40 @@ export const TiptapProvider = ({
   );
 
   return (
-    <EditorSettingsProvider>
-      <TiptapContext.Provider
-        value={{
-          editor,
-          contentElement,
-          isFullScreen,
-          isResizing,
-          isSourceMode,
-          setIsResizing,
-          toggleFullScreen: () => setIsFullScreen((prev) => !prev),
-          toggleSourceMode: () => setIsSourceMode((prev) => !prev),
-          exportActions,
-          draftActions,
-          messages,
-          locale: normalizedLocale,
-          userPlan,
-          documentTitle,
-          isSidebarOpen,
-          setIsSidebarOpen,
-          isLTSidebarOpen,
-          setIsLTSidebarOpen,
-          onSaveDocument: handleSaveDocument,
-          isSaving,
-          isMobile,
-        }}
-      >
-        {editorContent}
-        <SettingsDialog />
-        <SettingsShortcutBridge setterRef={setIsSettingsDialogOpenRef} />
-        {showSuccess && (
-          <SaveNotification
-            message={documentId ? "Documento atualizado" : "Documento salvo"}
-            onClose={() => setShowSuccess(false)}
-          />
-        )}
-      </TiptapContext.Provider>
-    </EditorSettingsProvider>
+    <TiptapContext.Provider
+      value={{
+        editor,
+        contentElement,
+        isFullScreen,
+        isResizing,
+        isSourceMode,
+        setIsResizing,
+        toggleFullScreen: () => setIsFullScreen((prev) => !prev),
+        toggleSourceMode: () => setIsSourceMode((prev) => !prev),
+        exportActions,
+        draftActions,
+        messages,
+        locale: normalizedLocale,
+        userPlan,
+        documentTitle,
+        isSidebarOpen,
+        setIsSidebarOpen,
+        isLTSidebarOpen,
+        setIsLTSidebarOpen,
+        onSaveDocument: handleSaveDocument,
+        isSaving,
+        isMobile,
+      }}
+    >
+      {editorContent}
+      {showSuccess && (
+        <SaveNotification
+          message={documentId ? "Documento atualizado" : "Documento salvo"}
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+    </TiptapContext.Provider>
   );
-};
-
-/** Small bridge rendered inside EditorSettingsProvider to expose setIsSettingsDialogOpen to Provider effects */
-const SettingsShortcutBridge = ({ setterRef }: { setterRef: React.MutableRefObject<((open: boolean) => void) | null> }) => {
-  const { setIsSettingsDialogOpen } = useEditorSettings();
-  setterRef.current = setIsSettingsDialogOpen;
-  return null;
 };
 
 export default TiptapProvider;
