@@ -33,19 +33,21 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
       <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-gray-800 p-4 space-y-2">
         <button
           onClick={() => setActiveTab("profile")}
-          className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === "profile"
+          className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeTab === "profile"
               ? "bg-indigo-600 text-white"
               : "text-gray-400 hover:bg-gray-800 hover:text-white"
-            }`}
+          }`}
         >
           Perfil
         </button>
         <button
           onClick={() => setActiveTab("subscription")}
-          className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition ${activeTab === "subscription"
+          className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition ${
+            activeTab === "subscription"
               ? "bg-indigo-600 text-white"
               : "text-gray-400 hover:bg-gray-800 hover:text-white"
-            }`}
+          }`}
         >
           Assinatura
         </button>
@@ -139,8 +141,8 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
                 Próxima renovação em:{" "}
                 {user.subscription.stripeCurrentPeriodEnd
                   ? new Date(
-                    user.subscription.stripeCurrentPeriodEnd as any,
-                  ).toLocaleDateString()
+                      user.subscription.stripeCurrentPeriodEnd as any,
+                    ).toLocaleDateString()
                   : "N/A"}
               </div>
             )}

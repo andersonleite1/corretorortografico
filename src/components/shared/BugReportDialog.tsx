@@ -344,10 +344,11 @@ export const BugReportDialog = ({
             <button
               onClick={handleSubmit}
               disabled={status === "submitting"}
-              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${status === "submitting"
+              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${
+                status === "submitting"
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-blue-600"
-                }`}
+              }`}
             >
               {status === "submitting" ? (
                 <>

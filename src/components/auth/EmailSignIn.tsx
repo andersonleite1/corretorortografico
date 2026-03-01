@@ -240,7 +240,6 @@ export default function EmailSignIn({
               <div id="clerk-captcha" className="flex justify-center" />
 
               <div className="pt-4 flex flex-col gap-4">
-
                 <button
                   type="submit"
                   disabled={loading}
