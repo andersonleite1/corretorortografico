@@ -7,6 +7,7 @@ import { Icon } from "../TiptapEditor/components/ui/Icon";
 import { useSidebar } from "../providers/SidebarProvider";
 import { ToolbarDivider } from "../TiptapEditor/components/ui/Toolbar";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
+import { EmptyState } from "./EmptyState";
 
 interface Document {
   id: string;
@@ -206,22 +207,24 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
         {/* Lista de Documentos */}
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-[3px] border-blue-500 border-t-transparent"></div>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-20 w-full rounded-[24px] bg-gray-100 dark:bg-white/5 animate-pulse"
+                />
+              ))}
             </div>
           ) : documents.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="bg-gray-50 dark:bg-white/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Icon
-                  name="Drafts"
-                  size={40}
-                  className="text-gray-300 dark:text-gray-700"
-                />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">
-                Nenhum documento encontrado.
-              </p>
-            </div>
+            <EmptyState
+              icon="Drafts"
+              title="Sua galeria está vazia"
+              description="Você ainda não salvou nenhum documento na nuvem. Que tal começar um agora?"
+              action={{
+                label: "Criar Novo",
+                onClick: onClose,
+              }}
+            />
           ) : (
             documents.map((doc) => (
               <motion.div

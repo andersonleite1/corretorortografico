@@ -95,7 +95,7 @@ describe("api/documents", () => {
   });
 
   describe("POST /api/documents", () => {
-    it("should create a new document when no id is provided and user is Pro", async () => {
+    it("should create a new document when no id is provided", async () => {
       const mockRequest = new Request("http://localhost:3000/api/documents", {
         method: "POST",
         body: JSON.stringify({
@@ -109,18 +109,18 @@ describe("api/documents", () => {
       expect(json.id).toBe("new-doc");
     });
 
-    it("should return 403 if user is Free", async () => {
+    it("should allow a document creation even if user is Free", async () => {
       mockGetUserPlan.mockResolvedValueOnce("free");
 
       const mockRequest = new Request("http://localhost:3000/api/documents", {
         method: "POST",
         body: JSON.stringify({
-          title: "New Doc",
+          title: "New Doc Free",
           content: '{"type":"doc","content":[]}',
         }),
       });
       const response = await POST(mockRequest);
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(200);
     });
 
     it("should update an existing document when id is provided", async () => {

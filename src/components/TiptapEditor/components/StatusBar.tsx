@@ -113,12 +113,36 @@ const StatusBar = () => {
                 draftActions.savingStatus === "error" && "text-red-500",
               )}
             >
-              {draftActions.savingStatus === "saving" && "Salvando..."}
-              {draftActions.savingStatus === "saved" && "Salvo"}
-              {draftActions.savingStatus === "error" && "Erro ao salvar"}
+              {draftActions.savingStatus === "saving" && "Salvando rascunho..."}
+              {draftActions.savingStatus === "saved" && "Rascunho salvo"}
+              {draftActions.savingStatus === "error" && "Erro no rascunho"}
             </span>
           </div>
         )}
+        <div className="flex items-center gap-2 px-3 py-1 ml-2 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider">
+          <div
+            className={clsx(
+              "w-1.5 h-1.5 rounded-full",
+              !!useTiptapContext().documentTitle ||
+                !!new URLSearchParams(window.location.search).get("docId")
+                ? "bg-green-500"
+                : "bg-amber-500",
+            )}
+          />
+          <span
+            className={clsx(
+              !!useTiptapContext().documentTitle ||
+                !!new URLSearchParams(window.location.search).get("docId")
+                ? "text-green-500"
+                : "text-amber-500",
+            )}
+          >
+            {!!useTiptapContext().documentTitle ||
+            !!new URLSearchParams(window.location.search).get("docId")
+              ? "Sincronizado"
+              : "Local"}
+          </span>
+        </div>
       </Toolbar>
 
       <div className="rte-counter">

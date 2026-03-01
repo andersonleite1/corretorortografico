@@ -16,17 +16,8 @@ const documentSchema = z.object({
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
-    const plan = await getUserPlan();
-
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Permitir salvamento apenas para usuários Pro ou Team
-    if (plan === "free") {
-      return new NextResponse("Upgrade ao plano Pro para salvar documentos", {
-        status: 403,
-      });
     }
 
     const body = await req.json();

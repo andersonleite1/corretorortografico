@@ -198,7 +198,7 @@ describe("StatusBar", () => {
         onCompareDraft: vi.fn(),
       } as any;
       render(<StatusBar />);
-      expect(screen.getByText("Salvando...")).toBeInTheDocument();
+      expect(screen.getByText("Salvando rascunho...")).toBeInTheDocument();
     });
 
     it('exibe "Salvo" quando savingStatus="saved"', () => {
@@ -211,7 +211,7 @@ describe("StatusBar", () => {
         onCompareDraft: vi.fn(),
       } as any;
       render(<StatusBar />);
-      expect(screen.getByText("Salvo")).toBeInTheDocument();
+      expect(screen.getByText("Rascunho salvo")).toBeInTheDocument();
     });
 
     it('exibe "Erro ao salvar" quando savingStatus="error"', () => {
@@ -224,7 +224,7 @@ describe("StatusBar", () => {
         onCompareDraft: vi.fn(),
       } as any;
       render(<StatusBar />);
-      expect(screen.getByText("Erro ao salvar")).toBeInTheDocument();
+      expect(screen.getByText("Erro no rascunho")).toBeInTheDocument();
     });
 
     it('não exibe status quando savingStatus="idle"', () => {
@@ -238,7 +238,22 @@ describe("StatusBar", () => {
       } as any;
       render(<StatusBar />);
       expect(screen.queryByText("Salvando...")).not.toBeInTheDocument();
-      expect(screen.queryByText("Salvo")).not.toBeInTheDocument();
+      expect(screen.queryByText("Rascunho salvo")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Status de Sincronização", () => {
+    it('exibe "Sincronizado" quando documentTitle está presente', () => {
+      defaultContextValue.documentTitle = "Meu Documento";
+      render(<StatusBar />);
+      expect(screen.getByText("Sincronizado")).toBeInTheDocument();
+    });
+
+    it('exibe "Local" quando não há documentTitle nem docId', () => {
+      defaultContextValue.documentTitle = undefined;
+      // Note: window.location.search mock is tricky, but let's assume it's empty by default
+      render(<StatusBar />);
+      expect(screen.getByText("Local")).toBeInTheDocument();
     });
   });
 });

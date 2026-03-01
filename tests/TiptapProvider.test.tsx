@@ -136,7 +136,7 @@ describe("TiptapProvider", () => {
     );
   });
 
-  it("bloqueia o salvamento e exibe erro para usuários do plano free", async () => {
+  it("permite o salvamento para usuários do plano free", async () => {
     const TestComponent = () => {
       const { onSaveDocument } = useTiptapContext();
       return <button onClick={onSaveDocument}>Save</button>;
@@ -148,10 +148,13 @@ describe("TiptapProvider", () => {
       </TiptapProvider>,
     );
 
-    fireEvent.click(getByText("Save"));
+    await act(async () => {
+      fireEvent.click(getByText("Save"));
+    });
 
-    expect(toast.error).toHaveBeenCalledWith(
-      expect.stringContaining("Upgrade para o plano Pro"),
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/documents",
+      expect.objectContaining({ method: "POST" }),
     );
   });
 

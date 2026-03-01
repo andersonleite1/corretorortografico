@@ -15,6 +15,7 @@ import {
   Legend,
 } from "recharts";
 import Link from "next/link";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface DashboardData {
@@ -211,9 +212,11 @@ function TimeSavedChart({
       </p>
 
       {!hasData ? (
-        <div className="h-44 flex items-center justify-center text-sm text-neutral-400 dark:text-neutral-500 mt-4">
-          Nenhuma reescrita registrada ainda. Use a IA para ver os gráficos!
-        </div>
+        <EmptyState
+          icon="📈"
+          title="Sem dados para exibir"
+          description="Nenhuma reescrita registrada ainda. Use a IA no editor para ver sua evolução aqui!"
+        />
       ) : (
         <div className="mt-4">
           <ResponsiveContainer width="100%" height={180}>
@@ -304,9 +307,11 @@ function ToneDistributionChart({
       </p>
 
       {formatted.length === 0 ? (
-        <div className="h-52 flex items-center justify-center text-sm text-neutral-400 dark:text-neutral-500 mt-4">
-          Nenhum tom registrado ainda.
-        </div>
+        <EmptyState
+          icon="🎨"
+          title="Nenhum tom detectado"
+          description="Seu estilo de escrita aparecerá aqui conforme você edita e usa diferentes tons de IA."
+        />
       ) : (
         <div className="mt-4">
           <ResponsiveContainer width="100%" height={200}>
@@ -383,9 +388,15 @@ function RecentDocuments({
       </div>
 
       {documents.length === 0 ? (
-        <div className="py-8 text-center text-sm text-neutral-400 dark:text-neutral-500">
-          Nenhum documento salvo. Comece escrevendo agora!
-        </div>
+        <EmptyState
+          icon="📄"
+          title="O início de algo grande"
+          description="Seus documentos recentes aparecerão aqui. Comece um novo projeto agora!"
+          action={{
+            label: "Novo Documento",
+            href: "/",
+          }}
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {documents.map((doc) => (

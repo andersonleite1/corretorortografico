@@ -64,10 +64,10 @@ export const DraftComparison = ({
               "text-gray-700 dark:text-gray-300 transition-colors";
             if (part.added) {
               className =
-                "bg-green-100/80 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-1 rounded-sm border-b-2 border-green-500/30 font-medium decoration-green-500/30";
+                "bg-green-100 dark:bg-green-900/60 text-green-800 dark:text-green-300 px-1 rounded-sm border-b-2 border-green-600/50 font-medium decoration-green-600/50";
             } else if (part.removed) {
               className =
-                "bg-red-100/80 dark:bg-red-900/40 text-red-600 dark:text-red-400 px-1 rounded-sm border-b-2 border-red-500/30 line-through decoration-red-500/50";
+                "bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 px-1 rounded-sm border-b-2 border-red-600/50 line-through decoration-red-600/70";
             }
 
             return (

@@ -137,11 +137,6 @@ export const TiptapProvider = ({
   }, [editor, buttonVisibility.browserSpellcheck]);
 
   const handleSaveDocument = useCallback(async () => {
-    if (userPlan === "free") {
-      toast.error("Upgrade para o plano Pro para salvar documentos");
-      return;
-    }
-
     setIsSaving(true);
     try {
       const content = editor.getJSON();
@@ -279,7 +274,7 @@ export const TiptapProvider = ({
 
   // Auto-save document every 30 seconds
   useEffect(() => {
-    if (!documentId || userPlan === "free" || !handleSaveDocument) {
+    if (!documentId || !handleSaveDocument) {
       return;
     }
 

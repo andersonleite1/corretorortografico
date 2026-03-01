@@ -1,12 +1,9 @@
+import React from "react";
 import MenuButton from "../MenuButton";
 import { useTiptapContext } from "../Provider";
 
 export const SaveButton = () => {
-  const { messages, userPlan, onSaveDocument, isSaving } = useTiptapContext();
-
-  if (userPlan === "free") {
-    return null;
-  }
+  const { messages, onSaveDocument, isSaving } = useTiptapContext();
 
   return (
     <MenuButton

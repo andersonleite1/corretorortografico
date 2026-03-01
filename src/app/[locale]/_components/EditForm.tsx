@@ -395,28 +395,61 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             content,
             updatedAt: doc.updatedAt,
           });
+
           reset({ title: recovered.title, content: recovered.content });
-          editorRef.current
-            ?.getInstance()
-            ?.commands.setContent(recovered.content);
+
+          // FIX: Only set content if it's different to avoid cursor jumps
+          const instance = editorRef.current?.getInstance();
+          if (instance) {
+            const currentContent = instance.getJSON();
+            const newContentString =
+              typeof recovered.content === "string"
+                ? recovered.content
+                : JSON.stringify(recovered.content);
+            const currentContentString = JSON.stringify(currentContent);
+
+            if (newContentString !== currentContentString) {
+              instance.commands.setContent(recovered.content);
+            }
+          }
           setIsLoading(false);
         })
         .catch((error) => {
           console.error(error);
           getPost().then((post) => {
             reset({ ...post });
-            editorRef.current
-              ?.getInstance()
-              ?.commands.setContent(post.content || "");
+            const instance = editorRef.current?.getInstance();
+            if (instance) {
+              const currentContent = instance.getJSON();
+              const newContentString =
+                typeof post.content === "string"
+                  ? post.content
+                  : JSON.stringify(post.content);
+              const currentContentString = JSON.stringify(currentContent);
+
+              if (newContentString !== currentContentString) {
+                instance.commands.setContent(post.content || "");
+              }
+            }
             setIsLoading(false);
           });
         });
     } else {
       getPost().then((post) => {
         reset({ ...post });
-        editorRef.current
-          ?.getInstance()
-          ?.commands.setContent(post.content || "");
+        const instance = editorRef.current?.getInstance();
+        if (instance) {
+          const currentContent = instance.getJSON();
+          const newContentString =
+            typeof post.content === "string"
+              ? post.content
+              : JSON.stringify(post.content);
+          const currentContentString = JSON.stringify(currentContent);
+
+          if (newContentString !== currentContentString) {
+            instance.commands.setContent(post.content || "");
+          }
+        }
         setIsLoading(false);
       });
     }
@@ -555,16 +588,22 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     [docId, drafts, formMessages, locale, watch],
   );
 
-  // Auto-save draft on content change (throttled by the API)
+  // Auto-save draft on content change (throttled by the API and debounced on frontend)
   useEffect(() => {
-    const subscription = watch((_values, { name: _name, type }) => {
-      // name === "content" ensures we don't save on title changes redundantely or vice-versa if handled elsewhere
-      // but usually we want both. The important thing is THAT it reacts to changes.
+    let debounceTimer: NodeJS.Timeout;
+
+    const subscription = watch((_values, { name, type }) => {
       if (type === "change") {
-        handleSaveDraft(false);
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          handleSaveDraft(false);
+        }, 3000); // 3 seconds debounce
       }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(debounceTimer);
+    };
   }, [watch, docId, handleSaveDraft]);
 
   // Função para carregar um rascunho
