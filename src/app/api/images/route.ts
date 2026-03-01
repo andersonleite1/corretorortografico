@@ -88,7 +88,7 @@ export async function POST(req: Request) {
     const result: any = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          public_id: file.name.split(/\.\w+$/)[0],
+          public_id: `${userId}/${Date.now()}-${file.name.split(/\.\w+$/)[0]}`,
           resource_type: "image",
           invalidate: true,
           tags: [userId],

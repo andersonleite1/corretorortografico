@@ -3,13 +3,12 @@ import { POST } from "@/app/api/bug-reports/route";
 import { NextRequest } from "next/server";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockBugReportCreate, mockUserFindUnique, mockRateLimitLimit } = vi.hoisted(
-  () => ({
+const { mockBugReportCreate, mockUserFindUnique, mockRateLimitLimit } =
+  vi.hoisted(() => ({
     mockBugReportCreate: vi.fn(),
     mockUserFindUnique: vi.fn().mockResolvedValue(null),
     mockRateLimitLimit: vi.fn().mockResolvedValue({ success: true, reset: 0 }),
-  }),
-);
+  }));
 
 vi.mock("@/lib/ratelimit", () => ({
   ratelimit: {
@@ -61,7 +60,7 @@ describe("POST /api/bug-reports", () => {
   it("retorna 429 quando o rate limit por IP é excedido (SEG-01 - REDIS)", async () => {
     mockRateLimitLimit.mockResolvedValue({
       success: false,
-      reset: Date.now() + 60000
+      reset: Date.now() + 60000,
     });
 
     const req = createRequest(validBody);

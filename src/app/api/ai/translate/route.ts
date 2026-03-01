@@ -26,8 +26,7 @@ export async function POST(req: Request) {
   try {
     // SEG-01/04: Rate limit global por IP (Prevenção de Abuso)
     const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-      "unknown";
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
 
     const globalLimit = await ratelimit.ai.limit(ip);
     if (!globalLimit.success) {

@@ -512,11 +512,22 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           date: new Date().toLocaleString(formMessages.dateLocale),
         };
 
-        let updatedDrafts = [...drafts, current];
-        if (updatedDrafts.length > 10) updatedDrafts = updatedDrafts.slice(-10);
-        localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
-        setDrafts(updatedDrafts);
-        if (isExplicit) showNotification(formMessages.modal.draftSaved);
+        try {
+          let updatedDrafts = [current, ...drafts]; // Rascunho novo no topo
+          if (updatedDrafts.length > 5)
+            updatedDrafts = updatedDrafts.slice(0, 5); // Reduzido para 5 para economizar espaço (BUG-05)
+
+          localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
+          setDrafts(updatedDrafts);
+          if (isExplicit) showNotification(formMessages.modal.draftSaved);
+        } catch (e) {
+          console.warn("Storage full, cleaning up drafts", e);
+          // Limpa tudo menos o mais recente se der erro de quota
+          localStorage.removeItem("drafts");
+          localStorage.setItem("drafts", JSON.stringify([current]));
+          setDrafts([current]);
+          if (isExplicit) showNotification(formMessages.modal.draftSaved);
+        }
         return;
       }
 

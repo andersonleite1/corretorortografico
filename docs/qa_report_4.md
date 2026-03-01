@@ -1,4 +1,5 @@
 # QA Report #4 — Editor de Texto
+
 **Data:** 2026-03-01  
 **Analista:** Antigravity (Agente de IA — Papel: QA Analyst)  
 **Versão do Sistema:** 0.1.0 (MVP)  
@@ -19,12 +20,12 @@
 
 ## Resumo Executivo
 
-| Categoria | Qtd. | Severidade Máx. |
-|---|---|---|
-| Vulnerabilidades de Segurança | 7 | 🔴 Crítica |
-| Bugs / Defeitos Funcionais | 5 | 🟠 Alta |
-| Riscos de Escalabilidade | 4 | 🟠 Alta |
-| **Total de Problemas** | **16** | |
+| Categoria                     | Qtd.   | Severidade Máx. |
+| ----------------------------- | ------ | --------------- |
+| Vulnerabilidades de Segurança | 7      | 🔴 Crítica      |
+| Bugs / Defeitos Funcionais    | 5      | 🟠 Alta         |
+| Riscos de Escalabilidade      | 4      | 🟠 Alta         |
+| **Total de Problemas**        | **16** |                 |
 
 **Veredito MVP:** ⚠️ **CONDICIONAL** — O sistema possui fundações sólidas, mas 3 vulnerabilidades de segurança devem ser corrigidas obrigatoriamente antes do lançamento público.
 
@@ -81,7 +82,7 @@ const extraPrompt = customInstructions
 
 ---
 
-### 🟠 [SEG-04] Rate Limiting In-Memory no `/api/pdf/export` — Não Persistente (Alta)
+### 🟠 [FIXED] [SEG-04] Rate Limiting In-Memory no `/api/pdf/export` — Não Persistente (Alta)
 
 **Arquivo:** `src/app/api/pdf/export/route.ts`  
 **Descrição:** O rate limiting é implementado usando um `Map` em memória (`ipRateLimitMap`). Em ambientes com múltiplas instâncias (Vercel Serverless Functions, Docker com múltiplas réplicas), cada instância mantém seu próprio contador isolado, tornando o limite completamente ineficaz. Além disso, o mapa não tem mecanismo de limpeza (memory leak progressivo).
@@ -96,7 +97,7 @@ const ipRateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 ---
 
-### 🟠 [SEG-05] Ausência de Rate Limiting na Rota `/api/ai/translate` e `/api/ai/seo` (Alta)
+### 🟠 [FIXED] [SEG-05] Ausência de Rate Limiting na Rota `/api/ai/translate` e `/api/ai/seo` (Alta)
 
 **Arquivo:** `src/app/api/ai/translate/route.ts`, `src/app/api/ai/seo/route.ts`  
 **Descrição:** Não foi possível verificar se as outras rotas de IA implementam o mesmo `checkAiRateLimit` da rota de rewrite. Se não o fizerem, um usuário free pode chamar os endpoints de tradução e SEO sem limitação de uso.  
@@ -104,7 +105,7 @@ const ipRateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 ---
 
-### 🟡 [SEG-06] Content Security Policy com `'unsafe-inline'` e `'unsafe-eval'` (Média)
+### 🟡 [FIXED] [SEG-06] Content Security Policy com `'unsafe-inline'` e `'unsafe-eval'` (Média)
 
 **Arquivo:** `next.config.mjs`  
 **Descrição:** A CSP (Content Security Policy) configurada inclui `'unsafe-inline'` e `'unsafe-eval'` na diretiva `script-src`. Isso enfraquece significativamente a proteção contra ataques de Cross-Site Scripting (XSS), que são especialmente relevantes neste contexto pois a aplicação é um editor de HTML rico.
@@ -113,7 +114,7 @@ const ipRateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 ---
 
-### 🟡 [SEG-07] `public_id` do Cloudinary Derivado do Nome do Arquivo do Usuário (Média)
+### 🟡 [FIXED] [SEG-07] `public_id` do Cloudinary Derivado do Nome do Arquivo do Usuário (Média)
 
 **Arquivo:** `src/app/api/images/route.ts`  
 **Descrição:** O `public_id` da imagem no Cloudinary é derivado diretamente do nome do arquivo original do usuário (sem o ramal).
@@ -195,7 +196,7 @@ O status `"past_due"` retorna o plano pago ao invés de "free".
 
 ---
 
-### 🟡 [BUG-05] Salvamento em localStorage Não Limpa Rascunhos Antigos (Média)
+### 🟡 [FIXED] [BUG-05] Salvamento em localStorage Não Limpa Rascunhos Antigos (Média)
 
 **Arquivo:** `MVP.md` menciona: _"Salvamento Automático: Persistência inteligente de rascunhos no localStorage"_  
 **Descrição:** O localStorage tem limite de ~5-10 MB. Documentos muito longos ou muitos rascunhos acumulados podem causar um `QuotaExceededError`, resultando em falha silenciosa na persistência do documento.  
@@ -205,7 +206,7 @@ O status `"past_due"` retorna o plano pago ao invés de "free".
 
 ## Escalabilidade
 
-### 🟠 [ESC-01] Rate Limiting em Memória é Incompatível com Deploy Serverless
+### 🟠 [FIXED] [ESC-01] Rate Limiting em Memória é Incompatível com Deploy Serverless (Alta)
 
 **Afeta:** `/api/pdf/export` (ipRateLimitMap) e potencialmente outros limitadores implementados da mesma forma.  
 **Problema:** Em ambiente serverless (Vercel), cada invocação pode ser uma instância separada; o Map em memória não é compartilhado. O rate limit é completamente ineficaz nesse cenário.  
@@ -213,25 +214,26 @@ O status `"past_due"` retorna o plano pago ao invés de "free".
 
 ---
 
-### 🟠 [ESC-02] Banco de Dados Sem Pool de Conexões Configurado Explicitamente
+### 🟠 [FIXED] [ESC-02] Banco de Dados Sem Pool de Conexões Configurado Explicitamente (Média)
 
 **Arquivo:** `src/lib/db.ts`, `prisma/schema.prisma`  
 **Descrição:** O `PrismaClient` é instanciado sem configuração explícita de pool de conexões. Em ambiente serverless com alta concorrência, isso pode esgotar o limite de conexões do PostgreSQL, resultando em erros `P2024` (connection pool timeout).
 
-**Recomendação:** 
+**Recomendação:**
+
 - Configurar `connection_limit` nas variáveis de ambiente (`DATABASE_URL?connection_limit=5`)
 - Considerar o uso de um pooler de conexões externo como **PgBouncer** ou **Prisma Accelerate**.
 
 ---
 
-### 🟡 [ESC-03] Ausência de Cache para Leituras Frequentes (Média)
+### 🟡 [FIXED] [ESC-03] Ausência de Cache para Leituras Frequentes (Média)
 
 **Descrição:** Dados como `editorSettings`, `subscription` e `user` são consultados no banco a cada requisição. Em alta escala, essas leituras frequentes gerarão pressão desnecessária no banco de dados.  
 **Recomendação:** Implementar cache de curta duração (TTL: 60-300s) usando Redis para dados imutáveis por curtos períodos (ex: plano de assinatura, configurações do editor).
 
 ---
 
-### 🟡 [ESC-04] Modelo `AiUsage` Pode Crescer Indefinidamente (Média)
+### 🟡 [FIXED] [ESC-04] Modelo `AiUsage` Pode Crescer Indefinidamente (Média)
 
 **Arquivo:** `prisma/schema.prisma`  
 **Descrição:** Cada uso de IA gera um registro em `ai_usage`. Sem política de archiving ou purge de dados históricos, a tabela crescerá indefinidamente. Com alto volume de usuários, isso impactará o desempenho das queries de rate limiting.
@@ -249,38 +251,38 @@ SELECT COUNT(*) FROM ai_usage WHERE userId = ? AND createdAt >= ?
 
 ### ✅ Pontos Positivos (Prontos para Produção)
 
-|# | Recurso | Status |
-|---|---|---|
-| ✅ | **Autenticação** via Clerk com suporte a webhook | Pronto |
-| ✅ | **Isolamento de dados** por usuário (tenant isolation) em todos os modelos | Pronto |
-| ✅ | **Validação de input** com Zod em todas as rotas principais | Pronto |
-| ✅ | **Assinatura Stripe** com webhook verificado via assinatura criptográfica | Pronto |
-| ✅ | **Webhook Clerk** verificado via Svix com headers obrigatórios | Pronto |
-| ✅ | **Cabeçalhos HTTP de segurança** configurados (HSTS, X-Frame-Options, CSP, nosniff) | Pronto |
-| ✅ | **Source Maps** desabilitados em produção | Pronto |
-| ✅ | **DOMPurify** aplicado no export de PDF (proteção contra XSS no HTML exportado) | Pronto |
-| ✅ | **Paginação** implementada na listagem de documentos | Pronto |
-| ✅ | **Sentry** integrado para monitoramento de erros | Pronto |
-| ✅ | **i18n** funcional (PT, EN, ES) | Pronto |
-| ✅ | **Rate Limiting de IA** por usuário e por plano implementado via banco de dados | Pronto |
-| ✅ | **Índices de banco de dados** adequados para as queries principais | Pronto |
+| #   | Recurso                                                                             | Status |
+| --- | ----------------------------------------------------------------------------------- | ------ |
+| ✅  | **Autenticação** via Clerk com suporte a webhook                                    | Pronto |
+| ✅  | **Isolamento de dados** por usuário (tenant isolation) em todos os modelos          | Pronto |
+| ✅  | **Validação de input** com Zod em todas as rotas principais                         | Pronto |
+| ✅  | **Assinatura Stripe** com webhook verificado via assinatura criptográfica           | Pronto |
+| ✅  | **Webhook Clerk** verificado via Svix com headers obrigatórios                      | Pronto |
+| ✅  | **Cabeçalhos HTTP de segurança** configurados (HSTS, X-Frame-Options, CSP, nosniff) | Pronto |
+| ✅  | **Source Maps** desabilitados em produção                                           | Pronto |
+| ✅  | **DOMPurify** aplicado no export de PDF (proteção contra XSS no HTML exportado)     | Pronto |
+| ✅  | **Paginação** implementada na listagem de documentos                                | Pronto |
+| ✅  | **Sentry** integrado para monitoramento de erros                                    | Pronto |
+| ✅  | **i18n** funcional (PT, EN, ES)                                                     | Pronto |
+| ✅  | **Rate Limiting de IA** por usuário e por plano implementado via banco de dados     | Pronto |
+| ✅  | **Índices de banco de dados** adequados para as queries principais                  | Pronto |
 
 ---
 
 ### ⚠️ Itens que Requerem Atenção Antes do Lançamento
 
-| # | Item | Prioridade |
-|---|---|---|
-| � | Corrigir SEG-01: Rate limit no `/api/bug-reports` | **FIXED** |
-| � | Corrigir SEG-03: Sanitização de `customInstructions` (prompt injection) | **FIXED** |
-| � | Corrigir BUG-01: Falha silenciosa no middleware em erros de auth | **FIXED** |
-| 🟠 | Corrigir SEG-04: Rate limiting in-memory → Redis | Alta |
-| � | Corrigir BUG-04: Status `past_due` ainda concede acesso ao plano pago | **FIXED** |
-| � | Corrigir BUG-02: Resposta de erro faltando no upload de imagem | **FIXED** |
-| 🟡 | Corrigir SEG-07: Unicidade do `public_id` no Cloudinary | Média |
-| 🟡 | Configurar pool de conexões do Prisma para produção (ESC-02) | Média |
-| 🟢 | Corrigir SEG-02: Adicionar IP Rate Limit rigído para `/api/languagetool` (rota pública) | **FIXED** |
-| 🟢 | Corrigir BUG-03: Validation `typeof id === string` em clerk webhook | **FIXED** |
+| #   | Item                                                                                    | Prioridade |
+| --- | --------------------------------------------------------------------------------------- | ---------- |
+| �   | Corrigir SEG-01: Rate limit no `/api/bug-reports`                                       | **FIXED**  |
+| �   | Corrigir SEG-03: Sanitização de `customInstructions` (prompt injection)                 | **FIXED**  |
+| �   | Corrigir BUG-01: Falha silenciosa no middleware em erros de auth                        | **FIXED**  |
+| ✅  | Corrigir SEG-04: Rate limiting in-memory → Redis                                        | **FIXED**  |
+| �   | Corrigir BUG-04: Status `past_due` ainda concede acesso ao plano pago                   | **FIXED**  |
+| �   | Corrigir BUG-02: Resposta de erro faltando no upload de imagem                          | **FIXED**  |
+|     | Corrigir SEG-07: Unicidade do `public_id` no Cloudinary                                 | **FIXED**  |
+| 🟡  | Configurar pool de conexões do Prisma para produção (ESC-02)                            | **FIXED**  |
+| 🟢  | Corrigir SEG-02: Adicionar IP Rate Limit rigído para `/api/languagetool` (rota pública) | **FIXED**  |
+| 🟢  | Corrigir BUG-03: Validation `typeof id === string` em clerk webhook                     | **FIXED**  |
 
 ---
 
@@ -302,4 +304,4 @@ SELECT COUNT(*) FROM ai_usage WHERE userId = ? AND createdAt >= ?
 
 ---
 
-*Relatório gerado em 2026-03-01 por análise estática do código-fonte. Não substitui testes de penetração (pentest) profissionais em ambiente de produção.*
+_Relatório gerado em 2026-03-01 por análise estática do código-fonte. Não substitui testes de penetração (pentest) profissionais em ambiente de produção._
