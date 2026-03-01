@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 import { LanguageToolResponse } from "@/types/languageTool";
-import { getIpRateLimit } from "@/lib/ip-rate-limit";
+import { ratelimit } from "@/lib/ratelimit";
 
 const MAX_TEXT_LENGTH = 20000;
 const apiEndpoint = "https://languagetool.editordetexto.cloud/v2/check";
@@ -19,17 +19,17 @@ export async function POST(request: NextRequest) {
     console.warn(`[LanguageTool API] Acesso negado para a origem: ${origin}`);
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
+
   // ---------------------------------------------
-  // SEG-02: Rate limit por IP (Permanece público, mas protegido contra spans diretos)
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
     request.headers.get("x-real-ip") ||
     "unknown";
 
-  const rateLimit = getIpRateLimit(ip, "languagetool", 30, 60 * 60 * 1000); // Ex: 30 requests/hora
+  const { success, reset } = await ratelimit.languageTool.limit(ip);
 
-  if (!rateLimit.allowed) {
-    const retryAfter = Math.ceil((rateLimit.resetAt - Date.now()) / 1000);
+  if (!success) {
+    const retryAfter = Math.ceil((reset - Date.now()) / 1000);
     return NextResponse.json(
       { error: "Muitas requisições. Tente novamente mais tarde." },
       { status: 429, headers: { "Retry-After": String(retryAfter) } },

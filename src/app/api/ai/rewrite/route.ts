@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 import { sanitizeAiInput } from "@/lib/ai-sanitize";
+import { ratelimit } from "@/lib/ratelimit";
 
 function logError(msg: string) {
   console.error(`[AI_REWRITE_ERROR] ${msg}`);
@@ -58,8 +59,21 @@ const TONE_PROMPTS = {
 };
 
 export async function POST(req: Request) {
-  // 1. Autenticação
   try {
+    // SEG-01/04: Rate limit global por IP (Prevenção de Abuso)
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      "unknown";
+
+    const globalLimit = await ratelimit.ai.limit(ip);
+    if (!globalLimit.success) {
+      return NextResponse.json(
+        { error: "Muitas requisições de IA. Tente novamente mais tarde." },
+        { status: 429 },
+      );
+    }
+
+    // 1. Autenticação
     const { userId: clerkId } = await auth();
     if (!clerkId)
       return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
@@ -147,6 +161,13 @@ export async function POST(req: Request) {
 
     return result.toTextStreamResponse();
   } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Dados inválidos.", details: error.issues },
+        { status: 400 },
+      );
+    }
+
     if (error instanceof Error) {
       logError(`${error.message}\n${error.stack}`);
     }

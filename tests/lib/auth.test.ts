@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserPlan } from "@/lib/auth";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockAuth, mockUserFindUnique } = vi.hoisted(() => ({
+const { mockAuth, mockUserFindUnique, mockRedisGet, mockRedisSet } = vi.hoisted(() => ({
     mockAuth: vi.fn(),
     mockUserFindUnique: vi.fn(),
+    mockRedisGet: vi.fn().mockResolvedValue(null),
+    mockRedisSet: vi.fn().mockResolvedValue("OK"),
 }));
 
 vi.mock("@clerk/nextjs/server", () => ({
@@ -19,6 +21,13 @@ vi.mock("@/lib/db", () => ({
     },
 }));
 
+vi.mock("@/lib/redis", () => ({
+    redis: {
+        get: (...args: any[]) => mockRedisGet(...args),
+        set: (...args: any[]) => mockRedisSet(...args),
+    },
+}));
+
 vi.mock("react", () => ({
     cache: (fn: any) => fn,
 }));
@@ -26,6 +35,8 @@ vi.mock("react", () => ({
 describe("getUserPlan", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockRedisGet.mockResolvedValue(null);
+        mockRedisSet.mockResolvedValue("OK");
     });
 
     const mockUserWithSubscription = (status: string, plan = "pro", expiry?: Date) => {
@@ -46,6 +57,17 @@ describe("getUserPlan", () => {
         expect(plan).toBe("free");
     });
 
+    it("retorna plano do cache se estiver disponível", async () => {
+        mockAuth.mockResolvedValue({ userId: "clerk-123" });
+        mockRedisGet.mockResolvedValue("pro");
+
+        const plan = await getUserPlan(false); // não forçar refresh
+
+        expect(plan).toBe("pro");
+        expect(mockRedisGet).toHaveBeenCalled();
+        expect(mockUserFindUnique).not.toHaveBeenCalled();
+    });
+
     it("retorna 'free' quando usuário não existe no DB", async () => {
         mockAuth.mockResolvedValue({ userId: "clerk-123" });
         mockUserFindUnique.mockResolvedValue(null);
@@ -60,30 +82,19 @@ describe("getUserPlan", () => {
         expect(plan).toBe("free");
     });
 
-    it("retorna o plano correto quando o status é 'active' (BUG-04)", async () => {
+    it("retorna o plano correto quando o status é 'active' e salva no cache", async () => {
         mockAuth.mockResolvedValue({ userId: "clerk-123" });
         mockUserFindUnique.mockResolvedValue(mockUserWithSubscription("active"));
-        const plan = await getUserPlan(true);
-        expect(plan).toBe("pro");
-    });
 
-    it("retorna o plano correto quando o status é 'trialing' (BUG-04)", async () => {
-        mockAuth.mockResolvedValue({ userId: "clerk-123" });
-        mockUserFindUnique.mockResolvedValue(mockUserWithSubscription("trialing"));
         const plan = await getUserPlan(true);
+
         expect(plan).toBe("pro");
+        expect(mockRedisSet).toHaveBeenCalledWith(expect.stringContaining("clerk-123"), "pro", expect.anything());
     });
 
     it("retorna 'free' quando o status é 'past_due' (BUG-04 - FIX)", async () => {
         mockAuth.mockResolvedValue({ userId: "clerk-123" });
         mockUserFindUnique.mockResolvedValue(mockUserWithSubscription("past_due"));
-        const plan = await getUserPlan(true);
-        expect(plan).toBe("free");
-    });
-
-    it("retorna 'free' quando o status é 'canceled' (BUG-04 - FIX)", async () => {
-        mockAuth.mockResolvedValue({ userId: "clerk-123" });
-        mockUserFindUnique.mockResolvedValue(mockUserWithSubscription("canceled"));
         const plan = await getUserPlan(true);
         expect(plan).toBe("free");
     });

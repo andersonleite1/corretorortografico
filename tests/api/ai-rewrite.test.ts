@@ -19,9 +19,18 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+// Mock the rate limit
+vi.mock("@/lib/ratelimit", () => ({
+  ratelimit: {
+    ai: {
+      limit: vi.fn().mockResolvedValue({ success: true }),
+    },
+  },
+}));
+
 // Mock the AI rate limit
 vi.mock("@/lib/ai-rate-limit", () => ({
-  checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: false }),
+  checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
 
 describe("POST /api/ai/rewrite", () => {
@@ -30,12 +39,12 @@ describe("POST /api/ai/rewrite", () => {
   });
 
   it("should reject request when user is not authenticated", async () => {
-    // Mock auth failure
-    (auth as any).mockResolvedValueOnce({ userId: null });
+    // Mock auth failure - need to mock it again if we want to change behavior
+    vi.mocked(auth).mockResolvedValueOnce({ userId: null } as any);
 
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",
-      body: JSON.stringify({ action: "improve", text: "hello" }),
+      body: JSON.stringify({ tone: "professional", text: "hello" }),
     });
 
     const response = await POST(mockRequest);
@@ -43,11 +52,19 @@ describe("POST /api/ai/rewrite", () => {
   });
 
   it("should reject request when rate limit exceeded", async () => {
+    // Mock rate limit failure
+    const { checkAiRateLimit } = await import("@/lib/ai-rate-limit");
+    vi.mocked(checkAiRateLimit).mockResolvedValueOnce({
+      allowed: false,
+      used: 5,
+      limit: 5,
+    } as any);
+
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",
       body: JSON.stringify({
-        action: "improve",
-        content: "hello",
+        tone: "professional",
+        text: "hello",
       }),
     });
 

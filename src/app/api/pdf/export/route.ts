@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 import DOMPurify from "isomorphic-dompurify";
-
-const ipRateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const LIMIT = 10;
-const WINDOW_IN_MS = 60 * 1000;
+import { ratelimit } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
   try {
@@ -12,23 +9,13 @@ export async function POST(req: Request) {
       req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
       "unknown";
-    const now = Date.now();
 
-    const rateLimitInfo = ipRateLimitMap.get(ip);
-    if (rateLimitInfo) {
-      if (now > rateLimitInfo.resetTime) {
-        ipRateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_IN_MS });
-      } else {
-        if (rateLimitInfo.count >= LIMIT) {
-          return new NextResponse(
-            "Rate limit exceeded. Tente novamente em 1 minuto.",
-            { status: 429 },
-          );
-        }
-        rateLimitInfo.count++;
-      }
-    } else {
-      ipRateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_IN_MS });
+    const { success } = await ratelimit.pdfExport.limit(ip);
+    if (!success) {
+      return new NextResponse(
+        "Rate limit exceeded. Tente novamente em 1 minuto.",
+        { status: 429 },
+      );
     }
 
     const htmlDocument = await req.text();

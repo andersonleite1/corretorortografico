@@ -3,12 +3,16 @@ import { POST } from "@/app/api/languagetool/route";
 import { NextRequest } from "next/server";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockGetIpRateLimit } = vi.hoisted(() => ({
-    mockGetIpRateLimit: vi.fn().mockReturnValue({ allowed: true, remaining: 29, resetAt: 0 }),
+const { mockRateLimitLimit } = vi.hoisted(() => ({
+    mockRateLimitLimit: vi.fn().mockResolvedValue({ success: true, reset: 0 }),
 }));
 
-vi.mock("@/lib/ip-rate-limit", () => ({
-    getIpRateLimit: (...args: any[]) => mockGetIpRateLimit(...args),
+vi.mock("@/lib/ratelimit", () => ({
+    ratelimit: {
+        languageTool: {
+            limit: (...args: any[]) => mockRateLimitLimit(...args),
+        },
+    },
 }));
 
 // Mock do fetch global para evitar chamadas reais à API externa
@@ -17,7 +21,7 @@ global.fetch = vi.fn();
 describe("POST /api/languagetool", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockGetIpRateLimit.mockReturnValue({ allowed: true, remaining: 29, resetAt: 0 });
+        mockRateLimitLimit.mockResolvedValue({ success: true, reset: 0 });
         (global.fetch as any).mockResolvedValue({
             ok: true,
             json: async () => ({ matches: [] }),
@@ -49,11 +53,10 @@ describe("POST /api/languagetool", () => {
         expect(global.fetch).toHaveBeenCalled();
     });
 
-    it("retorna 429 quando o rate limit por IP é excedido (SEG-02)", async () => {
-        mockGetIpRateLimit.mockReturnValue({
-            allowed: false,
-            remaining: 0,
-            resetAt: Date.now() + 60000
+    it("retorna 429 quando o rate limit por IP é excedido (SEG-02 - REDIS)", async () => {
+        mockRateLimitLimit.mockResolvedValue({
+            success: false,
+            reset: Date.now() + 60000
         });
 
         const req = createRequest(validBody);

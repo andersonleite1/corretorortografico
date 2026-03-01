@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import { ratelimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +24,19 @@ const SUPPORTED_LANGUAGES = [
 
 export async function POST(req: Request) {
   try {
+    // SEG-01/04: Rate limit global por IP (Prevenção de Abuso)
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      "unknown";
+
+    const globalLimit = await ratelimit.ai.limit(ip);
+    if (!globalLimit.success) {
+      return NextResponse.json(
+        { error: "Muitas requisições de IA. Tente novamente mais tarde." },
+        { status: 429 },
+      );
+    }
+
     const { userId: clerkId } = await auth();
     if (!clerkId)
       return NextResponse.json({ error: "Não autenticado." }, { status: 401 });

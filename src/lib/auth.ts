@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { cache } from "react";
+import { redis } from "./redis";
 
 // `cache` evita múltiplos fetches do mesmo usuário no mesmo request.
 // Adicionamos um parâmetro opcional para permitir bypass do cache se necessário.
@@ -23,20 +24,47 @@ export const getCurrentUser = cache(async (_forceRefresh: boolean = false) => {
   return user;
 });
 
-// Helper para verificar plano
+// Helper para verificar plano com Cache distribuído (Redis)
 export const getUserPlan = cache(async (forceRefresh: boolean = false) => {
+  const { userId: clerkId } = await auth();
+  if (!clerkId) return "free";
+
+  const cacheKey = `user_plan:${clerkId}`;
+
+  // Tenta buscar do Redis primeiro (se não for forceRefresh)
+  if (!forceRefresh) {
+    try {
+      const cachedPlan = await redis.get<string>(cacheKey);
+      if (cachedPlan) return cachedPlan as "free" | "pro" | "team";
+    } catch (err) {
+      console.error("[Redis Cache Error]:", err);
+    }
+  }
+
+  // Fallback para o DB (através do getCurrentUser)
   const user = await getCurrentUser(forceRefresh);
   if (!user) return "free";
 
   const sub = user.subscription;
-  // BUG-04: Verifica explicitamente por status válidos para não permitir acesso se estiver past_due
+  // BUG-04: Verifica explicitamente por status válidos
   const validStatuses = ["active", "trialing"];
-  if (!sub || !validStatuses.includes(sub.status)) return "free";
+  let plan: "free" | "pro" | "team" = "free";
 
-  // Se tiver stripeCurrentPeriodEnd, verifica se expirou
-  if (sub.stripeCurrentPeriodEnd && new Date() > sub.stripeCurrentPeriodEnd) {
-    return "free";
+  if (sub && validStatuses.includes(sub.status)) {
+    // Verifica expiração manual se houver data
+    const isExpired =
+      sub.stripeCurrentPeriodEnd && new Date() > sub.stripeCurrentPeriodEnd;
+    if (!isExpired) {
+      plan = sub.plan as "free" | "pro" | "team";
+    }
   }
 
-  return sub.plan as "free" | "pro" | "team";
+  // Salva no Redis por 5 minutos
+  try {
+    await redis.set(cacheKey, plan, { ex: 300 }); // 300 segundos = 5 min
+  } catch (err) {
+    console.error("[Redis Cache Set Error]:", err);
+  }
+
+  return plan;
 });

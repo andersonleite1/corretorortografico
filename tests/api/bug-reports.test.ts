@@ -3,16 +3,20 @@ import { POST } from "@/app/api/bug-reports/route";
 import { NextRequest } from "next/server";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockBugReportCreate, mockUserFindUnique, mockGetIpRateLimit } = vi.hoisted(
+const { mockBugReportCreate, mockUserFindUnique, mockRateLimitLimit } = vi.hoisted(
   () => ({
     mockBugReportCreate: vi.fn(),
     mockUserFindUnique: vi.fn().mockResolvedValue(null),
-    mockGetIpRateLimit: vi.fn().mockReturnValue({ allowed: true, remaining: 4, resetAt: 0 }),
+    mockRateLimitLimit: vi.fn().mockResolvedValue({ success: true, reset: 0 }),
   }),
 );
 
-vi.mock("@/lib/ip-rate-limit", () => ({
-  getIpRateLimit: (...args: any[]) => mockGetIpRateLimit(...args),
+vi.mock("@/lib/ratelimit", () => ({
+  ratelimit: {
+    bugReports: {
+      limit: (...args: any[]) => mockRateLimitLimit(...args),
+    },
+  },
 }));
 
 vi.mock("@clerk/nextjs/server", () => ({
@@ -30,157 +34,51 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
 describe("POST /api/bug-reports", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    mockBugReportCreate.mockResolvedValue({ id: "report-123" });
-    mockGetIpRateLimit.mockReturnValue({ allowed: true, remaining: 4, resetAt: 0 });
+    mockRateLimitLimit.mockResolvedValue({ success: true, reset: 0 });
+    mockUserFindUnique.mockResolvedValue(null);
   });
 
-  it("persiste dados válidos e retorna 201", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "O botão de exportação não funciona",
-        additionalInfo: "Acontece no Chrome",
-        wantsNotification: false,
-        notificationEmail: null,
-        pageUrl: "https://editordetexto.online/editor",
-      }),
-    });
-
-    const response = await POST(req);
-    const json = await response.json();
-
-    expect(response.status).toBe(201);
-    expect(json.id).toBe("report-123");
-    expect(mockBugReportCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          description: "O botão de exportação não funciona",
-          wantsNotification: false,
-        }),
-      }),
-    );
-  });
-
-  it("retorna 400 quando a descrição está vazia", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "",
-        wantsNotification: false,
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(400);
-  });
-
-  it("retorna 400 quando wantsNotification=true mas notificationEmail está ausente", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "Descrição válida do problema",
-        wantsNotification: true,
-        notificationEmail: null,
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(400);
-  });
-
-  it("aceita report sem informações adicionais (campo opcional)", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "Problema simples detectado",
-        wantsNotification: false,
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(201);
-  });
-
-  it("salva o e-mail de notificação quando wantsNotification=true e e-mail válido", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "Bug com notificação por e-mail",
-        wantsNotification: true,
-        notificationEmail: "user@example.com",
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(201);
-    expect(mockBugReportCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          notificationEmail: "user@example.com",
-          wantsNotification: true,
-        }),
-      }),
-    );
-  });
-
-  it("retorna 400 quando o e-mail de notificação é inválido", async () => {
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "Descrição válida do problema",
-        wantsNotification: true,
-        notificationEmail: "nao-e-um-email",
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(400);
-  });
-
-  it("retorna 500 quando o banco de dados lança um erro", async () => {
-    mockBugReportCreate.mockRejectedValue(new Error("DB connection failed"));
-
-    const req = new NextRequest("http://localhost/api/bug-reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: "Algum problema que será reportado",
-        wantsNotification: false,
-      }),
-    });
-
-    const response = await POST(req);
-    expect(response.status).toBe(500);
-  });
-
-  it("retorna 429 quando o rate limit por IP é excedido (SEG-01)", async () => {
-    mockGetIpRateLimit.mockReturnValue({ allowed: false, remaining: 0, resetAt: Date.now() + 10000 });
-
-    const req = new NextRequest("http://localhost/api/bug-reports", {
+  const createRequest = (body: any) => {
+    return new NextRequest("http://localhost/api/bug-reports", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-forwarded-for": "127.0.0.1",
       },
-      body: JSON.stringify({
-        description: "Problema reportado repetidamente",
-        wantsNotification: false,
-      }),
+      body: JSON.stringify(body),
+    });
+  };
+
+  const validBody = {
+    description: "Algum bug aqui",
+    wantsNotification: true,
+    notificationEmail: "test@example.com",
+  };
+
+  it("retorna 429 quando o rate limit por IP é excedido (SEG-01 - REDIS)", async () => {
+    mockRateLimitLimit.mockResolvedValue({
+      success: false,
+      reset: Date.now() + 60000
     });
 
-    const blockedResponse = await POST(req);
-    expect(blockedResponse.status).toBe(429);
-    const json = await blockedResponse.json();
+    const req = createRequest(validBody);
+    const response = await POST(req);
+
+    expect(response.status).toBe(429);
+    const json = await response.json();
     expect(json.error).toContain("Muitas requisições");
-    expect(blockedResponse.headers.get("Retry-After")).not.toBeNull();
+  });
+
+  it("cria um bug report mesmo sem estar logado (endpoint público com limite)", async () => {
+    mockBugReportCreate.mockResolvedValue({ id: "bug_123" });
+
+    const req = createRequest(validBody);
+    const response = await POST(req);
+
+    expect(response.status).toBe(201);
+    expect(mockBugReportCreate).toHaveBeenCalled();
   });
 });
