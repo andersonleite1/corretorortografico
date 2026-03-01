@@ -411,15 +411,7 @@ function RecentDocuments({
   );
 }
 
-// ── Skeleton ───────────────────────────────────────────────────────────────────
-function SkeletonCard({ height = "h-36" }: { height?: string }) {
-  return (
-    <div
-      className={`rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse ${height}`}
-    />
-  );
-}
-
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 
 // ── Main Component ─────────────────────────────────────────────────────────────
@@ -472,21 +464,7 @@ export default function DashboardContent({ userName }: { userName: string }) {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 pb-20">
-        {loading && (
-          <div className="flex flex-col gap-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </div>
-            <SkeletonCard height="h-40" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SkeletonCard height="h-72" />
-              <SkeletonCard height="h-72" />
-            </div>
-            <SkeletonCard height="h-52" />
-          </div>
-        )}
+        {loading && <DashboardSkeleton showPageHeader={false} />}
 
         {error && (
           <div className="p-5 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-center text-sm">
