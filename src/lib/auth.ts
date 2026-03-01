@@ -29,7 +29,9 @@ export const getUserPlan = cache(async (forceRefresh: boolean = false) => {
   if (!user) return "free";
 
   const sub = user.subscription;
-  if (!sub || sub.status !== "active") return "free";
+  // BUG-04: Verifica explicitamente por status válidos para não permitir acesso se estiver past_due
+  const validStatuses = ["active", "trialing"];
+  if (!sub || !validStatuses.includes(sub.status)) return "free";
 
   // Se tiver stripeCurrentPeriodEnd, verifica se expirou
   if (sub.stripeCurrentPeriodEnd && new Date() > sub.stripeCurrentPeriodEnd) {

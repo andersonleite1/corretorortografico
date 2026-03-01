@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { z } from "zod";
+import { getIpRateLimit } from "@/lib/ip-rate-limit";
 
 export const dynamic = "force-dynamic";
+
+// SEG-01: Máx. 5 reports por hora por IP (previne spam em endpoint público)
+const BUG_REPORT_RATE_LIMIT = 5;
+const BUG_REPORT_WINDOW_MS = 60 * 60 * 1000; // 1 hora
 
 const BugReportSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória").max(500),
@@ -15,6 +20,37 @@ const BugReportSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // SEG-01 — Rate limit por IP
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+
+    const rateLimit = getIpRateLimit(
+      ip,
+      "bug-reports",
+      BUG_REPORT_RATE_LIMIT,
+      BUG_REPORT_WINDOW_MS,
+    );
+
+    if (!rateLimit.allowed) {
+      const retryAfterSeconds = Math.ceil(
+        (rateLimit.resetAt - Date.now()) / 1000,
+      );
+      return NextResponse.json(
+        {
+          error: "Muitas requisições. Tente novamente mais tarde.",
+          retryAfter: retryAfterSeconds,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(retryAfterSeconds),
+          },
+        },
+      );
+    }
+
     const { userId: clerkId } = await auth();
 
     const body = await req.json();

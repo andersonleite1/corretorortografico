@@ -113,6 +113,12 @@ export async function POST(req: Request) {
         width: result.width,
         height: result.height,
       });
+    } else {
+      // BUG-02: Retorna erro se o upload falhar silenciosamente
+      return NextResponse.json(
+        { error: "Falha ao realizar upload para a nuvem." },
+        { status: 500 },
+      );
     }
   } catch (error) {
     console.error("Error uploading file:", error);

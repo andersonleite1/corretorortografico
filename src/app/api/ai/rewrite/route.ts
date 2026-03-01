@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import { sanitizeAiInput } from "@/lib/ai-sanitize";
 
 function logError(msg: string) {
   console.error(`[AI_REWRITE_ERROR] ${msg}`);
@@ -26,7 +27,8 @@ const schema = z.object({
     ]), // Mantendo compatibilidade se necessário
     z.string(), // Permitir qualquer string de tom (incluindo os novos 14 e customizados)
   ]),
-  customInstructions: z.string().optional(),
+  // SEG-03: limita e sanitiza instruções customizadas para prevenir prompt injection
+  customInstructions: z.string().max(500).optional(),
   language: z.string().default("pt-BR"),
 });
 
@@ -99,9 +101,13 @@ export async function POST(req: Request) {
       TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] ||
       "mantendo o sentido original";
 
-    // Se houver instruções customizadas, elas têm prioridade ou complementam
-    const extraPrompt = customInstructions
-      ? `\nInstruções específicas do usuário a seguir: ${customInstructions}`
+    // Se houver instruções customizadas, sanitizar antes de usar no prompt (SEG-03)
+    const sanitizedInstructions = customInstructions
+      ? sanitizeAiInput(customInstructions)
+      : null;
+
+    const extraPrompt = sanitizedInstructions
+      ? `\nInstruções específicas do usuário a seguir: ${sanitizedInstructions}`
       : `\nEstilo solicitado: ${stylePrompt}`;
 
     // 5. Chamada IA com streaming

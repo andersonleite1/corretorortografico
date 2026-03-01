@@ -106,8 +106,18 @@ export default clerkMiddleware(async (auth, request) => {
     }
     return i18nMiddleware(request);
   } catch (error) {
-    // Log silencioso no Edge, evita travar a requisição em caso de erro no auth em rotas públicas
     console.error("[Middleware Error]:", error);
+
+    // BUG-01: Se ocorrer erro de autenticação em rota protegida,
+    // redirecionar para o login ao invés de prosseguir silenciosamente.
+    // Isso impede que falhas do serviço de auth exponham rotas protegidas.
+    if (isProtectedRoute(request)) {
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set("redirect_url", request.url);
+      return NextResponse.redirect(signInUrl);
+    }
+
+    // Para rotas públicas, falha segura: prossegue com i18n
     return i18nMiddleware(request);
   }
 });

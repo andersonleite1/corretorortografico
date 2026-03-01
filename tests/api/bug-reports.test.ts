@@ -3,9 +3,16 @@ import { POST } from "@/app/api/bug-reports/route";
 import { NextRequest } from "next/server";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockBugReportCreate, mockUserFindUnique } = vi.hoisted(() => ({
-  mockBugReportCreate: vi.fn(),
-  mockUserFindUnique: vi.fn().mockResolvedValue(null),
+const { mockBugReportCreate, mockUserFindUnique, mockGetIpRateLimit } = vi.hoisted(
+  () => ({
+    mockBugReportCreate: vi.fn(),
+    mockUserFindUnique: vi.fn().mockResolvedValue(null),
+    mockGetIpRateLimit: vi.fn().mockReturnValue({ allowed: true, remaining: 4, resetAt: 0 }),
+  }),
+);
+
+vi.mock("@/lib/ip-rate-limit", () => ({
+  getIpRateLimit: (...args: any[]) => mockGetIpRateLimit(...args),
 }));
 
 vi.mock("@clerk/nextjs/server", () => ({
@@ -25,9 +32,10 @@ vi.mock("@/lib/db", () => ({
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("POST /api/bug-reports", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockBugReportCreate.mockResolvedValue({ id: "report-123" });
+    mockGetIpRateLimit.mockReturnValue({ allowed: true, remaining: 4, resetAt: 0 });
   });
 
   it("persiste dados válidos e retorna 201", async () => {
@@ -153,5 +161,26 @@ describe("POST /api/bug-reports", () => {
 
     const response = await POST(req);
     expect(response.status).toBe(500);
+  });
+
+  it("retorna 429 quando o rate limit por IP é excedido (SEG-01)", async () => {
+    mockGetIpRateLimit.mockReturnValue({ allowed: false, remaining: 0, resetAt: Date.now() + 10000 });
+
+    const req = new NextRequest("http://localhost/api/bug-reports", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        description: "Problema reportado repetidamente",
+        wantsNotification: false,
+      }),
+    });
+
+    const blockedResponse = await POST(req);
+    expect(blockedResponse.status).toBe(429);
+    const json = await blockedResponse.json();
+    expect(json.error).toContain("Muitas requisições");
+    expect(blockedResponse.headers.get("Retry-After")).not.toBeNull();
   });
 });

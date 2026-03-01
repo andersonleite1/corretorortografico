@@ -86,8 +86,15 @@ export async function POST(req: Request) {
   // ===== EVENTO: Usuário deletado =====
   if (type === "user.deleted") {
     const { id } = data;
+
+    // BUG-03: Valida se o ID é uma string válida antes de tentar deletar
+    if (!id || typeof id !== "string") {
+      console.error("ID de usuário inválido para deleção:", id);
+      return new NextResponse("ID inválido.", { status: 400 });
+    }
+
     try {
-      await db.user.delete({ where: { clerkId: id as string } });
+      await db.user.delete({ where: { clerkId: id } });
       console.log(`🗑️ Usuário deletado do DB: clerkId=${id}`);
     } catch (dbError) {
       console.error("Error deleting user:", dbError);
