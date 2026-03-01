@@ -29,8 +29,9 @@ const defaultContextValue = {
       },
     },
   },
-  draftActions: undefined,
+  draftActions: undefined as any,
   isMobile: false,
+  documentTitle: undefined as string | undefined,
 };
 
 let mockEditorStateReturn = {
