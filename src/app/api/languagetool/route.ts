@@ -10,6 +10,9 @@ const defaultLanguage = "pt-BR";
 
 export async function POST(request: NextRequest) {
   // --- Proteção contra Abuso (Origin Check) ---
+  // NOTA DE REGRA DE NEGÓCIO: Este endpoint permanece público propositalmente.
+  // Usuários não precisam estar logados para verificações gramaticais básicas.
+  // A proteção é feita via Origin Check e Rate Limit por IP (SEG-02).
   const origin =
     request.headers.get("origin") || request.headers.get("referer");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
