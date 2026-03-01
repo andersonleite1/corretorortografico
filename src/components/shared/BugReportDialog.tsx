@@ -110,8 +110,12 @@ export const BugReportDialog = ({
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
-      <div className="w-full max-w-2xl flex flex-col relative outline-none">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open: boolean) => !open && onClose()}
+      className="max-w-2xl"
+    >
+      <div className="w-full flex flex-col relative outline-none">
         {/* Header */}
         <div className="px-8 py-8 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
           <div>
@@ -340,11 +344,10 @@ export const BugReportDialog = ({
             <button
               onClick={handleSubmit}
               disabled={status === "submitting"}
-              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${
-                status === "submitting"
+              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${status === "submitting"
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-blue-600"
-              }`}
+                }`}
             >
               {status === "submitting" ? (
                 <>

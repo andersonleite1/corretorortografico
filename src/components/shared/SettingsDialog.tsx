@@ -74,8 +74,9 @@ export const SettingsDialog = () => {
     <Dialog
       open={isSettingsDialogOpen}
       onOpenChange={(open: boolean) => setIsSettingsDialogOpen(open)}
+      className="max-w-5xl"
     >
-      <div className="w-full max-w-5xl max-h-[90vh] flex flex-col md:flex-row relative outline-none">
+      <div className="w-full max-h-[90vh] flex flex-col md:flex-row relative outline-none">
         {/* Sidebar (Desktop) / Header (Mobile) */}
         <div className="w-full md:w-72 bg-gray-50/50 dark:bg-black/20 border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5 flex flex-col">
           <div className="p-8 pb-4">
@@ -89,11 +90,10 @@ export const SettingsDialog = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                    : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[14px] font-medium transition-all duration-200 ${activeTab === tab.id
+                  ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                  : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
+                  }`}
               >
                 <div
                   className={`p-1.5 rounded-lg ${activeTab === tab.id ? "bg-white/20" : "bg-gray-100 dark:bg-white/5"}`}
@@ -162,11 +162,10 @@ export const SettingsDialog = () => {
                           <button
                             key={id}
                             onClick={() => toggleToneActivation(id)}
-                            className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${
-                              isActive
-                                ? "border-blue-500/50 bg-blue-50/50 dark:bg-blue-500/10 shadow-[0_8px_20px_-6px_rgba(59,130,246,0.3)]"
-                                : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
-                            }`}
+                            className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${isActive
+                              ? "border-blue-500/50 bg-blue-50/50 dark:bg-blue-500/10 shadow-[0_8px_20px_-6px_rgba(59,130,246,0.3)]"
+                              : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+                              }`}
                           >
                             <div className="text-3xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
                               {TONE_ICONS[id]}
@@ -193,11 +192,10 @@ export const SettingsDialog = () => {
                       {customTones.map((tone) => (
                         <div
                           key={tone.id}
-                          className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${
-                            tone.isActive
-                              ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 shadow-[0_8px_20px_-6px_rgba(16,185,129,0.3)]"
-                              : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
-                          }`}
+                          className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${tone.isActive
+                            ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 shadow-[0_8px_20px_-6px_rgba(16,185,129,0.3)]"
+                            : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+                            }`}
                         >
                           <button
                             onClick={() => toggleCustomToneActivation(tone.id)}
@@ -377,8 +375,9 @@ export const SettingsDialog = () => {
         <Dialog
           open={isCreateToneDialogOpen}
           onOpenChange={(open: boolean) => setIsCreateToneDialogOpen(open)}
+          className="max-w-md sm:max-w-[540px]"
         >
-          <div className="w-full max-w-md bg-white dark:bg-[#2c2c2e] rounded-[32px] p-10 flex flex-col relative outline-none">
+          <div className="w-full bg-white dark:bg-[#2c2c2e] rounded-[32px] p-10 flex flex-col relative outline-none">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
               Cadastrar tom personalizado
             </h3>

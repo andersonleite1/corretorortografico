@@ -20,38 +20,40 @@ export default function AuthOverlay({
   onSwitchView,
 }: AuthOverlayProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <div className="w-full max-w-md overflow-hidden outline-none">
-        <AnimatePresence mode="wait">
-          {view === "sign-up" ? (
-            <motion.div
-              key="sign-up"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            >
-              <EmailCodeSignUp
-                onClose={onClose}
-                onSignInClick={() => onSwitchView("sign-in")}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="sign-in"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            >
-              <EmailSignIn
-                onClose={onClose}
-                onSignUpClick={() => onSwitchView("sign-up")}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      className="max-w-md sm:max-w-[540px]"
+    >
+      <AnimatePresence mode="wait">
+        {view === "sign-up" ? (
+          <motion.div
+            key="sign-up"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+          >
+            <EmailCodeSignUp
+              onClose={onClose}
+              onSignInClick={() => onSwitchView("sign-in")}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="sign-in"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+          >
+            <EmailSignIn
+              onClose={onClose}
+              onSignUpClick={() => onSwitchView("sign-up")}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Dialog>
   );
 }

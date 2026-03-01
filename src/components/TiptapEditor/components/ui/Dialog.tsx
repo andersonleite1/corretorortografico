@@ -6,9 +6,10 @@ interface DialogProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange?: (open: boolean) => void;
+  className?: string;
 }
 
-const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
+const Dialog = ({ children, open, onOpenChange, className }: DialogProps) => {
   const onDismiss = () => {
     onOpenChange?.(false);
   };
@@ -29,7 +30,7 @@ const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="relative bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-2xl rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)] border border-white/20 dark:border-white/5 my-auto w-full max-w-fit overflow-hidden"
+            className={`relative bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-2xl rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)] border border-white/20 dark:border-white/5 my-auto w-full overflow-hidden ${className || "max-w-fit"}`}
             onClick={(e) => e.stopPropagation()}
           >
             {children}

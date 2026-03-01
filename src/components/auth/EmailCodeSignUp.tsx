@@ -183,7 +183,11 @@ export default function EmailCodeSignUp({
                 </motion.div>
               )}
 
+              {/* CAPTCHA Placeholder */}
+              <div id="clerk-captcha" className="flex justify-center" />
+
               <div className="pt-4 flex flex-col gap-4">
+
                 <button
                   type="submit"
                   disabled={loading}
