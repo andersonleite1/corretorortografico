@@ -6,10 +6,15 @@ import { Icon } from "./ui/Icon";
 import clsx from "clsx";
 import { useEditorState } from "@tiptap/react";
 import { LanguageToolIssue } from "@/types/languageTool";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../i18n-config";
 
 export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const { editor, setIsLTSidebarOpen } = useTiptapContext();
   const [activeTab, setActiveTab] = useState<"resumo" | "detalhes">("resumo");
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).languageTool;
 
   const ltState = useEditorState({
     editor,
@@ -86,7 +91,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
       <button
         onClick={() => setIsLTSidebarOpen(false)}
         className="absolute top-3.5 right-3.5 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 transition-colors z-10"
-        title="Fechar"
+        title={t.close}
       >
         <Icon name="Close" size={14} />
       </button>
@@ -114,7 +119,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
       <div className="rte-lt-sidebar__content">
         {activeTab === "resumo" ? (
           <div className="animate-in fade-in duration-300">
-            <div className="rte-lt-sidebar__section-title">Categorias</div>
+            <div className="rte-lt-sidebar__section-title">{t.categories}</div>
 
             <div className="rte-lt-sidebar__progress-item">
               <div className="header">
@@ -172,20 +177,20 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
 
             <div className="rte-lt-sidebar__stat-grid">
               <div className="rte-lt-sidebar__stat-box">
-                <span className="label">Caracteres</span>
+                <span className="label">{t.characters}</span>
                 <span className="value">{stats.chars}</span>
               </div>
               <div className="rte-lt-sidebar__stat-box">
-                <span className="label">Palavras</span>
+                <span className="label">{t.words}</span>
                 <span className="value">{stats.words}</span>
               </div>
               <div className="rte-lt-sidebar__stat-box">
-                <span className="label">Tempo de Leitura</span>
+                <span className="label">{t.readingTime}</span>
                 <span className="value">{stats.readingTime} min</span>
               </div>
               <div className="rte-lt-sidebar__stat-box">
-                <span className="label">Status</span>
-                <span className="status-link">Sugestões prontas</span>
+                <span className="label">{t.status}</span>
+                <span className="status-link">{t.readySuggestions}</span>
               </div>
             </div>
           </div>
@@ -247,7 +252,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
       <div className="rte-lt-sidebar__footer">
         <div className="rte-lt-sidebar__tip">
           <span className="label">DICA RÁPIDA</span>
-          <span className="title">Corrija tudo de uma vez</span>
+          <span className="title">{t.fixAllTip}</span>
           <p className="desc">
             Aplica a primeira sugestão de cada erro detectado automaticamente.
           </p>

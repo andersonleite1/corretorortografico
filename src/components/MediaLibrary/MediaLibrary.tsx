@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import MediaGallery from "./MediaGallery";
 import Button from "@/components/TiptapEditor/components/ui/Button";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 import "./style.scss";
 
@@ -27,6 +30,8 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onInsert, onClose }) => {
   const [previews, setPreviews] = useState<ImageData[]>([]);
   const [selected, setSelected] = useState<ImageData | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).mediaLibrary;
 
   const handleUploadClick = () => {
     const confirmUpload = window.confirm(
@@ -114,7 +119,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onInsert, onClose }) => {
   return (
     <div className="media-library">
       <header className="media-library__header">
-        <h2>Assets</h2>
+        <h2>{t.assets}</h2>
         <Button disabled={loading || uploading} onClick={handleUploadClick}>
           Upload
         </Button>
@@ -122,7 +127,10 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ onInsert, onClose }) => {
 
       <div className="media-library__content">
         {loading ? (
-          <div className="media-library__spinner" aria-label="Loading images" />
+          <div
+            className="media-library__spinner"
+            aria-label={t.loadingImages}
+          />
         ) : (
           <MediaGallery
             data={[...previews, ...images]}

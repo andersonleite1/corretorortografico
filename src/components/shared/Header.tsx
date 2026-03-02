@@ -14,6 +14,7 @@ const MobileMenu = dynamic(() => import("./MobileMenu"), {
 });
 import Tooltip from "../TiptapEditor/components/ui/Tooltip";
 import { getHeaderContent } from "@/data/header";
+import { getCommonMessages } from "@/data/common";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
   ssr: false,
@@ -44,6 +45,7 @@ const Header = ({ userButton }: HeaderProps) => {
     return { currentLocale, segments };
   }, [pathname, locales, defaultLocale]);
 
+  const t = getCommonMessages(currentLocale).header;
   const [clerkTimeout, setClerkTimeout] = useState(false);
 
   // Timeout para evitar skeleton infinito se Clerk demorar
@@ -112,7 +114,7 @@ const Header = ({ userButton }: HeaderProps) => {
             <Link href="/">
               <Image
                 src={theme === "dark" ? "/logo-black.webp" : "/logo.webp"}
-                alt="Editor de texto"
+                alt={t.appName}
                 width={150}
                 height={90}
                 priority
@@ -127,7 +129,7 @@ const Header = ({ userButton }: HeaderProps) => {
                   className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
                 >
                   <span>📊</span>
-                  <span>Dashboard</span>
+                  <span>{t.dashboard}</span>
                 </Link>
               </SignedIn>
               <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
@@ -191,7 +193,7 @@ const Header = ({ userButton }: HeaderProps) => {
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="md:hidden p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-              aria-label="Open Menu"
+              aria-label={t.openMenu}
             >
               <Menu className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
             </button>

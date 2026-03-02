@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { User } from "@/types/user";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../i18n-config";
 
 export function SettingsContent({ user, plan }: { user: User; plan: string }) {
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).settings;
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("subscription");
 
@@ -17,10 +22,10 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        toast.error(data.error || "Erro ao acessar portal de faturamento.");
+        toast.error(data.error || t.errorProcess);
       }
     } catch (error) {
-      toast.error("Erro ao processar solicitação.");
+      toast.error(t.errorProcess);
       console.error(error);
     } finally {
       setLoading(false);
@@ -58,7 +63,7 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
         {activeTab === "profile" && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">Seu Perfil</h2>
+              <h2 className="text-xl font-bold text-white mb-1">{t.profile}</h2>
               <p className="text-sm text-gray-400">
                 Gerencie suas informações básicas.
               </p>

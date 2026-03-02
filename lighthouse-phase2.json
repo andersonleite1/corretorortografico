@@ -506,7 +506,7 @@
         ],
         "items": [
           {
-            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.png&w=1920&q=80",
+            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.webp&w=1920&q=80",
             "node": {
               "type": "node",
               "lhId": "1-20-IMG",
@@ -520,7 +520,7 @@
                 "width": 960,
                 "height": 960
               },
-              "snippet": "<img alt=\"Mockup de um MacBook Pro mostrando a interface do editor de texto online\" fetchpriority=\"high\" width=\"960\" height=\"960\" decoding=\"async\" data-nimg=\"1\" class=\"landing-hero__screenshot\" style=\"color:transparent\" srcset=\"/_next/image?url=%2Fmacbook-mockup.png&amp;w=1080&amp;q=80 1x, /_next/image?url=%2…\" src=\"/_next/image?url=%2Fmacbook-mockup.png&amp;w=1920&amp;q=80\">",
+              "snippet": "<img alt=\"Mockup de um MacBook Pro mostrando a interface do editor de texto online\" fetchpriority=\"high\" width=\"960\" height=\"960\" decoding=\"async\" data-nimg=\"1\" class=\"landing-hero__screenshot\" style=\"color:transparent\" srcset=\"/_next/image?url=%2Fmacbook-mockup.webp&amp;w=1080&amp;q=80 1x, /_next/image?url=%2…\" src=\"/_next/image?url=%2Fmacbook-mockup.webp&amp;w=1920&amp;q=80\">",
               "nodeLabel": "Mockup de um MacBook Pro mostrando a interface do editor de texto online"
             },
             "displayedAspectRatio": "960 x 960\n        (1.00)",
@@ -999,7 +999,7 @@
             "entity": "localhost"
           },
           {
-            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.png&w=1920&q=80",
+            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.webp&w=1920&q=80",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 1124.4819999933243,
@@ -3363,7 +3363,7 @@
             "totalBytes": 9819936
           },
           {
-            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.png&w=1920&q=80",
+            "url": "http://localhost:3001/_next/image?url=%2Fmacbook-mockup.webp&w=1920&q=80",
             "totalBytes": 130914
           },
           {

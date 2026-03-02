@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Icon } from "./ui/Icon";
 import { useTiptapContext } from "./Provider";
 import Tooltip from "./ui/Tooltip";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../i18n-config";
 
 interface Document {
   id: string;
@@ -20,6 +22,8 @@ export const SideBar = ({ isOpen }: { isOpen: boolean }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { editor, setIsSidebarOpen } = useTiptapContext();
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).sidebar;
 
   const fetchDocuments = useCallback(async () => {
     setIsLoading(true);
@@ -31,7 +35,7 @@ export const SideBar = ({ isOpen }: { isOpen: boolean }) => {
       setDocuments(data.documents || []);
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao carregar documentos");
+      toast.error(t.errorLoadDocs);
     } finally {
       setIsLoading(false);
     }
@@ -48,19 +52,19 @@ export const SideBar = ({ isOpen }: { isOpen: boolean }) => {
       const response = await fetch(`/api/documents/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Erro ao excluir documento");
-      toast.success("Documento excluído");
+      if (!response.ok) throw new Error(t.errorDeleteDoc);
+      toast.success(t.docDeleted);
       setDocuments(documents.filter((doc) => doc.id !== id));
       setConfirmDelete(null);
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao excluir documento");
+      toast.error(t.errorDeleteDoc);
     }
   };
 
   const handleEdit = (doc: Document) => {
     editor.commands.setContent(doc.content);
-    toast.success(`Documento "${doc.title || "Sem título"}" carregado`);
+    toast.success(`${t.docLoaded}: "${doc.title || "Sem título"}"`);
     // Opcionalmente podemos fechar a sidebar em telas pequenas
     if (window.innerWidth < 768) {
       setIsSidebarOpen(false);
@@ -78,7 +82,7 @@ export const SideBar = ({ isOpen }: { isOpen: boolean }) => {
         <button
           onClick={fetchDocuments}
           className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 transition-colors"
-          title="Atualizar"
+          title={t.refresh}
         >
           <Icon name="Refresh" size={16} />
         </button>
@@ -91,7 +95,7 @@ export const SideBar = ({ isOpen }: { isOpen: boolean }) => {
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-8 px-4">
-            <p className="text-sm text-gray-500">Nenhum documento salvo.</p>
+            <p className="text-sm text-gray-500">{t.noDocuments}</p>
           </div>
         ) : (
           <div className="space-y-1 p-2">

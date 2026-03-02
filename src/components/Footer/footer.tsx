@@ -15,6 +15,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 
 import { getFooterContent } from "@/data/footer";
+import { getCommonMessages } from "@/data/common";
 import { i18n, type Locale } from "../../../i18n-config";
 
 import packageInfo from "../../../package.json";
@@ -52,6 +53,7 @@ const Footer = ({ initialLocale }: FooterProps) => {
   }, [pathname, locales, fallbackLocale]);
 
   const content = getFooterContent(currentLocale);
+  const t = getCommonMessages(currentLocale).footer;
   const localePrefix =
     currentLocale === defaultLocale ? "" : `/${currentLocale}`;
   const homeHref = currentLocale === defaultLocale ? "/" : `/${currentLocale}`;
@@ -164,7 +166,7 @@ const Footer = ({ initialLocale }: FooterProps) => {
             <div className="opacity-40 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0 border-l border-gray-800 pl-6 h-10 flex items-center">
               <Image
                 src="/comprasegurassl.webp"
-                alt="Compra Segura SSL"
+                alt={t.secureImageAlt}
                 width={60}
                 height={20}
                 className="h-auto w-[50px] md:w-[60px]"

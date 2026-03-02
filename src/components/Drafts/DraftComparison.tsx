@@ -2,6 +2,9 @@ import React, { useMemo } from "react";
 import * as Diff from "diff";
 import { jsonToPlainText } from "../TiptapEditor/utils/jsonToPlainText";
 import { FaHistory, FaCheck, FaTimes } from "react-icons/fa";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 interface DraftComparisonProps {
   oldContent: any; // JSON or String
@@ -16,6 +19,8 @@ export const DraftComparison = ({
   onRestore,
   onClose,
 }: DraftComparisonProps) => {
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).drafts;
   const diffs = useMemo(() => {
     const oldText = jsonToPlainText(oldContent);
     const newText = jsonToPlainText(newContent);
@@ -82,15 +87,15 @@ export const DraftComparison = ({
       <div className="p-4 border-t dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex justify-center gap-8 text-xs font-medium uppercase tracking-wider text-gray-500">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 bg-green-400 rounded-full shadow-sm shadow-green-500/50" />
-          <span>Texto Adicionado</span>
+          <span>{t.textAdded}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 bg-red-400 rounded-full shadow-sm shadow-red-500/50" />
-          <span className="line-through">Texto Removido</span>
+          <span className="line-through">{t.textRemoved}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
-          <span>Sem Alterações</span>
+          <span>{t.noChanges}</span>
         </div>
       </div>
     </div>

@@ -58,7 +58,7 @@ export default function LandingHero({ data }: Props) {
           <div className="landing-hero__visual" aria-hidden="true">
             <div className="landing-hero__screenshot-wrap">
               <Image
-                src="/macbook-mockup.png"
+                src="/macbook-mockup.webp"
                 alt="Mockup de um MacBook Pro mostrando a interface do editor de texto online"
                 width={960}
                 height={960}

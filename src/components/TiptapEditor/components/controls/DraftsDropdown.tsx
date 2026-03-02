@@ -2,13 +2,17 @@ import React, { useCallback, useMemo } from "react";
 import MenuButton from "../MenuButton";
 import { DropdownMenuItem, DropdownMenuSeparator } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
-
 import { FaHistory, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { useAuth } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../../i18n-config";
 
 const DraftsDropdown = () => {
   const { draftActions, messages } = useTiptapContext();
   const { isSignedIn } = useAuth();
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).drafts;
   const orderedDrafts = useMemo(() => {
     const baseDrafts = draftActions?.drafts ?? [];
     return [...baseDrafts].reverse();
@@ -106,7 +110,7 @@ const DraftsDropdown = () => {
                     draftActions?.onCompareDraft?.(draft.id);
                   }}
                   className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors"
-                  title="Comparar Versão"
+                  title={t.compareVersion}
                   disabled={!draftActions?.onCompareDraft}
                 >
                   <FaEye size={14} />

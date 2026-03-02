@@ -68,7 +68,7 @@ describe("Images API POST", () => {
     };
 
     (cloudinary.uploader.upload_stream as any).mockImplementation(
-      (options, callback) => {
+      (options: any, callback: any) => {
         // Capture the public_id passed to options
         expect(options.public_id).toMatch(
           new RegExp(`^${userId}/\\d+-test-image$`),

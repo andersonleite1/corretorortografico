@@ -2,6 +2,9 @@ import React from "react";
 import { LuCheck } from "react-icons/lu";
 import clsx from "clsx";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 export interface MediaImage {
   id: string;
@@ -23,6 +26,8 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
   selected,
   onSelect,
 }) => {
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).mediaLibrary;
   return (
     <div className="media-gallery">
       {data.map((image, index) => {
@@ -66,7 +71,7 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({
                     </span>
                   </>
                 )}
-                {isUploading && <span>Enviando...</span>}
+                {isUploading && <span>{t.uploading}</span>}
               </div>
             </div>
           </div>

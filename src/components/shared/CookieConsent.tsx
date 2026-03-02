@@ -6,6 +6,7 @@ import { Cookie, X } from "lucide-react";
 import Link from "next/link";
 import { Locale } from "../../../i18n-config";
 import { getCookieConsentContent } from "@/data/cookie-consent";
+import { getCommonMessages } from "@/data/common";
 
 interface CookieConsentProps {
   locale: Locale;
@@ -14,6 +15,7 @@ interface CookieConsentProps {
 export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
   const [isVisible, setIsVisible] = useState(false);
   const content = getCookieConsentContent(locale);
+  const t = getCommonMessages(locale).cookieConsent;
 
   useEffect(() => {
     const consent = localStorage.getItem("cookie_consent");
@@ -67,7 +69,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
               <button
                 onClick={() => setIsVisible(false)}
                 className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-500 transition-all hover:bg-gray-50 hover:text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200"
-                aria-label="Close"
+                aria-label={t.close}
               >
                 <X className="h-5 w-5" />
               </button>

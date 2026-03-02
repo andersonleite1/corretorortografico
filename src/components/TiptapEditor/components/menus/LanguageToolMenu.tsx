@@ -13,9 +13,14 @@ import { BubbleMenu } from "../BubbleMenu";
 import { useTiptapContext } from "../Provider";
 import { useEditorState } from "@tiptap/react";
 import { Icon } from "../ui/Icon";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../../i18n-config";
 
 const LanguageToolMenuComponent = () => {
   const { editor, messages } = useTiptapContext();
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).languageTool;
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
   const hoveredElRef = useRef<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
@@ -224,7 +229,7 @@ const LanguageToolMenuComponent = () => {
         <div className="lt-menu-card__header">
           <div className="lt-menu-card__header-left">
             <div className="lt-menu-card__logo">EDT</div>
-            <span>Corrigir</span>
+            <span>{t.fix}</span>
             <Icon name="ChevronDown" size={14} />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

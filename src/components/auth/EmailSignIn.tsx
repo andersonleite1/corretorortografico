@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "../TiptapEditor/components/ui/Icon";
 import { i18n, Locale } from "../../../i18n-config";
 import { getAuthContent } from "@/data/auth";
+import { getCommonMessages } from "@/data/common";
 
 interface EmailSignInProps {
   onClose?: () => void;
@@ -34,6 +35,7 @@ export default function EmailSignIn({
     () => getAuthContent(currentLocale),
     [currentLocale],
   );
+  const t = getCommonMessages(currentLocale).auth;
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -210,7 +212,7 @@ export default function EmailSignIn({
                 <div className="relative group">
                   <input
                     type="email"
-                    placeholder="Ex: seuemail@exemplo.com"
+                    placeholder={t.emailPlaceholder}
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
                     required

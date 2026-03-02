@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { PricingContent } from "@/data/home/types";
-import { useAuth } from "@clerk/nextjs";
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 import dynamic from "next/dynamic";
 
 const AuthOverlay = dynamic(() => import("../auth/AuthOverlay"), {
@@ -19,6 +22,8 @@ type Props = {
 
 export default function LandingPricing({ data }: Props) {
   const { isLoaded, isSignedIn } = useAuth();
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).pricing;
   const [authModal, setAuthModal] = useState<{
     isOpen: boolean;
     view: "sign-in" | "sign-up";
@@ -94,7 +99,7 @@ export default function LandingPricing({ data }: Props) {
                     </div>
                   ) : (
                     <div className="landing-pricing__price-wrap">
-                      <span className="landing-pricing__price">Grátis</span>
+                      <span className="landing-pricing__price">{t.free}</span>
                     </div>
                   )}
                   <ul className="landing-pricing__items">

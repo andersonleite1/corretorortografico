@@ -5,10 +5,15 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
 import useToc from "@/hooks/useToc";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 const PostToc = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const localeMatch = pathname.match(/^\/([^\/]+)/);
+  const locale = (localeMatch ? localeMatch[1] : "pt") as Locale;
+  const t = getCommonMessages(locale).toc;
   const { items, activeId } = useToc({
     containerSelector: ".article-content",
     headingSelector: "h2, h3",
@@ -33,7 +38,7 @@ const PostToc = () => {
   return (
     <div className="order-1 lg:order-3">
       <div className="lg:sticky lg:h-[calc(100vh-120px)] lg:top-24 overflow-auto">
-        <h2 className="text-sm font-bold uppercase">On this page</h2>
+        <h2 className="text-sm font-bold uppercase">{t.title}</h2>
         <ul className="mt-4 space-y-3.5 text-sm">
           {items.map((item) => (
             <li

@@ -25,6 +25,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SaveNotification from "@/components/shared/SaveNotification";
 import { saveLocalDocument } from "@/lib/local-storage";
+import { getCommonMessages } from "@/data/common";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -124,6 +125,7 @@ export const TiptapProvider = ({
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
+  const t = getCommonMessages(normalizedLocale).editor;
 
   // Sync spellcheck attribute with settings
   useEffect(() => {
@@ -188,12 +190,12 @@ export const TiptapProvider = ({
       console.error(error);
       if (error instanceof Error) {
         if (error.message === "storage_limit_exceeded") {
-          toast.error("Limite de armazenamento local atingido");
+          toast.error(t.localLimitReached);
         } else {
-          toast.error(error.message || "Erro ao salvar o documento");
+          toast.error(error.message || t.saveError);
         }
       } else {
-        toast.error("Erro ao salvar o documento");
+        toast.error(t.saveError);
       }
     } finally {
       setIsSaving(false);

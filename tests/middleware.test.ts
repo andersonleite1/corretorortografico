@@ -32,7 +32,7 @@ describe("Middleware", () => {
 
   it("prossegue normalmente em rotas públicas", async () => {
     const req = createRequest("/");
-    const response = await middleware(mockAuth as any, req);
+    const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
 
     expect(response).toBeInstanceOf(NextResponse);
     expect(mockAuthProtect).not.toHaveBeenCalled();
@@ -41,7 +41,7 @@ describe("Middleware", () => {
   it("chama auth.protect() em rotas protegidas", async () => {
     mockIsProtectedRoute.mockReturnValue(true);
     const req = createRequest("/dashboard");
-    await middleware(mockAuth as any, req);
+    await (middleware as any)(mockAuth, req);
 
     expect(mockAuthProtect).toHaveBeenCalled();
   });
@@ -51,7 +51,7 @@ describe("Middleware", () => {
     const req = createRequest("/dashboard");
     mockAuthProtect.mockRejectedValue(new Error("Auth failed"));
 
-    const response = await middleware(mockAuth as any, req);
+    const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
 
     expect(response.status).toBe(307); // NextResponse.redirect
     expect(response.headers.get("location")).toContain("/sign-in");
@@ -69,7 +69,7 @@ describe("Middleware", () => {
       })
       .mockReturnValueOnce(false);
 
-    const response = await middleware(mockAuth as any, req);
+    const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
 
     expect(response).toBeInstanceOf(NextResponse);
     // Verificamos que NÃO redirecionou para sign-in

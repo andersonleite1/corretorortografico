@@ -3,8 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 export const ScrollToTop = () => {
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).scrollToTop;
   const [isVisible, setIsVisible] = useState(false);
 
   // Show button when page is scrolled up to a certain distance
@@ -48,7 +53,7 @@ export const ScrollToTop = () => {
           whileTap={{ scale: 0.95 }}
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 backdrop-blur-md text-[#059669] shadow-xl border border-gray-200/50 dark:bg-gray-900/80 dark:text-[#10b981] dark:border-gray-700/50 transition-all duration-300 group"
-          aria-label="Voltar para o topo"
+          aria-label={t.ariaLabel}
         >
           <ChevronUp className="h-7 w-7 transition-transform duration-300 group-hover:-translate-y-1" />
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#059669]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
