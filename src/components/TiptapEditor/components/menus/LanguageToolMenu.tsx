@@ -17,6 +17,7 @@ import { Icon } from "../ui/Icon";
 const LanguageToolMenuComponent = () => {
   const { editor, messages } = useTiptapContext();
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
+  const hoveredElRef = useRef<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
   const showDialogRef = useRef(false);
   const suppressAutoOpenRef = useRef(false);
@@ -31,6 +32,11 @@ const LanguageToolMenuComponent = () => {
       };
     },
   });
+
+  const ltStateEnabledRef = useRef(ltState.enabled);
+  useEffect(() => {
+    ltStateEnabledRef.current = ltState.enabled;
+  }, [ltState.enabled]);
 
   const lastDownRef = useRef(0);
 
@@ -74,6 +80,7 @@ const LanguageToolMenuComponent = () => {
         suppressAutoOpenRef.current = true;
         if (hoveredEl) {
           setHoveredEl(null);
+          hoveredElRef.current = null;
           setHoveredIssueId(null);
         }
         editor?.view?.dispatch(editor.view.state.tr);
@@ -83,6 +90,7 @@ const LanguageToolMenuComponent = () => {
       suppressAutoOpenRef.current = false;
       const id = el.getAttribute("data-lt-id");
       setHoveredEl(el);
+      hoveredElRef.current = el;
       setHoveredIssueId(id);
       editor?.view?.dispatch(editor.view.state.tr);
     };
@@ -93,12 +101,13 @@ const LanguageToolMenuComponent = () => {
       if (el) {
         const id = el.getAttribute("data-lt-id");
         setHoveredEl(el);
+        hoveredElRef.current = el;
         setHoveredIssueId(id);
         showDialogRef.current = true;
         editor?.view?.dispatch(editor.view.state.tr);
       }
     };
-    const handleLeave = () => {};
+    const handleLeave = () => { };
     dom.addEventListener("mousemove", handleMove, { passive: true });
     dom.addEventListener("mouseleave", handleLeave, { passive: true });
     return () => {
@@ -146,19 +155,19 @@ const LanguageToolMenuComponent = () => {
 
   const shouldShow = useCallback(() => {
     return Boolean(
-      ltState.enabled &&
+      ltStateEnabledRef.current &&
       !suppressAutoOpenRef.current &&
-      (showDialogRef.current || hoveredEl),
+      (showDialogRef.current || hoveredElRef.current),
     );
-  }, [ltState.enabled, hoveredEl]);
+  }, []);
 
   const getReferencedVirtualElement = useCallback(() => {
-    if (!hoveredEl) return null;
+    if (!hoveredElRef.current) return null;
     return {
-      getBoundingClientRect: () => hoveredEl.getBoundingClientRect(),
-      contextElement: hoveredEl,
+      getBoundingClientRect: () => hoveredElRef.current!.getBoundingClientRect(),
+      contextElement: hoveredElRef.current,
     } as any;
-  }, [hoveredEl]);
+  }, []);
 
   const applyReplacement = useCallback(
     (text: string) => {
@@ -171,6 +180,7 @@ const LanguageToolMenuComponent = () => {
       editor.commands.ignoreLanguageToolIssue?.(issue.id);
       showDialogRef.current = false;
       setHoveredEl(null);
+      hoveredElRef.current = null;
       setHoveredIssueId(null);
     },
     [editor, issue],
@@ -181,6 +191,7 @@ const LanguageToolMenuComponent = () => {
     editor.commands.ignoreLanguageToolIssue?.(issue.id);
     showDialogRef.current = false;
     setHoveredEl(null);
+    hoveredElRef.current = null;
     setHoveredIssueId(null);
     editor?.view?.dispatch(editor.view.state.tr);
   }, [editor, issue]);
@@ -188,6 +199,7 @@ const LanguageToolMenuComponent = () => {
   const closeDialog = useCallback(() => {
     showDialogRef.current = false;
     setHoveredEl(null);
+    hoveredElRef.current = null;
     setHoveredIssueId(null);
     editor?.view?.dispatch(editor.view.state.tr);
   }, [editor]);

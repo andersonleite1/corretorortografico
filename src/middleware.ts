@@ -42,6 +42,7 @@ function getLocale(request: NextRequest): string {
  */
 function i18nMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const { locales, defaultLocale } = i18n;
 
   // Redirecionamento de /pricing para /#pricing (Legado -> Home)
   if (pathname.endsWith("/pricing")) {
@@ -68,7 +69,6 @@ function i18nMiddleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { locales, defaultLocale } = i18n;
 
   // Verifica se o pathname já começa com um locale suportado
   const pathnameHasLocale = locales.some(
