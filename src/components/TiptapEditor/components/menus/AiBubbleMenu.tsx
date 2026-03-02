@@ -71,11 +71,9 @@ export function AiBubbleMenu() {
                   <button
                     onClick={() => setOpen(!open)}
                     disabled={isLoading || !isSignedIn}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap ${
-                      isPro
-                        ? "bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20"
-                        : "bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-                    } ${!isSignedIn ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20 ${
+                      !isSignedIn ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     {isLoading ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -84,14 +82,17 @@ export function AiBubbleMenu() {
                     )}
                     Reescrever IA
                     <ChevronDown
-                      className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`}
+                      className={`w-3 h-3 transition-transform ${
+                        open ? "rotate-180" : ""
+                      }`}
                     />
-                    {!isPro && isSignedIn && (
-                      <span className="ml-1 px-1.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-[10px] uppercase tracking-tighter">
-                        Pro
-                      </span>
-                    )}
                   </button>
+                  {isSignedIn && (
+                    <div className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500 border-2 border-white dark:border-gray-950"></span>
+                    </div>
+                  )}
                 </div>
               );
 

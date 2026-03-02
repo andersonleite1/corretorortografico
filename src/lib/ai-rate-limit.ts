@@ -5,15 +5,22 @@ const PLAN_MONTHLY_LIMITS = { free: 0, pro: 500, team: 500 } as const;
 
 export async function checkAiRateLimit(userId: string, plan: string) {
   const isFree = plan === "free";
-  const monthlyPaidLimit = PLAN_MONTHLY_LIMITS[plan as keyof typeof PLAN_MONTHLY_LIMITS] ?? 0;
+  const monthlyPaidLimit =
+    PLAN_MONTHLY_LIMITS[plan as keyof typeof PLAN_MONTHLY_LIMITS] ?? 0;
   const DAILY_FREE_LIMIT = 5;
 
   if (monthlyPaidLimit === Infinity) {
     return {
       allowed: true,
-      usedDaily: 0, limitDaily: DAILY_FREE_LIMIT, remainingDaily: DAILY_FREE_LIMIT,
-      usedMonthlyPaid: 0, limitMonthlyPaid: -1, remainingMonthlyPaid: -1,
-      used: 0, limit: -1, remaining: -1
+      usedDaily: 0,
+      limitDaily: DAILY_FREE_LIMIT,
+      remainingDaily: DAILY_FREE_LIMIT,
+      usedMonthlyPaid: 0,
+      limitMonthlyPaid: -1,
+      remainingMonthlyPaid: -1,
+      used: 0,
+      limit: -1,
+      remaining: -1,
     };
   }
 
