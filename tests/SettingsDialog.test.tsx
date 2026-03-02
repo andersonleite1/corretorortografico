@@ -227,22 +227,28 @@ describe("SettingsDialog", () => {
   // ── Aba Configurações Gerais ───────────────────────────────────────────────
   it('alterna para aba "Configurações Gerais" ao clicar', async () => {
     render(<SettingsDialog />);
-    fireEvent.click(screen.getByRole("button", { name: /Configurações Gerais/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /Configurações Gerais/i }),
+    );
     await waitFor(() => {
       expect(
         screen.getByText(/Exibição do rodapé do editor/i),
       ).toBeInTheDocument();
-      expect(screen.getAllByText(/Corretor do Navegador/i).length).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText(/Corretor do Navegador/i).length,
+      ).toBeGreaterThan(0);
     });
   });
 
   it("chama toggleButtonVisibility para browserSpellcheck na aba Configurações Gerais", async () => {
     render(<SettingsDialog />);
-    fireEvent.click(screen.getByRole("button", { name: /Configurações Gerais/i }));
-    await waitFor(() => screen.getAllByText(/Corretor do Navegador/i).length > 0);
     fireEvent.click(
-      screen.getByLabelText(/Corretor do Navegador/i),
+      screen.getByRole("button", { name: /Configurações Gerais/i }),
     );
+    await waitFor(
+      () => screen.getAllByText(/Corretor do Navegador/i).length > 0,
+    );
+    fireEvent.click(screen.getByLabelText(/Corretor do Navegador/i));
     expect(mockToggleButtonVisibility).toHaveBeenCalledWith(
       "browserSpellcheck",
     );

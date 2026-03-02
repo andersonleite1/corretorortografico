@@ -78,9 +78,7 @@ describe("AiRewriteButton", () => {
     fireEvent.click(screen.getByText(/Reescrever/i));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Escolha o tom/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Escolha o tom/i)).toBeInTheDocument();
     });
 
     const toneIds = Object.keys(TONE_LABELS);
@@ -104,9 +102,7 @@ describe("AiRewriteButton", () => {
     fireEvent.click(screen.getByText(/Reescrever/i));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Escolha o tom/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Escolha o tom/i)).toBeInTheDocument();
     });
 
     const toneIds = Object.keys(TONE_LABELS);

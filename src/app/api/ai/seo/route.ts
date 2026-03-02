@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 import { ratelimit } from "@/lib/ratelimit";
+import { sanitizeAiInput } from "@/lib/ai-sanitize";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -84,10 +85,13 @@ export async function POST(req: Request) {
       })
       .parse(body);
 
+    const safeTitle = title ? sanitizeAiInput(title) : "Sem título";
+    const safeContent = sanitizeAiInput(content);
+
     const { object, usage } = await generateObject({
       model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
       schema: seoSchema,
-      prompt: `Analise o seguinte artigo e retorne análise SEO completa.\nTítulo: ${title ?? "Sem título"}\n\n${content}`,
+      prompt: `Analise o seguinte artigo e retorne análise SEO completa.\nTítulo: ${safeTitle}\n\n${safeContent}`,
     });
 
     await db.aiUsage.create({

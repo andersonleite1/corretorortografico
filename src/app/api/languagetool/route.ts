@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
     params.append("text", trimmedText);
     params.append("language", language);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     const ltResponse = await fetch(apiEndpoint, {
       method: "POST",
       headers: {
@@ -71,7 +74,10 @@ export async function POST(request: NextRequest) {
       },
       body: params.toString(),
       cache: "no-store",
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!ltResponse.ok) {
       const details = await ltResponse.text();
@@ -90,7 +96,16 @@ export async function POST(request: NextRequest) {
       matches: data.matches ?? [],
       language: data.language?.code ?? language,
     });
-  } catch (_error) {
+  } catch (error: any) {
+    if (error.name === "AbortError") {
+      return respond(
+        {
+          error:
+            "O servidor de verificação demorou muito para responder. Tente novamente.",
+        },
+        { status: 504 },
+      );
+    }
     return respond(
       {
         error: "Erro inesperado ao consultar LanguageTool.",

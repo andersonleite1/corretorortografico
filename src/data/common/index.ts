@@ -373,7 +373,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Aceitar",
       discard: "Descartar",
       generating: "Gerando sugestão...",
-      rewriteTooltip: "Faça login ou registre-se no site para acessar o recurso de reescrita assistida por IA.",
+      rewriteTooltip:
+        "Faça login ou registre-se no site para acessar o recurso de reescrita assistida por IA.",
     },
     dashboard: {
       noData: "Sem dados para exibir",
@@ -575,7 +576,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
         "Anonymous technical data will be attached automatically to help our team reproduce and fix the error.",
       validationDescEmpty: "Please describe the problem briefly.",
       validationDescShort: "Description must be at least 10 characters long.",
-      validationEmailEmpty: "Please provide your email to receive notifications.",
+      validationEmailEmpty:
+        "Please provide your email to receive notifications.",
       validationEmailInvalid: "Please provide a valid email.",
     },
     landing: {
@@ -598,7 +600,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Accept",
       discard: "Discard",
       generating: "Generating suggestion...",
-      rewriteTooltip: "Please log in or register to access the AI-assisted rewriting feature.",
+      rewriteTooltip:
+        "Please log in or register to access the AI-assisted rewriting feature.",
     },
     dashboard: {
       noData: "No data to display",
@@ -824,7 +827,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Aceptar",
       discard: "Descartar",
       generating: "Generando sugerencia...",
-      rewriteTooltip: "Inicie sesión o regístrese para acceder a la función de reescritura asistida por IA.",
+      rewriteTooltip:
+        "Inicie sesión o regístrese para acceder a la función de reescritura asistida por IA.",
     },
     dashboard: {
       noData: "Sin datos para mostrar",

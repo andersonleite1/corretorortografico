@@ -57,8 +57,9 @@ export default function AiRewriteButton() {
       <button
         onClick={() => setOpen(!open)}
         disabled={isLoading || !isSignedIn}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20 ${!isSignedIn ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20 ${
+          !isSignedIn ? "opacity-50 cursor-not-allowed" : ""
+        }`}
       >
         {isLoading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -80,11 +81,7 @@ export default function AiRewriteButton() {
   );
 
   if (!isSignedIn) {
-    return (
-      <Tooltip content={t.rewriteTooltip}>
-        {button}
-      </Tooltip>
-    );
+    return <Tooltip content={t.rewriteTooltip}>{button}</Tooltip>;
   }
 
   return (

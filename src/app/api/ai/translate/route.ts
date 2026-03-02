@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkAiRateLimit } from "@/lib/ai-rate-limit";
 import { ratelimit } from "@/lib/ratelimit";
+import { sanitizeAiInput } from "@/lib/ai-sanitize";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -73,6 +74,8 @@ export async function POST(req: Request) {
       })
       .parse(body);
 
+    const safeContent = sanitizeAiInput(content);
+
     if (!SUPPORTED_LANGUAGES.includes(to)) {
       return NextResponse.json(
         { error: "Idioma não suportado." },
@@ -85,7 +88,7 @@ export async function POST(req: Request) {
       system:
         "Tradutor profissional. Preserve toda a formatação HTML. Retorne APENAS o HTML traduzido.",
       messages: [
-        { role: "user", content: `Traduza para "${to}":\n\n${content}` },
+        { role: "user", content: `Traduza para "${to}":\n\n${safeContent}` },
       ],
       onFinish: async ({ usage }) => {
         await db.aiUsage.create({
