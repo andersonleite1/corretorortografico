@@ -44,37 +44,58 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
     },
     title: "Termos de Uso",
     introHtml:
-      "Bem-vindo ao <strong>Editor de Texto Online</strong>. Ao acessar e utilizar este site, você concorda com os presentes Termos de Uso. Caso não concorde, recomendamos que não utilize nossa plataforma.",
+      "Bem-vindo ao <strong>Editor de Texto Online</strong>. Ao acessar e utilizar este site, assinar nossos planos ou usar nossos recursos de inteligência artificial, você concorda legalmente com os presentes Termos de Uso. Caso não concorde com qualquer parte destes termos, você deve parar de utilizar nossa plataforma.",
     sections: [
       {
-        title: "1. Uso permitido",
+        title: "1. Criação de Conta e Cadastro",
         paragraphs: [
-          "Este site é destinado para uso pessoal e profissional, sem necessidade de cadastro. É proibido utilizá-lo para qualquer finalidade ilegal ou que viole direitos de terceiros.",
+          "Para utilizar de forma plena a plataforma, como armazenar documentos online e usar recursos premium de IA, você precisará criar uma conta. Você é responsável por manter a confidencialidade de suas credenciais de acesso e por todas as atividades que ocorram sob sua conta. Contas inativas por longos períodos podem ser suspensas a nosso critério.",
         ],
       },
       {
-        title: "2. Propriedade intelectual",
+        title: "2. Propriedade Intelectual e Conteúdo",
         paragraphs: [
-          "Todo o conteúdo, design, logotipo e funcionalidades do site são de propriedade do Editor de Texto Online, protegidos por leis de direitos autorais e propriedade intelectual.",
+          "Nós não reivindicamos a propriedade dos textos e documentos que você cria no Editor de Texto Online. Você retém todos os direitos autorais do seu conteúdo gerado ou armazenado na plataforma.",
+          "O código-fonte, a interface, a marca e as funcionalidades do site, por outro lado, são de propriedade exclusiva do Editor de Texto Online e protegidos por leis de propriedade intelectual.",
         ],
       },
       {
-        title: "3. Isenção de responsabilidade",
+        title: "3. Responsabilidades e Uso Aceitável",
         paragraphs: [
-          "O conteúdo digitado no editor não é armazenado em nossos servidores. O usuário é responsável por salvar e gerenciar seus próprios textos.",
+          "É terminantemente proibido utilizar o Editor de Texto Online para gerar, processar ou hospedar conteúdos de natureza ilegal, difamatória, maliciosa, fraudulenta ou que viole direitos de terceiros.",
+          "O desrespeito a essas regras poderá resultar no bloqueio permanente de sua conta sem aviso prévio.",
         ],
       },
       {
-        title: "4. Alterações nos termos",
+        title: "4. Uso de Inteligência Artificial",
         paragraphs: [
-          "Podemos modificar estes Termos de Uso a qualquer momento. O uso contínuo do site após alterações significa que você aceita os novos termos.",
+          "Oferecemos funcionalidades baseadas em Inteligência Artificial, providas por integrações de terceiros (como OpenAI). Você compreende e concorda que o conteúdo gerado pela IA pode apresentar erros, imprecisões lógicas ou falhas de formatação. O usuário humano se responsabiliza integralmente pela verificação dos textos antes de seu uso final.",
+        ],
+      },
+      {
+        title: "5. Assinaturas, Pagamentos e Cancelamento",
+        paragraphs: [
+          "Certos recursos do site exigem o pagamento de uma assinatura. Valores e planos são listados na plataforma. As transações são realizadas com segurança via provedor terceirizado (Stripe).",
+          "O usuário pode cancelar a renovação de sua assinatura a qualquer momento; o cancelamento manterá os benefícios ativos até o final do ciclo já pago. Os valores de assinaturas mensais ou anuais não são reembolsáveis pro-rata.",
+        ],
+      },
+      {
+        title: "6. Isenção de Responsabilidade (Disclaimer)",
+        paragraphs: [
+          "O Editor de Texto Online e seus serviços associados são fornecidos na condição \"como estão\" (as is). Não oferecemos garantias de que os serviços operarão de forma ininterrupta ou totalmente livres de erros. Não seremos responsáveis por falhas de hardware, instabilidades de rede ou exclusão acidental de documentos decorrente da ação do próprio usuário.",
+        ],
+      },
+      {
+        title: "7. Jurisdição e Atualizações destes Termos",
+        paragraphs: [
+          "Temos o direito de modificar estes Termos de Uso periodicamente. Alterações significativas poderão ser comunicadas via sistema ou e-mail. Estes termos são regidos e interpretados segundo as leis brasileiras.",
         ],
       },
     ],
     contactHtml:
-      'Em caso de dúvidas sobre estes Termos de Uso, entre em contato pelo e-mail: <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
+      'Em caso de dúvidas sobre estes Termos de Uso ou disputas comerciais, entre em contato pelo e-mail: <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
     lastUpdatedLabel: "Última atualização",
-    lastUpdatedValue: "13 de agosto de 2025",
+    lastUpdatedValue: "02 de Março de 2026",
   },
   en: {
     locale: "en",
@@ -85,37 +106,58 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
     },
     title: "Terms of Use",
     introHtml:
-      "Welcome to <strong>Online Text Editor</strong>. By accessing and using this site, you agree to these Terms of Use. If you do not agree, we recommend that you do not use our platform.",
+      "Welcome to <strong>Online Text Editor</strong>. By accessing and using this site, subscribing to our plans, or utilizing our AI features, you legally agree to these Terms of Use. If you do not agree with any part of these terms, you must stop using our platform immediately.",
     sections: [
       {
-        title: "1. Permitted use",
+        title: "1. Account Creation",
         paragraphs: [
-          "This site is intended for personal and professional use without the need for registration. It is forbidden to use it for illegal purposes or to infringe on the rights of third parties.",
+          "To fully use the platform, such as syncing documents online and accessing premium AI generation features, you will need to create an account. You are responsible for keeping your login credentials confidential and for all activities that occur under your account.",
         ],
       },
       {
-        title: "2. Intellectual property",
+        title: "2. Intellectual Property and Content",
         paragraphs: [
-          "All content, design, logos, and features are owned by Online Text Editor and protected by copyright and intellectual property laws.",
+          "We do not claim ownership of the texts and documents you create on Online Text Editor. You retain all copyrights to your generated or stored content on the platform.",
+          "However, the source code, interface design, brand, and features entirely belong to Online Text Editor and are protected by applicable intellectual property laws.",
         ],
       },
       {
-        title: "3. Disclaimer",
+        title: "3. Acceptable Use",
         paragraphs: [
-          "The text typed in the editor is not stored on our servers. Users are responsible for saving and managing their own files.",
+          "It is strictly forbidden to use the Online Text Editor to generate, process, or host illegal, defamatory, malicious, fraudulent content, or content that infringes upon third-party rights.",
+          "Violation of these rules may lead to a permanent suspension of your account without prior notice.",
         ],
       },
       {
-        title: "4. Changes to these terms",
+        title: "4. Use of Artificial Intelligence",
         paragraphs: [
-          "We may modify these Terms of Use at any time. Continued use of the site after changes indicates that you accept the new terms.",
+          "We offer features powered by artificial intelligence provided by third-party integrations (like OpenAI). You acknowledge that AI-generated content might include errors, logical inaccuracies, or formatting flaws. The human user is fully responsible for reviewing the generated texts before their final use.",
+        ],
+      },
+      {
+        title: "5. Subscriptions, Payments, and Cancellation",
+        paragraphs: [
+          "Certain premium features require a paid subscription. Pricing is displayed within the platform. Transactions are processed securely through a third-party gateway (Stripe).",
+          "You may cancel your subscription renewal at any time; cancellation ensures benefits continue until the end of the paid billing cycle. We do not provide pro-rated refunds for subscription periods.",
+        ],
+      },
+      {
+        title: "6. Disclaimer of Warranties",
+        paragraphs: [
+          "The Online Text Editor and its services are provided on an \"as is\" basis. We do not guarantee that the services will be free of interruptions, errors, or delays. We will not be liable for hardware failures, network interruptions, or the accidental deletion of documents by the user.",
+        ],
+      },
+      {
+        title: "7. Governing Law and Term Modifications",
+        paragraphs: [
+          "We reserve the right to modify these Terms of Use from time to time. Continued use of the service constitutes acceptance. These terms are governed by and construed in accordance with the laws of Brazil.",
         ],
       },
     ],
     contactHtml:
       'If you have any questions about these Terms of Use, please email us at <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
     lastUpdatedLabel: "Last update",
-    lastUpdatedValue: "August 13, 2025",
+    lastUpdatedValue: "March 02, 2026",
   },
   es: {
     locale: "es",
@@ -126,37 +168,58 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
     },
     title: "Términos de Uso",
     introHtml:
-      "Bienvenido a <strong>Editor de Texto en Línea</strong>. Al acceder y utilizar este sitio, aceptas estos Términos de Uso. Si no estás de acuerdo, te recomendamos no utilizar nuestra plataforma.",
+      "Bienvenido al <strong>Editor de Texto en Línea</strong>. Al acceder y utilizar este sitio web, suscribirse a nuestros planes o usar las funciones de IA, acepta legalmente estos Términos de Uso. Si no está de acuerdo, le rogamos no utilice nuestra plataforma.",
     sections: [
       {
-        title: "1. Uso permitido",
+        title: "1. Creación de Cuenta",
         paragraphs: [
-          "Este sitio está destinado para uso personal y profesional sin necesidad de registro. Está prohibido utilizarlo con fines ilegales o que violen derechos de terceros.",
+          "Para utilizar las funciones avanzadas como el almacenamiento en la nube y la inteligencia artificial, deberá crear una cuenta. Usted es responsable de mantener la confidencialidad de su cuenta y contraseña de acceso. Nos reservamos el derecho de suspender cuentas sin actividad prolongada.",
         ],
       },
       {
-        title: "2. Propiedad intelectual",
+        title: "2. Propiedad Intelectual y Contenidos",
         paragraphs: [
-          "Todo el contenido, diseño, logotipo y funcionalidades del sitio son propiedad de Editor de Texto en Línea y están protegidos por las leyes de derechos de autor y propiedad intelectual.",
+          "No reclamamos ser los dueños de los textos y documentos creados. Usted retiene todos los derechos de autor sobre su contenido original creado en la plataforma.",
+          "Por el contrario, el código, el diseño del sistema y los elementos gráficos del sitio son propiedad exclusiva del Editor de Texto en Línea.",
         ],
       },
       {
-        title: "3. Exención de responsabilidad",
+        title: "3. Uso Aceptable y Responsabilidades",
         paragraphs: [
-          "El contenido escrito en el editor no se almacena en nuestros servidores. Cada usuario es responsable de guardar y administrar sus propios textos.",
+          "Queda rigurosamente prohibido emplear el Editor de Texto en Línea para procesar, redactar o distribuir contenidos de índole estrictamente ilegal, piratería, spam, fraude o material que vulnere derechos y marcas.",
+          "El incumplimiento podrá derivar en la eliminación o suspensión definitiva de su acceso.",
         ],
       },
       {
-        title: "4. Cambios en los términos",
+        title: "4. Uso de la Inteligencia Artificial",
         paragraphs: [
-          "Podemos modificar estos Términos de Uso en cualquier momento. El uso continuo del sitio después de los cambios significa que aceptas los nuevos términos.",
+          "Ofrecemos asistentas de corrección o generación potenciadas por modelos de Inteligencia Artificial de terceros (ej. OpenAI). Entienda que el resultado generado puede adolecer ocasionalmente de incorrecciones. Es fundamental que verifique el texto de salida antes de utilizarlo profesionalmente.",
+        ],
+      },
+      {
+        title: "5. Suscripciones y Pagos",
+        paragraphs: [
+          "Contamos con modalidades de suscripciones de pago mediante proveedores de cobros (Stripe). Usted se compromete a proporcionar información de facturación válida.",
+          "Puede cancelar la renovación automática de la suscripción en cualquier instante. No hay reembolsos proporcionales si decide cancelar a mitad del período de facturación abonado.",
+        ],
+      },
+      {
+        title: "6. Exención de Garantías",
+        paragraphs: [
+          "El editor se suministra de modalidad \"tal cual\" (as is). No podemos asegurar que los servicios de servidor estén exentos de interrupciones técnicas. El usuario asume libremente la responsabilidad del uso y recomendamos mantener respaldos (backups) propios de documentos críticos.",
+        ],
+      },
+      {
+        title: "7. Actualización de Términos de Uso",
+        paragraphs: [
+          "Podremos actualizar estos términos ocasionalmente. El uso de la plataforma posteriormente a la actualización significará su asentimiento de los nuevos Términos. Están regidos por la legislación de Brasil.",
         ],
       },
     ],
     contactHtml:
-      'Si tienes dudas sobre estos Términos de Uso, escríbenos al correo <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
+      'Si tienes dudas o reclamos sobre estos Términos de Uso, escríbenos a <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
     lastUpdatedLabel: "Última actualización",
-    lastUpdatedValue: "13 de agosto de 2025",
+    lastUpdatedValue: "02 de Marzo de 2026",
   },
 };
 
