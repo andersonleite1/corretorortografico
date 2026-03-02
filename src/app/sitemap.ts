@@ -25,36 +25,36 @@ const localizedRoutes: LocalizedRoute[] = [
     priority: 0.7,
     changeFrequency: "weekly",
     paths: {
-      pt: "/about",
-      es: "/es/about",
-      en: "/en/about",
+      pt: "/sobre",
+      es: "/es/sobre",
+      en: "/about",
     },
   },
   {
     priority: 0.65,
     changeFrequency: "weekly",
     paths: {
-      pt: "/contact",
-      es: "/es/contact",
-      en: "/en/contact",
+      pt: "/contato",
+      es: "/es/contato",
+      en: "/contact",
     },
   },
   {
     priority: 0.6,
     changeFrequency: "weekly",
     paths: {
-      pt: "/privacy",
-      es: "/es/privacy",
-      en: "/en/privacy",
+      pt: "/privacidade",
+      es: "/es/privacidade",
+      en: "/privacy",
     },
   },
   {
     priority: 0.6,
     changeFrequency: "weekly",
     paths: {
-      pt: "/terms",
-      es: "/es/terms",
-      en: "/en/terms",
+      pt: "/termos",
+      es: "/es/termos",
+      en: "/terms",
     },
   },
 ];

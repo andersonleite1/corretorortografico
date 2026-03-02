@@ -100,28 +100,21 @@ export default async function RootLayout({
   const userPlan = await getUserPlan();
 
   return (
-    <ClerkThemeProvider locale={locale}>
-      <SidebarProvider>
-        <html
-          lang={locale}
-          className={`${fontMono.variable} ${fontSans.variable}`}
-        >
-          <head>
-            <link
-              rel="preconnect"
-              href="https://www.clarity.ms"
-              crossOrigin=""
-            />
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-            />
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-            />
-          </head>
-          <body>
+    <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      </head>
+      <body>
+        <ClerkThemeProvider locale={locale}>
+          <SidebarProvider>
             <Analytics />
             <MainContent
               userButton={<UserButton locale={locale} />}
@@ -132,9 +125,9 @@ export default async function RootLayout({
             </MainContent>
             <Toaster richColors position="top-right" />
             <CookieConsent locale={locale} />
-          </body>
-        </html>
-      </SidebarProvider>
-    </ClerkThemeProvider>
+          </SidebarProvider>
+        </ClerkThemeProvider>
+      </body>
+    </html>
   );
 }

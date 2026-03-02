@@ -51,6 +51,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/editar-pdf",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/edit-pdf",
+        destination: "/",
+        permanent: true,
+      },
+      {
         source: "/sobre",
         destination: "/about",
         permanent: true,
