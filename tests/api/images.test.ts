@@ -85,6 +85,20 @@ describe("POST /api/images", () => {
     expect(json.url).toBe(mockResult.secure_url);
   });
 
+  it("garante que o public_id enviado ao Cloudinary contém o userId (SEG-07 - FIX)", async () => {
+    mockCloudinaryUpload.mockImplementation((options, callback) => {
+      callback(null, { public_id: "any" });
+    });
+
+    const req = createRequestWithFile("foto.jpg", "image/jpeg", 1000);
+    await POST(req);
+
+    const callArgs = mockCloudinaryUpload.mock.calls[0][0];
+    expect(callArgs.public_id).toContain("user-123");
+    expect(callArgs.public_id).toMatch(/user-123\/\d+-/); // Verifica estrutura userId/timestamp-
+    expect(callArgs.tags).toContain("user-123");
+  });
+
   it("retorna 400 para arquivos com tipo não permitido", async () => {
     const req = createRequestWithFile("test.pdf", "application/pdf", 1000);
     const response = await POST(req);

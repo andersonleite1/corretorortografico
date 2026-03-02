@@ -34,16 +34,30 @@ const Header = ({ userButton }: HeaderProps) => {
   const pathname = usePathname() || "/";
   const router = useRouter();
   const { locales, defaultLocale } = i18n;
-  const { isLoaded } = useAuth();
-
-  const segments = useMemo(
-    () => pathname.split("/").filter(Boolean),
-    [pathname],
-  );
-  const currentLocale = useMemo<Locale>(() => {
+  const { isLoaded, userId } = useAuth();
+  const { currentLocale, segments } = useMemo(() => {
+    const segments = pathname.split("/").filter(Boolean);
     const potential = segments[0] as Locale | undefined;
-    return locales.includes(potential as Locale) ? potential! : defaultLocale;
-  }, [segments, locales, defaultLocale]);
+    const currentLocale = locales.includes(potential as Locale)
+      ? potential!
+      : defaultLocale;
+    return { currentLocale, segments };
+  }, [pathname, locales, defaultLocale]);
+
+  const [clerkTimeout, setClerkTimeout] = useState(false);
+
+  // Timeout para evitar skeleton infinito se Clerk demorar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isLoaded) {
+        console.warn(
+          "[Header] Clerk demorou mais de 2s para carregar. Usando fallback.",
+        );
+        setClerkTimeout(true);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
 
   const [theme, setTheme] = useState("light");
   const [authModal, setAuthModal] = useState<{
@@ -140,29 +154,33 @@ const Header = ({ userButton }: HeaderProps) => {
                 </Tooltip>
               </div>
               <div className="flex gap-4 items-center min-w-[140px] justify-end">
-                {!isLoaded ? (
+                {!isLoaded && !clerkTimeout ? (
                   <HeaderSkeleton />
                 ) : (
                   <>
-                    <SignedOut>
-                      <button
-                        onClick={() =>
-                          setAuthModal({ isOpen: true, view: "sign-in" })
-                        }
-                        className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-                      >
-                        Entrar
-                      </button>
-                      <button
-                        onClick={() =>
-                          setAuthModal({ isOpen: true, view: "sign-up" })
-                        }
-                        className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
-                      >
-                        Começar agora
-                      </button>
-                    </SignedOut>
-                    <SignedIn>{userButton}</SignedIn>
+                    {/* Bypass Clerk's SignedIn/SignedOut components during timeout */}
+                    {!isLoaded || !userId ? (
+                      <>
+                        <button
+                          onClick={() =>
+                            setAuthModal({ isOpen: true, view: "sign-in" })
+                          }
+                          className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                        >
+                          Entrar
+                        </button>
+                        <button
+                          onClick={() =>
+                            setAuthModal({ isOpen: true, view: "sign-up" })
+                          }
+                          className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                        >
+                          Começar agora
+                        </button>
+                      </>
+                    ) : (
+                      <SignedIn>{userButton}</SignedIn>
+                    )}
                   </>
                 )}
                 <ThemeSwitcher />

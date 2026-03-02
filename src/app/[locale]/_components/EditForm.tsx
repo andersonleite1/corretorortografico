@@ -435,23 +435,29 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           });
         });
     } else {
-      getPost().then((post) => {
-        reset({ ...post });
-        const instance = editorRef.current?.getInstance();
-        if (instance) {
-          const currentContent = instance.getJSON();
-          const newContentString =
-            typeof post.content === "string"
-              ? post.content
-              : JSON.stringify(post.content);
-          const currentContentString = JSON.stringify(currentContent);
+      getPost()
+        .then((post) => {
+          reset({ ...post });
+          const instance = editorRef.current?.getInstance();
+          if (instance) {
+            const currentContent = instance.getJSON();
+            const newContentString =
+              typeof post.content === "string"
+                ? post.content
+                : JSON.stringify(post.content);
+            const currentContentString = JSON.stringify(currentContent);
 
-          if (newContentString !== currentContentString) {
-            instance.commands.setContent(post.content || "");
+            if (newContentString !== currentContentString) {
+              instance.commands.setContent(post.content || "");
+            }
           }
-        }
-        setIsLoading(false);
-      });
+        })
+        .catch((err) => {
+          console.error("[EditForm] Error loading post:", err);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
 
     return () => {

@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         {
           error: "Limite atingido.",
           message: "Você atingiu seu limite diário.",
-          upgradeUrl: "/pricing",
+          upgradeUrl: "#pricing",
         },
         { status: 429 },
       );

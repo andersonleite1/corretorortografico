@@ -43,6 +43,20 @@ function getLocale(request: NextRequest): string {
 function i18nMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Redirecionamento de /pricing para /#pricing (Legado -> Home)
+  if (pathname.endsWith("/pricing")) {
+    const locale =
+      locales.find((l) => pathname.startsWith(`/${l}/`)) || defaultLocale;
+    const newPath =
+      pathname === "/pricing" || pathname === `/${locale}/pricing`
+        ? `/${locale}`
+        : pathname.replace("/pricing", "");
+    const url = new URL(newPath, request.url);
+    url.hash = "pricing";
+    url.search = request.nextUrl.search;
+    return NextResponse.redirect(url);
+  }
+
   // Pular arquivos estáticos e rotas internas
   if (
     PUBLIC_FILE.test(pathname) ||

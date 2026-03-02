@@ -120,7 +120,7 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
 
               {plan === "free" ? (
                 <a
-                  href="/pricing"
+                  href="#pricing"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition text-center"
                 >
                   Fazer Upgrade

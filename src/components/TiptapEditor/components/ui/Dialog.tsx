@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,9 +12,17 @@ interface DialogProps {
 }
 
 const Dialog = ({ children, open, onOpenChange, className }: DialogProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const onDismiss = () => {
     onOpenChange?.(false);
   };
+
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>
@@ -38,7 +48,7 @@ const Dialog = ({ children, open, onOpenChange, className }: DialogProps) => {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.querySelector("body")!,
+    document.body,
   );
 };
 

@@ -2,14 +2,14 @@ import { UserButton as ClerkUserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { getUserPlan } from "@/lib/auth";
 
-export async function UserButton() {
+export async function UserButton({ locale = "pt" }: { locale?: string }) {
   const plan = await getUserPlan();
 
   return (
     <div className="flex items-center gap-3">
       {plan === "free" && (
         <Link
-          href="/pricing"
+          href={`/${locale}#pricing`}
           className="text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1.5 rounded-full hover:opacity-90 transition"
         >
           ⚡ Upgrade para Pro

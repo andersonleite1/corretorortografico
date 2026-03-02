@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${appUrl}/settings?tab=subscription&success=true`,
-      cancel_url: `${appUrl}/pricing?canceled=true`,
+      cancel_url: `${appUrl}/#pricing?canceled=true`,
       subscription_data: {
         metadata: { userId: user.id }, // Para identificar no webhook
       },

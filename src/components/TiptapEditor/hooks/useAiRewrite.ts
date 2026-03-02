@@ -16,7 +16,9 @@ export function useAiRewrite() {
       try {
         const data = JSON.parse(err.message);
         if (data.upgradeUrl) {
-          alert(`${data.message || data.error}\n\nAcesse: /pricing`);
+          alert(
+            `${data.message || data.error}\n\nAcesse a seção de planos na Home.`,
+          );
         } else {
           alert(data.error || data.message || "Erro na IA. Tente novamente.");
         }

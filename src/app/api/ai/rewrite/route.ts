@@ -99,7 +99,7 @@ export async function POST(req: Request) {
         {
           error: "Limite de uso gratuito atingido.",
           message: `${rateLimit.used}/${rateLimit.limit} usos hoje. Faça upgrade para Pro.`,
-          upgradeUrl: "/pricing",
+          upgradeUrl: "#pricing",
         },
         { status: 429 },
       );

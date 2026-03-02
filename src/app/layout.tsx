@@ -120,7 +120,10 @@ export default async function RootLayout({
           </head>
           <body>
             <Analytics />
-            <MainContent userButton={<UserButton />} locale={locale}>
+            <MainContent
+              userButton={<UserButton locale={locale} />}
+              locale={locale}
+            >
               {children}
             </MainContent>
             <Toaster richColors position="top-right" />

@@ -541,7 +541,7 @@ export default function DashboardContent({ userName }: { userName: string }) {
                   </p>
                 </div>
                 <Link
-                  href="/pricing"
+                  href="#pricing"
                   className="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors whitespace-nowrap flex-shrink-0"
                 >
                   Ver Planos →

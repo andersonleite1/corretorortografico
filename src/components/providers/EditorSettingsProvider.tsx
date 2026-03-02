@@ -139,14 +139,28 @@ export const EditorSettingsProvider = ({
   // Ref para rastrear o último estado de autenticação que iniciamos o carregamento
   // Previne chamadas duplicadas quando há re-renders, mas permite corretamente
   // detectar mudanças reais (ex: login/logout).
-  const loadedForSignedIn = useRef<boolean | null>(null);
+  const loadedForSignedIn = useRef<boolean | null | undefined>(null);
+  const [clerkTimeout, setClerkTimeout] = useState(false);
+
+  // Timeout para evitar skeleton infinito se Clerk demorar a responder
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isClerkLoaded) {
+        console.warn(
+          "[EditorSettings] Clerk demorou mais de 2s para carregar. Usando defaults.",
+        );
+        setClerkTimeout(true);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isClerkLoaded]);
 
   // -----------------------------------------------------------------------
   // Carregamento inicial das configurações
   // -----------------------------------------------------------------------
   useEffect(() => {
-    // Aguardar Clerk resolver o estado de auth
-    if (!isClerkLoaded) return;
+    // Aguardar Clerk resolver o estado de auth (ou timeout)
+    if (!isClerkLoaded && !clerkTimeout) return;
 
     // Evitar recarregar se já carregamos para este mesmo estado de auth
     if (loadedForSignedIn.current === isSignedIn) return;
@@ -191,6 +205,8 @@ export const EditorSettingsProvider = ({
       setButtonVisibility(local.buttonVisibility);
       setActiveTones(local.activeTones);
       setCustomTones(local.customTones);
+      // Garante que não ficamos travados em loading se formos anônimos
+      setIsLoadingSettings(false);
     }
   }, [isClerkLoaded, isSignedIn]);
 
