@@ -22,33 +22,29 @@ function calcTimeSavedSeconds(
   return Math.max(0, humanTimeSeconds - aiTimeSeconds);
 }
 
+import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+
 export async function GET() {
   try {
     const user = await getCurrentUser();
     if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
     const plan = await getUserPlan();
-    const aiMonthlyLimit = AI_MONTHLY_LIMITS[plan] ?? 30;
 
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Run all queries in parallel
+    // Run all queries in parallel, plus rate stats
     const [
       totalDocuments,
-      aiUsageThisMonth,
       allAiUsage,
       recentDocuments,
       toneGroups,
       dailyRawUsage,
+      rateStats,
     ] = await Promise.all([
       db.document.count({ where: { userId: user.id } }),
-
-      db.aiUsage.count({
-        where: { userId: user.id, createdAt: { gte: startOfMonth } },
-      }),
 
       db.aiUsage.findMany({
         where: { userId: user.id },
@@ -75,6 +71,8 @@ export async function GET() {
         select: { createdAt: true, wordCount: true, processingTimeMs: true },
         orderBy: { createdAt: "asc" },
       }),
+
+      checkAiRateLimit(user.id, plan),
     ]);
 
     // Total time saved (seconds)
@@ -120,13 +118,15 @@ export async function GET() {
 
     return NextResponse.json({
       totalDocuments,
-      aiUsageThisMonth,
-      aiMonthlyLimit,
       plan,
       totalTimeSavedSeconds: Math.round(totalTimeSavedSeconds),
       topTones,
       recentDocuments,
       dailySeries,
+      usedDaily: rateStats.usedDaily,
+      limitDaily: rateStats.limitDaily,
+      usedMonthlyPaid: rateStats.usedMonthlyPaid,
+      limitMonthlyPaid: rateStats.limitMonthlyPaid,
     });
   } catch (error) {
     console.error("[DASHBOARD_GET]", error);

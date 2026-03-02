@@ -20,13 +20,15 @@ import { EmptyState } from "@/components/shared/EmptyState";
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface DashboardData {
   totalDocuments: number;
-  aiUsageThisMonth: number;
-  aiMonthlyLimit: number;
   plan: string;
   totalTimeSavedSeconds: number;
   topTones: { tone: string; count: number }[];
   recentDocuments: { id: string; title: string; updatedAt: string }[];
   dailySeries: { date: string; timeSavedMinutes: number; rewrites: number }[];
+  usedDaily: number;
+  limitDaily: number;
+  usedMonthlyPaid: number;
+  limitMonthlyPaid: number;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -122,10 +124,14 @@ function KpiCard({
 }
 
 function AiQuotaRing({
+  title,
+  subtitle,
   used,
   limit,
   plan,
 }: {
+  title: string;
+  subtitle: string;
   used: number;
   limit: number;
   plan: string;
@@ -178,13 +184,13 @@ function AiQuotaRing({
       </div>
       <div>
         <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-1">
-          Reescritas IA
+          {title}
         </p>
         <p className="text-2xl font-bold text-neutral-900 dark:text-white leading-none">
           {Math.round(percentage)}%
         </p>
         <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5">
-          utilizadas este mês
+          {subtitle}
         </p>
         <span className="inline-block mt-2.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold capitalize">
           Plano {plan}
@@ -502,20 +508,33 @@ export default function DashboardContent({ userName }: { userName: string }) {
                 icon="📁"
               />
               <KpiCard
-                label="Reescritas este Mês"
-                value={String(data.aiUsageThisMonth)}
-                sublabel={`de ${data.aiMonthlyLimit} disponíveis (plano ${data.plan})`}
+                label="Reescritas Hoje"
+                value={String(data.usedDaily)}
+                sublabel={`de ${data.limitDaily} gratuitas (plano ${data.plan})`}
                 accentClass="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                 icon="✨"
               />
             </div>
 
             {/* Quota Ring */}
-            <AiQuotaRing
-              used={data.aiUsageThisMonth}
-              limit={data.aiMonthlyLimit}
-              plan={data.plan}
-            />
+            <div className={`grid grid-cols-1 ${data.plan !== 'free' ? 'md:grid-cols-2' : ''} gap-4`}>
+              <AiQuotaRing
+                title="Cota Diária Gratuita"
+                subtitle="utilizadas hoje"
+                used={data.usedDaily}
+                limit={data.limitDaily}
+                plan={data.plan}
+              />
+              {data.plan !== "free" && (
+                <AiQuotaRing
+                  title="Cota Mensal do Plano"
+                  subtitle="utilizadas este mês"
+                  used={data.usedMonthlyPaid}
+                  limit={data.limitMonthlyPaid}
+                  plan={data.plan}
+                />
+              )}
+            </div>
 
             {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-4">

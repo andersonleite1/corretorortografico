@@ -60,8 +60,10 @@ describe("POST /api/ai/rewrite", () => {
     const { checkAiRateLimit } = await import("@/lib/ai-rate-limit");
     vi.mocked(checkAiRateLimit).mockResolvedValueOnce({
       allowed: false,
-      used: 5,
-      limit: 5,
+      usedDaily: 5,
+      limitDaily: 5,
+      usedMonthlyPaid: 0,
+      limitMonthlyPaid: 0,
     } as any);
 
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
@@ -119,5 +121,35 @@ describe("POST /api/ai/rewrite", () => {
 
     const response = await POST(mockRequest);
     expect(response.status).toBe(200);
+  });
+
+  it("should reject request when Pro rate limit exceeded", async () => {
+    const { db } = await import("@/lib/db");
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce({
+      id: "db_test_user_id",
+      subscription: { plan: "pro" },
+    } as any);
+
+    const { checkAiRateLimit } = await import("@/lib/ai-rate-limit");
+    vi.mocked(checkAiRateLimit).mockResolvedValueOnce({
+      allowed: false,
+      usedDaily: 5,
+      limitDaily: 5,
+      usedMonthlyPaid: 500,
+      limitMonthlyPaid: 500,
+    } as any);
+
+    const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
+      method: "POST",
+      body: JSON.stringify({
+        tone: "professional",
+        text: "hello",
+      }),
+    });
+
+    const response = await POST(mockRequest);
+    expect(response.status).toBe(429);
+    const json = await response.json();
+    expect(json.error).toBe("Limite do plano Pro atingido.");
   });
 });

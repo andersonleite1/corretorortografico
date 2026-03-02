@@ -90,26 +90,34 @@ export async function POST(req: Request) {
     }
 
     // 3. Rate Limiting
-    const rateLimit = await checkAiRateLimit(
-      user.id,
-      user.subscription?.plan ?? "free",
-    );
+    const plan = user.subscription?.plan ?? "free";
+    const rateLimit = await checkAiRateLimit(user.id, plan);
+
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          error: "Limite de uso gratuito atingido.",
-          message: `${rateLimit.used}/${rateLimit.limit} usos hoje. Faça upgrade para Pro.`,
-          upgradeUrl: "#pricing",
-        },
-        { status: 429 },
-      );
+      if (plan === "free") {
+        return NextResponse.json(
+          {
+            error: "Limite de uso gratuito atingido.",
+            message: `${rateLimit.usedDaily}/${rateLimit.limitDaily} usos hoje. Faça upgrade para Pro para ter 500 reescritas mensais.`,
+            upgradeUrl: "#pricing",
+          },
+          { status: 429 },
+        );
+      } else {
+        return NextResponse.json(
+          {
+            error: "Limite do plano Pro atingido.",
+            message: `Você já utilizou suas 5 reescritas gratuitas de hoje e também atingiu o limite de ${rateLimit.limitMonthlyPaid} reescritas do seu plano este mês.`,
+            upgradeUrl: "#pricing",
+          },
+          { status: 429 },
+        );
+      }
     }
 
     // 4. Validar input
     const body = await req.json();
     const { text, tone, customInstructions, language } = schema.parse(body);
-
-    const plan = user.subscription?.plan ?? "free";
 
     // RESTRICTION: Free plan only allowed first 5 tones
     if (plan === "free") {
