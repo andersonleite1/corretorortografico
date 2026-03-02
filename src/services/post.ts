@@ -24,8 +24,12 @@ export const savePost = (data: any, docId?: string | null) => {
   try {
     // If it's a string, we check trim. If it's an object (JSON), we assume it's valid if it exists.
     const hasContent =
-      typeof data?.content === "string" ? data.content.trim() : !!data?.content;
-    const value = hasContent ? { ...mock, ...data } : mock;
+      typeof data?.content === "string"
+        ? data.content.trim().length > 0
+        : !!data?.content && Object.keys(data.content).length > 0;
+    const value = hasContent
+      ? { ...mock, ...data }
+      : { ...mock, title: "", content: "", wordCount: 0 };
 
     localStorage.setItem(
       "post",

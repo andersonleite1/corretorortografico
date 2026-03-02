@@ -28,6 +28,24 @@ export default function useTiptapEditor({
   );
 
   useEffect(() => {
+    if (!editor || editorOptions.content === undefined || editor.isFocused)
+      return;
+
+    const currentContent =
+      typeof editorOptions.content === "string"
+        ? editor.getHTML()
+        : JSON.stringify(editor.getJSON());
+    const newContent =
+      typeof editorOptions.content === "string"
+        ? editorOptions.content
+        : JSON.stringify(editorOptions.content);
+
+    if (currentContent !== newContent) {
+      editor.commands.setContent(editorOptions.content, { emitUpdate: false });
+    }
+  }, [editor, editorOptions.content]);
+
+  useEffect(() => {
     const isEditable = editorOptions.editable;
     if (!editor || editor.isEditable === isEditable) return;
     editor.setOptions({ editable: Boolean(isEditable) });

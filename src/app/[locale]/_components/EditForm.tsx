@@ -130,10 +130,21 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   const handleClear = () => {
-    localStorage.removeItem("post");
+    // We don't remove "post" from localStorage because savePost (via watch)
+    // will immediately save the empty state anyway.
+    // Instead, we reset the form and explicitly clear the editor content.
     reset({ title: "", content: "" });
-    editorRef.current?.getInstance()?.commands.setContent("");
-    router.push(`/${locale}`);
+
+    const editor = editorRef.current?.getInstance();
+    if (editor) {
+      editor.commands.setContent("");
+    }
+
+    // If there's a docId, navigating back to root clears the selection
+    if (docId) {
+      router.push(`/${locale}`);
+    }
+
     showNotification(formMessages.modal.cleared);
   };
 

@@ -111,7 +111,7 @@ const StatusBar = () => {
               className={clsx(
                 "w-1.5 h-1.5 rounded-full",
                 draftActions.savingStatus === "saving" &&
-                "bg-blue-500 animate-pulse",
+                  "bg-blue-500 animate-pulse",
                 draftActions.savingStatus === "saved" && "bg-green-500",
                 draftActions.savingStatus === "error" && "bg-red-500",
               )}
@@ -148,7 +148,7 @@ const StatusBar = () => {
             )}
           >
             {!!useTiptapContext().documentTitle ||
-              !!new URLSearchParams(window.location.search).get("docId")
+            !!new URLSearchParams(window.location.search).get("docId")
               ? "Sincronizado"
               : "Local"}
           </span>
