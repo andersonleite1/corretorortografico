@@ -115,8 +115,15 @@ export default function AiRewriteButton() {
             </div>
             {(() => {
               const toneIds = Object.keys(TONE_LABELS) as ToneId[];
-              const activeToneIds = toneIds.filter((id) => activeTones[id]);
-              const activeCustomTones = customTones.filter((t) => t.isActive);
+              const activeToneIds = toneIds.filter((id, index) => {
+                const isWithinLimit = userPlan !== "free" || index < 5;
+                return activeTones[id] && isWithinLimit;
+              });
+              const activeCustomTones = customTones.filter((t, idx) => {
+                const index = toneIds.length + idx;
+                const isWithinLimit = userPlan !== "free" || index < 5;
+                return t.isActive && isWithinLimit;
+              });
 
               if (
                 activeToneIds.length === 0 &&
@@ -124,7 +131,7 @@ export default function AiRewriteButton() {
               ) {
                 return (
                   <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500 text-center">
-                    Nenhum tom selecionado nas configurações.
+                    Nenhum tom disponível ou selecionado.
                   </div>
                 );
               }

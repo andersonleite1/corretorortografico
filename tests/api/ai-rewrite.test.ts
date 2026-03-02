@@ -7,6 +7,10 @@ vi.mock("@clerk/nextjs/server", () => ({
   auth: vi.fn().mockResolvedValue({ userId: "test_user_id" }),
 }));
 
+vi.mock("ai", () => ({
+  streamText: vi.fn(),
+}));
+
 // Mock the database
 vi.mock("@/lib/db", () => ({
   db: {
@@ -73,5 +77,47 @@ describe("POST /api/ai/rewrite", () => {
 
     const json = await response.json();
     expect(json.error).toBe("Limite de uso gratuito atingido.");
+  });
+
+  it("should reject unauthorized tones for Free users", async () => {
+    const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
+      method: "POST",
+      body: JSON.stringify({
+        tone: "romantic", // 6th tone (unauthorized for Free)
+        text: "hello",
+      }),
+    });
+
+    const response = await POST(mockRequest);
+    expect(response.status).toBe(403);
+    const json = await response.json();
+    expect(json.error).toContain(
+      "Este tom não está disponível no plano gratuito",
+    );
+  });
+
+  it("should allow any tone for Pro users", async () => {
+    const { db } = await import("@/lib/db");
+    vi.mocked(db.user.findUnique).mockResolvedValueOnce({
+      id: "db_test_user_id",
+      subscription: { plan: "pro" },
+    } as any);
+
+    const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
+      method: "POST",
+      body: JSON.stringify({
+        tone: "romantic",
+        text: "hello",
+      }),
+    });
+
+    // Mock completion response since it would try to talk to OpenAI
+    const { streamText } = await import("ai");
+    vi.mocked(streamText).mockResolvedValue({
+      toTextStreamResponse: () => new Response("AI response"),
+    } as any);
+
+    const response = await POST(mockRequest);
+    expect(response.status).toBe(200);
   });
 });

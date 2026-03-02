@@ -85,15 +85,15 @@ describe("SettingsDialog", () => {
     expect(mockToggleToneActivation).toHaveBeenCalledWith(toneIds[0]);
   });
 
-  it('exibe botão "Novo Tom" quando há menos de 5 tons personalizados', () => {
+  it('exibe botão "Novo Tom" quando há menos de 5 tons personalizados e plano Pro', () => {
     mockEditorSettings.customTones = [];
-    render(<SettingsDialog />);
+    render(<SettingsDialog userPlan="pro" />);
     expect(
       screen.getByTitle("Cadastrar tom personalizado"),
     ).toBeInTheDocument();
   });
 
-  it('não exibe botão "Novo Tom" quando há 5 tons personalizados', () => {
+  it('não exibe botão "Novo Tom" quando há 5 tons personalizados (Pro)', () => {
     mockEditorSettings.customTones = [
       {
         id: "1",
@@ -131,14 +131,14 @@ describe("SettingsDialog", () => {
         isActive: true,
       },
     ];
-    render(<SettingsDialog />);
+    render(<SettingsDialog userPlan="pro" />);
     expect(
       screen.queryByTitle("Cadastrar tom personalizado"),
     ).not.toBeInTheDocument();
   });
 
-  it('abre modal de criação ao clicar em "Novo Tom"', async () => {
-    render(<SettingsDialog />);
+  it('abre modal de criação ao clicar em "Novo Tom" (Pro)', async () => {
+    render(<SettingsDialog userPlan="pro" />);
     fireEvent.click(screen.getByTitle("Cadastrar tom personalizado"));
     await waitFor(() => {
       expect(
@@ -148,8 +148,8 @@ describe("SettingsDialog", () => {
     });
   });
 
-  it("chama addCustomTone com dados corretos ao criar tom personalizado", async () => {
-    render(<SettingsDialog />);
+  it("chama addCustomTone com dados corretos ao criar tom personalizado (Pro)", async () => {
+    render(<SettingsDialog userPlan="pro" />);
     fireEvent.click(screen.getByTitle("Cadastrar tom personalizado"));
 
     await userEvent.type(
@@ -246,6 +246,45 @@ describe("SettingsDialog", () => {
     expect(mockToggleButtonVisibility).toHaveBeenCalledWith(
       "browserSpellcheck",
     );
+  });
+
+  // ── Plan-based restrictions ──────────────────────────────────────────────
+  it("desabilita tons além dos primeiros 5 para usuários no plano Free", () => {
+    render(<SettingsDialog userPlan="free" />);
+    const toneIds = Object.keys(DEFAULT_TONES);
+
+    // First 5 should be enabled
+    for (let i = 0; i < 5; i++) {
+      const toneLabel = TONE_LABELS[toneIds[i] as keyof typeof TONE_LABELS];
+      const toneButton = screen.getByText(toneLabel).closest("button")!;
+      expect(toneButton).not.toBeDisabled();
+    }
+
+    // Remaining should be disabled
+    for (let i = 5; i < toneIds.length; i++) {
+      const toneLabel = TONE_LABELS[toneIds[i] as keyof typeof TONE_LABELS];
+      const toneButton = screen.getByText(toneLabel).closest("button")!;
+      expect(toneButton).toBeDisabled();
+      expect(toneButton).toHaveClass("opacity-40");
+    }
+  });
+
+  it("não desabilita tons para usuários no plano Pro", () => {
+    render(<SettingsDialog userPlan="pro" />);
+    const toneIds = Object.keys(DEFAULT_TONES);
+
+    toneIds.forEach((id) => {
+      const toneLabel = TONE_LABELS[id as keyof typeof TONE_LABELS];
+      const toneButton = screen.getByText(toneLabel).closest("button")!;
+      expect(toneButton).not.toBeDisabled();
+    });
+  });
+
+  it('desabilita botão "Novo Tom" para usuários no plano Free', () => {
+    render(<SettingsDialog userPlan="free" />);
+    const newToneButton = screen.getByTitle("Disponível apenas no plano Pro");
+    expect(newToneButton).toBeInTheDocument();
+    expect(newToneButton).toBeDisabled();
   });
 
   // ── Fechar ────────────────────────────────────────────────────────────────

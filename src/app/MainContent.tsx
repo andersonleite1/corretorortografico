@@ -40,7 +40,7 @@ export const MainContent = ({
         userPlan={userPlan}
       />
       <ScrollToTop />
-      <SettingsDialog />
+      <SettingsDialog userPlan={userPlan} />
     </EditorSettingsProvider>
   );
 };

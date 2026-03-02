@@ -14,7 +14,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
 
-export const SettingsDialog = () => {
+export const SettingsDialog = ({
+  userPlan = "free",
+}: {
+  userPlan?: "free" | "pro" | "team";
+}) => {
   const {
     isSettingsDialogOpen,
     setIsSettingsDialogOpen,
@@ -157,32 +161,42 @@ export const SettingsDialog = () => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {toneIds.map((id) => {
+                      {toneIds.map((id, index) => {
                         const isActive = activeTones[id];
+                        const isDisabled = userPlan === "free" && index >= 5;
+
                         return (
                           <button
                             key={id}
+                            disabled={isDisabled}
                             onClick={() => toggleToneActivation(id)}
                             className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${
                               isActive
                                 ? "border-blue-500/50 bg-blue-50/50 dark:bg-blue-500/10 shadow-[0_8px_20px_-6px_rgba(59,130,246,0.3)]"
                                 : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
-                            }`}
+                            } ${isDisabled ? "opacity-40 cursor-not-allowed grayscale-[0.5]" : ""}`}
                           >
                             <div className="text-3xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
                               {TONE_ICONS[id]}
                             </div>
-                            <h4
-                              className={`text-sm font-bold uppercase tracking-widest mb-1 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400"}`}
-                            >
-                              {TONE_LABELS[id]}
-                            </h4>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4
+                                className={`text-sm font-bold uppercase tracking-widest ${isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400"}`}
+                              >
+                                {TONE_LABELS[id]}
+                              </h4>
+                              {isDisabled && (
+                                <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-tighter">
+                                  Pro
+                                </span>
+                              )}
+                            </div>
                             <p
                               className={`text-xs leading-relaxed text-left ${isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-gray-500 dark:text-gray-400"}`}
                             >
                               {TONE_DESCRIPTIONS[id]}
                             </p>
-                            {isActive && (
+                            {isActive && !isDisabled && (
                               <div className="absolute top-4 right-4 text-blue-500">
                                 <Icon name="Check" size={16} />
                               </div>
@@ -191,49 +205,76 @@ export const SettingsDialog = () => {
                         );
                       })}
 
-                      {customTones.map((tone) => (
-                        <div
-                          key={tone.id}
-                          className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${
-                            tone.isActive
-                              ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 shadow-[0_8px_20px_-6px_rgba(16,185,129,0.3)]"
-                              : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
-                          }`}
-                        >
-                          <button
-                            onClick={() => toggleCustomToneActivation(tone.id)}
-                            className="absolute inset-0 z-0"
-                          />
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteCustomTone(tone.id);
-                            }}
-                            className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 z-10"
+                      {customTones.map((tone, idx) => {
+                        const index = toneIds.length + idx;
+                        const isDisabled = userPlan === "free" && index >= 5;
+
+                        return (
+                          <div
+                            key={tone.id}
+                            className={`group relative flex flex-col items-start p-6 rounded-[24px] border transition-all duration-300 ${
+                              tone.isActive
+                                ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10 shadow-[0_8px_20px_-6px_rgba(16,185,129,0.3)]"
+                                : "border-gray-100 bg-gray-50/50 hover:border-gray-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+                            } ${isDisabled ? "opacity-40 cursor-not-allowed grayscale-[0.5]" : ""}`}
                           >
-                            <Icon name="Trash" size={14} />
-                          </button>
-                          <div className="text-3xl mb-4 z-0 transform group-hover:scale-110 transition-transform duration-300">
-                            ✨
+                            <button
+                              disabled={isDisabled}
+                              onClick={() =>
+                                !isDisabled &&
+                                toggleCustomToneActivation(tone.id)
+                              }
+                              className="absolute inset-0 z-0"
+                            />
+                            {!isDisabled && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteCustomTone(tone.id);
+                                }}
+                                className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 md:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 z-10"
+                              >
+                                <Icon name="Trash" size={14} />
+                              </button>
+                            )}
+                            <div className="text-3xl mb-4 z-0 transform group-hover:scale-110 transition-transform duration-300">
+                              ✨
+                            </div>
+                            <div className="flex items-center gap-2 mb-1 z-0">
+                              <h4
+                                className={`text-sm font-bold uppercase tracking-widest ${tone.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400"}`}
+                              >
+                                {tone.name}
+                              </h4>
+                              {isDisabled && (
+                                <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-tighter">
+                                  Pro
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              className={`text-xs leading-relaxed text-left z-0 ${tone.isActive ? "text-emerald-500/80 dark:text-emerald-400/80" : "text-gray-500 dark:text-gray-400"}`}
+                            >
+                              {tone.description}
+                            </p>
                           </div>
-                          <h4
-                            className={`text-sm font-bold uppercase tracking-widest mb-1 z-0 ${tone.isActive ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400"}`}
-                          >
-                            {tone.name}
-                          </h4>
-                          <p
-                            className={`text-xs leading-relaxed text-left z-0 ${tone.isActive ? "text-emerald-500/80 dark:text-emerald-400/80" : "text-gray-500 dark:text-gray-400"}`}
-                          >
-                            {tone.description}
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {customTones.length < 5 && (
                         <button
                           onClick={() => setIsCreateToneDialogOpen(true)}
-                          title="Cadastrar tom personalizado"
-                          className="flex flex-col items-center justify-center text-center p-6 rounded-[24px] border-2 border-dashed border-gray-100 hover:border-blue-400 hover:bg-blue-50/50 dark:border-white/5 dark:hover:border-blue-500/20 transition-all group"
+                          disabled={userPlan === "free"}
+                          title={
+                            userPlan === "free"
+                              ? "Disponível apenas no plano Pro"
+                              : "Cadastrar tom personalizado"
+                          }
+                          className={`flex flex-col items-center justify-center text-center p-6 rounded-[24px] border-2 border-dashed border-gray-100 hover:border-blue-400 hover:bg-blue-50/50 dark:border-white/5 dark:hover:border-blue-500/20 transition-all group ${
+                            userPlan === "free"
+                              ? "opacity-40 cursor-not-allowed"
+                              : ""
+                          }`}
                         >
                           <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-3 group-hover:rotate-90 transition-transform duration-300">
                             <Icon
@@ -242,9 +283,16 @@ export const SettingsDialog = () => {
                               className="text-gray-400 group-hover:text-blue-500"
                             />
                           </div>
-                          <span className="text-sm font-bold text-gray-500 group-hover:text-blue-600 transition-colors">
-                            Novo Tom
-                          </span>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-sm font-bold text-gray-500 group-hover:text-blue-600 transition-colors">
+                              Novo Tom
+                            </span>
+                            {userPlan === "free" && (
+                              <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-tighter">
+                                Pro
+                              </span>
+                            )}
+                          </div>
                         </button>
                       )}
                     </div>

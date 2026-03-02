@@ -109,6 +109,28 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { text, tone, customInstructions, language } = schema.parse(body);
 
+    const plan = user.subscription?.plan ?? "free";
+
+    // RESTRICTION: Free plan only allowed first 5 tones
+    if (plan === "free") {
+      const allowedTones = [
+        "formal",
+        "casual",
+        "academic",
+        "creative",
+        "simplified",
+      ];
+      if (!allowedTones.includes(tone)) {
+        return NextResponse.json(
+          {
+            error:
+              "Este tom não está disponível no plano gratuito. Faça upgrade para Pro.",
+          },
+          { status: 403 },
+        );
+      }
+    }
+
     // Determinar o prompt de estilo
     const stylePrompt =
       TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] ||
