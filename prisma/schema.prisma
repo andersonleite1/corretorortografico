@@ -139,3 +139,15 @@ model AiUsage {
   @@index([userId, createdAt])
   @@map("ai_usage")
 }
+
+model Waitlist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  email     String   @unique
+  region    String?
+  device    String?
+  info      Json?
+
+  @@map("waitlist")
+}

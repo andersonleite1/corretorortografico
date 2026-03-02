@@ -17,11 +17,14 @@ import { FaXTwitter } from "react-icons/fa6";
 import { getFooterContent } from "@/data/footer";
 import { i18n, type Locale } from "../../../i18n-config";
 
+import packageInfo from "../../../package.json";
+
 type FooterProps = {
   initialLocale?: Locale;
 };
 
 const Footer = ({ initialLocale }: FooterProps) => {
+  const version = packageInfo.version;
   const pathname = usePathname();
   const { locales, defaultLocale } = i18n;
 
@@ -135,6 +138,9 @@ const Footer = ({ initialLocale }: FooterProps) => {
                 {content.brandName}
               </Link>
               . {content.rightsText}
+              <span className="ml-2 text-[10px] text-gray-600 font-mono opacity-50">
+                v{version}
+              </span>
             </span>
           </div>
 

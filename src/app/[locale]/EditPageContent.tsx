@@ -164,7 +164,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
       )}
     >
       {/* ── Editor ─────────────────────────────────────────────────────────── */}
-      <div className="landing-editor-section">
+      <div id="editor" className="landing-editor-section">
         <EditForm locale={content.locale} userPlan={userPlan} />
       </div>
 
