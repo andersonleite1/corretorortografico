@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "../TiptapEditor/components/ui/Icon";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../i18n-config";
 
 interface BugReportDialogProps {
   isOpen: boolean;
@@ -19,6 +22,11 @@ export const BugReportDialog = ({
   onClose,
   pageUrl,
 }: BugReportDialogProps) => {
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).bugReport;
+  const tc = getCommonMessages(params?.locale as Locale).contact;
+  const ta = getCommonMessages(params?.locale as Locale).auth;
+
   const [status, setStatus] = useState<ReportStatus>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -44,19 +52,18 @@ export const BugReportDialog = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.description.trim()) {
-      newErrors.description = "Por favor, descreva o problema brevemente.";
+      newErrors.description = t.error; // Generic error or detailed? Let's use validation logic.
     } else if (formData.description.trim().length < 10) {
-      newErrors.description = "A descrição deve ter pelo menos 10 caracteres.";
+      newErrors.description = t.descriptionLabel; // Fallback or new key?
     }
 
     if (formData.wantsNotification) {
       if (!formData.notificationEmail.trim()) {
-        newErrors.notificationEmail =
-          "Informe seu e-mail para receber a notificação.";
+        newErrors.notificationEmail = t.emailLabel;
       } else if (
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.notificationEmail.trim())
       ) {
-        newErrors.notificationEmail = "Informe um e-mail válido.";
+        newErrors.notificationEmail = t.emailLabel;
       }
     }
 
@@ -89,18 +96,17 @@ export const BugReportDialog = ({
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error ?? "Erro ao enviar o relatório.");
+        throw new Error(data?.error ?? t.error);
       }
 
       setStatus("success");
-      toast.success("Relatório enviado com sucesso!");
+      toast.success(t.success);
     } catch (err) {
       setStatus("error");
       setErrors({
-        submit:
-          err instanceof Error ? err.message : "Ocorreu um erro inesperado.",
+        submit: err instanceof Error ? err.message : t.error,
       });
-      toast.error("Erro ao enviar relatório.");
+      toast.error(t.error);
     }
   };
 
@@ -120,7 +126,7 @@ export const BugReportDialog = ({
         <div className="px-8 py-8 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Reportar Problema
+              {t.title}
             </h2>
             <p className="text-sm font-medium text-gray-400 dark:text-gray-500 mt-1 uppercase tracking-widest leading-relaxed">
               Debug • Feedback • Beta
@@ -128,7 +134,7 @@ export const BugReportDialog = ({
           </div>
           <button
             onClick={onClose}
-            aria-label="Fechar diálogo"
+            aria-label={t.close}
             className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 dark:text-gray-500 transition-all active:scale-90"
           >
             <Icon name="Close" size={24} />
@@ -154,13 +160,10 @@ export const BugReportDialog = ({
                   />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Obrigado pelo reporte!
+                  {t.successTitle}
                 </h3>
                 <div className="mt-4 text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-sm">
-                  <p>
-                    Seu relatório foi enviado para nossa equipe técnica. Juntos
-                    estamos construindo um editor melhor.
-                  </p>
+                  <p>{t.successDesc}</p>
                   {formData.wantsNotification && formData.notificationEmail && (
                     <p className="mt-2 text-blue-500 font-bold">
                       {formData.notificationEmail}
@@ -171,7 +174,7 @@ export const BugReportDialog = ({
                   onClick={onClose}
                   className="mt-10 px-10 py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all active:scale-95"
                 >
-                  Entendido
+                  {t.understood}
                 </button>
               </motion.div>
             ) : (
@@ -189,7 +192,7 @@ export const BugReportDialog = ({
                     htmlFor="description"
                     className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1 flex items-center gap-2"
                   >
-                    Descrição breve <span className="text-red-500">*</span>
+                    {t.descriptionLabel} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="description"
@@ -200,7 +203,7 @@ export const BugReportDialog = ({
                       if (errors.description)
                         setErrors((p) => ({ ...p, description: "" }));
                     }}
-                    placeholder="Ex: O botão de exportação não está funcionando"
+                    placeholder={t.placeholderTitle}
                     className={`w-full px-4 py-3 bg-gray-50/50 dark:bg-black/20 border ${errors.description ? "border-red-400 dark:border-red-500" : "border-gray-100 dark:border-white/5"} rounded-2xl text-[15px] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-700 font-medium`}
                   />
                   {errors.description && (
@@ -216,7 +219,7 @@ export const BugReportDialog = ({
                     htmlFor="additionalInfo"
                     className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1"
                   >
-                    Informações adicionais (opcional)
+                    {t.additionalInfoLabel}
                   </label>
                   <textarea
                     id="additionalInfo"
@@ -227,7 +230,7 @@ export const BugReportDialog = ({
                         additionalInfo: e.target.value,
                       })
                     }
-                    placeholder="Descreva os passos para reproduzir o problema..."
+                    placeholder={t.placeholderDesc}
                     className="w-full h-32 p-4 bg-gray-50/50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl text-[15px] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all resize-none dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-700 font-medium"
                   />
                 </div>
@@ -235,7 +238,7 @@ export const BugReportDialog = ({
                 {/* Notification Options */}
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1">
-                    Notificações
+                    {t.notificationLabel.split(" ")[0]}
                   </label>
                   <div className="space-y-3">
                     <button
@@ -251,7 +254,7 @@ export const BugReportDialog = ({
                       className="w-full flex items-center justify-between p-4 bg-gray-50/50 dark:bg-black/20 border border-gray-100 dark:border-white/5 rounded-2xl transition-all"
                     >
                       <span className="text-[14px] font-bold text-gray-600 dark:text-gray-400">
-                        Receber notificações por e-mail
+                        {t.notificationLabel}
                       </span>
                       <div
                         className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${formData.wantsNotification ? "bg-blue-500" : "bg-gray-200 dark:bg-white/10"}`}
@@ -275,7 +278,7 @@ export const BugReportDialog = ({
                             htmlFor="notificationEmail"
                             className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-1"
                           >
-                            Seu e-mail
+                            {t.emailLabel}
                           </label>
                           <input
                             id="notificationEmail"
@@ -292,7 +295,7 @@ export const BugReportDialog = ({
                                   notificationEmail: "",
                                 }));
                             }}
-                            placeholder="seuemail@exemplo.com"
+                            placeholder={ta.emailPlaceholder}
                             className={`w-full px-4 py-3 bg-gray-50/50 dark:bg-black/20 border ${errors.notificationEmail ? "border-red-400 dark:border-red-500" : "border-gray-100 dark:border-white/5"} rounded-2xl text-[15px] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-700 font-medium`}
                           />
                           {errors.notificationEmail && (
@@ -322,8 +325,7 @@ export const BugReportDialog = ({
                     <Icon name="Info" size={20} />
                   </div>
                   <p className="text-[13px] font-medium text-blue-800/80 dark:text-blue-200/60 leading-relaxed">
-                    Dados técnicos anônimos serão anexados automaticamente para
-                    ajudar nossa equipe a reproduzir e corrigir o erro.
+                    {t.technicalInfo}
                   </p>
                 </div>
               </motion.form>
@@ -339,7 +341,7 @@ export const BugReportDialog = ({
               onClick={onClose}
               className="px-8 py-2.5 bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-full hover:bg-gray-200 dark:hover:bg-white/20 transition-all active:scale-95"
             >
-              Cancelar
+              {t.cancel}
             </button>
             <button
               onClick={handleSubmit}
@@ -353,10 +355,10 @@ export const BugReportDialog = ({
               {status === "submitting" ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Enviando...
+                  {t.sending}
                 </>
               ) : (
-                "Enviar Relatório"
+                t.send
               )}
             </button>
           </div>

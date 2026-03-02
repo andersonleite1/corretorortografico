@@ -103,7 +103,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
           )}
           onClick={() => setActiveTab("resumo")}
         >
-          Resumo
+          {t.summary}
         </button>
         <button
           className={clsx(
@@ -112,7 +112,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
           )}
           onClick={() => setActiveTab("detalhes")}
         >
-          Dados detalhados
+          {t.detailedData}
         </button>
       </div>
 
@@ -125,7 +125,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
               <div className="header">
                 <div className="label-wrap">
                   <span className="dot bg-[#ef4444]" />
-                  Ortografia
+                  {t.spelling}
                 </div>
                 <span className="count">{stats.spelling}</span>
               </div>
@@ -143,7 +143,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
               <div className="header">
                 <div className="label-wrap">
                   <span className="dot bg-[#f59e0b]" />
-                  Gramática
+                  {t.grammar}
                 </div>
                 <span className="count">{stats.grammar}</span>
               </div>
@@ -161,7 +161,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
               <div className="header">
                 <div className="label-wrap">
                   <span className="dot bg-[#8b5cf6]" />
-                  Estilo/Pontuação
+                  {t.stylePunctuation}
                 </div>
                 <span className="count">{stats.style}</span>
               </div>
@@ -198,9 +198,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
           <div className="animate-in fade-in duration-300">
             {ltState.issues.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-sm text-gray-500">
-                  Nenhum erro encontrado. Bom trabalho!
-                </p>
+                <p className="text-sm text-gray-500">{t.noErrorsFound}</p>
               </div>
             ) : (
               ltState.issues.map((issue) => (
@@ -251,11 +249,9 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
 
       <div className="rte-lt-sidebar__footer">
         <div className="rte-lt-sidebar__tip">
-          <span className="label">DICA RÁPIDA</span>
+          <span className="label">{t.quickTip}</span>
           <span className="title">{t.fixAllTip}</span>
-          <p className="desc">
-            Aplica a primeira sugestão de cada erro detectado automaticamente.
-          </p>
+          <p className="desc">{t.quickTipDesc}</p>
         </div>
         <button
           className="rte-lt-sidebar__fix-all"
@@ -263,7 +259,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
           disabled={ltState.issues.length === 0}
         >
           <Icon name="Check" size={18} />
-          Corrigir todos
+          {t.fixAll}
         </button>
       </div>
     </div>

@@ -44,7 +44,7 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
               : "text-gray-400 hover:bg-gray-800 hover:text-white"
           }`}
         >
-          Perfil
+          {t.profile}
         </button>
         <button
           onClick={() => setActiveTab("subscription")}
@@ -54,7 +54,7 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
               : "text-gray-400 hover:bg-gray-800 hover:text-white"
           }`}
         >
-          Assinatura
+          {t.subscription}
         </button>
       </div>
 
@@ -64,23 +64,21 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-bold text-white mb-1">{t.profile}</h2>
-              <p className="text-sm text-gray-400">
-                Gerencie suas informações básicas.
-              </p>
+              <p className="text-sm text-gray-400">{t.manageInfo}</p>
             </div>
 
             <div className="space-y-4">
               <div className="grid gap-2">
                 <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Nome
+                  {t.nameLabel}
                 </label>
                 <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
-                  {user.name || "Não informado"}
+                  {user.name || t.notInformed}
                 </div>
               </div>
               <div className="grid gap-2">
                 <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Email
+                  {getCommonMessages(params?.locale as Locale).contact.email}
                 </label>
                 <div className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white">
                   {user.email}
@@ -94,11 +92,9 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-bold text-white mb-1">
-                Plano e Pagamento
+                {t.planBilling}
               </h2>
-              <p className="text-sm text-gray-400">
-                Gerencie sua assinatura e faturamento.
-              </p>
+              <p className="text-sm text-gray-400">{t.manageBilling}</p>
             </div>
 
             <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -111,14 +107,12 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
                     <h3 className="font-bold text-white capitalize">{plan}</h3>
                     {plan !== "free" && (
                       <span className="bg-green-500/10 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                        Ativo
+                        {t.active}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-gray-400">
-                    {plan === "free"
-                      ? "Você está no plano gratuito."
-                      : `Sua assinatura ${plan} está ativa.`}
+                    {plan === "free" ? t.freePlanDesc : t.planActiveDesc}
                   </p>
                 </div>
               </div>
@@ -128,7 +122,7 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
                   href="#pricing"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition text-center"
                 >
-                  Fazer Upgrade
+                  {t.makeUpgrade}
                 </a>
               ) : (
                 <button
@@ -136,19 +130,19 @@ export function SettingsContent({ user, plan }: { user: User; plan: string }) {
                   disabled={loading}
                   className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50"
                 >
-                  {loading ? "Carregando..." : "Gerenciar Assinatura"}
+                  {loading ? t.loading : t.manageSub}
                 </button>
               )}
             </div>
 
             {user.subscription && (
               <div className="text-xs text-gray-500">
-                Próxima renovação em:{" "}
+                {t.nextRenewal}{" "}
                 {user.subscription.stripeCurrentPeriodEnd
                   ? new Date(
                       user.subscription.stripeCurrentPeriodEnd as any,
                     ).toLocaleDateString()
-                  : "N/A"}
+                  : t.notInformed}
               </div>
             )}
           </div>

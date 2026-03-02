@@ -13,6 +13,9 @@ import {
 } from "@/components/providers/EditorSettingsProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { Locale } from "../../../i18n-config";
 
 export const SettingsDialog = ({
   userPlan = "free",
@@ -37,6 +40,11 @@ export const SettingsDialog = ({
   const [isCreateToneDialogOpen, setIsCreateToneDialogOpen] = useState(false);
 
   // Estados do formulário de novo tom
+  const params = useParams();
+  const locale = (params?.locale as Locale) || "pt";
+  const t = getCommonMessages(locale);
+  const ts = t.settings;
+
   const [newToneName, setNewToneName] = useState("");
   const [newToneDescription, setNewToneDescription] = useState("");
   const [newToneInstructions, setNewToneInstructions] = useState("");
@@ -69,9 +77,9 @@ export const SettingsDialog = ({
   };
 
   const tabs = [
-    { id: "tones", label: "Tons de IA", icon: "Palette" as const },
-    { id: "toolbar", label: "Barra de Ferramentas", icon: "Columns" as const },
-    { id: "general", label: "Conf. Gerais", icon: "Settings" as const },
+    { id: "tones", label: ts.tabs.tones, icon: "Palette" as const },
+    { id: "toolbar", label: ts.tabs.toolbar, icon: "Columns" as const },
+    { id: "general", label: ts.tabs.general, icon: "Settings" as const },
   ];
 
   return (
@@ -85,7 +93,7 @@ export const SettingsDialog = ({
         <div className="w-full md:w-72 bg-gray-50/50 dark:bg-black/20 border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5 flex flex-col">
           <div className="p-8 pb-4">
             <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
-              Configurações
+              {ts.title}
             </h2>
           </div>
 
@@ -123,7 +131,7 @@ export const SettingsDialog = ({
               onClick={() => setIsSettingsDialogOpen(false)}
               className="w-full px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity active:scale-95"
             >
-              Concluído
+              {ts.done}
             </button>
           </div>
         </div>
@@ -152,11 +160,10 @@ export const SettingsDialog = ({
                   <div className="space-y-8 h-full">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        Opções de Tom e Estilo
+                        {ts.tonesTitle}
                       </h3>
                       <p className="text-gray-500 dark:text-gray-400 text-[15px]">
-                        Ative os tons que você deseja usar com a reescrita por
-                        IA.
+                        {ts.tonesDesc}
                       </p>
                     </div>
 
@@ -183,7 +190,7 @@ export const SettingsDialog = ({
                               <h4
                                 className={`text-sm font-bold uppercase tracking-widest ${isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400"}`}
                               >
-                                {TONE_LABELS[id]}
+                                {t.tones[id].label}
                               </h4>
                               {isDisabled && (
                                 <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-tighter">
@@ -194,7 +201,7 @@ export const SettingsDialog = ({
                             <p
                               className={`text-xs leading-relaxed text-left ${isActive ? "text-blue-500/80 dark:text-blue-400/80" : "text-gray-500 dark:text-gray-400"}`}
                             >
-                              {TONE_DESCRIPTIONS[id]}
+                              {t.tones[id].desc}
                             </p>
                             {isActive && !isDisabled && (
                               <div className="absolute top-4 right-4 text-blue-500">
@@ -266,9 +273,7 @@ export const SettingsDialog = ({
                           onClick={() => setIsCreateToneDialogOpen(true)}
                           disabled={userPlan === "free"}
                           title={
-                            userPlan === "free"
-                              ? "Disponível apenas no plano Pro"
-                              : "Cadastrar tom personalizado"
+                            userPlan === "free" ? ts.proOnly : ts.registerCustom
                           }
                           className={`flex flex-col items-center justify-center text-center p-6 rounded-[24px] border-2 border-dashed border-gray-100 hover:border-blue-400 hover:bg-blue-50/50 dark:border-white/5 dark:hover:border-blue-500/20 transition-all group ${
                             userPlan === "free"
@@ -285,7 +290,7 @@ export const SettingsDialog = ({
                           </div>
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-sm font-bold text-gray-500 group-hover:text-blue-600 transition-colors">
-                              Novo Tom
+                              {ts.newTone}
                             </span>
                             {userPlan === "free" && (
                               <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold uppercase tracking-tighter">
@@ -303,11 +308,10 @@ export const SettingsDialog = ({
                   <div className="space-y-8">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        Barra de Ferramentas
+                        {ts.toolbarTitle}
                       </h3>
                       <p className="text-gray-500 dark:text-gray-400 text-[15px]">
-                        Selecione quais botões você deseja exibir no cabeçalho
-                        do editor.
+                        {ts.toolbarDesc}
                       </p>
                     </div>
 
@@ -347,17 +351,17 @@ export const SettingsDialog = ({
                   <div className="space-y-12">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        Configurações Gerais
+                        {ts.generalTitle}
                       </h3>
                       <p className="text-gray-500 dark:text-gray-400 text-[15px]">
-                        Ajustes de interface e correções automáticas.
+                        {ts.generalDesc}
                       </p>
                     </div>
 
                     <div className="space-y-10">
                       <section className="space-y-4">
                         <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                          Exibição do rodapé do editor
+                          {ts.footerDisplay}
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {[
@@ -390,7 +394,7 @@ export const SettingsDialog = ({
 
                       <section className="space-y-4">
                         <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                          Corretor do navegador
+                          {ts.browserSpellcheck}
                         </h4>
                         <label
                           htmlFor="browserSpellcheck"
@@ -408,10 +412,10 @@ export const SettingsDialog = ({
                           />
                           <div className="flex flex-col">
                             <span className="text-[15px] font-semibold text-gray-700 dark:text-gray-200">
-                              Corretor do Navegador
+                              {ts.browserSpellcheck}
                             </span>
                             <span className="text-xs text-gray-500">
-                              Utilizar revisor ortográfico nativo do navegador.
+                              {ts.browserSpellcheckDesc}
                             </span>
                           </div>
                         </label>
@@ -432,16 +436,16 @@ export const SettingsDialog = ({
         >
           <div className="w-full bg-white dark:bg-[#2c2c2e] rounded-[32px] p-10 flex flex-col relative outline-none">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-              Cadastrar tom personalizado
+              {ts.createToneTitle}
             </h3>
             <form onSubmit={handleCreateTone} className="space-y-6">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 px-1">
-                  Nome
+                  {ts.nameLabel}
                 </label>
                 <input
                   className="w-full px-5 py-3.5 rounded-2xl border-none bg-gray-100 dark:bg-white/5 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white font-medium"
-                  placeholder="Ex: Divertido, Técnico..."
+                  placeholder={ts.placeholderTone}
                   value={newToneName}
                   onChange={(e) => setNewToneName(e.target.value)}
                   required
@@ -449,11 +453,11 @@ export const SettingsDialog = ({
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 px-1">
-                  Descrição Curta
+                  {ts.descLabel}
                 </label>
                 <input
                   className="w-full px-5 py-3.5 rounded-2xl border-none bg-gray-100 dark:bg-white/5 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white font-medium"
-                  placeholder="Máximo 20 caracteres"
+                  placeholder={ts.placeholderMaxChars}
                   maxLength={20}
                   value={newToneDescription}
                   onChange={(e) => setNewToneDescription(e.target.value)}
@@ -462,11 +466,11 @@ export const SettingsDialog = ({
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 px-1">
-                  Instruções para a IA
+                  {ts.instructionsLabel}
                 </label>
                 <textarea
                   className="w-full px-5 py-4 rounded-2xl border-none bg-gray-100 dark:bg-white/5 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white font-medium min-h-[140px] resize-none"
-                  placeholder="Instruções para a IA"
+                  placeholder={ts.placeholderInstructions}
                   value={newToneInstructions}
                   onChange={(e) => setNewToneInstructions(e.target.value)}
                   required
@@ -478,13 +482,13 @@ export const SettingsDialog = ({
                   onClick={() => setIsCreateToneDialogOpen(false)}
                   className="flex-1 px-4 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-2xl transition-all"
                 >
-                  Cancelar
+                  {ts.cancel}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-3.5 text-sm font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/25 transition-all active:scale-95"
                 >
-                  Criar Tom
+                  {ts.create}
                 </button>
               </div>
             </form>

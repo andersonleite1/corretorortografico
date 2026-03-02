@@ -12,7 +12,11 @@ export const metadata: Metadata = {
     "Visualize suas métricas de produtividade e o tempo economizado com a IA.",
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
@@ -23,5 +27,10 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/");
 
-  return <DashboardContent userName={user.name ?? user.email} />;
+  return (
+    <DashboardContent
+      userName={user.name ?? user.email}
+      locale={params.locale as any}
+    />
+  );
 }

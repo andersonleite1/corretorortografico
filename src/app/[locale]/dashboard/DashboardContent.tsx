@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import Link from "next/link";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../i18n-config";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface DashboardData {
@@ -202,8 +204,10 @@ function AiQuotaRing({
 
 function TimeSavedChart({
   data,
+  t,
 }: {
   data: { date: string; timeSavedMinutes: number; rewrites: number }[];
+  t: any;
 }) {
   const formatted = data.map((d) => ({ ...d, label: formatShortDate(d.date) }));
   const hasData = data.some((d) => d.timeSavedMinutes > 0);
@@ -211,18 +215,14 @@ function TimeSavedChart({
   return (
     <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-6">
       <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-        Evolução de Produtividade
+        {t.productivityEvol}
       </p>
       <p className="text-lg font-semibold text-neutral-900 dark:text-white mt-1">
-        Tempo Economizado — Últimos 30 Dias
+        {t.timeSaved30}
       </p>
 
       {!hasData ? (
-        <EmptyState
-          icon="📈"
-          title="Sem dados para exibir"
-          description="Nenhuma reescrita registrada ainda. Use a IA no editor para ver sua evolução aqui!"
-        />
+        <EmptyState icon="📈" title={t.noData} description={t.noRewrites} />
       ) : (
         <div className="mt-4">
           <ResponsiveContainer width="100%" height={180}>
@@ -261,7 +261,7 @@ function TimeSavedChart({
                 }}
                 formatter={(
                   value: number | string | (number | string)[] | undefined,
-                ) => [`${value ?? 0} min`, "Tempo Economizado"]}
+                ) => [`${value ?? 0} min`, t.timeSaved]}
                 cursor={{ stroke: "rgba(0,0,0,0.08)" }}
               />
               <Area
@@ -288,8 +288,10 @@ function TimeSavedChart({
 
 function ToneDistributionChart({
   data,
+  t,
 }: {
   data: { tone: string; count: number }[];
+  t: any;
 }) {
   const groupedTones: Record<string, number> = {};
   data.forEach((d) => {
@@ -306,18 +308,14 @@ function ToneDistributionChart({
   return (
     <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-6">
       <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-        Preferências
+        {t.preferences}
       </p>
       <p className="text-lg font-semibold text-neutral-900 dark:text-white mt-1">
-        Tons Mais Utilizados
+        {t.topTones}
       </p>
 
       {formatted.length === 0 ? (
-        <EmptyState
-          icon="🎨"
-          title="Nenhum tom detectado"
-          description="Seu estilo de escrita aparecerá aqui conforme você edita e usa diferentes tons de IA."
-        />
+        <EmptyState icon="🎨" title={t.noTones} description={t.noTonesDesc} />
       ) : (
         <div className="mt-4">
           <ResponsiveContainer width="100%" height={200}>
@@ -371,35 +369,37 @@ function ToneDistributionChart({
 
 function RecentDocuments({
   documents,
+  t,
 }: {
   documents: { id: string; title: string; updatedAt: string }[];
+  t: any;
 }) {
   return (
     <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
           <p className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-            Acesso Rápido
+            {t.quickAccess}
           </p>
           <p className="text-lg font-semibold text-neutral-900 dark:text-white mt-1">
-            Documentos Recentes
+            {t.recentDocs}
           </p>
         </div>
         <Link
           href="/"
           className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
         >
-          Ver todos →
+          {t.seeAll} →
         </Link>
       </div>
 
       {documents.length === 0 ? (
         <EmptyState
           icon="📄"
-          title="O início de algo grande"
-          description="Seus documentos recentes aparecerão aqui. Comece um novo projeto agora!"
+          title={t.startGreat}
+          description={t.recentDocsDesc}
           action={{
-            label: "Novo Documento",
+            label: t.newDocument,
             href: "/",
           }}
         />
@@ -414,7 +414,7 @@ function RecentDocuments({
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-base flex-shrink-0">📄</span>
                 <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
-                  {doc.title || "Sem título"}
+                  {doc.title || t.untitled}
                 </span>
               </div>
               <span className="text-xs text-neutral-400 dark:text-neutral-500 flex-shrink-0 ml-3">
@@ -433,11 +433,18 @@ import { useEditorSettings } from "@/components/providers/EditorSettingsProvider
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function DashboardContent({ userName }: { userName: string }) {
+export default function DashboardContent({
+  userName,
+  locale,
+}: {
+  userName: string;
+  locale: Locale;
+}) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setIsSettingsDialogOpen } = useEditorSettings();
+  const t = getCommonMessages(locale).dashboard;
 
   useEffect(() => {
     fetch("/api/dashboard")
@@ -456,7 +463,7 @@ export default function DashboardContent({ userName }: { userName: string }) {
         <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">
-              Bem-vindo de volta 👋
+              {t.welcomeBack} 👋
             </p>
             <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
               {userName}
@@ -467,13 +474,13 @@ export default function DashboardContent({ userName }: { userName: string }) {
               href="/"
               className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white text-sm font-semibold transition-colors"
             >
-              ✏️ Novo Documento
+              ✏️ {t.newDocument}
             </Link>
             <button
               onClick={() => setIsSettingsDialogOpen(true)}
               className="px-5 py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-medium transition-colors"
             >
-              ⚙️ Configurações
+              ⚙️ {t.settings}
             </button>
           </div>
         </div>
@@ -494,23 +501,23 @@ export default function DashboardContent({ userName }: { userName: string }) {
             {/* KPI Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <KpiCard
-                label="Tempo Economizado"
+                label={t.timeSaved}
                 value={formatTimeSaved(data.totalTimeSavedSeconds)}
-                sublabel="no total com ajuda da IA"
+                sublabel={t.timeSavedTotal}
                 accentClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
                 icon="⏱️"
               />
               <KpiCard
-                label="Documentos"
+                label={t.documents}
                 value={String(data.totalDocuments)}
-                sublabel="documentos salvos na nuvem"
+                sublabel={t.docsSavedCloud}
                 accentClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
                 icon="📁"
               />
               <KpiCard
-                label="Reescritas Hoje"
+                label={t.rewritesToday}
                 value={String(data.usedDaily)}
-                sublabel={`de ${data.limitDaily} gratuitas (plano ${data.plan})`}
+                sublabel={`de ${data.limitDaily} ${t.freeLimit} ${data.plan})`}
                 accentClass="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                 icon="✨"
               />
@@ -521,16 +528,16 @@ export default function DashboardContent({ userName }: { userName: string }) {
               className={`grid grid-cols-1 ${data.plan !== "free" ? "md:grid-cols-2" : ""} gap-4`}
             >
               <AiQuotaRing
-                title="Cota Diária Gratuita"
-                subtitle="utilizadas hoje"
+                title={t.freeDailyQuota}
+                subtitle={t.usedToday}
                 used={data.usedDaily}
                 limit={data.limitDaily}
                 plan={data.plan}
               />
               {data.plan !== "free" && (
                 <AiQuotaRing
-                  title="Cota Mensal do Plano"
-                  subtitle="utilizadas este mês"
+                  title={t.planMonthlyQuota}
+                  subtitle={t.usedMonth}
                   used={data.usedMonthlyPaid}
                   limit={data.limitMonthlyPaid}
                   plan={data.plan}
@@ -540,32 +547,32 @@ export default function DashboardContent({ userName }: { userName: string }) {
 
             {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-4">
-              <TimeSavedChart data={data.dailySeries} />
-              <ToneDistributionChart data={data.topTones} />
+              <TimeSavedChart data={data.dailySeries} t={t} />
+              <ToneDistributionChart data={data.topTones} t={t} />
             </div>
 
             {/* Recent Documents */}
-            <RecentDocuments documents={data.recentDocuments} />
+            <RecentDocuments documents={data.recentDocuments} t={t} />
 
             {/* Upgrade CTA — free plan only */}
             {data.plan === "free" && (
               <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-indigo-50 dark:from-emerald-900/20 dark:to-indigo-900/20 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
-                    ⚡ Plano Gratuito
+                    ⚡ {t.freePlan}
                   </p>
                   <p className="text-lg font-semibold text-neutral-900 dark:text-white mt-1">
-                    Desbloqueie 300 reescritas/mês com o Pro
+                    {t.unlockPro}
                   </p>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-                    Documentos ilimitados, todos os tons de IA e muito mais.
+                    {t.unlimitedDocs}
                   </p>
                 </div>
                 <Link
                   href="#pricing"
                   className="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors whitespace-nowrap flex-shrink-0"
                 >
-                  Ver Planos →
+                  {t.seePlans} →
                 </Link>
               </div>
             )}
