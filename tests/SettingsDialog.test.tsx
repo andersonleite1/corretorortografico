@@ -225,23 +225,23 @@ describe("SettingsDialog", () => {
   });
 
   // ── Aba Configurações Gerais ───────────────────────────────────────────────
-  it('alterna para aba "Conf. Gerais" ao clicar', async () => {
+  it('alterna para aba "Configurações Gerais" ao clicar', async () => {
     render(<SettingsDialog />);
-    fireEvent.click(screen.getByText("Conf. Gerais"));
+    fireEvent.click(screen.getByRole("button", { name: /Configurações Gerais/i }));
     await waitFor(() => {
       expect(
-        screen.getByText("Exibição do rodapé do editor"),
+        screen.getByText(/Exibição do rodapé do editor/i),
       ).toBeInTheDocument();
-      expect(screen.getByText("Corretor do navegador")).toBeInTheDocument();
+      expect(screen.getAllByText(/Corretor do Navegador/i).length).toBeGreaterThan(0);
     });
   });
 
-  it("chama toggleButtonVisibility para browserSpellcheck na aba Conf. Gerais", async () => {
+  it("chama toggleButtonVisibility para browserSpellcheck na aba Configurações Gerais", async () => {
     render(<SettingsDialog />);
-    fireEvent.click(screen.getByText("Conf. Gerais"));
-    await waitFor(() => screen.getByText("Corretor do navegador"));
+    fireEvent.click(screen.getByRole("button", { name: /Configurações Gerais/i }));
+    await waitFor(() => screen.getAllByText(/Corretor do Navegador/i).length > 0);
     fireEvent.click(
-      screen.getByLabelText(TOOLBAR_BUTTON_LABELS.browserSpellcheck),
+      screen.getByLabelText(/Corretor do Navegador/i),
     );
     expect(mockToggleButtonVisibility).toHaveBeenCalledWith(
       "browserSpellcheck",

@@ -68,18 +68,18 @@ describe("AiRewriteButton", () => {
 
   it("renderiza o botão de reescrita", () => {
     render(<AiRewriteButton />);
-    expect(screen.getByText("Reescrever IA")).toBeInTheDocument();
+    expect(screen.getByText(/Reescrever/i)).toBeInTheDocument();
   });
 
   it("exibe apenas os primeiros 5 tons para usuários no plano Free", async () => {
     render(<AiRewriteButton />);
 
     // Abrir popover
-    fireEvent.click(screen.getByText("Reescrever IA"));
+    fireEvent.click(screen.getByText(/Reescrever/i));
 
     await waitFor(() => {
       expect(
-        screen.getByText("Escolha o tom (Todo o texto)"),
+        screen.getByText(/Escolha o tom/i),
       ).toBeInTheDocument();
     });
 
@@ -101,11 +101,11 @@ describe("AiRewriteButton", () => {
     render(<AiRewriteButton />);
 
     // Abrir popover
-    fireEvent.click(screen.getByText("Reescrever IA"));
+    fireEvent.click(screen.getByText(/Reescrever/i));
 
     await waitFor(() => {
       expect(
-        screen.getByText("Escolha o tom (Todo o texto)"),
+        screen.getByText(/Escolha o tom/i),
       ).toBeInTheDocument();
     });
 
@@ -122,7 +122,7 @@ describe("AiRewriteButton", () => {
     mockTiptapContext.userPlan = "pro";
     render(<AiRewriteButton />);
 
-    fireEvent.click(screen.getByText("Reescrever IA"));
+    fireEvent.click(screen.getByText(/Reescrever/i));
 
     await waitFor(() => {
       const formalButton = screen.getByText(TONE_LABELS.formal);

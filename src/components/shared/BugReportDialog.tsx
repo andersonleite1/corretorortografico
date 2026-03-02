@@ -50,20 +50,19 @@ export const BugReportDialog = ({
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-
     if (!formData.description.trim()) {
-      newErrors.description = t.error; // Generic error or detailed? Let's use validation logic.
+      newErrors.description = t.validationDescEmpty;
     } else if (formData.description.trim().length < 10) {
-      newErrors.description = t.descriptionLabel; // Fallback or new key?
+      newErrors.description = t.validationDescShort;
     }
 
     if (formData.wantsNotification) {
       if (!formData.notificationEmail.trim()) {
-        newErrors.notificationEmail = t.emailLabel;
+        newErrors.notificationEmail = t.validationEmailEmpty;
       } else if (
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.notificationEmail.trim())
       ) {
-        newErrors.notificationEmail = t.emailLabel;
+        newErrors.notificationEmail = t.validationEmailInvalid;
       }
     }
 
@@ -346,11 +345,10 @@ export const BugReportDialog = ({
             <button
               onClick={handleSubmit}
               disabled={status === "submitting"}
-              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${
-                status === "submitting"
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-blue-600"
-              }`}
+              className={`px-10 py-2.5 bg-blue-500 text-white text-sm font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95 ${status === "submitting"
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-blue-600"
+                }`}
             >
               {status === "submitting" ? (
                 <>

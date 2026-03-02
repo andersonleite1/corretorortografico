@@ -139,6 +139,10 @@ export type CommonMessages = {
     successDesc: string;
     understood: string;
     technicalInfo: string;
+    validationDescEmpty: string;
+    validationDescShort: string;
+    validationEmailEmpty: string;
+    validationEmailInvalid: string;
   };
   landing: {
     heroAria: string;
@@ -159,6 +163,7 @@ export type CommonMessages = {
     accept: string;
     discard: string;
     generating: string;
+    rewriteTooltip: string;
   };
   dashboard: {
     noData: string;
@@ -276,7 +281,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
       tabs: {
         tones: "Tons de IA",
         toolbar: "Barra de Ferramentas",
-        general: "Conf. Gerais",
+        general: "Configurações Gerais",
       },
       done: "Concluído",
       tonesTitle: "Opções de Tom e Estilo",
@@ -343,6 +348,10 @@ const commonMessages: Record<Locale, CommonMessages> = {
       understood: "Entendido",
       technicalInfo:
         "Dados técnicos anônimos serão anexados automaticamente para ajudar nossa equipe a reproduzir e corrigir o erro.",
+      validationDescEmpty: "Por favor, descreva o problema brevemente.",
+      validationDescShort: "A descrição deve ter pelo menos 10 caracteres.",
+      validationEmailEmpty: "Informe seu e-mail para receber a notificação.",
+      validationEmailInvalid: "Informe um e-mail válido.",
     },
     landing: {
       heroAria: "Apresentação do editor de texto online",
@@ -364,6 +373,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Aceitar",
       discard: "Descartar",
       generating: "Gerando sugestão...",
+      rewriteTooltip: "Faça login ou registre-se no site para acessar o recurso de reescrita assistida por IA.",
     },
     dashboard: {
       noData: "Sem dados para exibir",
@@ -563,6 +573,10 @@ const commonMessages: Record<Locale, CommonMessages> = {
       understood: "Understood",
       technicalInfo:
         "Anonymous technical data will be attached automatically to help our team reproduce and fix the error.",
+      validationDescEmpty: "Please describe the problem briefly.",
+      validationDescShort: "Description must be at least 10 characters long.",
+      validationEmailEmpty: "Please provide your email to receive notifications.",
+      validationEmailInvalid: "Please provide a valid email.",
     },
     landing: {
       heroAria: "Online text editor presentation",
@@ -584,6 +598,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Accept",
       discard: "Discard",
       generating: "Generating suggestion...",
+      rewriteTooltip: "Please log in or register to access the AI-assisted rewriting feature.",
     },
     dashboard: {
       noData: "No data to display",
@@ -717,7 +732,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
       tabs: {
         tones: "Tonos de IA",
         toolbar: "Barra de Herramientas",
-        general: "Conf. Generales",
+        general: "Configuración General",
       },
       done: "Hecho",
       tonesTitle: "Opciones de Tono y Estilo",
@@ -784,6 +799,10 @@ const commonMessages: Record<Locale, CommonMessages> = {
       understood: "Entendido",
       technicalInfo:
         "Se adjuntarán automáticamente datos técnicos anónimos para ayudar a nuestro equipo a reproducir y corregir el error.",
+      validationDescEmpty: "Por favor, describe el problema brevemente.",
+      validationDescShort: "La descripción debe tener al menos 10 caracteres.",
+      validationEmailEmpty: "Informa tu correo para recibir la notificación.",
+      validationEmailInvalid: "Informa un correo válido.",
     },
     landing: {
       heroAria: "Presentación del editor de texto en línea",
@@ -805,6 +824,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
       accept: "Aceptar",
       discard: "Descartar",
       generating: "Generando sugerencia...",
+      rewriteTooltip: "Inicie sesión o regístrese para acceder a la función de reescritura asistida por IA.",
     },
     dashboard: {
       noData: "Sin datos para mostrar",
