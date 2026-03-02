@@ -165,7 +165,7 @@ const es: HomeContent = {
         icon: "☁️",
         title: "Portabilidad y Fluidez",
         description:
-          "Guardado automático en la nube, soporte multiidioma y exportación directa a PDF, DOCX, TXT y HTML. Accede a tus documentos desde cualquier dispositivo, en cualquier momento.",
+          "Guardado automático, soporte multiidioma y exportación directa a PDF, DOCX, TXT y HTML. Tus documentos siempre contigo.",
       },
     ],
   },
@@ -181,7 +181,7 @@ const es: HomeContent = {
           "Formato Rich Text completo",
           "5 reescrituras con IA por día",
           "5 tonos de reescritura",
-          "1 documento en la nube",
+          "Guardar documentos localmente",
           "Exportación PDF y DOCX",
           "Sin tarjeta de crédito",
         ],

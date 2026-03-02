@@ -163,7 +163,7 @@ const en: HomeContent = {
         icon: "☁️",
         title: "Portability and Flow",
         description:
-          "Automatic cloud saving, multi-language support, and direct export to PDF, DOCX, TXT, and HTML. Access your documents from any device, anytime.",
+          "Automatic saving, multi-language support, and direct export to PDF, DOCX, TXT, and HTML. Your documents always with you.",
       },
     ],
   },
@@ -179,7 +179,7 @@ const en: HomeContent = {
           "Full Rich Text formatting",
           "5 AI rewrites per day",
           "5 rewriting tones",
-          "1 document saved in the cloud",
+          "Save documents locally",
           "PDF and DOCX export",
           "No credit card required",
         ],

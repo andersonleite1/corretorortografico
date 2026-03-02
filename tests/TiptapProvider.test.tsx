@@ -26,6 +26,13 @@ vi.mock("@/components/TiptapEditor/hooks/useTiptapEditor", () => ({
   default: () => mockEditor,
 }));
 
+vi.mock("@/lib/local-storage", () => ({
+  saveLocalDocument: vi.fn().mockReturnValue({ id: "local-123" }),
+  getLocalDocuments: vi.fn().mockReturnValue([]),
+  deleteLocalDocument: vi.fn(),
+  getLocalDocumentById: vi.fn(),
+}));
+
 // Mock Tiptap EditorContent with forwardRef if needed (Provider uses ref)
 vi.mock("@tiptap/react", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
@@ -136,7 +143,7 @@ describe("TiptapProvider", () => {
     );
   });
 
-  it("permite o salvamento para usuários do plano free", async () => {
+  it("salva localmente para usuários do plano free", async () => {
     const TestComponent = () => {
       const { onSaveDocument } = useTiptapContext();
       return <button onClick={onSaveDocument}>Save</button>;
@@ -148,14 +155,16 @@ describe("TiptapProvider", () => {
       </TiptapProvider>,
     );
 
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+
     await act(async () => {
       fireEvent.click(getByText("Save"));
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/documents",
-      expect.objectContaining({ method: "POST" }),
-    );
+    // Não deve chamar o fetch
+    expect(global.fetch).not.toHaveBeenCalled();
+    // Deve chamar o utilitário de storage local
+    expect(saveLocalDocument).toHaveBeenCalled();
   });
 
   it("escuta atalhos de teclado globais (ex: Ctrl+O)", async () => {

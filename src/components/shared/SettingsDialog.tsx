@@ -272,6 +272,7 @@ export const SettingsDialog = () => {
                               "sourceCode",
                               "fullScreen",
                               "shortcuts",
+                              "documents",
                             ].includes(id),
                         )
                         .map((id) => (
@@ -311,30 +312,31 @@ export const SettingsDialog = () => {
                           Exibição do rodapé do editor
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {["sourceCode", "fullScreen", "shortcuts"].map(
-                            (id) => (
-                              <label
-                                key={id}
-                                className="flex items-center gap-4 p-4 rounded-2xl border border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-all active:scale-[0.98]"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={
-                                    buttonVisibility[id as ToolbarButtonId]
-                                  }
-                                  onChange={() =>
-                                    toggleButtonVisibility(
-                                      id as ToolbarButtonId,
-                                    )
-                                  }
-                                  className="w-6 h-6 rounded-lg border-gray-200 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 bg-white dark:bg-white/10 dark:border-white/10 cursor-pointer"
-                                />
-                                <span className="text-[15px] font-semibold text-gray-700 dark:text-gray-200 select-none">
-                                  {TOOLBAR_BUTTON_LABELS[id as ToolbarButtonId]}
-                                </span>
-                              </label>
-                            ),
-                          )}
+                          {[
+                            "sourceCode",
+                            "fullScreen",
+                            "shortcuts",
+                            "documents",
+                          ].map((id) => (
+                            <label
+                              key={id}
+                              className="flex items-center gap-4 p-4 rounded-2xl border border-gray-50 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-all active:scale-[0.98]"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={
+                                  buttonVisibility[id as ToolbarButtonId]
+                                }
+                                onChange={() =>
+                                  toggleButtonVisibility(id as ToolbarButtonId)
+                                }
+                                className="w-6 h-6 rounded-lg border-gray-200 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 bg-white dark:bg-white/10 dark:border-white/10 cursor-pointer"
+                              />
+                              <span className="text-[15px] font-semibold text-gray-700 dark:text-gray-200 select-none">
+                                {TOOLBAR_BUTTON_LABELS[id as ToolbarButtonId]}
+                              </span>
+                            </label>
+                          ))}
                         </div>
                       </section>
 

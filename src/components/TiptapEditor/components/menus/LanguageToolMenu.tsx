@@ -107,7 +107,7 @@ const LanguageToolMenuComponent = () => {
         editor?.view?.dispatch(editor.view.state.tr);
       }
     };
-    const handleLeave = () => { };
+    const handleLeave = () => {};
     dom.addEventListener("mousemove", handleMove, { passive: true });
     dom.addEventListener("mouseleave", handleLeave, { passive: true });
     return () => {
@@ -164,7 +164,8 @@ const LanguageToolMenuComponent = () => {
   const getReferencedVirtualElement = useCallback(() => {
     if (!hoveredElRef.current) return null;
     return {
-      getBoundingClientRect: () => hoveredElRef.current!.getBoundingClientRect(),
+      getBoundingClientRect: () =>
+        hoveredElRef.current!.getBoundingClientRect(),
       contextElement: hoveredElRef.current,
     } as any;
   }, []);

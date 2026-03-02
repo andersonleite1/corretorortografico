@@ -82,7 +82,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       {
         title: "6. Isenção de Responsabilidade (Disclaimer)",
         paragraphs: [
-          "O Editor de Texto Online e seus serviços associados são fornecidos na condição \"como estão\" (as is). Não oferecemos garantias de que os serviços operarão de forma ininterrupta ou totalmente livres de erros. Não seremos responsáveis por falhas de hardware, instabilidades de rede ou exclusão acidental de documentos decorrente da ação do próprio usuário.",
+          'O Editor de Texto Online e seus serviços associados são fornecidos na condição "como estão" (as is). Não oferecemos garantias de que os serviços operarão de forma ininterrupta ou totalmente livres de erros. Não seremos responsáveis por falhas de hardware, instabilidades de rede ou exclusão acidental de documentos decorrente da ação do próprio usuário.',
         ],
       },
       {
@@ -144,7 +144,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       {
         title: "6. Disclaimer of Warranties",
         paragraphs: [
-          "The Online Text Editor and its services are provided on an \"as is\" basis. We do not guarantee that the services will be free of interruptions, errors, or delays. We will not be liable for hardware failures, network interruptions, or the accidental deletion of documents by the user.",
+          'The Online Text Editor and its services are provided on an "as is" basis. We do not guarantee that the services will be free of interruptions, errors, or delays. We will not be liable for hardware failures, network interruptions, or the accidental deletion of documents by the user.',
         ],
       },
       {
@@ -206,7 +206,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       {
         title: "6. Exención de Garantías",
         paragraphs: [
-          "El editor se suministra de modalidad \"tal cual\" (as is). No podemos asegurar que los servicios de servidor estén exentos de interrupciones técnicas. El usuario asume libremente la responsabilidad del uso y recomendamos mantener respaldos (backups) propios de documentos críticos.",
+          'El editor se suministra de modalidad "tal cual" (as is). No podemos asegurar que los servicios de servidor estén exentos de interrupciones técnicas. El usuario asume libremente la responsabilidad del uso y recomendamos mantener respaldos (backups) propios de documentos críticos.',
         ],
       },
       {

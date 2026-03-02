@@ -145,7 +145,7 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
   browserSpellcheck: "Corretor do Navegador",
   export: "Exportar",
   preview: "Visualizar",
-  documents: "Meus Documentos",
+  documents: "Meus Documentos (Lateral)",
   drafts: "Rascunhos",
   importPdf: "Importar PDF",
   copyEditor: "Copiar Texto",

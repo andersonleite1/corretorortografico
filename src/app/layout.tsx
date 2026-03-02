@@ -12,6 +12,7 @@ import { UserButton } from "@/components/shared/UserButton";
 import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
 import { SidebarProvider } from "@/components/providers/SidebarProvider";
 import { syncUserWithDb } from "@/lib/sync-user";
+import { getUserPlan } from "@/lib/auth";
 
 import "@/styles/globals.scss";
 import { getHomeFaqSchema } from "@/data/home";
@@ -96,6 +97,8 @@ export default async function RootLayout({
   // Removido o await para não bloquear o rendering inicial do layout
   syncUserWithDb();
 
+  const userPlan = await getUserPlan();
+
   return (
     <ClerkThemeProvider locale={locale}>
       <SidebarProvider>
@@ -123,6 +126,7 @@ export default async function RootLayout({
             <MainContent
               userButton={<UserButton locale={locale} />}
               locale={locale}
+              userPlan={userPlan}
             >
               {children}
             </MainContent>

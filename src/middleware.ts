@@ -69,7 +69,6 @@ function i18nMiddleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-
   // Verifica se o pathname já começa com um locale suportado
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,

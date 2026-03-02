@@ -8,6 +8,7 @@ import { useSidebar } from "../providers/SidebarProvider";
 import { ToolbarDivider } from "../TiptapEditor/components/ui/Toolbar";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
 import { EmptyState } from "./EmptyState";
+import { getLocalDocuments, deleteLocalDocument } from "@/lib/local-storage";
 
 interface Document {
   id: string;
@@ -20,9 +21,14 @@ interface Document {
 interface DocumentsDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  userPlan?: "free" | "pro" | "team";
 }
 
-export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
+export const DocumentsDialog = ({
+  isOpen,
+  onClose,
+  userPlan = "free",
+}: DocumentsDialogProps) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -40,6 +46,28 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
   const fetchDocuments = async (page = 1) => {
     setIsLoading(true);
     try {
+      if (userPlan === "free") {
+        const localDocs = getLocalDocuments();
+        const limit = 6;
+        const totalCount = localDocs.length;
+        const totalPages = Math.ceil(totalCount / limit);
+        const start = (page - 1) * limit;
+        const documentsSlice = localDocs.slice(start, start + limit);
+
+        setDocuments(
+          documentsSlice.map((doc) => ({
+            ...doc,
+            content: typeof doc.content === "string" ? doc.content : "", // Simplificação: s/ preview p/ JSON local
+          })),
+        );
+        setPagination({
+          currentPage: page,
+          totalPages,
+          totalCount,
+        });
+        return;
+      }
+
       const response = await fetch(`/api/documents?page=${page}&limit=6`);
       if (!response.ok) throw new Error("Erro ao carregar documentos");
       const data = await response.json();
@@ -65,6 +93,14 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
 
   const handleDelete = async (id: string) => {
     try {
+      if (userPlan === "free") {
+        deleteLocalDocument(id);
+        toast.success("Documento excluído (local)");
+        setDocuments(documents.filter((doc) => doc.id !== id));
+        setConfirmDelete(null);
+        return;
+      }
+
       const response = await fetch(`/api/documents/${id}`, {
         method: "DELETE",
       });
@@ -193,7 +229,8 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
               Meus Documentos
             </h2>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-widest">
-              Nuvem • {pagination.totalCount} itens
+              {userPlan === "free" ? "Local / Navegador" : "Nuvem"} •{" "}
+              {pagination.totalCount} itens
             </p>
           </div>
           <button
@@ -219,7 +256,11 @@ export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
             <EmptyState
               icon="Drafts"
               title="Sua galeria está vazia"
-              description="Você ainda não salvou nenhum documento na nuvem. Que tal começar um agora?"
+              description={
+                userPlan === "free"
+                  ? "Você ainda não salvou nenhum documento localmente. Seus textos ficam apenas no seu navegador."
+                  : "Você ainda não salvou nenhum documento na nuvem. Que tal começar um agora?"
+              }
               action={{
                 label: "Criar Novo",
                 onClick: onClose,

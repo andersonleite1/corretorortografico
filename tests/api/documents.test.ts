@@ -109,7 +109,7 @@ describe("api/documents", () => {
       expect(json.id).toBe("new-doc");
     });
 
-    it("should allow a document creation even if user is Free", async () => {
+    it("should NOT allow a document creation if user is Free (returns 403)", async () => {
       mockGetUserPlan.mockResolvedValueOnce("free");
 
       const mockRequest = new Request("http://localhost:3000/api/documents", {
@@ -120,7 +120,9 @@ describe("api/documents", () => {
         }),
       });
       const response = await POST(mockRequest);
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(403);
+      const text = await response.text();
+      expect(text).toContain("plano Pro");
     });
 
     it("should update an existing document when id is provided", async () => {

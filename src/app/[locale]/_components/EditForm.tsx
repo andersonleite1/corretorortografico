@@ -15,6 +15,7 @@ import { FaTimes, FaBug } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
+import { getLocalDocumentById } from "@/lib/local-storage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
@@ -372,6 +373,35 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     };
 
     if (docId) {
+      if (docId.startsWith("local-")) {
+        const localDoc = getLocalDocumentById(docId);
+        if (localDoc) {
+          const recovered = checkRecovery({
+            title: localDoc.title,
+            content: localDoc.content,
+            updatedAt: localDoc.updatedAt,
+          });
+
+          reset({ title: recovered.title, content: recovered.content });
+
+          const instance = editorRef.current?.getInstance();
+          if (instance) {
+            const currentContent = instance.getJSON();
+            const newContentString =
+              typeof recovered.content === "string"
+                ? recovered.content
+                : JSON.stringify(recovered.content);
+            const currentContentString = JSON.stringify(currentContent);
+
+            if (newContentString !== currentContentString) {
+              instance.commands.setContent(recovered.content);
+            }
+          }
+          setIsLoading(false);
+          return;
+        }
+      }
+
       fetch(`/api/documents/${docId}`)
         .then((res) => {
           if (!res.ok) throw new Error("Documento não encontrado");

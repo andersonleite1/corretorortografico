@@ -30,6 +30,14 @@ export async function POST(req: Request) {
       );
     }
 
+    const plan = await getUserPlan();
+    if (plan === "free") {
+      return new NextResponse(
+        "O armazenamento na nuvem é um recurso do plano Pro.",
+        { status: 403 },
+      );
+    }
+
     const { id, title, content } = parseResult.data;
 
     let document;

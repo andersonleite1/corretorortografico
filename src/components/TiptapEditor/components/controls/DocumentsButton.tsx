@@ -25,14 +25,6 @@ const DocumentsButton = () => {
         tooltip="Meus Documentos"
         onClick={() => setIsDocumentsDialogOpen(true)}
       />
-      {!isMobile && (
-        <MenuButton
-          icon="Columns"
-          tooltip="Mostrar na Lateral Meus Documentos"
-          active={isSidebarOpen}
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
-      )}
     </>
   );
 };

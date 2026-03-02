@@ -166,7 +166,7 @@ const pt: HomeContent = {
         icon: "☁️",
         title: "Portabilidade e Fluxo",
         description:
-          "Salvamento automático em nuvem, suporte multi-idioma e exportação direta para PDF, DOCX, TXT e HTML. Acesse seus documentos de qualquer dispositivo, a qualquer hora.",
+          "Salvamento automático, suporte multi-idioma e exportação direta para PDF, DOCX, TXT e HTML. Seus documentos sempre com você.",
       },
     ],
   },
@@ -182,7 +182,7 @@ const pt: HomeContent = {
           "Formatação Rich Text completa",
           "5 reescritas com IA por dia",
           "5 tons de reescrita",
-          "1 documento salvo na nuvem",
+          "Salvar documentos localmente",
           "Exportação PDF e DOCX",
           "Sem necessidade de cartão",
         ],

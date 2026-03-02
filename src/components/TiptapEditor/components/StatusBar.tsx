@@ -6,6 +6,7 @@ import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { ShortcutsDialog } from "@/components/shared/ShortcutsDialog";
+import { useSidebar } from "@/components/providers/SidebarProvider";
 
 const StatusBar = () => {
   const {
@@ -18,6 +19,7 @@ const StatusBar = () => {
     draftActions,
     isMobile,
   } = useTiptapContext();
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const { buttonVisibility } = useEditorSettings();
   const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const counter = useEditorState({
@@ -62,6 +64,14 @@ const StatusBar = () => {
   return (
     <div className="rte-status-bar">
       <Toolbar dense>
+        {!isMobile && buttonVisibility.documents && (
+          <MenuButton
+            icon="Columns"
+            tooltip="Mostrar na Lateral Meus Documentos"
+            active={isSidebarOpen}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          />
+        )}
         {buttonVisibility.sourceCode && (
           <MenuButton
             icon="SourceCode"
@@ -101,7 +111,7 @@ const StatusBar = () => {
               className={clsx(
                 "w-1.5 h-1.5 rounded-full",
                 draftActions.savingStatus === "saving" &&
-                  "bg-blue-500 animate-pulse",
+                "bg-blue-500 animate-pulse",
                 draftActions.savingStatus === "saved" && "bg-green-500",
                 draftActions.savingStatus === "error" && "bg-red-500",
               )}
@@ -138,7 +148,7 @@ const StatusBar = () => {
             )}
           >
             {!!useTiptapContext().documentTitle ||
-            !!new URLSearchParams(window.location.search).get("docId")
+              !!new URLSearchParams(window.location.search).get("docId")
               ? "Sincronizado"
               : "Local"}
           </span>

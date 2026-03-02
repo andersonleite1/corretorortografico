@@ -16,12 +16,14 @@ interface MainContentProps {
   children: React.ReactNode;
   userButton: React.ReactNode;
   locale: Locale;
+  userPlan: "free" | "pro" | "team";
 }
 
 export const MainContent = ({
   children,
   userButton,
   locale,
+  userPlan,
 }: MainContentProps) => {
   const { isDocumentsDialogOpen, setIsDocumentsDialogOpen } = useSidebar();
 
@@ -35,6 +37,7 @@ export const MainContent = ({
       <DocumentsDialog
         isOpen={isDocumentsDialogOpen}
         onClose={() => setIsDocumentsDialogOpen(false)}
+        userPlan={userPlan}
       />
       <ScrollToTop />
       <SettingsDialog />

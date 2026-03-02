@@ -24,6 +24,7 @@ import { useEditorSettings } from "@/components/providers/EditorSettingsProvider
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SaveNotification from "@/components/shared/SaveNotification";
+import { saveLocalDocument } from "@/lib/local-storage";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -140,6 +141,24 @@ export const TiptapProvider = ({
     setIsSaving(true);
     try {
       const content = editor.getJSON();
+
+      if (userPlan === "free") {
+        // Salvar localmente para usuários Free
+        const savedDoc = saveLocalDocument({
+          id: documentId || undefined,
+          content,
+          title: documentTitle || "Sem título",
+        });
+
+        setShowSuccess(true);
+
+        if (!documentId && savedDoc.id) {
+          router.push(`/${normalizedLocale}?docId=${savedDoc.id}`);
+        }
+        return;
+      }
+
+      // Salvar na nuvem para usuários Pro/Team
       const stringifiedContent = JSON.stringify(content);
       const response = await fetch("/api/documents", {
         method: "POST",
@@ -168,7 +187,11 @@ export const TiptapProvider = ({
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof Error) {
-        toast.error(error.message || "Erro ao salvar o documento");
+        if (error.message === "storage_limit_exceeded") {
+          toast.error("Limite de armazenamento local atingido");
+        } else {
+          toast.error(error.message || "Erro ao salvar o documento");
+        }
       } else {
         toast.error("Erro ao salvar o documento");
       }
