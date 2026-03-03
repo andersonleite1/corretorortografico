@@ -60,7 +60,6 @@ const nextConfig = {
         destination: "/",
         permanent: true,
       },
-
     ];
   },
   async headers() {

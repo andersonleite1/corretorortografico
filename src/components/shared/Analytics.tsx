@@ -22,18 +22,12 @@ export function Analytics() {
     window.addEventListener("keydown", handleInteraction, { passive: true });
     window.addEventListener("click", handleInteraction, { passive: true });
 
-    // Fallback: load after 5 seconds if no interaction
-    const timeout = setTimeout(() => {
-      setShouldLoad(true);
-    }, 5000);
-
     return () => {
       window.removeEventListener("scroll", handleInteraction);
       window.removeEventListener("mousemove", handleInteraction);
       window.removeEventListener("touchstart", handleInteraction);
       window.removeEventListener("keydown", handleInteraction);
       window.removeEventListener("click", handleInteraction);
-      clearTimeout(timeout);
     };
   }, []);
 
