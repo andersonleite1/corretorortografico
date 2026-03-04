@@ -6,7 +6,7 @@ const BASE_URL = "https://editordetexto.online";
 
 const CONTACT_PATHS: Record<Locale, string> = {
   pt: "/contato",
-  en: "/en/contact",
+  en: "/en/contato",
   es: "/es/contato",
 };
 

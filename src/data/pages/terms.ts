@@ -6,7 +6,7 @@ const BASE_URL = "https://editordetexto.online";
 
 const TERMS_PATHS: Record<Locale, string> = {
   pt: "/termos",
-  en: "/en/terms",
+  en: "/en/termos",
   es: "/es/termos",
 };
 

@@ -27,7 +27,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/sobre",
       es: "/es/sobre",
-      en: "/about",
+      en: "/en/sobre",
     },
   },
   {
@@ -36,7 +36,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/contato",
       es: "/es/contato",
-      en: "/contact",
+      en: "/en/contato",
     },
   },
   {
@@ -45,7 +45,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/privacidade",
       es: "/es/privacidade",
-      en: "/privacy",
+      en: "/en/privacidade",
     },
   },
   {
@@ -54,7 +54,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/termos",
       es: "/es/termos",
-      en: "/terms",
+      en: "/en/termos",
     },
   },
 ];

@@ -51,7 +51,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
                 <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                   {content.message}
                   <Link
-                    href={`/${locale}/privacy`}
+                    href={`/${locale}/privacidade`}
                     className="ml-1 font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     {content.privacyPolicy}

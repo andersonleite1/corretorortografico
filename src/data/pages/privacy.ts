@@ -6,7 +6,7 @@ const BASE_URL = "https://editordetexto.online";
 
 const PRIVACY_PATHS: Record<Locale, string> = {
   pt: "/privacidade",
-  en: "/en/privacy",
+  en: "/en/privacidade",
   es: "/es/privacidade",
 };
 
