@@ -97,8 +97,8 @@ export default function EmailCodeSignUp({
 
       if (completeSignUp.status === "complete") {
         await setActive!({ session: completeSignUp.createdSessionId });
-        router.push("/");
         if (onClose) onClose();
+        router.refresh(); // Atualiza a página atual para refletir o estado logado
       } else {
         if (completeSignUp.status === "missing_requirements") {
           const missing = completeSignUp.missingFields;

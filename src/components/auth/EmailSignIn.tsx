@@ -114,8 +114,8 @@ export default function EmailSignIn({
 
       if (result.status === "complete") {
         await setActive!({ session: result.createdSessionId });
-        router.push("/");
         if (onClose) onClose();
+        router.refresh(); // Atualiza a página atual para refletir o estado logado
       } else {
         setError("Não foi possível completar o acesso.");
       }
@@ -139,8 +139,8 @@ export default function EmailSignIn({
 
       if (result.status === "complete") {
         await setActive!({ session: result.createdSessionId });
-        router.push("/");
         if (onClose) onClose();
+        router.refresh(); // Atualiza a página atual para refletir o estado logado
       } else {
         setError("Não foi possível completar o acesso. Verifique sua senha.");
       }

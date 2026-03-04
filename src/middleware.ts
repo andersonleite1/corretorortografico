@@ -9,6 +9,8 @@ const PUBLIC_FILE = /\.[^/]+$/;
 const isProtectedRoute = createRouteMatcher([
   "/:locale/editor(.*)", // Editor principal (com locale)
   "/editor(.*)", // Editor principal (sem locale)
+  "/:locale/dashboard(.*)", // Dashboard
+  "/dashboard(.*)",
   "/:locale/settings(.*)", // Configurações
   "/settings(.*)",
   "/api/ai(.*)", // APIs de IA
