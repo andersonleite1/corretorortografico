@@ -112,7 +112,7 @@ function i18nMiddleware(request: NextRequest) {
   return NextResponse.redirect(url);
 }
 
-export default clerkMiddleware(async (auth, request) => {
+const clerkHof = clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
     const authObj = await auth();
     if (!authObj.userId) {
@@ -123,6 +123,18 @@ export default clerkMiddleware(async (auth, request) => {
   }
   return i18nMiddleware(request);
 });
+
+export default async function middleware(request: NextRequest, event: any) {
+  try {
+    return await clerkHof(request, event);
+  } catch (err: any) {
+    console.error("Middleware Error caught:", err);
+    // Retorna uma resposta amigável com o erro no header para debugarmos sem quebrar o Edge Runtime
+    const res = NextResponse.next();
+    res.headers.set("x-middleware-error", encodeURIComponent(err.message || String(err)));
+    return res;
+  }
+}
 
 export const config = {
   matcher: [
