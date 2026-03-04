@@ -113,26 +113,10 @@ function i18nMiddleware(request: NextRequest) {
 }
 
 export default clerkMiddleware(async (auth, request) => {
-  try {
-    if (isProtectedRoute(request)) {
-      await auth.protect();
-    }
-    return i18nMiddleware(request);
-  } catch (error) {
-    console.error("[Middleware Error]:", error);
-
-    // BUG-01: Se ocorrer erro de autenticação em rota protegida,
-    // redirecionar para o login ao invés de prosseguir silenciosamente.
-    // Isso impede que falhas do serviço de auth exponham rotas protegidas.
-    if (isProtectedRoute(request)) {
-      const signInUrl = new URL("/sign-in", request.url);
-      signInUrl.searchParams.set("redirect_url", request.url);
-      return NextResponse.redirect(signInUrl);
-    }
-
-    // Para rotas públicas, falha segura: prossegue com i18n
-    return i18nMiddleware(request);
+  if (isProtectedRoute(request)) {
+    await auth.protect();
   }
+  return i18nMiddleware(request);
 });
 
 export const config = {
