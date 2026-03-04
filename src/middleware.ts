@@ -114,7 +114,12 @@ function i18nMiddleware(request: NextRequest) {
 
 export default clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
-    await auth.protect();
+    const authObj = await auth();
+    if (!authObj.userId) {
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set("redirect_url", request.url);
+      return NextResponse.redirect(signInUrl);
+    }
   }
   return i18nMiddleware(request);
 });

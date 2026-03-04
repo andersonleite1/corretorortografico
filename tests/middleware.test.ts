@@ -26,31 +26,31 @@ describe("Middleware", () => {
     return new NextRequest(url);
   };
 
-  const mockAuth = {
-    protect: () => mockAuthProtect(),
-  };
+  const mockAuth = vi.fn().mockResolvedValue({ userId: "user_123" });
 
   it("prossegue normalmente em rotas públicas", async () => {
     const req = createRequest("/");
     const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
 
     expect(response).toBeInstanceOf(NextResponse);
-    expect(mockAuthProtect).not.toHaveBeenCalled();
+    expect(mockAuth).not.toHaveBeenCalled();
   });
 
-  it("chama auth.protect() em rotas protegidas", async () => {
+  it("chama auth() em rotas protegidas", async () => {
     mockIsProtectedRoute.mockReturnValue(true);
     const req = createRequest("/dashboard");
     await (middleware as any)(mockAuth, req);
 
-    expect(mockAuthProtect).toHaveBeenCalled();
+    expect(mockAuth).toHaveBeenCalled();
   });
 
-  it("deixa o erro propagar quando auth.protect() falha", async () => {
+  it("retorna redirect quando auth não encontra userId", async () => {
     mockIsProtectedRoute.mockReturnValue(true);
     const req = createRequest("/dashboard");
-    mockAuthProtect.mockRejectedValue(new Error("NEXT_REDIRECT"));
+    mockAuth.mockResolvedValueOnce({ userId: null });
 
-    await expect((middleware as any)(mockAuth, req)).rejects.toThrow("NEXT_REDIRECT");
+    const response = await (middleware as any)(mockAuth, req) as NextResponse;
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/sign-in");
   });
 });

@@ -23,57 +23,39 @@ describe("Middleware", () => {
     vi.clearAllMocks();
   });
 
-  it("should propagate error on auth failure for protected routes", async () => {
+  it("should return explicit redirect on auth failure for protected routes", async () => {
     const request = new NextRequest(new URL("http://localhost:3000/editor"));
 
-    const authMock = {
-      protect: vi.fn().mockRejectedValue(new Error("Unauthorized")),
-    };
+    const authMock = vi.fn().mockResolvedValue({ userId: null });
 
-    // @ts-ignore
-    await expect(middleware(authMock, request)).rejects.toThrow("Unauthorized");
-    expect(authMock.protect).toHaveBeenCalled();
+    // @ts-expect-error
+    const response = await middleware(authMock, request) as NextResponse;
+
+    expect(authMock).toHaveBeenCalled();
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/sign-in");
   });
 
   it("should proceed to i18n middleware on auth success", async () => {
     const request = new NextRequest(new URL("http://localhost:3000/editor"));
 
-    const authMock = {
-      protect: vi.fn().mockResolvedValue({}),
-    };
+    const authMock = vi.fn().mockResolvedValue({ userId: "user_123" });
 
-    // @ts-ignore
+    // @ts-expect-error
     const response = await middleware(authMock, request);
 
-    expect(authMock.protect).toHaveBeenCalled();
-    // i18nMiddleware redirects "pt" (default) to /pt/editor or rewrites
-    // In our simplified mock, it might be a rewrite or next()
+    expect(authMock).toHaveBeenCalled();
     expect(response?.status).not.toBe(307); // Should not be the sign-in redirect
   });
 
-  it("should not redirect to sign-in on auth failure for public routes", async () => {
+  it("should not invoke auth for public routes", async () => {
     const request = new NextRequest(new URL("http://localhost:3000/home"));
 
-    // createRouteMatcher mock returns false for /home (it only checks for /editor)
-    const authMock = {
-      protect: vi.fn(),
-    };
+    const authMock = vi.fn();
 
-    // Simulate an error that shouldn't happen but if it does, it's a public route
-    // The handler catch block should still run if the handler throws
-    const handler = async (auth: any, req: any) => {
-      if (!req.nextUrl.pathname.includes("/editor")) {
-        throw new Error("Some other error");
-      }
-    };
+    // @ts-expect-error
+    await middleware(authMock, request);
 
-    // We need to re-invoke the middleware with our mocked state
-    // Actually, let's just test that it doesn't call auth.protect() for /home
-
-    // @ts-ignore
-    const response = await middleware(authMock, request);
-
-    expect(authMock.protect).not.toHaveBeenCalled();
-    // Should proceed to i18n even if auth.protect failed (if it was called)
+    expect(authMock).not.toHaveBeenCalled();
   });
 });
