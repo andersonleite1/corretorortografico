@@ -40,6 +40,12 @@ export async function syncUserWithDb() {
         email,
         name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
         imageUrl: user.imageUrl || null,
+        subscription: {
+          create: {
+            plan: "free",
+            status: "active",
+          },
+        },
       },
     });
 

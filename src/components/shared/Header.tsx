@@ -133,31 +133,32 @@ const Header = ({ userButton }: HeaderProps) => {
                 </Link>
               </SignedIn>
               <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                <Tooltip content={headerContent.selectLanguage} portal>
-                  <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60 transition-colors hover:border-neutral-400 dark:hover:border-neutral-600">
-                    {locales.map((locale) => {
-                      const isActive = locale === currentLocale;
-                      return (
+                <div className="flex rounded-full border border-neutral-300 bg-white/70 p-1 text-[11px] uppercase dark:border-neutral-700 dark:bg-neutral-900/60 transition-colors hover:border-neutral-400 dark:hover:border-neutral-600">
+                  {locales.map((locale) => {
+                    const isActive = locale === currentLocale;
+                    return (
+                      <Tooltip key={locale} content={headerContent.selectLanguage} portal>
                         <button
-                          key={locale}
                           type="button"
                           onClick={() => switchLocale(locale as Locale)}
-                          className={`px-3 py-1 rounded-full transition ${
-                            isActive
+                          className={`px-3 py-1 rounded-full transition ${isActive
                               ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
                               : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-                          }`}
+                            }`}
                         >
                           {locale.toUpperCase()}
                         </button>
-                      );
-                    })}
-                  </div>
-                </Tooltip>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex gap-4 items-center min-w-[140px] justify-end">
+              <div className="flex gap-4 items-center min-w-[200px] justify-end">
                 {!isLoaded && !clerkTimeout ? (
-                  <HeaderSkeleton />
+                  <div className="flex gap-4 items-center">
+                    <div className="w-16 h-9 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-full" />
+                    <div className="w-32 h-9 bg-neutral-100 dark:bg-neutral-800 animate-pulse rounded-full" />
+                  </div>
                 ) : (
                   <>
                     {/* Bypass Clerk's SignedIn/SignedOut components during timeout */}
@@ -167,7 +168,7 @@ const Header = ({ userButton }: HeaderProps) => {
                           onClick={() =>
                             setAuthModal({ isOpen: true, view: "sign-in" })
                           }
-                          className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                          className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors h-9 px-2"
                         >
                           Entrar
                         </button>
@@ -175,13 +176,15 @@ const Header = ({ userButton }: HeaderProps) => {
                           onClick={() =>
                             setAuthModal({ isOpen: true, view: "sign-up" })
                           }
-                          className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                          className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap h-9"
                         >
                           Começar agora
                         </button>
                       </>
                     ) : (
-                      <SignedIn>{userButton}</SignedIn>
+                      <div className="h-9 flex items-center">
+                        <SignedIn>{userButton}</SignedIn>
+                      </div>
                     )}
                   </>
                 )}

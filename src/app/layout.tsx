@@ -102,7 +102,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <head>
-        <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
+        <link rel="preconnect" href="https://www.clarity.ms" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}

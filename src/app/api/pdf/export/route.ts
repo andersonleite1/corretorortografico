@@ -32,9 +32,17 @@ export async function POST(req: Request) {
       return new NextResponse("Documento HTML é obrigatório", { status: 400 });
     }
 
-    const sanitizedHtml = DOMPurify.sanitize(htmlDocument, {
+    let sanitizedHtml = DOMPurify.sanitize(htmlDocument, {
       USE_PROFILES: { html: true }, // permite tags HTML normais
+      WHOLE_DOCUMENT: true,
+      ADD_TAGS: ["html", "head", "meta", "style", "body"],
+      ADD_ATTR: ["charset", "lang"],
     });
+
+    // Ensure the DOCTYPE is preserved as it might be stripped
+    if (!sanitizedHtml.toLowerCase().startsWith("<!doctype html>")) {
+      sanitizedHtml = `<!DOCTYPE html>\n${sanitizedHtml}`;
+    }
 
     const response = await fetch(
       "https://api.editordetexto.cloud/api/pdf/html",

@@ -15,12 +15,19 @@ export const getCurrentUser = cache(async (_forceRefresh: boolean = false) => {
   // No React cache, a mesma função com argumentos diferentes gera entradas de cache diferentes.
 
   try {
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkId },
       include: {
         subscription: true,
       },
     });
+
+    // Se o usuário não existe no DB local, tenta sincronizar on-the-fly (ESC-01)
+    if (!user) {
+      const { syncUserWithDb } = await import("./sync-user");
+      user = (await syncUserWithDb()) as any;
+    }
+
     return user;
   } catch (error) {
     console.error("[getCurrentUser] Error fetching user from DB:", error);

@@ -98,7 +98,9 @@ function i18nMiddleware(request: NextRequest) {
   const locale =
     cookieLocale && locales.includes(cookieLocale as any)
       ? cookieLocale
-      : getLocale(request);
+      : pathname === "/"
+        ? defaultLocale
+        : getLocale(request);
 
   // Redireciona para o locale correto
   // Se for o default locale, faz rewrite (não aparece na URL)
