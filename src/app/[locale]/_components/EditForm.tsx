@@ -117,11 +117,43 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [draftSavingStatus, setDraftSavingStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
+  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+
   const [notification, setNotification] = useState<{
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
-  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+
+  const [shouldLoadEditor, setShouldLoadEditor] = useState(false);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+      setShouldLoadEditor(true);
+      return;
+    }
+
+    const loadEditor = () => {
+      if (shouldLoadEditor) return;
+      setShouldLoadEditor(true);
+      window.removeEventListener("scroll", loadEditor);
+      window.removeEventListener("touchstart", loadEditor);
+      window.removeEventListener("mousemove", loadEditor);
+    };
+
+    window.addEventListener("scroll", loadEditor, { passive: true });
+    window.addEventListener("touchstart", loadEditor, { passive: true });
+    window.addEventListener("mousemove", loadEditor, { passive: true });
+
+    const timer = setTimeout(loadEditor, 8000);
+
+    return () => {
+      window.removeEventListener("scroll", loadEditor);
+      window.removeEventListener("touchstart", loadEditor);
+      window.removeEventListener("mousemove", loadEditor);
+      clearTimeout(timer);
+    };
+  }, [shouldLoadEditor]);
 
   const showNotification = (
     message: string,
@@ -860,41 +892,45 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                   } as CSSProperties
                 }
               >
-                <TiptapEditor
-                  ref={editorRef}
-                  ssr={true}
-                  output="json"
-                  locale={locale}
-                  placeholder={editorPlaceholder}
-                  contentMinHeight={320}
-                  contentMaxHeight={440}
-                  onContentChange={field.onChange}
-                  initialContent={field.value}
-                  exportActions={{
-                    onExportDoc: handleSaveDOC,
-                    onExportPdf: handleExportToPDF,
-                    onExportTxt: handleExportToTxt,
-                    onPreviewPdf: handlePreviewPdf,
-                    onPreviewPost: handlePreviewPost,
-                    onClear: handleClear,
-                    isExportingPdf: isExportingPDF,
-                  }}
-                  draftActions={{
-                    drafts: drafts.map(({ id, title, date }) => ({
-                      id,
-                      title,
-                      date,
-                    })),
-                    onSaveDraft: () => handleSaveDraft(true),
-                    onLoadDraft: handleLoadDraft,
-                    onDeleteDraft: handleDeleteDraft,
-                    onCompareDraft: handleCompareDraft,
-                    savingStatus: draftSavingStatus,
-                  }}
-                  userPlan={userPlan}
-                  documentTitle={watch("title")}
-                  aria-label={formMessages.aria.content}
-                />
+                {!shouldLoadEditor ? (
+                  <div className="w-full h-[480px] bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d]" />
+                ) : (
+                  <TiptapEditor
+                    ref={editorRef}
+                    ssr={true}
+                    output="json"
+                    locale={locale}
+                    placeholder={editorPlaceholder}
+                    contentMinHeight={320}
+                    contentMaxHeight={440}
+                    onContentChange={field.onChange}
+                    initialContent={field.value}
+                    exportActions={{
+                      onExportDoc: handleSaveDOC,
+                      onExportPdf: handleExportToPDF,
+                      onExportTxt: handleExportToTxt,
+                      onPreviewPdf: handlePreviewPdf,
+                      onPreviewPost: handlePreviewPost,
+                      onClear: handleClear,
+                      isExportingPdf: isExportingPDF,
+                    }}
+                    draftActions={{
+                      drafts: drafts.map(({ id, title, date }) => ({
+                        id,
+                        title,
+                        date,
+                      })),
+                      onSaveDraft: () => handleSaveDraft(true),
+                      onLoadDraft: handleLoadDraft,
+                      onDeleteDraft: handleDeleteDraft,
+                      onCompareDraft: handleCompareDraft,
+                      savingStatus: draftSavingStatus,
+                    }}
+                    userPlan={userPlan}
+                    documentTitle={watch("title")}
+                    aria-label={formMessages.aria.content}
+                  />
+                )}
               </div>
             );
           }}

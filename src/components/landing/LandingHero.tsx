@@ -62,7 +62,7 @@ export default function LandingHero({ data }: Props) {
                 alt="Mockup de um MacBook Pro mostrando a interface do editor de texto online"
                 width={960}
                 height={960}
-                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 960px"
                 className="landing-hero__screenshot"
                 quality={80}
               />
