@@ -1,47 +1,146 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { i18n } from "../i18n-config";
 
-export default function middleware(request: NextRequest) {
-  // MAINTENANCE MODE
-  return new NextResponse(
-    `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manutenção Programada - Editor de Texto Online</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8f9fa; color: #333; text-align: center; }
-        .container { max-width: 600px; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #2563eb; margin-bottom: 16px; font-size: 28px; }
-        p { font-size: 16px; line-height: 1.6; color: #666; margin-bottom: 24px; }
-        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Estamos passando por manutenção</h1>
-        <p>O Editor de Texto Online está passando por uma manutenção de rotina para melhorar nossos serviços. Voltaremos ao ar em alguns minutos!</p>
-        <p>Agradecemos a sua paciência.</p>
-        <div class="spinner"></div>
-    </div>
-</body>
-</html>`,
-    {
-      status: 503,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Retry-After": "300",
-      },
-    }
+const PUBLIC_FILE = /\.[^/]+$/;
+
+// Rotas que requerem autenticação
+const isProtectedRoute = createRouteMatcher([
+  "/:locale/editor(.*)", // Editor principal (com locale)
+  "/editor(.*)", // Editor principal (sem locale)
+  "/:locale/settings(.*)", // Configurações
+  "/settings(.*)",
+  "/api/ai(.*)", // APIs de IA
+  "/api/documents(.*)",
+  "/api/editor-settings(.*)", // Configurações do editor (multi-tenant)
+  "/api/images(.*)",
+]);
+
+/**
+ * Detecta o melhor locale sem dependências externas (Edge compatible)
+ */
+function getLocale(request: NextRequest): string {
+  const { locales, defaultLocale } = i18n;
+  const acceptLanguage = request.headers.get("accept-language");
+
+  if (!acceptLanguage) return defaultLocale;
+
+  // Parsing simples: pega o primeiro idioma suportado no header ou o default
+  const languages = acceptLanguage
+    .split(",")
+    .map((l) => l.split(";")[0].trim().split("-")[0]);
+  const matched = languages.find((lang) =>
+    (locales as readonly string[]).includes(lang),
   );
+
+  return matched || defaultLocale;
+}
+
+/**
+ * Middleware de i18n simplificado para evitar loops e crashes no Edge
+ */
+function i18nMiddleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const { locales, defaultLocale } = i18n;
+
+  // Redirecionamento de /pricing para /#pricing (Legado -> Home)
+  if (pathname.endsWith("/pricing")) {
+    const locale =
+      locales.find((l) => pathname.startsWith(`/${l}/`)) || defaultLocale;
+    const newPath =
+      pathname === "/pricing" || pathname === `/${locale}/pricing`
+        ? `/${locale}`
+        : pathname.replace("/pricing", "");
+    const url = new URL(newPath, request.url);
+    url.hash = "pricing";
+    url.search = request.nextUrl.search;
+    return NextResponse.redirect(url);
+  }
+
+  // Pular arquivos estáticos e rotas internas
+  if (
+    PUBLIC_FILE.test(pathname) ||
+    pathname.startsWith("/api") ||
+    pathname.includes("_next") ||
+    pathname.startsWith("/_clerk") ||
+    pathname.includes("clerk_catchall_check")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Verifica se o pathname já começa com um locale suportado
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+  );
+
+  if (pathnameHasLocale) {
+    // Normalização: se é o default locale na URL, remove (canonical URL)
+    if (
+      pathname.startsWith(`/${defaultLocale}/`) ||
+      pathname === `/${defaultLocale}`
+    ) {
+      const newPath =
+        pathname === `/${defaultLocale}`
+          ? "/"
+          : pathname.replace(`/${defaultLocale}/`, "/");
+      const url = new URL(newPath, request.url);
+      url.search = request.nextUrl.search; // Preserva query params
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // Se não tem locale, resolve qual usar
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  const locale =
+    cookieLocale && locales.includes(cookieLocale as any)
+      ? cookieLocale
+      : getLocale(request);
+
+  // Redireciona para o locale correto
+  // Se for o default locale, faz rewrite (não aparece na URL)
+  if (locale === defaultLocale) {
+    const url = new URL(`/${defaultLocale}${pathname}`, request.url);
+    url.search = request.nextUrl.search;
+    return NextResponse.rewrite(url);
+  }
+
+  // Se for idioma secundário, redireciona (aparece na URL)
+  const url = new URL(`/${locale}${pathname}`, request.url);
+  url.search = request.nextUrl.search;
+  return NextResponse.redirect(url);
+}
+
+const clerkHof = clerkMiddleware(async (auth, request) => {
+  if (isProtectedRoute(request)) {
+    const authObj = await auth();
+    if (!authObj.userId) {
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set("redirect_url", request.url);
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+  return i18nMiddleware(request);
+});
+
+export default async function middleware(request: NextRequest, event: any) {
+  try {
+    return await clerkHof(request, event);
+  } catch (err: any) {
+    console.error("Middleware Error caught:", err);
+    // Retorna uma resposta amigável com o erro no header para debugarmos sem quebrar o Edge Runtime
+    const res = NextResponse.next();
+    res.headers.set("x-middleware-error", encodeURIComponent(err.message || String(err)));
+    return res;
+  }
 }
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Pular Next.js internals e arquivos estáticos
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Sempre rodar para API routes
     "/(api|trpc)(.*)",
   ],
 };
