@@ -1,4 +1,11 @@
-User-Agent: *
+# *
+User-agent: *
 Allow: /
-Disallow: /private/
+Disallow: /private
+Disallow: /post-csr
+
+# Host
+Host: https://editordetexto.online
+
+# Sitemaps
 Sitemap: https://editordetexto.online/sitemap.xml

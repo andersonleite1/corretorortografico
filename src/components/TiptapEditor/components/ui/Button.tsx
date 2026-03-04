@@ -20,13 +20,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       slotAfter,
       ...props
     },
-    ref
+    ref,
   ) => {
     const classes = clsx(
       "rte-button",
       `rte-button--${variant}`,
       iconOnly && "rte-button--icon-only",
-      className
+      className,
     );
 
     return (
@@ -41,7 +41,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!iconOnly && slotAfter}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

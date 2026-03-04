@@ -17,13 +17,16 @@ export function ImagePlugin({ name }: { name: string }) {
           const imageBlocks = findChildren(
             view.state.doc,
             (node) =>
-              node.type.name === name && (!node.attrs.naturalWidth || !node.attrs.naturalHeight)
+              node.type.name === name &&
+              (!node.attrs.naturalWidth || !node.attrs.naturalHeight),
           );
 
           if (imageBlocks.length === 0) return;
 
           const results = await Promise.all(
-            imageBlocks.flatMap(({ node }) => getDimensionsImage(node.attrs.src))
+            imageBlocks.flatMap(({ node }) =>
+              getDimensionsImage(node.attrs.src),
+            ),
           );
 
           const tr = view.state.tr;
@@ -50,7 +53,8 @@ export function ImagePlugin({ name }: { name: string }) {
 const getDimensionsImage = async (url: string): Promise<ImageDimensions> => {
   return new Promise((resovle, reject) => {
     const img = new Image();
-    img.onload = () => resovle({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onload = () =>
+      resovle({ width: img.naturalWidth, height: img.naturalHeight });
     img.onerror = reject;
     img.src = url;
   });

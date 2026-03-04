@@ -9,7 +9,10 @@ import Image from "../Image/Image";
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     imageFigure: {
-      setImageFigure: (options: { src: string; caption?: string }) => ReturnType;
+      setImageFigure: (options: {
+        src: string;
+        caption?: string;
+      }) => ReturnType;
       imageToFigure: () => ReturnType;
       figureToImage: () => ReturnType;
       removeImage: () => ReturnType;
@@ -59,7 +62,9 @@ export const ImageFigure = Figure.extend({
         ({ state, dispatch }: CommandProps) => {
           const { selection } = state;
           const imagePos =
-            selection instanceof NodeSelection ? selection.from : selection.$anchor.pos;
+            selection instanceof NodeSelection
+              ? selection.from
+              : selection.$anchor.pos;
 
           const imageNode = state.doc.nodeAt(imagePos);
 
@@ -84,7 +89,7 @@ export const ImageFigure = Figure.extend({
           const tr = state.tr.replaceWith(
             imagePos,
             imagePos + imageNode.nodeSize,
-            figureNode
+            figureNode,
           );
 
           const mappedPos = tr.mapping.map(imagePos);
@@ -117,7 +122,8 @@ export const ImageFigure = Figure.extend({
               : selection.$from;
 
           let depth = $from.depth;
-          let figurePos = selection instanceof NodeSelection ? selection.from : $from.pos;
+          let figurePos =
+            selection instanceof NodeSelection ? selection.from : $from.pos;
 
           while (depth > 0 && $from.node(depth).type.name !== this.name) {
             figurePos = $from.before(depth);
@@ -139,10 +145,12 @@ export const ImageFigure = Figure.extend({
           const tr = state.tr.replaceWith(
             figurePos,
             figurePos + figureNode.nodeSize,
-            imageNode
+            imageNode,
           );
 
-          tr.setSelection(NodeSelection.create(tr.doc, tr.mapping.map(figurePos)));
+          tr.setSelection(
+            NodeSelection.create(tr.doc, tr.mapping.map(figurePos)),
+          );
 
           if (dispatch) {
             dispatch(tr.scrollIntoView());
@@ -159,11 +167,16 @@ export const ImageFigure = Figure.extend({
         ({ state, tr, dispatch }: CommandProps) => {
           const { selection } = state;
           const pos =
-            selection instanceof NodeSelection ? selection.from : selection.$from.pos;
+            selection instanceof NodeSelection
+              ? selection.from
+              : selection.$from.pos;
 
           const node = state.doc.nodeAt(pos);
 
-          if (!node || (node.type.name !== this.name && node.type.name !== Image.name)) {
+          if (
+            !node ||
+            (node.type.name !== this.name && node.type.name !== Image.name)
+          ) {
             return false;
           }
 
@@ -206,9 +219,13 @@ export const ImageFigure = Figure.extend({
               }
 
               // Set up drag data
-              draggedNode = NodeSelection.create(view.state.doc, $pos.before($pos.depth));
+              draggedNode = NodeSelection.create(
+                view.state.doc,
+                $pos.before($pos.depth),
+              );
               const draggedSlice = draggedNode.content();
-              const { dom, text, slice } = view.serializeForClipboard(draggedSlice);
+              const { dom, text, slice } =
+                view.serializeForClipboard(draggedSlice);
 
               event.dataTransfer.clearData();
               event.dataTransfer.setData("text/html", dom.innerHTML);

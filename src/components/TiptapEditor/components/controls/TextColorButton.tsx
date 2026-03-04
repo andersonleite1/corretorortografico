@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, useRef } from "react";
 import MenuButton from "../MenuButton";
 import { createPortal } from "react-dom";
 import useMount from "../../hooks/useMount";
@@ -26,12 +26,16 @@ const TextColorButton: React.FC = () => {
     height: 4,
     borderRadius: 4,
     pointerEvents: "none",
-    background: state.color === "DEFAULT" ? "var(--rte-fg, black)" : state.color,
+    background:
+      state.color === "DEFAULT" ? "var(--rte-fg, black)" : state.color,
   };
 
   const renderBar =
     mounted && buttonRef.current
-      ? createPortal(<div style={colorBarStyle as CSSProperties} />, buttonRef.current)
+      ? createPortal(
+          <div style={colorBarStyle as CSSProperties} />,
+          buttonRef.current,
+        )
       : null;
 
   return (

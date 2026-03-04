@@ -12,8 +12,6 @@ const UploadWidget = ({ children, onSuccess, onError }: UploadWidgetProps) => {
   const cloudinary = useRef<CloudinaryInstance>();
   const widget = useRef<UploadWidgetInstance>();
 
-  const [isScriptLoading, setIsScriptLoading] = useState(true);
-
   const uploadOptions = {
     cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
@@ -21,8 +19,6 @@ const UploadWidget = ({ children, onSuccess, onError }: UploadWidgetProps) => {
   };
 
   function handleOnLoad() {
-    setIsScriptLoading(false);
-
     // Store the Cloudinary window instance to a ref when the page renders
 
     if (!cloudinary.current && typeof window) {
@@ -70,7 +66,7 @@ const UploadWidget = ({ children, onSuccess, onError }: UploadWidgetProps) => {
         if (result.event === "success" && typeof onSuccess === "function") {
           onSuccess(result, widget.current);
         }
-      }
+      },
     );
   }
 

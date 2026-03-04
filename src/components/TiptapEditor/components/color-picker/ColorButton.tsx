@@ -8,7 +8,12 @@ interface ColorButtonProps {
   onClick?: (color: string) => void;
 }
 
-const ColorButton = ({ color, tooltip = true, active, onClick }: ColorButtonProps) => {
+const ColorButton = ({
+  color,
+  tooltip = true,
+  active,
+  onClick,
+}: ColorButtonProps) => {
   const content = (
     <button
       type="button"

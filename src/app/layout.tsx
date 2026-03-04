@@ -1,7 +1,5 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import { cookies } from "next/headers";
 
 const fontMono = JetBrains_Mono({
@@ -10,14 +8,29 @@ const fontMono = JetBrains_Mono({
 });
 const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
-import Header from "@/components/shared/Header";
+import { UserButton } from "@/components/shared/UserButton";
+import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
+import { SidebarProvider } from "@/components/providers/SidebarProvider";
+import { syncUserWithDb } from "@/lib/sync-user";
+import { getUserPlan } from "@/lib/auth";
 
 import "@/styles/globals.scss";
-import Head from "next/head";
-import Script from "next/script";
-import Footer from "@/components/Footer/footer";
 import { getHomeFaqSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
+import { MainContent } from "./MainContent";
+import { Toaster } from "sonner";
+
+import dynamic from "next/dynamic";
+const CookieConsent = dynamic(
+  () =>
+    import("@/components/shared/CookieConsent").then(
+      (mod) => mod.CookieConsent,
+    ),
+  {
+    ssr: false,
+  },
+);
+import { Analytics } from "@/components/shared/Analytics";
 
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
@@ -38,82 +51,82 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const cookieStore = cookies();
-  const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as Locale | undefined;
-  const locale = storedLocale && i18n.locales.includes(storedLocale) ? storedLocale : i18n.defaultLocale;
+  const storedLocale = cookieStore.get("NEXT_LOCALE")?.value as
+    | Locale
+    | undefined;
+  const locale =
+    storedLocale && i18n.locales.includes(storedLocale)
+      ? storedLocale
+      : i18n.defaultLocale;
   const faqSchema = getHomeFaqSchema(locale);
+  const webAppSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Editor de Texto Online",
+    url: "https://editordetexto.online",
+    description:
+      "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
+    applicationCategory: "Utility",
+    operatingSystem: "All",
+    creator: {
+      "@type": "Organization",
+      name: "Editor de Texto Online",
+    },
+    featureList: [
+      "Edição de texto avançada",
+      "Exportação para PDF e DOCX",
+      "Interface minimalista e intuitiva",
+      "Compatível com dispositivos móveis",
+    ],
+    keywords: [
+      "editor de texto online",
+      "escrever textos online",
+      "ferramenta gratuita para textos",
+      "exportar textos para PDF",
+      "editor de documentos online",
+    ],
+  };
+
+  // Sincroniza o usuário com o banco de dados (Fallback)
+  // Removido o await para não bloquear o rendering inicial do layout
+  syncUserWithDb();
+
+  const userPlan = await getUserPlan();
 
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
-      <Head>
+      <head>
         <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: "Editor de Texto Online",
-            url: "https://editordetexto.online",
-            description:
-              "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-            applicationCategory: "Utility",
-            operatingSystem: "All",
-            creator: {
-              "@type": "Organization",
-              name: "Editor de Texto Online",
-            },
-            featureList: [
-              "Edição de texto avançada",
-              "Exportação para PDF e DOCX",
-              "Interface minimalista e intuitiva",
-              "Compatível com dispositivos móveis",
-            ],
-            keywords: [
-              "editor de texto online",
-              "escrever textos online",
-              "ferramenta gratuita para textos",
-              "exportar textos para PDF",
-              "editor de documentos online",
-            ],
-          })}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(faqSchema)}
-        </script>
-      </Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      </head>
       <body>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XFE7CNSV4S');
-          `}
-        </Script>
-        <Script
-          id="ms-clarity"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `(function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i+"?ref=bwt";
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "sc6j3d7url");`,
-          }}
-        />
-        <Header />
-        <main>{children}</main>
-        <SpeedInsights />
-        <Analytics />
-        <Footer initialLocale={locale} />
+        <ClerkThemeProvider locale={locale}>
+          <SidebarProvider>
+            <Analytics />
+            <MainContent
+              userButton={<UserButton locale={locale} />}
+              locale={locale}
+              userPlan={userPlan}
+            >
+              {children}
+            </MainContent>
+            <Toaster richColors position="top-right" />
+            <CookieConsent locale={locale} />
+          </SidebarProvider>
+        </ClerkThemeProvider>
       </body>
     </html>
   );

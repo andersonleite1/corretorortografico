@@ -22,21 +22,12 @@ const localizedRoutes: LocalizedRoute[] = [
     },
   },
   {
-    priority: 0.9,
-    changeFrequency: "weekly",
-    paths: {
-      pt: "/editar-pdf",
-      es: "/es/editar-pdf",
-      en: "/en/edit-pdf",
-    },
-  },
-  {
     priority: 0.7,
     changeFrequency: "weekly",
     paths: {
       pt: "/sobre",
       es: "/es/sobre",
-      en: "/en/about",
+      en: "/about",
     },
   },
   {
@@ -45,7 +36,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/contato",
       es: "/es/contato",
-      en: "/en/contact",
+      en: "/contact",
     },
   },
   {
@@ -54,7 +45,7 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/privacidade",
       es: "/es/privacidade",
-      en: "/en/privacy",
+      en: "/privacy",
     },
   },
   {
@@ -63,18 +54,16 @@ const localizedRoutes: LocalizedRoute[] = [
     paths: {
       pt: "/termos",
       es: "/es/termos",
-      en: "/en/terms",
+      en: "/terms",
     },
   },
 ];
-
-const standaloneRoutes = [{ path: "/post-ssr", priority: 0.6, changeFrequency: "monthly" as const }];
 
 const toAbsoluteUrl = (path: string) => `${baseUrl}${path}`;
 
 const buildAlternates = (paths: LocalizedRoute["paths"]) => {
   const entries = Object.entries(paths).filter(
-    (entry): entry is [Locale, string] => Boolean(entry[1])
+    (entry): entry is [Locale, string] => Boolean(entry[1]),
   );
 
   if (entries.length <= 1) {
@@ -102,7 +91,7 @@ const buildAlternates = (paths: LocalizedRoute["paths"]) => {
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  const localizedEntries = localizedRoutes.flatMap(({ paths, priority, changeFrequency }) => {
+  return localizedRoutes.flatMap(({ paths, priority, changeFrequency }) => {
     const alternates = buildAlternates(paths);
 
     return Object.values(paths)
@@ -115,13 +104,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ...(alternates && { alternates: { languages: alternates } }),
       }));
   });
-
-  const staticEntries = standaloneRoutes.map(({ path, priority, changeFrequency }) => ({
-    url: toAbsoluteUrl(path),
-    lastModified,
-    priority,
-    changeFrequency,
-  }));
-
-  return [...localizedEntries, ...staticEntries];
 }

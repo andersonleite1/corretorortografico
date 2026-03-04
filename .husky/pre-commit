@@ -1,0 +1,21 @@
+# #!/bin/sh
+# # ─── PRE-COMMIT PIPELINE ──────────────────────────────────────────────────────
+# # Focus on linting and formatting for faster commits.
+
+# export NODE_OPTIONS="--max-old-space-size=4096"
+
+# echo ""
+# echo "🚀 Iniciando pipeline de pré-commit (Linting)..."
+# echo "──────────────────────────────────────────────────────────────────────────"
+
+# # Etapa 0: Prettier em todo o projeto
+# npx prettier --write .
+
+# # Etapa 1: lint-staged (ESLint e Prettier nos arquivos staged)
+# npx lint-staged --concurrent false
+
+# echo ""
+# echo "══════════════════════════════════════════════════════════════════════════"
+# echo "✨ Linting concluído! Realizando commit... 🎉"
+# echo "══════════════════════════════════════════════════════════════════════════"
+# echo ""

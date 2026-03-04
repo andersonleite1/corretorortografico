@@ -9,7 +9,9 @@ export type IconProps = IconBaseProps & {
 export const Icon = ({ name, className, size = 20, ...props }: IconProps) => {
   const Comp = icons[name];
 
-  return <Comp size={size} className={clsx("rte-icon", className)} {...props} />;
+  return (
+    <Comp size={size} className={clsx("rte-icon", className)} {...props} />
+  );
 };
 
 export default Icon;

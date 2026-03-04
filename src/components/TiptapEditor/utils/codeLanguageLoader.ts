@@ -32,7 +32,7 @@ export const languagesLoader: Record<string, () => Promise<any>> = {
 
 export async function loadLanguage(
   languageName: string,
-  lowlight: ReturnType<typeof createLowlight>
+  lowlight: ReturnType<typeof createLowlight>,
 ) {
   if (lowlight.registered(languageName)) return false;
   try {
@@ -48,7 +48,9 @@ export async function loadLanguage(
 export function findLanguage(value: string | undefined) {
   const lowercase = value?.toLowerCase() || CODE_BLOCK_LANGUAGUE_SYNTAX_DEFAULT;
   const language = CODE_BLOCK_LANGUAGUES.find(
-    (language) => language.syntax === lowercase || language.alias?.split(", ").includes(lowercase)
+    (language) =>
+      language.syntax === lowercase ||
+      language.alias?.split(", ").includes(lowercase),
   );
   return language;
 }

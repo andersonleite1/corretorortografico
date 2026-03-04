@@ -64,7 +64,9 @@ export const LineHeight = Extension.create<LineHeightOptions>({
           }
 
           return this.options.types
-            .map((type) => commands.updateAttributes(type, { lineHeight: normalized }))
+            .map((type) =>
+              commands.updateAttributes(type, { lineHeight: normalized }),
+            )
             .every(Boolean);
         },
       unsetLineHeight:

@@ -1,77 +1,145 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-import { match } from "@formatjs/intl-localematcher";
-import Negotiator from "negotiator";
-
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { i18n } from "../i18n-config";
-import type { I18nConfig } from "../i18n-config";
 
 const PUBLIC_FILE = /\.[^/]+$/;
 
-function getLocale(request: NextRequest, i18nConfig: I18nConfig): string {
-  const { locales, defaultLocale } = i18nConfig;
+// Rotas que requerem autenticação
+const isProtectedRoute = createRouteMatcher([
+  "/:locale/editor(.*)", // Editor principal (com locale)
+  "/editor(.*)", // Editor principal (sem locale)
+  "/:locale/settings(.*)", // Configurações
+  "/settings(.*)",
+  "/api/ai(.*)", // APIs de IA
+  "/api/documents(.*)",
+  "/api/editor-settings(.*)", // Configurações do editor (multi-tenant)
+  "/api/images(.*)",
+]);
 
-  const negotiatorHeaders: Record<string, string> = {};
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
+/**
+ * Detecta o melhor locale sem dependências externas (Edge compatible)
+ */
+function getLocale(request: NextRequest): string {
+  const { locales, defaultLocale } = i18n;
+  const acceptLanguage = request.headers.get("accept-language");
 
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages(locales);
+  if (!acceptLanguage) return defaultLocale;
 
-  return match(languages, locales, defaultLocale);
+  // Parsing simples: pega o primeiro idioma suportado no header ou o default
+  const languages = acceptLanguage
+    .split(",")
+    .map((l) => l.split(";")[0].trim().split("-")[0]);
+  const matched = languages.find((lang) =>
+    (locales as readonly string[]).includes(lang),
+  );
+
+  return matched || defaultLocale;
 }
 
-export function middleware(request: NextRequest) {
-  const { pathname, basePath } = request.nextUrl;
+/**
+ * Middleware de i18n simplificado para evitar loops e crashes no Edge
+ */
+function i18nMiddleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const { locales, defaultLocale } = i18n;
 
-  if (PUBLIC_FILE.test(pathname)) {
+  // Redirecionamento de /pricing para /#pricing (Legado -> Home)
+  if (pathname.endsWith("/pricing")) {
+    const locale =
+      locales.find((l) => pathname.startsWith(`/${l}/`)) || defaultLocale;
+    const newPath =
+      pathname === "/pricing" || pathname === `/${locale}/pricing`
+        ? `/${locale}`
+        : pathname.replace("/pricing", "");
+    const url = new URL(newPath, request.url);
+    url.hash = "pricing";
+    url.search = request.nextUrl.search;
+    return NextResponse.redirect(url);
+  }
+
+  // Pular arquivos estáticos e rotas internas
+  if (
+    PUBLIC_FILE.test(pathname) ||
+    pathname.startsWith("/api") ||
+    pathname.includes("_next") ||
+    pathname.startsWith("/_clerk") ||
+    pathname.includes("clerk_catchall_check")
+  ) {
     return NextResponse.next();
   }
 
-  let response;
-  let nextLocale;
-
-  const { locales, defaultLocale } = i18n;
-
-  const pathLocale = locales.find(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  // Verifica se o pathname já começa com um locale suportado
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  if (pathLocale) {
-    const isDefaultLocale = pathLocale === defaultLocale;
-    if (isDefaultLocale) {
-      let pathWithoutLocale = pathname.slice(`/${pathLocale}`.length) || "/";
-      if (request.nextUrl.search) pathWithoutLocale += request.nextUrl.search;
-
-      const url = basePath + pathWithoutLocale;
-
-      response = NextResponse.redirect(new URL(url, request.url));
+  if (pathnameHasLocale) {
+    // Normalização: se é o default locale na URL, remove (canonical URL)
+    if (
+      pathname.startsWith(`/${defaultLocale}/`) ||
+      pathname === `/${defaultLocale}`
+    ) {
+      const newPath =
+        pathname === `/${defaultLocale}`
+          ? "/"
+          : pathname.replace(`/${defaultLocale}/`, "/");
+      const url = new URL(newPath, request.url);
+      url.search = request.nextUrl.search; // Preserva query params
+      return NextResponse.redirect(url);
     }
-
-    nextLocale = pathLocale;
-  } else {
-    const isFirstVisit = !request.cookies.has("NEXT_LOCALE");
-
-    const locale = isFirstVisit ? getLocale(request, i18n) : defaultLocale;
-
-    let newPath = `/${locale}${pathname}`;
-    if (request.nextUrl.search) newPath += request.nextUrl.search;
-
-    const url = basePath + newPath;
-
-    response =
-      locale === defaultLocale
-        ? NextResponse.rewrite(new URL(url, request.url))
-        : NextResponse.redirect(new URL(url, request.url));
-    nextLocale = locale;
+    return NextResponse.next();
   }
 
-  if (!response) response = NextResponse.next();
+  // Se não tem locale, resolve qual usar
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  const locale =
+    cookieLocale && locales.includes(cookieLocale as any)
+      ? cookieLocale
+      : getLocale(request);
 
-  if (nextLocale) response.cookies.set("NEXT_LOCALE", nextLocale);
+  // Redireciona para o locale correto
+  // Se for o default locale, faz rewrite (não aparece na URL)
+  if (locale === defaultLocale) {
+    const url = new URL(`/${defaultLocale}${pathname}`, request.url);
+    url.search = request.nextUrl.search;
+    return NextResponse.rewrite(url);
+  }
 
-  return response;
+  // Se for idioma secundário, redireciona (aparece na URL)
+  const url = new URL(`/${locale}${pathname}`, request.url);
+  url.search = request.nextUrl.search;
+  return NextResponse.redirect(url);
 }
 
+export default clerkMiddleware(async (auth, request) => {
+  try {
+    if (isProtectedRoute(request)) {
+      await auth.protect();
+    }
+    return i18nMiddleware(request);
+  } catch (error) {
+    console.error("[Middleware Error]:", error);
+
+    // BUG-01: Se ocorrer erro de autenticação em rota protegida,
+    // redirecionar para o login ao invés de prosseguir silenciosamente.
+    // Isso impede que falhas do serviço de auth exponham rotas protegidas.
+    if (isProtectedRoute(request)) {
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set("redirect_url", request.url);
+      return NextResponse.redirect(signInUrl);
+    }
+
+    // Para rotas públicas, falha segura: prossegue com i18n
+    return i18nMiddleware(request);
+  }
+});
+
 export const config = {
-  matcher: "/((?!api|_next/static|_next/image|img/|favicon.ico).*)",
+  matcher: [
+    // Pular Next.js internals e arquivos estáticos
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Sempre rodar para API routes
+    "/(api|trpc)(.*)",
+  ],
 };

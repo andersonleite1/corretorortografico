@@ -20,6 +20,7 @@ import {
   Highlight,
   Table,
   LanguageTool,
+  Shortcuts,
 } from "./extensions";
 import { Locale, i18n } from "../../../i18n-config";
 
@@ -30,7 +31,8 @@ const languageToolCodeByLocale: Record<Locale, string> = {
 };
 
 const resolveLanguageToolCode = (locale?: Locale) => {
-  const normalized = (locale && languageToolCodeByLocale[locale]) ? locale : i18n.defaultLocale;
+  const normalized =
+    locale && languageToolCodeByLocale[locale] ? locale : i18n.defaultLocale;
   return languageToolCodeByLocale[normalized];
 };
 
@@ -45,7 +47,7 @@ const createExtensionKit = (locale?: Locale) => [
     includeChildren: true,
     showOnlyCurrent: true,
     placeholder: ({ editor, node }) => {
-      // @ts-ignore
+      // @ts-expect-error - placeholder is a custom extension property
       const placeholder = editor.options.editorProps["placeholder"];
       switch (node.type.name) {
         case ImageCaption.name:
@@ -56,6 +58,7 @@ const createExtensionKit = (locale?: Locale) => [
     },
   }),
   Selection,
+  Shortcuts,
   CharacterCount,
   Superscript,
   Subscript,
@@ -75,9 +78,9 @@ const createExtensionKit = (locale?: Locale) => [
   Youtube,
   Table,
   LanguageTool.configure({
-    checkDelay: 10000,
+    checkDelay: 1000,
     minChars: 15,
-    enabled: true,
+    enabled: false,
     language: resolveLanguageToolCode(locale),
   }),
 ];

@@ -7,7 +7,11 @@ interface LabelProps {
   className?: string;
 }
 
-const Label = ({ as: Comp = "label", children, className = "" }: LabelProps) => {
+const Label = ({
+  as: Comp = "label",
+  children,
+  className = "",
+}: LabelProps) => {
   return <Comp className={clsx("rte-label", className)}>{children}</Comp>;
 };
 

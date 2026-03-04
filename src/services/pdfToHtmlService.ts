@@ -1,4 +1,5 @@
-const PDF_TO_HTML_ENDPOINT = "https://html-to-pdf-api-edt.fly.dev/api/pdf/to-html";
+const PDF_TO_HTML_ENDPOINT =
+  "https://html-to-pdf-api-edt.fly.dev/api/pdf/to-html";
 const DEFAULT_TOKEN = "3xEt7CBU1XydZFeA4foiNgSGJOfCcwab";
 
 /**

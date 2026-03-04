@@ -1,6 +1,5 @@
 import { mergeAttributes } from "@tiptap/core";
 import { Image as TiptapImage } from "@tiptap/extension-image";
-import { ImagePlugin } from "./image-plugin";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -57,7 +56,10 @@ export const Image = TiptapImage.extend({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["img", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    return [
+      "img",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+    ];
   },
 
   addCommands() {

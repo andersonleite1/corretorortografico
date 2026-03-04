@@ -3,23 +3,43 @@
 import React, { forwardRef, useCallback, useEffect, useMemo } from "react";
 import { Content, type Editor } from "@tiptap/react";
 
-import TiptapProvider, { type ExportActions, type DraftActions } from "./Provider";
+import dynamic from "next/dynamic";
+import TiptapProvider, {
+  type ExportActions,
+  type DraftActions,
+} from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
-import MenuBar from "./MenuBar";
-import StatusBar from "./StatusBar";
-import Resizer from "./Resizer";
+const MenuBar = dynamic(() => import("./MenuBar"), { ssr: false });
+const StatusBar = dynamic(() => import("./StatusBar"), { ssr: false });
+const Resizer = dynamic(() => import("./Resizer"), { ssr: false });
 
-import { TextMenu, LinkMenu, ImageMenu, CodeBlockMenu, LanguageToolMenu } from "./menus";
+const LinkMenu = dynamic(
+  () => import("./menus/LinkMenu").then((mod) => mod.LinkMenu),
+  { ssr: false },
+);
+const ImageMenu = dynamic(
+  () => import("./menus/ImageMenu").then((mod) => mod.ImageMenu),
+  { ssr: false },
+);
+const CodeBlockMenu = dynamic(
+  () => import("./menus/CodeBlockMenu").then((mod) => mod.CodeBlockMenu),
+  { ssr: false },
+);
+const TableMenu = dynamic(() => import("./menus/TableMenu"), { ssr: false });
+const LanguageToolMenu = dynamic(() => import("./menus/LanguageToolMenu"), {
+  ssr: false,
+});
+const AiBubbleMenu = dynamic(
+  () => import("./menus/AiBubbleMenu").then((mod) => mod.AiBubbleMenu),
+  { ssr: false },
+);
 
 import getExtensionKit from "../kit";
-
 import { cssVar } from "../utils/cssVar";
-import { throttle } from "../utils/throttle";
 import { type Locale } from "../../../../i18n-config";
 
 import "../styles/index.scss";
-import TableMenu from "@/components/TiptapEditor/components/menus/TableMenu";
 
 export type TiptapEditorRef = {
   getInstance: () => Editor | null;
@@ -47,6 +67,8 @@ export interface TiptapEditorProps {
   exportActions?: ExportActions;
   draftActions?: DraftActions;
   locale?: Locale;
+  userPlan?: "free" | "pro" | "team";
+  documentTitle?: string;
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -67,24 +89,25 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       exportActions,
       draftActions,
       locale,
+      userPlan = "free",
+      documentTitle,
     },
-    ref
+    ref,
   ) => {
     const isEditable = !readonly && !disabled;
     const displayBubbleMenu = isEditable && hideBubbleMenu;
 
-    const throttledUpdate = useCallback(
-      throttle((value: Content) => onContentChange?.(value), 1500),
-      []
-    );
-
     const handleUpdate = useCallback(
       (editor: Editor) => {
         const content =
-          output === "html" ? (editor.isEmpty ? "" : editor.getHTML()) : editor.getJSON();
-        throttledUpdate(content);
+          output === "html"
+            ? editor.isEmpty
+              ? ""
+              : editor.getHTML()
+            : editor.getJSON();
+        onContentChange?.(content);
       },
-      [throttledUpdate, output]
+      [onContentChange, output],
     );
 
     const extensions = useMemo(() => getExtensionKit(locale), [locale]);
@@ -99,6 +122,11 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       shouldRerenderOnTransaction: false,
       autofocus: false,
       onUpdate: ({ editor }) => handleUpdate(editor),
+      editorProps: {
+        attributes: {
+          spellcheck: "false",
+        },
+      },
     };
 
     useEffect(() => {
@@ -114,6 +142,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         <CodeBlockMenu />
         <TableMenu />
         <LanguageToolMenu />
+        <AiBubbleMenu />
       </>
     );
 
@@ -125,12 +154,14 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         exportActions={exportActions}
         draftActions={draftActions}
         locale={locale}
+        userPlan={userPlan}
+        documentTitle={documentTitle}
       >
         {menus}
         <Resizer />
       </TiptapProvider>
     );
-  }
+  },
 );
 
 TiptapEditor.displayName = "TiptapEditor";

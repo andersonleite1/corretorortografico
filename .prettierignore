@@ -1,0 +1,14 @@
+# Arquivos de relatório gerados automaticamente (não formatar)
+lighthouse*.json
+lighthouse-report*.json
+lighthouse-desktop.json
+lighthouse-mobile.json
+lighthouse-local-mobile.json
+a11y.json
+
+# Build
+.next/
+node_modules/
+
+# Lockfiles (não formatar)
+package-lock.json

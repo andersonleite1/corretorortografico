@@ -3,7 +3,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 
-import {i18n, type Locale} from "../../../i18n-config";
+import { i18n, type Locale } from "../../../i18n-config";
 
 const LABELS: Record<Locale, string> = {
   pt: "Voltar ao início",
@@ -16,8 +16,10 @@ type BackHomeButtonProps = {
   className?: string;
 };
 
-export function BackHomeButton({locale, className}: BackHomeButtonProps) {
-  const normalized = i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
+export function BackHomeButton({ locale, className }: BackHomeButtonProps) {
+  const normalized = i18n.locales.includes(locale)
+    ? locale
+    : i18n.defaultLocale;
   const href = normalized === i18n.defaultLocale ? "/" : `/${normalized}`;
   const label = LABELS[normalized] ?? LABELS[i18n.defaultLocale];
 
@@ -26,7 +28,7 @@ export function BackHomeButton({locale, className}: BackHomeButtonProps) {
       href={href}
       className={clsx(
         "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-500 shadow-sm transition hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200",
-        className
+        className,
       )}
     >
       <svg

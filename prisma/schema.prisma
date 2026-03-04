@@ -1,0 +1,153 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  clerkId          String          @unique
+  email            String          @unique
+  name             String?
+  imageUrl         String?
+  stripeCustomerId String?         @unique
+  aiUsage          AiUsage[]
+  documents        Document[]
+  subscription     Subscription?
+  editorSettings   EditorSettings?
+
+  @@map("users")
+}
+
+/// Configurações do editor de texto por usuário.
+/// Garante isolamento completo de dados entre tenants:
+/// cada registro pertence exclusivamente a um userId.
+model EditorSettings {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  /// FK para o usuário dono destas configurações (tenant key)
+  userId            String   @unique
+  /// Visibilidade dos botões da barra de ferramentas
+  /// Ex: { "bold": true, "italic": false, ... }
+  toolbarSettings   Json     @default("{}")
+  /// Tons de IA ativos
+  /// Ex: { "formal": true, "casual": false, ... }
+  activeTones       Json     @default("{}")
+  /// Tons personalizados criados pelo usuário (máx. 5)
+  /// Ex: [{ "id": "custom-123", "name": "...", ... }]
+  customTones       Json     @default("[]")
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Índice no userId para lookups O(log n) garantidos
+  @@index([userId])
+  @@map("editor_settings")
+}
+
+model Subscription {
+  id                     String   @id @default(cuid())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  userId                 String   @unique
+  stripeSubscriptionId   String?  @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  status                 String   @default("active")
+  plan                   String   @default("free")
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  title       String   @default("Sem título")
+  content     String
+  slug        String?  @unique
+  isPublished Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drafts      Draft[]
+
+  @@index([userId])
+  @@map("documents")
+}
+
+model Draft {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  documentId  String
+  title       String
+  content     String   // Tiptap JSON stringified
+  
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, createdAt])
+  @@map("drafts")
+}
+
+
+/// Relatórios de bugs submetidos por usuários.
+model BugReport {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  /// Descrição breve obrigatória
+  description       String
+  /// Informações adicionais (opcional)
+  additionalInfo    String?
+  /// Se o usuário solicitou notificação por email
+  wantsNotification Boolean  @default(false)
+  /// Email para notificação (apenas se wantsNotification = true)
+  notificationEmail String?
+  /// ID do usuário autenticado (opcional – pode ser anônimo)
+  userId            String?
+  /// User-Agent do navegador
+  userAgent         String?
+  /// URL da página onde o problema ocorreu
+  pageUrl           String?
+  /// Status do relatório: open | in_progress | resolved | closed
+  status            String   @default("open")
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("bug_reports")
+}
+
+model AiUsage {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  userId           String
+  feature          String
+  tokensUsed       Int      @default(0)
+  // Dashboard metrics
+  wordCount        Int      @default(0)
+  processingTimeMs Int      @default(0)
+  toneUsed         String?
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, feature, createdAt])
+  @@index([userId, createdAt])
+  @@map("ai_usage")
+}
+
+model Waitlist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  email     String   @unique
+  region    String?
+  device    String?
+  info      Json?
+
+  @@map("waitlist")
+}

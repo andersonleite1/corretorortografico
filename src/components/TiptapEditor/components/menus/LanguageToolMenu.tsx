@@ -1,16 +1,28 @@
 "use client";
 
 // Componente de menu do LanguageTool
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { BubbleMenu } from "../BubbleMenu";
 import { useTiptapContext } from "../Provider";
 import { useEditorState } from "@tiptap/react";
-
-const PrimaryColor = "#389E74";
+import { Icon } from "../ui/Icon";
+import { useParams } from "next/navigation";
+import { getCommonMessages } from "@/data/common";
+import { type Locale } from "../../../../../i18n-config";
 
 const LanguageToolMenuComponent = () => {
-  const { editor, contentElement, messages } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
+  const params = useParams();
+  const t = getCommonMessages(params?.locale as Locale).languageTool;
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
+  const hoveredElRef = useRef<HTMLElement | null>(null);
   const [hoveredIssueId, setHoveredIssueId] = useState<string | null>(null);
   const showDialogRef = useRef(false);
   const suppressAutoOpenRef = useRef(false);
@@ -26,17 +38,29 @@ const LanguageToolMenuComponent = () => {
     },
   });
 
+  const ltStateEnabledRef = useRef(ltState.enabled);
+  useEffect(() => {
+    ltStateEnabledRef.current = ltState.enabled;
+  }, [ltState.enabled]);
+
   const lastDownRef = useRef(0);
 
   const findErrorElement = useCallback((e: MouseEvent): HTMLElement | null => {
     const raw = e.target as Node | null;
-    const elem = (raw && (raw as any).nodeType === 3 ? (raw as any).parentElement : (raw as Element | null));
+    const elem =
+      raw && (raw as any).nodeType === 3
+        ? (raw as any).parentElement
+        : (raw as Element | null);
     let el = elem?.closest?.(".lt-error") as HTMLElement | null;
     if (!el && (e as any).composedPath) {
       const path = (e as any).composedPath() as Array<EventTarget>;
       for (const t of path) {
         const et = t as Element;
-        if (et && (et as any).classList && (et as any).classList.contains("lt-error")) {
+        if (
+          et &&
+          (et as any).classList &&
+          (et as any).classList.contains("lt-error")
+        ) {
           el = et as HTMLElement;
           break;
         }
@@ -44,6 +68,7 @@ const LanguageToolMenuComponent = () => {
     }
     return el;
   }, []);
+
   useEffect(() => {
     const dom = editor?.view?.dom as HTMLElement | undefined;
     if (!dom) return;
@@ -60,17 +85,17 @@ const LanguageToolMenuComponent = () => {
         suppressAutoOpenRef.current = true;
         if (hoveredEl) {
           setHoveredEl(null);
+          hoveredElRef.current = null;
           setHoveredIssueId(null);
         }
         editor?.view?.dispatch(editor.view.state.tr);
         return;
       }
-      // vou remover o display none do dialog
-      document.querySelector('#language-tool-dialog')?.setAttribute('style', 'display: auto;');
       showDialogRef.current = true;
       suppressAutoOpenRef.current = false;
       const id = el.getAttribute("data-lt-id");
       setHoveredEl(el);
+      hoveredElRef.current = el;
       setHoveredIssueId(id);
       editor?.view?.dispatch(editor.view.state.tr);
     };
@@ -81,14 +106,13 @@ const LanguageToolMenuComponent = () => {
       if (el) {
         const id = el.getAttribute("data-lt-id");
         setHoveredEl(el);
+        hoveredElRef.current = el;
         setHoveredIssueId(id);
         showDialogRef.current = true;
         editor?.view?.dispatch(editor.view.state.tr);
       }
     };
-    const handleLeave = () => {
-      // mantém a última seleção exibida; não limpa estados nem fecha o diálogo
-    };
+    const handleLeave = () => {};
     dom.addEventListener("mousemove", handleMove, { passive: true });
     dom.addEventListener("mouseleave", handleLeave, { passive: true });
     return () => {
@@ -96,8 +120,7 @@ const LanguageToolMenuComponent = () => {
       dom.removeEventListener("mousemove", handleMove as any);
       dom.removeEventListener("mouseleave", handleLeave as any);
     };
-
-  }, [editor]);
+  }, [editor, findErrorElement, hoveredEl]);
 
   const getActiveIssue = useCallback(() => {
     if (!ltState.enabled) return null;
@@ -136,51 +159,37 @@ const LanguageToolMenuComponent = () => {
   }, [hoveredIssueId, ltState.issues, getActiveIssue]);
 
   const shouldShow = useCallback(() => {
-    return Boolean(ltState.enabled && !suppressAutoOpenRef.current && (showDialogRef.current || hoveredEl));
-  }, [ltState.enabled, hoveredEl]);
+    return Boolean(
+      ltStateEnabledRef.current &&
+      !suppressAutoOpenRef.current &&
+      (showDialogRef.current || hoveredElRef.current),
+    );
+  }, []);
 
   const getReferencedVirtualElement = useCallback(() => {
-    const container = (contentElement.current as HTMLElement | null) ?? editor?.view?.dom;
-    if (!container) return null;
-    const containerRect = container.getBoundingClientRect();
-    const elRect = hoveredEl?.getBoundingClientRect();
-    const gap = 16;
-    const margin = 12;
-    const estimatedWidth = Math.min(380, (window?.innerWidth ?? 380) - 24);
-    const estimatedHeight = 260;
-    const viewportW = window?.innerWidth ?? containerRect.right;
-    const viewportH = window?.innerHeight ?? containerRect.bottom;
-    const maxX = Math.max(margin, viewportW - estimatedWidth - margin);
-    const x = Math.min(Math.max(containerRect.right + gap, margin), maxX);
-    const baseY = elRect?.top ?? (containerRect.top + 80);
-    const maxY = Math.max(margin, viewportH - estimatedHeight - margin);
-    const y = Math.min(Math.max(baseY, margin), maxY);
-    const w = 1;
-    const h = 1;
-    const sideRect = {
-      width: w,
-      height: h,
-      x,
-      y,
-      top: y,
-      left: x,
-      right: x + w,
-      bottom: y + h,
-      toJSON: () => ({ x, y, width: w, height: h, top: y, left: x, right: x + w, bottom: y + h }),
-    } as DOMRect;
+    if (!hoveredElRef.current) return null;
     return {
-      getBoundingClientRect: () => sideRect,
-      contextElement: document.body,
+      getBoundingClientRect: () =>
+        hoveredElRef.current!.getBoundingClientRect(),
+      contextElement: hoveredElRef.current,
     } as any;
-  }, [hoveredEl, contentElement, editor]);
+  }, []);
 
   const applyReplacement = useCallback(
     (text: string) => {
       if (!issue) return;
-      editor.commands.applyLanguageToolSuggestion({ from: issue.from, to: issue.to, text });
+      editor.commands.applyLanguageToolSuggestion({
+        from: issue.from,
+        to: issue.to,
+        text,
+      });
       editor.commands.ignoreLanguageToolIssue?.(issue.id);
+      showDialogRef.current = false;
+      setHoveredEl(null);
+      hoveredElRef.current = null;
+      setHoveredIssueId(null);
     },
-    [editor, issue]
+    [editor, issue],
   );
 
   const ignoreIssue = useCallback(() => {
@@ -188,9 +197,18 @@ const LanguageToolMenuComponent = () => {
     editor.commands.ignoreLanguageToolIssue?.(issue.id);
     showDialogRef.current = false;
     setHoveredEl(null);
+    hoveredElRef.current = null;
     setHoveredIssueId(null);
     editor?.view?.dispatch(editor.view.state.tr);
   }, [editor, issue]);
+
+  const closeDialog = useCallback(() => {
+    showDialogRef.current = false;
+    setHoveredEl(null);
+    hoveredElRef.current = null;
+    setHoveredIssueId(null);
+    editor?.view?.dispatch(editor.view.state.tr);
+  }, [editor]);
 
   return (
     <BubbleMenu
@@ -201,89 +219,69 @@ const LanguageToolMenuComponent = () => {
       appendTo={() => document.body}
       getReferencedVirtualElement={getReferencedVirtualElement as any}
       options={{
-        placement: "right-start",
+        placement: "bottom-start",
         strategy: "fixed",
-        flip: false,
-        offset: () => ({ mainAxis: 0, crossAxis: 0 }),
+        flip: true,
+        offset: [0, 8] as any,
       }}
     >
-      {/* Layout do diálogo: cabeçalho, descrição da regra/mensagem e bloco de sugestões */}
-      <div id="language-tool-dialog">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                backgroundColor: PrimaryColor,
-                color: "#fff",
-                fontSize: 10,
-                fontWeight: 700,
-              }}
-            >
-              EDT
-            </span>
-            <span style={{ fontWeight: 600 }}>{messages.languageTool.title}</span>
+      <div className="lt-menu-card">
+        <div className="lt-menu-card__header">
+          <div className="lt-menu-card__header-left">
+            <div className="lt-menu-card__logo">EDT</div>
+            <span>{t.fix}</span>
+            <Icon name="ChevronDown" size={14} />
           </div>
-          <button
-            type="button"
-            aria-label={messages.languageTool.close}
-            onClick={() => {
-              document.querySelector('#language-tool-dialog')?.setAttribute('style', 'display: none;');
-            }}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "var(--rte-muted-fg)",
-              cursor: "pointer",
-              fontSize: 24,
-              lineHeight: 1,
-              padding: "0.35rem",
-            }}
-          >
-            ×
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="lt-menu-card__handle">
+              <Icon name="Stretch" size={16} />
+            </div>
+            <button className="lt-menu-card__close" onClick={closeDialog}>
+              <Icon name="Close" size={18} />
+            </button>
+          </div>
         </div>
 
-        <div style={{ marginTop: 8, border: "1px solid var(--rte-border)", borderRadius: 8, overflow: "hidden" }}>
-          {/* Mensagem da regra e descrição do erro */}
-          <div style={{ padding: "0.5rem" }}>
-            <div className="rte-label" style={{ marginBottom: 4 }}>
-              {(issue && (issue.ruleDescription || issue.typeName)) || messages.languageTool.fallbackRule}
-            </div>
-            <p style={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
-              {issue?.message || messages.languageTool.empty}
-            </p>
+        <div className="lt-menu-card__body">
+          <div className="lt-menu-card__title">
+            {(issue && (issue.ruleDescription || issue.typeName)) ||
+              messages.languageTool.fallbackRule}
           </div>
-          {/* Lista de sugestões (máx. 6) e ação de ignorar */}
-          <div style={{ borderTop: "1px solid var(--rte-border)", padding: "0.5rem", display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <p className="lt-menu-card__message">
+            {issue?.message || messages.languageTool.empty}
+          </p>
+
+          <div className="lt-menu-card__suggestions">
             {(issue?.replacements || []).slice(0, 6).map((rep: string) => (
               <button
                 key={String(rep)}
-                className="rte-button rte-button--primary"
-                style={{ backgroundColor: PrimaryColor, borderColor: PrimaryColor }}
+                className="lt-menu-card__suggestion-btn"
                 onClick={() => applyReplacement(String(rep))}
               >
                 {rep}
               </button>
             ))}
-            {issue && (!issue.replacements || issue.replacements.length === 0) && (
-              <span className="rte-label" style={{ color: "var(--rte-muted-fg)" }}>
-                {messages.languageTool.noSuggestions}
-              </span>
-            )}
-            {false && (
-              <button className="rte-button rte-button--outline" onClick={ignoreIssue}>
-                {messages.languageTool.ignore}
-              </button>
-            )}
+            {issue &&
+              (!issue.replacements || issue.replacements.length === 0) && (
+                <span
+                  className="rte-label"
+                  style={{ color: "var(--rte-muted-fg)" }}
+                >
+                  {messages.languageTool.noSuggestions}
+                </span>
+              )}
+          </div>
+
+          <div className="lt-menu-card__actions">
+            <button
+              className="lt-menu-card__action-btn lt-menu-card__action-btn--ignore"
+              onClick={ignoreIssue}
+            >
+              <Icon name="Trash" size={14} />
+              {messages.languageTool.ignore}
+            </button>
           </div>
         </div>
-
       </div>
     </BubbleMenu>
   );

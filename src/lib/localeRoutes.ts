@@ -1,4 +1,4 @@
-import {i18n, type Locale} from "../../i18n-config";
+import { i18n, type Locale } from "../../i18n-config";
 
 const routeSlugMap = {
   about: {
@@ -20,11 +20,6 @@ const routeSlugMap = {
     pt: "termos",
     en: "terms",
     es: "termos",
-  },
-  pdfEditor: {
-    pt: "editar-pdf",
-    en: "edit-pdf",
-    es: "editar-pdf",
   },
 } as const;
 

@@ -1,12 +1,12 @@
-import {BackHomeButton} from "@/components/shared/BackHomeButton";
-import {getAboutContent} from "@/data/pages/about";
-import {Locale} from "../../../../i18n-config";
+import { BackHomeButton } from "@/components/shared/BackHomeButton";
+import { getAboutContent } from "@/data/pages/about";
+import { Locale } from "../../../../i18n-config";
 
 type AboutPageContentProps = {
   locale: Locale;
 };
 
-export default function AboutPageContent({locale}: AboutPageContentProps) {
+export default function AboutPageContent({ locale }: AboutPageContentProps) {
   const content = getAboutContent(locale);
 
   return (

@@ -27,7 +27,11 @@ const LinkView = ({ url, onEdit, onRemove }: LinkViewProps) => {
         text={isCopied ? messages.link.copied : messages.link.copy}
         onClick={() => copy(url)}
       />
-      <MenuButton icon="Unlink" text={messages.link.remove} onClick={onRemove} />
+      <MenuButton
+        icon="Unlink"
+        text={messages.link.remove}
+        onClick={onRemove}
+      />
     </Toolbar>
   );
 };

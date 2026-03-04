@@ -54,8 +54,20 @@ import {
   TbTrash,
   TbUnderline,
   TbX,
-  TbNotebook
+  TbNotebook,
+  TbDeviceFloppy,
+  TbLayoutSidebar,
+  TbRefresh,
+  TbChevronLeft,
+  TbChevronRight,
+  TbSquareCheck,
+  TbSquare,
+  TbSettings,
+  TbKeyboard,
+  TbInfoCircle,
+  TbAlertTriangle,
 } from "react-icons/tb";
+import { MdHistory } from "react-icons/md";
 import { RiTextSpacing } from "react-icons/ri";
 import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
 import IconCorner from "./Corner";
@@ -134,6 +146,18 @@ export const icons = {
   FileTxt: FaFileAlt,
   Eye: FaRegEye,
   Drafts: TbNotebook,
+  Save: TbDeviceFloppy,
+  Columns: TbLayoutSidebar,
+  Refresh: TbRefresh,
+  ChevronLeft: TbChevronLeft,
+  ChevronRight: TbChevronRight,
+  CheckboxChecked: TbSquareCheck,
+  CheckboxEmpty: TbSquare,
+  History: MdHistory,
+  Settings: TbSettings,
+  Keyboard: TbKeyboard,
+  Info: TbInfoCircle,
+  Alert: TbAlertTriangle,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

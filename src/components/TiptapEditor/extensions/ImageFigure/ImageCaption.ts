@@ -17,7 +17,11 @@ export const ImageCaption = Figcaption.extend({
 
             // If not editable, not focused, or selection is not in the imageCaption node,
             // return no decorations
-            if (!isEditable || !isFocused || $anchor.parent.type.name !== this.name) {
+            if (
+              !isEditable ||
+              !isFocused ||
+              $anchor.parent.type.name !== this.name
+            ) {
               return DecorationSet.create(doc, []);
             }
 

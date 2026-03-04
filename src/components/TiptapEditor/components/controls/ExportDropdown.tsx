@@ -58,7 +58,9 @@ const ExportDropdown = () => {
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onExportPdf}>
         <MenuButton
-          text={isExportingPdf ? messages.export.generatingPdf : messages.export.pdf}
+          text={
+            isExportingPdf ? messages.export.generatingPdf : messages.export.pdf
+          }
           icon="FilePdf"
           hideText={false}
           tooltip={false}

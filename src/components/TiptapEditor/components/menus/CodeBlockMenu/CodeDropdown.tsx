@@ -15,7 +15,10 @@ const CodeDropdown = ({ value, onSelect }: CodeDropdownProps) => {
   const { contentElement, messages } = useTiptapContext();
   const [search, setSearch] = useState("");
 
-  const options = CODE_BLOCK_LANGUAGUES.map((item) => ({ label: item.label, value: item.syntax }));
+  const options = CODE_BLOCK_LANGUAGUES.map((item) => ({
+    label: item.label,
+    value: item.syntax,
+  }));
   const filterOptions = useMemo(() => {
     if (!search) return options;
     return options.filter((item) => item.label.includes(search));
@@ -57,7 +60,12 @@ const CodeDropdown = ({ value, onSelect }: CodeDropdownProps) => {
             >
               {item.label}
               {item.value === value && (
-                <Icon name="Check" className="code-item__indicator" size={14} strokeWidth={2.5} />
+                <Icon
+                  name="Check"
+                  className="code-item__indicator"
+                  size={14}
+                  strokeWidth={2.5}
+                />
               )}
             </div>
           </PopoverClose>

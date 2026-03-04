@@ -77,7 +77,11 @@ $shadow-2: var(
   0px 24px 48px -12px #25292e14,
   0px 48px 96px -24px #25292e14
 );
-$shadow-3: var(--rte-shadow-3, 0px 0px 0px 1px #d1d9e0, 0px 40px 80px 0px #25292e3d);
+$shadow-3: var(
+  --rte-shadow-3,
+  0px 0px 0px 1px #d1d9e0,
+  0px 40px 80px 0px #25292e3d
+);
 
 // Editor
 $editor-min-height: var(--rte-editor-min-height);

@@ -38,6 +38,10 @@ export type EditorMessages = {
     importPdf: string;
     clearEditor: string;
     copyEditor: string;
+    save: string;
+  };
+  auth: {
+    loginRequired: string;
   };
   insert: {
     quote: string;
@@ -125,6 +129,11 @@ export type EditorMessages = {
     noSuggestions: string;
     ignore: string;
   };
+  browserSpellcheck: {
+    enableTooltip: string;
+    disableTooltip: string;
+    label: string;
+  };
   codeBlock: {
     copy: string;
     delete: string;
@@ -196,6 +205,10 @@ export const editorMessages = withDefault({
       importPdf: "Importar PDF",
       clearEditor: "Limpar conteúdo",
       copyEditor: "Copiar conteúdo",
+      save: "Salvar documento",
+    },
+    auth: {
+      loginRequired: "Recurso disponível para usuários logados",
     },
     insert: {
       quote: "Citação",
@@ -264,7 +277,7 @@ export const editorMessages = withDefault({
       fullscreen: "Tela cheia",
       words: "Palavras",
       characters: "Caracteres",
-      toggleHint: "Clique aqui para ocultar anúncios",
+      toggleHint: "Clique aqui para expandir",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugestões: ${count}`,
@@ -282,6 +295,11 @@ export const editorMessages = withDefault({
       empty: "Selecione um erro para ver as sugestões",
       noSuggestions: "Nenhuma sugestão",
       ignore: "Ignorar",
+    },
+    browserSpellcheck: {
+      enableTooltip: "Ativar sugestões do navegador",
+      disableTooltip: "Desativar sugestões do navegador",
+      label: "Sugestões do navegador",
     },
     codeBlock: {
       copy: "Copiar código",
@@ -350,6 +368,10 @@ export const editorMessages = withDefault({
       importPdf: "Import PDF",
       clearEditor: "Clear content",
       copyEditor: "Copy content",
+      save: "Save document",
+    },
+    auth: {
+      loginRequired: "Feature available for logged in users",
     },
     insert: {
       quote: "Quote",
@@ -418,7 +440,7 @@ export const editorMessages = withDefault({
       fullscreen: "Full screen",
       words: "Words",
       characters: "Characters",
-      toggleHint: "Click here to hide ads",
+      toggleHint: "Click here to expand",
       spellcheck: {
         checking: "Checking…",
         ready: (count: number) => `Suggestions: ${count}`,
@@ -436,6 +458,11 @@ export const editorMessages = withDefault({
       empty: "Select an issue to see suggestions",
       noSuggestions: "No suggestions",
       ignore: "Ignore",
+    },
+    browserSpellcheck: {
+      enableTooltip: "Enable browser suggestions",
+      disableTooltip: "Disable browser suggestions",
+      label: "Browser suggestions",
     },
     codeBlock: {
       copy: "Copy code",
@@ -503,7 +530,11 @@ export const editorMessages = withDefault({
       preview: "Vista previa",
       importPdf: "Importar PDF",
       clearEditor: "Limpiar contenido",
-      copyEditor: "Copiar contenido",
+      copyEditor: "Copiar conteúdo",
+      save: "Guardar documento",
+    },
+    auth: {
+      loginRequired: "Recurso disponible para usuarios logueados",
     },
     insert: {
       quote: "Cita",
@@ -572,7 +603,7 @@ export const editorMessages = withDefault({
       fullscreen: "Pantalla completa",
       words: "Palabras",
       characters: "Caracteres",
-      toggleHint: "Haz clic para ocultar los anuncios",
+      toggleHint: "Haz clic para expandir",
       spellcheck: {
         checking: "Revisando…",
         ready: (count: number) => `Sugerencias: ${count}`,
@@ -590,6 +621,11 @@ export const editorMessages = withDefault({
       empty: "Seleccione un error para ver sugerencias",
       noSuggestions: "Sin sugerencias",
       ignore: "Ignorar",
+    },
+    browserSpellcheck: {
+      enableTooltip: "Activar sugerencias del navegador",
+      disableTooltip: "Desactivar sugerencias del navegador",
+      label: "Sugerencias del navegador",
     },
     codeBlock: {
       copy: "Copiar código",
@@ -623,6 +659,7 @@ export const editorMessages = withDefault({
 });
 
 export const getEditorMessages = (locale?: Locale): EditorMessages => {
-  const normalized = locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
+  const normalized =
+    locale && i18n.locales.includes(locale) ? locale : i18n.defaultLocale;
   return editorMessages[normalized];
 };

@@ -1,55 +1,150 @@
-# Editor de Texto Online
+# Editor de Texto Online ✨
 
-## Descrição Geral
-O Editor de Texto Online é uma aplicação Next.js voltada para criação de conteúdo rico diretamente no navegador. Ele combina um editor WYSIWYG avançado, pré-visualizações em diferentes contextos e ferramentas de exportação para dar suporte a redatores, equipes de marketing e criadores de conteúdo técnico. O fluxo padrão salva automaticamente o texto no `localStorage`, permitindo retomar rascunhos, visualizar a leitura final e gerar entregáveis sem depender de backend dedicado.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-## Tecnologias Utilizadas
-- **Next.js 14** — framework React com App Router e recursos híbridos CSR/SSR, empregado para estruturar rotas do editor, prévias (`post-csr`, `post-ssr`, `post-pdf`) e APIs internas.
-- **React 18 + React Hook Form** — biblioteca de UI e gerenciamento de formulários, usada para controlar o estado do editor e validar campos como título e conteúdo.
-- **TypeScript** — linguagem tipada que garante segurança em componentes complexos (menus, hooks personalizados e serviços de persistência).
-- **Tiptap (ProseMirror)** — editor rich text modular que fornece formatação avançada, tabelas, alinhamentos, contagem de palavras e menus contextuais.
-- **CodeMirror 6** — editor de código utilizado no modo fonte para ajustar HTML exportado com destaque de sintaxe.
-- **Tailwind CSS + SCSS** — combinação de utilitários e folhas de estilo globais para compor o design responsivo, temas claro/escuro e efeitos específicos do editor.
-- **Cloudinary SDK** — armazenamento externo de imagens com upload via `/api/images`, facilitando biblioteca de mídia integrada.
-- **html2canvas & jsPDF** — ferramentas client-side responsáveis por capturar a visualização e gerar PDFs (workflow em desenvolvimento).
-- **File Saver** — utilitário para baixar versões `.doc` do conteúdo.
-- **Vercel Analytics & Speed Insights** — monitoramento de uso e performance em produção.
+Um editor de texto WYSIWYG moderno, robusto e altamente customizável construído com **Next.js 14**. Projetado para oferecer uma experiência de escrita fluida com recursos avançados de formatação, persistência local e múltiplas opções de exportação.
 
-## Como Executar o Projeto Localmente
-1. Garanta Node.js 18+ instalado.
-2. Clone o repositório e acesse a pasta: `git clone ... && cd editordetexto`.
-3. Copie as variáveis de ambiente: `cp .env.example .env.local` e preencha credenciais Cloudinary.
-4. Instale dependências: `npm install`.
-5. Execute em modo desenvolvimento: `npm run dev` (http://localhost:3000).
-6. Opcional: `npm run lint` para garantir conformidade com o ESLint.
-7. Build de produção: `npm run build` seguido de `npm run start`.
+---
 
-## Estrutura de Pastas
-```
+## 🚀 Principais Funcionalidades
+
+- **✍️ Editor Rich Text Avançado**: Baseado em Tiptap (ProseMirror), oferecendo headers, listas, tabelas, cores, links e suporte a mídias.
+- **🌍 Internacionalização (i18n)**: Suporte nativo para Português (PT), Inglês (EN) e Espanhol (ES) usando App Router.
+- **💾 Persistência Inteligente**: Salvamento automático no `localStorage` para garantir que rascunhos nunca sejam perdidos.
+- **🖼️ Gerenciamento de Mídia**: Integração direta com Cloudinary para upload e biblioteca de imagens.
+- **📑 Múltiplos Formatos de Exportação**: Gere arquivos `.doc`, visualize versões CSR/SSR e fluxo otimizado para PDF.
+- **💻 Modo Fonte (HTML)**: Edição direta do código-fonte usando CodeMirror 6 com syntax highlighting.
+- **🌓 Tema Dinâmico**: Suporte total a temas Claro e Escuro com transições suaves.
+- **📊 Insights de Leitura**: Sumário automático (ToC), estimativa de tempo de leitura, barra de progresso e contagem de palavras.
+
+---
+
+## 🛠️ Tech Stack
+
+### Core
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
+- **UI & Styling**: [Tailwind CSS](https://tailwindcss.com/) + [SCSS](https://sass-lang.com/)
+- **Componentes**: [Radix UI](https://www.radix-ui.com/) (Dropdown, Popover, Tooltip)
+
+### Editor & Ferramentas
+
+- **Engine do Editor**: [Tiptap](https://tiptap.dev/) / [ProseMirror](https://prosemirror.net/)
+- **Edição de Código**: [CodeMirror 6](https://codemirror.net/)
+- **Upload de Imagens**: [Cloudinary](https://cloudinary.com/)
+- **Exportação**: [jsPDF](https://github.com/parallax/jsPDF), [html2canvas](https://html2canvas.hertzen.com/), [html-docx-js](https://github.com/evidenceprime/html-docx-js)
+
+---
+
+## 📂 Estrutura do Projeto
+
+```bash
 src/
-  app/                # Rotas App Router, incluindo editor principal e pré-visualizações
-  components/         # Biblioteca de UI: TiptapEditor, SourceEditor, MediaLibrary e componentes compartilhados
-  data/               # Conteúdo estático exibido no site (ex.: texto institucional)
-  extensions/         # Extensões customizadas para o editor rich text
-  hooks/              # Hooks reutilizáveis (ex.: sumário automático, progresso de leitura)
-  services/           # Serviços client-side como persistência em localStorage
-  styles/             # Estilos globais e tokens complementares ao Tailwind
-public/               # Ativos estáticos (logos, imagens de fallback, favicon)
+├── app/             # Rotas do App Router (Editor, Previews, API)
+│   ├── (edit)/      # Página principal do editor
+│   ├── [locale]/    # Rotas internacionalizadas
+│   └── api/         # Endpoints para upload de imagens e utilities
+├── components/      # Componentes de UI modulares
+│   ├── TiptapEditor/# Core do editor e extensões
+│   ├── MediaLibrary/# Interface de gestão de imagens
+│   └── shared/      # Botões, inputs e elementos comuns
+├── extensions/      # Customizações e extensões do Tiptap
+├── hooks/           # Hooks personalizados (sumário, progresso, etc.)
+├── services/        # Lógica de persistência e serviços externos
+└── styles/          # Configurações globais de CSS/SCSS
 ```
 
-## Funcionalidades Principais
-- **Editor Rich Text com menus avançados**: botões para heading, listas, tabela, cores, links e inserção de mídia, com estado persistido automaticamente.
-- **Visualização em múltiplos contextos**: páginas dedicadas para preview CSR (com leitura estimada), SSR e layout pronto para impressão/PDF.
-- **Exportação e compartilhamento**: download de `.doc`, fluxo de captura para PDF e links rápidos de compartilhamento social.
-- **Modo Fonte (HTML)**: alternância para CodeMirror permitindo ajustes finos no markup.
-- **Biblioteca de mídia**: upload e seleção de imagens hospedadas na Cloudinary diretamente do editor.
-- **Recursos de leitura**: sumário automático (`PostToc`), barra de progresso, contagem de palavras e dados do autor.
-- **Gestão de rascunhos locais**: salvar, carregar e excluir versões anteriores limitadas a 10 entradas.
-- **Tema claro/escuro**: alternância persistida via `ThemeSwitcher`.
+---
 
-## Possíveis Melhorias Futuras
-- Concluir exportação PDF nativa para remover dependência de janela auxiliar e suportar documentos longos.
-- Adicionar autenticação e sincronização com backend para rascunhos multi-dispositivos.
-- Implementar suíte de testes (Jest/Vitest + Playwright) para garantir estabilidade do editor e rotas críticas.
-- Internacionalização (i18n) para atender público além do português.
-- Criar modo colaborativo ou comentários em tempo real usando WebSockets ou serviços terceiros.
+## 🏁 Introdução
+
+### Pré-requisitos
+
+- Node.js 18.x ou superior
+- NPM ou Yarn
+
+### Instalação
+
+1. Clone o repositório:
+
+   ```bash
+   git clone https://github.com/andersonleite1/editordetexto.git
+   cd editordetexto
+   ```
+
+2. Instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+3. Configure as variáveis de ambiente:
+
+   ```bash
+   cp .env.example .env.local
+   # Adicione suas credenciais do Cloudinary no .env.local
+   ```
+
+4. Execute o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+   Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+
+---
+
+### Testes
+
+O projeto utiliza **Vitest** com **React Testing Library** para garantir a qualidade do código.
+
+- Executar todos os testes:
+  ```bash
+  npm test
+  ```
+- Abrir interface visual do Vitest:
+  ```bash
+  npx vitest --ui
+  ```
+
+---
+
+## 🌎 Internacionalização (i18n)
+
+O projeto utiliza uma estrutura robusta de i18n. Para adicionar ou modificar traduções, consulte:
+
+- `src/app/[locale]/` para rotas específicas.
+- `i18n-config.ts` para definições de locales disponíveis (`pt`, `en`, `es`).
+
+---
+
+## 📄 Exportação & Compartilhamento
+
+- **Documento Word**: Utilize a função de exportação para gerar arquivos `.docx` compatíveis.
+- **PDF**: O projeto inclui um fluxo dedicado em `/post-pdf` para geração de documentos prontos para impressão ou salvamento em PDF.
+- **Social**: Compartilhamento rápido via WhatsApp, LinkedIn, Twitter e Facebook.
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são o que tornam a comunidade open source um lugar incrível para aprender, inspirar e criar. Qualquer contribuição que você fizer será **muito apreciada**.
+
+1. Faça um Fork do projeto
+2. Crie uma Branch para sua Feature (`git checkout -b feature/AmazingFeature`)
+3. Insira suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Faça o Push para a Branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+---
+
+## ⚖️ Licença
+
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
+
+---
+
+<p align="center">Desenvolvido com ❤️ por Anderson Leite</p>

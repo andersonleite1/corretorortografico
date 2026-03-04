@@ -7,7 +7,11 @@ import {
 
 export type BubbleMenuProps = TipTapBubbleMenuProps;
 
-export const BubbleMenu = ({ className, children, ...props }: BubbleMenuProps) => {
+export const BubbleMenu = ({
+  className,
+  children,
+  ...props
+}: BubbleMenuProps) => {
   return (
     <TipTapBubbleMenu {...props} className={clsx("rte-bubble-menu", className)}>
       {children}

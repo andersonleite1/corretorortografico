@@ -11,15 +11,16 @@ const FontSizeDropdown = () => {
 
   const currentSize = useEditorState({
     editor,
-    selector: ({ editor }) => editor.getAttributes("textStyle").fontSize as string | undefined,
+    selector: ({ editor }) =>
+      editor.getAttributes("textStyle").fontSize as string | undefined,
   });
 
   const options = useMemo(
     () =>
       FONT_SIZE_OPTIONS.map((option, index) =>
-        index === 0 ? { ...option, label: messages.fontSize.default } : option
+        index === 0 ? { ...option, label: messages.fontSize.default } : option,
       ),
-    [messages.fontSize.default]
+    [messages.fontSize.default],
   );
   const normalizedCurrent = currentSize ?? "";
 
@@ -37,7 +38,7 @@ const FontSizeDropdown = () => {
 
       editor.chain().focus().setFontSize(value).run();
     },
-    [editor]
+    [editor],
   );
 
   if (!editor) return null;

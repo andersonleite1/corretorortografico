@@ -1,12 +1,14 @@
-import {BackHomeButton} from "@/components/shared/BackHomeButton";
-import {getPrivacyContent} from "@/data/pages/privacy";
-import {Locale} from "../../../../i18n-config";
+import { BackHomeButton } from "@/components/shared/BackHomeButton";
+import { getPrivacyContent } from "@/data/pages/privacy";
+import { Locale } from "../../../../i18n-config";
 
 type PrivacyPageContentProps = {
   locale: Locale;
 };
 
-export default function PrivacyPageContent({locale}: PrivacyPageContentProps) {
+export default function PrivacyPageContent({
+  locale,
+}: PrivacyPageContentProps) {
   const content = getPrivacyContent(locale);
 
   return (
@@ -16,7 +18,9 @@ export default function PrivacyPageContent({locale}: PrivacyPageContentProps) {
         <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-500">
           {content.title}
         </p>
-        <h1 className="mt-3 text-4xl font-bold text-slate-900 dark:text-white">{content.title}</h1>
+        <h1 className="mt-3 text-4xl font-bold text-slate-900 dark:text-white">
+          {content.title}
+        </h1>
         <p
           className="mt-4 text-base text-slate-600 dark:text-slate-300"
           dangerouslySetInnerHTML={{
@@ -52,7 +56,8 @@ export default function PrivacyPageContent({locale}: PrivacyPageContentProps) {
 
       <footer className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
         <p>
-          {content.lastUpdatedLabel}: <strong>{content.lastUpdatedValue}</strong>
+          {content.lastUpdatedLabel}:{" "}
+          <strong>{content.lastUpdatedValue}</strong>
         </p>
       </footer>
     </main>

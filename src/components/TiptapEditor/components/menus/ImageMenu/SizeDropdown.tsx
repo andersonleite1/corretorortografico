@@ -27,7 +27,9 @@ const SizeDropdown = ({ value, onChange }: SizeDropdownProps) => {
           data-active={option == value || undefined}
           onSelect={() => onChange(option)}
         >
-          {option ? messages.image.sizeOptionLabel(option) : messages.general.default}
+          {option
+            ? messages.image.sizeOptionLabel(option)
+            : messages.general.default}
         </DropdownMenuItem>
       ))}
     </MenuButton>

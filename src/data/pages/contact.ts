@@ -2,6 +2,20 @@ import { Metadata } from "next";
 
 import { i18n, Locale } from "../../../i18n-config";
 
+const BASE_URL = "https://editordetexto.online";
+
+const CONTACT_PATHS: Record<Locale, string> = {
+  pt: "/contato",
+  en: "/en/contact",
+  es: "/es/contato",
+};
+
+const HREF_LANG_MAP: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+  es: "es",
+};
+
 export type ContactFormContent = {
   nameLabel: string;
   emailLabel: string;
@@ -29,7 +43,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
     locale: "pt",
     metadata: {
       title: "Fale conosco | Editor de Texto Online",
-      description: "Fale conosco e converse com a equipe do Editor de Texto Online",
+      description:
+        "Fale conosco e converse com a equipe do Editor de Texto Online",
     },
     heroTitle: "Fale diretamente com nossa equipe",
     heroSubtitle: "Fale diretamente",
@@ -42,7 +57,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
       messageLabel: "Mensagem",
       submitLabel: "Enviar Mensagem",
     },
-    altContactPrefix: "Você também pode entrar em contato diretamente pelo e-mail:",
+    altContactPrefix:
+      "Você também pode entrar em contato diretamente pelo e-mail:",
     altContactEmailLabel: "contato@editordetexto.online",
   },
   en: {
@@ -69,7 +85,8 @@ const contactContentMap: Record<Locale, ContactPageContent> = {
     locale: "es",
     metadata: {
       title: "Hable con nosotros | Editor de Texto en Línea",
-      description: "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
+      description:
+        "Hable con nosotros y contacte al equipo de Editor de Texto en Línea",
     },
     heroTitle: "Hable directamente con nuestro equipo",
     heroSubtitle: "Hable directamente",
@@ -97,8 +114,23 @@ export function getContactContent(locale: string): ContactPageContent {
 
 export function buildContactMetadata(locale: string): Metadata {
   const content = getContactContent(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+
+  const languages = Object.fromEntries(
+    i18n.locales.map((loc) => [
+      HREF_LANG_MAP[loc] ?? loc,
+      `${BASE_URL}${CONTACT_PATHS[loc]}`,
+    ]),
+  );
+
+  languages["x-default"] = `${BASE_URL}${CONTACT_PATHS[i18n.defaultLocale]}`;
+
   return {
     title: content.metadata.title,
     description: content.metadata.description,
+    alternates: {
+      canonical: `${BASE_URL}${CONTACT_PATHS[normalizedLocale]}`,
+      languages,
+    },
   };
 }

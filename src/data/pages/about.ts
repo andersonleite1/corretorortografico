@@ -1,6 +1,20 @@
-import {Metadata} from "next";
+import { Metadata } from "next";
 
-import {i18n, Locale} from "../../../i18n-config";
+import { i18n, Locale } from "../../../i18n-config";
+
+const BASE_URL = "https://editordetexto.online";
+
+const ABOUT_PATHS: Record<Locale, string> = {
+  pt: "/sobre",
+  en: "/en/about",
+  es: "/es/sobre",
+};
+
+const HREF_LANG_MAP: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en",
+  es: "es",
+};
 
 type AboutSection = {
   title: string;
@@ -162,8 +176,23 @@ export function getAboutContent(locale: string): AboutPageContent {
 
 export function buildAboutMetadata(locale: string): Metadata {
   const content = getAboutContent(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+
+  const languages = Object.fromEntries(
+    i18n.locales.map((loc) => [
+      HREF_LANG_MAP[loc] ?? loc,
+      `${BASE_URL}${ABOUT_PATHS[loc]}`,
+    ]),
+  );
+
+  languages["x-default"] = `${BASE_URL}${ABOUT_PATHS[i18n.defaultLocale]}`;
+
   return {
     title: content.metadata.title,
     description: content.metadata.description,
+    alternates: {
+      canonical: `${BASE_URL}${ABOUT_PATHS[normalizedLocale]}`,
+      languages,
+    },
   };
 }

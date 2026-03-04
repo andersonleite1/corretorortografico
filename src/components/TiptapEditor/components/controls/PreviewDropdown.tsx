@@ -34,7 +34,11 @@ const PreviewDropdown = () => {
     >
       <DropdownMenuItem asChild disabled={!onPreviewPdf}>
         <MenuButton
-          text={isExportingPdf ? messages.preview.generatingPdf : messages.preview.pdf}
+          text={
+            isExportingPdf
+              ? messages.preview.generatingPdf
+              : messages.preview.pdf
+          }
           icon="FilePdf"
           hideText={false}
           tooltip={false}

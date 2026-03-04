@@ -28,26 +28,36 @@ interface TooltipProps {
   options?: TooltipOptions;
 }
 
-const Tooltip = React.forwardRef<React.ElementRef<typeof TooltipTrigger>, TooltipProps>(
-  ({ children, content, portal = false, options, ...triggerProps }, ref) => {
-    const Wrapper = portal ? TooltipPortal : React.Fragment;
+const Tooltip = React.forwardRef<
+  React.ElementRef<typeof TooltipTrigger>,
+  TooltipProps
+>(({ children, content, portal = false, options, ...triggerProps }, ref) => {
+  const Wrapper = portal ? TooltipPortal : React.Fragment;
 
-    return (
-      <TooltipProvider delayDuration={500} skipDelayDuration={0} disableHoverableContent={false}>
-        <TooltipRoot>
-          <TooltipTrigger ref={ref} asChild={true} {...triggerProps}>
-            {children}
-          </TooltipTrigger>
-          <Wrapper>
-            <TooltipContent className="rte-tooltip" side={"top"} align={"center"} {...options}>
-              {content}
-            </TooltipContent>
-          </Wrapper>
-        </TooltipRoot>
-      </TooltipProvider>
-    );
-  }
-);
+  return (
+    <TooltipProvider
+      delayDuration={500}
+      skipDelayDuration={0}
+      disableHoverableContent={false}
+    >
+      <TooltipRoot>
+        <TooltipTrigger ref={ref} asChild={true} {...triggerProps}>
+          {children}
+        </TooltipTrigger>
+        <Wrapper>
+          <TooltipContent
+            className="rte-tooltip"
+            side={"top"}
+            align={"center"}
+            {...options}
+          >
+            {content}
+          </TooltipContent>
+        </Wrapper>
+      </TooltipRoot>
+    </TooltipProvider>
+  );
+});
 
 Tooltip.displayName = "Tooltip";
 
