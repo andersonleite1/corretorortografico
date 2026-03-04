@@ -14,14 +14,18 @@ export const getCurrentUser = cache(async (_forceRefresh: boolean = false) => {
   // ou simplesmente confiar que quem chama com true quer dados novos do DB.
   // No React cache, a mesma função com argumentos diferentes gera entradas de cache diferentes.
 
-  const user = await db.user.findUnique({
-    where: { clerkId },
-    include: {
-      subscription: true,
-    },
-  });
-
-  return user;
+  try {
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      include: {
+        subscription: true,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error("[getCurrentUser] Error fetching user from DB:", error);
+    return null;
+  }
 });
 
 // Helper para verificar plano com Cache distribuído (Redis)

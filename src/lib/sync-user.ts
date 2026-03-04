@@ -23,25 +23,30 @@ export async function syncUserWithDb() {
     return null;
   }
 
-  // Verificar se o usuário já existe
-  const existingUser = await db.user.findUnique({
-    where: { clerkId: user.id },
-  });
+  try {
+    // Verificar se o usuário já existe
+    const existingUser = await db.user.findUnique({
+      where: { clerkId: user.id },
+    });
 
-  if (existingUser) {
-    return existingUser;
+    if (existingUser) {
+      return existingUser;
+    }
+
+    // Criar o usuário se não existir (Fallback para quando o webhook falha ou atrasa)
+    const newUser = await db.user.create({
+      data: {
+        clerkId: user.id,
+        email,
+        name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
+        imageUrl: user.imageUrl || null,
+      },
+    });
+
+    console.log(`✅ [Fallback] Usuário sincronizado no DB: ${email}`);
+    return newUser;
+  } catch (dbError) {
+    console.error("[syncUserWithDb] Erro ao sincronizar usuário no DB (possível race condition com webhook):", dbError);
+    return null;
   }
-
-  // Criar o usuário se não existir (Fallback para quando o webhook falha ou atrasa)
-  const newUser = await db.user.create({
-    data: {
-      clerkId: user.id,
-      email,
-      name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
-      imageUrl: user.imageUrl || null,
-    },
-  });
-
-  console.log(`✅ [Fallback] Usuário sincronizado no DB: ${email}`);
-  return newUser;
 }
