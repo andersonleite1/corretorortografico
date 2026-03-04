@@ -13,12 +13,18 @@ export async function POST(request: NextRequest) {
   // NOTA DE REGRA DE NEGÓCIO: Este endpoint permanece público propositalmente.
   // Usuários não precisam estar logados para verificações gramaticais básicas.
   // A proteção é feita via Origin Check e Rate Limit por IP (SEG-02).
-  const origin =
-    request.headers.get("origin") || request.headers.get("referer");
+  const origin = request.headers.get("origin") || request.headers.get("referer") || "";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+  const isLocalhost = origin.includes("localhost") || origin.includes("127.0.0.1") || origin.includes("192.168.");
+  const isVercel = origin.includes("vercel.app");
+  const isProd = origin.includes("editordetexto.online") || origin.includes("editordetexto.cloud");
+
+  // Remove possível barra final para evitar falha no startsWith
+  const cleanAppUrl = appUrl.replace(/\/$/, "");
+
   // Verifica se a requisição originou de dentro da própria aplicação
-  if (!origin || !origin.startsWith(appUrl)) {
+  if (!origin || (!origin.startsWith(cleanAppUrl) && !isLocalhost && !isVercel && !isProd)) {
     console.warn(`[LanguageTool API] Acesso negado para a origem: ${origin}`);
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }

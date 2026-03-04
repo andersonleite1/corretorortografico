@@ -18,11 +18,11 @@ export const ratelimit = {
 
   /**
    * Limite para ferramenta de gramática (SEG-02)
-   * 30 requisições por hora
+   * 60 requisições por minuto
    */
   languageTool: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(30, "1 h"),
+    limiter: Ratelimit.slidingWindow(60, "1 m"),
     prefix: "@upstash/ratelimit/languagetool",
   }),
 
