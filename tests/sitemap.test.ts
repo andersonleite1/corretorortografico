@@ -26,18 +26,18 @@ describe("Sitemap Generator", () => {
     const result = sitemap();
     const urls = result.map((entry) => entry.url);
 
-    expect(urls).toContain("https://editordetexto.online/about");
-    expect(urls).toContain("https://editordetexto.online/contact");
-    expect(urls).toContain("https://editordetexto.online/privacy");
-    expect(urls).toContain("https://editordetexto.online/terms");
+    expect(urls).toContain("https://editordetexto.online/en/sobre");
+    expect(urls).toContain("https://editordetexto.online/en/contato");
+    expect(urls).toContain("https://editordetexto.online/en/privacidade");
+    expect(urls).toContain("https://editordetexto.online/en/termos");
   });
 
-  it("não deve conter as rotas antigas em inglês com prefixo /en/", () => {
+  it("deve conter as rotas em inglês com prefixo /en/", () => {
     const result = sitemap();
     const urls = result.map((entry) => entry.url);
 
     const enPrefixUrls = urls.filter((url) => url.includes("/en/"));
-    expect(enPrefixUrls).toHaveLength(0);
+    expect(enPrefixUrls).not.toHaveLength(0);
   });
 
   it("não deve conter a rota removida /editar-pdf", () => {
