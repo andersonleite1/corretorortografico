@@ -23,7 +23,7 @@ describe("Middleware", () => {
     vi.clearAllMocks();
   });
 
-  it("should redirect to sign-in on auth failure for protected routes", async () => {
+  it("should propagate error on auth failure for protected routes", async () => {
     const request = new NextRequest(new URL("http://localhost:3000/editor"));
 
     const authMock = {
@@ -31,14 +31,8 @@ describe("Middleware", () => {
     };
 
     // @ts-ignore
-    const response = await middleware(authMock, request);
-
+    await expect(middleware(authMock, request)).rejects.toThrow("Unauthorized");
     expect(authMock.protect).toHaveBeenCalled();
-    expect(response?.status).toBe(307); // NextResponse.redirect default status
-    expect(response?.headers.get("location")).toContain("/sign-in");
-    expect(response?.headers.get("location")).toContain(
-      "redirect_url=http%3A%2F%2Flocalhost%3A3000%2Feditor",
-    );
   });
 
   it("should proceed to i18n middleware on auth success", async () => {

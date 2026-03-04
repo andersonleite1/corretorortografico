@@ -46,33 +46,11 @@ describe("Middleware", () => {
     expect(mockAuthProtect).toHaveBeenCalled();
   });
 
-  it("redireciona para /sign-in quando ocorre erro em rota protegida (BUG-01 - FIX)", async () => {
+  it("deixa o erro propagar quando auth.protect() falha", async () => {
     mockIsProtectedRoute.mockReturnValue(true);
     const req = createRequest("/dashboard");
-    mockAuthProtect.mockRejectedValue(new Error("Auth failed"));
+    mockAuthProtect.mockRejectedValue(new Error("NEXT_REDIRECT"));
 
-    const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
-
-    expect(response.status).toBe(307); // NextResponse.redirect
-    expect(response.headers.get("location")).toContain("/sign-in");
-    expect(response.headers.get("location")).toContain("redirect_url");
-  });
-
-  it("prossegue (fail-safe) se houver erro em rota pública", async () => {
-    const req = createRequest("/");
-
-    // Forçar um erro no try block antes do retorno
-    // Na primeira chamada (try), lança erro. Na segunda (catch), retorna false.
-    mockIsProtectedRoute
-      .mockImplementationOnce(() => {
-        throw new Error("Unexpected error");
-      })
-      .mockReturnValueOnce(false);
-
-    const response = (await (middleware as any)(mockAuth, req)) as NextResponse;
-
-    expect(response).toBeInstanceOf(NextResponse);
-    // Verificamos que NÃO redirecionou para sign-in
-    expect(response.headers.get("location")).toBeNull();
+    await expect((middleware as any)(mockAuth, req)).rejects.toThrow("NEXT_REDIRECT");
   });
 });
