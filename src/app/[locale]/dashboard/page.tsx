@@ -20,16 +20,21 @@ export default async function DashboardPage({
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  const user = await db.user.findUnique({
-    where: { clerkId },
-    select: { id: true, name: true, email: true },
-  });
+  let user = null;
+  try {
+    user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (dbError) {
+    console.error("[DashboardPage] Erro ao buscar usuario:", dbError);
+  }
 
   if (!user) redirect("/");
 
   return (
     <DashboardContent
-      userName={user.name ?? user.email}
+      userName={user.name ?? user.email ?? "Usuário"}
       locale={params.locale as any}
     />
   );

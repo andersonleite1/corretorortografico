@@ -14,10 +14,15 @@ export default async function SettingsPage({
   const { userId: clerkId } = await auth();
   if (!clerkId) redirect("/sign-in");
 
-  const user = await db.user.findUnique({
-    where: { clerkId },
-    include: { subscription: true },
-  });
+  let user = null;
+  try {
+    user = await db.user.findUnique({
+      where: { clerkId },
+      include: { subscription: true },
+    });
+  } catch (dbError) {
+    console.error("[SettingsPage] Erro ao buscar usuario:", dbError);
+  }
 
   if (!user) redirect("/");
 
