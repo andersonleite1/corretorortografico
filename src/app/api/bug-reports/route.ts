@@ -68,15 +68,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Resolve userId interno a partir do clerkId
-    let internalUserId: string | null = null;
-    if (clerkId) {
-      const user = await db.user.findUnique({
-        where: { clerkId },
-        select: { id: true },
-      });
-      internalUserId = user?.id ?? null;
-    }
+    // Resolve userId interno a partir da sessão (sincroniza se necessário)
+    const { getCurrentUser } = await import("@/lib/auth");
+    const user = await getCurrentUser();
+    const internalUserId = user?.id ?? null;
 
     const userAgent = req.headers.get("user-agent") ?? undefined;
 

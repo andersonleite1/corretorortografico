@@ -72,19 +72,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Autenticação
-    const { userId: clerkId } = await auth();
-    if (!clerkId)
-      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    // 1. Autenticação e Sincronização de Usuário
+    const { getCurrentUser } = await import("@/lib/auth");
+    const user = await getCurrentUser();
 
-    // 2. Buscar usuário e plano
-    const user = await db.user.findUnique({
-      where: { clerkId },
-      include: { subscription: true },
-    });
     if (!user) {
       return NextResponse.json(
-        { error: "Usuário não encontrado." },
+        { error: "Usuário não encontrado ou não autenticado." },
         { status: 404 },
       );
     }

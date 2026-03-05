@@ -7,13 +7,18 @@ export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId)
-      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    // 1. Autenticação e Sincronização de Usuário
+    const { getCurrentUser } = await import("@/lib/auth");
+    const user = await getCurrentUser();
 
-    const user = await db.user.findUnique({ where: { clerkId } });
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado ou não autenticado." },
+        { status: 404 },
+      );
+    }
 
-    if (!user?.stripeCustomerId) {
+    if (!user.stripeCustomerId) {
       return NextResponse.json(
         { error: "Nenhuma assinatura ativa." },
         { status: 404 },

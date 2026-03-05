@@ -48,14 +48,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const { userId: clerkId } = await auth();
-    if (!clerkId)
-      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
-
-    const user = await db.user.findUnique({
-      where: { clerkId },
-      include: { subscription: true },
-    });
+    // 1. Autenticação e Sincronização de Usuário
+    const { getCurrentUser } = await import("@/lib/auth");
+    const user = await getCurrentUser();
 
     // SEO é exclusivo para Pro
     if (!user?.subscription || user.subscription.plan === "free") {
