@@ -19,6 +19,25 @@ const pt: HomeContent = {
     openGraphDescription:
       "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
   },
+  webAppSchema: {
+    name: "Editor de Texto Online",
+    description:
+      "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
+    applicationCategory: "UtilityApplication",
+    featureList: [
+      "Edição de texto avançada",
+      "Exportação para PDF e DOCX",
+      "Interface minimalista e intuitiva",
+      "Compatível com dispositivos móveis",
+    ],
+    keywords: [
+      "editor de texto online",
+      "escrever textos online",
+      "ferramenta gratuita para textos",
+      "exportar textos para PDF",
+      "editor de documentos online",
+    ],
+  },
   article: {
     title:
       "Editor de Texto Online: Escreva, Edite e Exporte Seus Textos Gratuitamente",

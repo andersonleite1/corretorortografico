@@ -19,6 +19,25 @@ const es: HomeContent = {
     openGraphDescription:
       "Organiza ideas, limpia el formato y exporta archivos PDF o DOCX con un editor de texto online ligero y sin instalaciones.",
   },
+  webAppSchema: {
+    name: "Editor de Texto Online",
+    description:
+      "El Editor de Texto Online es una herramienta gratuita para crear, editar y exportar textos de forma práctica y eficiente. Ideal para estudiantes, profesionales y escritores ocasionales.",
+    applicationCategory: "UtilityApplication",
+    featureList: [
+      "Edición de texto avanzada",
+      "Exportación a PDF y DOCX",
+      "Interfaz minimalista e intuitiva",
+      "Compatible con dispositivos móviles",
+    ],
+    keywords: [
+      "editor de texto online",
+      "escribir texto online",
+      "herramienta gratuita para textos",
+      "exportar texto a PDF",
+      "editor de documentos online",
+    ],
+  },
   article: {
     title: "Escribe, edita y exporta con el editor de texto online",
     introHtml:

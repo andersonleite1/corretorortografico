@@ -18,6 +18,25 @@ const en: HomeContent = {
     openGraphDescription:
       "Draft, format, and export content directly from the browser with a lightweight online text editor—no installs or logins required.",
   },
+  webAppSchema: {
+    name: "Online Text Editor",
+    description:
+      "Free online tool to edit, format, and clean text. Includes word counter, case converter, and formatting removal.",
+    applicationCategory: "UtilityApplication",
+    featureList: [
+      "Advanced text editing",
+      "Export to PDF and DOCX",
+      "Minimalist and intuitive interface",
+      "Mobile compatible",
+    ],
+    keywords: [
+      "online text editor",
+      "write text online",
+      "free text tool",
+      "export text to PDF",
+      "online document editor",
+    ],
+  },
   article: {
     title: "Write, Edit, and Export Content with the Online Text Editor",
     introHtml:

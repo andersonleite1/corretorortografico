@@ -15,7 +15,7 @@ import { syncUserWithDb } from "@/lib/sync-user";
 import { getUserPlan } from "@/lib/auth";
 
 import "@/styles/globals.scss";
-import { getHomeFaqSchema } from "@/data/home";
+import { getHomeFaqSchema, getHomeWebAppSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
@@ -65,33 +65,7 @@ export default async function RootLayout({
       ? storedLocale
       : i18n.defaultLocale;
   const faqSchema = getHomeFaqSchema(locale);
-  const webAppSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Editor de Texto Online",
-    url: "https://editordetexto.online",
-    description:
-      "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-    applicationCategory: "Utility",
-    operatingSystem: "All",
-    creator: {
-      "@type": "Organization",
-      name: "Editor de Texto Online",
-    },
-    featureList: [
-      "Edição de texto avançada",
-      "Exportação para PDF e DOCX",
-      "Interface minimalista e intuitiva",
-      "Compatível com dispositivos móveis",
-    ],
-    keywords: [
-      "editor de texto online",
-      "escrever textos online",
-      "ferramenta gratuita para textos",
-      "exportar textos para PDF",
-      "editor de documentos online",
-    ],
-  };
+  const webAppSchema = getHomeWebAppSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
   // Removido o await para não bloquear o rendering inicial do layout

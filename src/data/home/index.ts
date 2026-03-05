@@ -60,6 +60,33 @@ export function getHomeSeo(locale: string) {
   };
 }
 
+export function getHomeWebAppSchema(locale: string) {
+  const { webAppSchema } = getHomeContent(locale);
+  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
+  const inLanguageMap: Record<Locale, string> = {
+    pt: "pt-BR",
+    en: "en",
+    es: "es",
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: webAppSchema.name,
+    url: getLocaleUrl(normalizedLocale),
+    description: webAppSchema.description,
+    inLanguage: inLanguageMap[normalizedLocale],
+    applicationCategory: webAppSchema.applicationCategory,
+    operatingSystem: "All",
+    creator: {
+      "@type": "Organization",
+      name: "Editor de Texto Online",
+    },
+    featureList: webAppSchema.featureList,
+    keywords: webAppSchema.keywords,
+  };
+}
+
 export function buildHomeMetadata(locale: string): Metadata {
   const seo = getHomeSeo(locale);
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;

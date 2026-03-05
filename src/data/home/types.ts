@@ -35,6 +35,14 @@ export type SeoContent = {
   openGraphDescription?: string;
 };
 
+export type WebAppSchemaContent = {
+  name: string;
+  description: string;
+  applicationCategory: string;
+  featureList: string[];
+  keywords: string[];
+};
+
 // --- New Landing Page Sections ---
 
 export type HeroContent = {
@@ -96,6 +104,7 @@ export type CtaContent = {
 export type HomeContent = {
   locale: Locale;
   seo: SeoContent;
+  webAppSchema: WebAppSchemaContent;
   article: ArticleContent;
   faq: FaqContent;
   hero?: HeroContent;
