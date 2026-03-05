@@ -20,6 +20,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 import { getCommonMessages } from "@/data/common";
+import { generateHTML } from "@tiptap/react";
+import getExtensionKit from "@/components/TiptapEditor/kit";
 
 const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
   ssr: false,
@@ -126,6 +128,42 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   const [shouldLoadEditor, setShouldLoadEditor] = useState(false);
 
+  const getEditorHtml = useCallback(() => {
+    const editorInstance = editorRef.current?.getInstance();
+    const htmlFromInstance = editorInstance?.getHTML();
+
+    if (htmlFromInstance && htmlFromInstance !== "<p></p>") {
+      return htmlFromInstance;
+    }
+
+    let content = getValues("content");
+    if (!content) return "";
+
+    if (typeof content === "string") {
+      if (content.startsWith("{") || content.startsWith("[")) {
+        try {
+          content = JSON.parse(content);
+        } catch {
+          return content;
+        }
+      } else {
+        return content;
+      }
+    }
+
+    if (typeof content === "object") {
+      try {
+        // @ts-expect-error - content is JSON
+        return generateHTML(content, getExtensionKit(locale));
+      } catch (err) {
+        console.error("Error generating HTML from JSON:", err);
+        return "";
+      }
+    }
+
+    return "";
+  }, [getValues, locale]);
+
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
     if (!isMobile) {
@@ -182,10 +220,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   const preparePdfExport = () => {
-    const editorInstance = editorRef.current?.getInstance();
-    const { title, content } = getValues();
-    const htmlFromEditor = editorInstance?.getHTML() || (typeof content === "string" ? content : "");
-    const safeHtml = typeof htmlFromEditor === "string" ? htmlFromEditor.trim() : "";
+    const { title } = getValues();
+    const htmlFromEditor = getEditorHtml();
+    const safeHtml = htmlFromEditor.trim();
 
     if (!safeHtml) {
       showNotification(formMessages.modal.noContent, "info");
@@ -261,15 +298,15 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   const handleSaveDOC = async () => {
-    const postData = localStorage.getItem("post");
-    if (!postData) {
+    const { title } = getValues();
+    const htmlContent = getEditorHtml().trim();
+    if (!htmlContent || htmlContent === "<p></p>") {
       showNotification(formMessages.modal.noContent, "info");
       return;
     }
 
-    const post = JSON.parse(postData);
     const fallbackName = formMessages.defaults.documentName;
-    const docTitleRaw = (post.title || fallbackName).trim() || fallbackName;
+    const docTitleRaw = (title || fallbackName).trim() || fallbackName;
     const docTitle = docTitleRaw.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
 
     const html = `
@@ -281,7 +318,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           <title>${docTitle}</title>
         </head>
         <body>
-          ${post.content}
+          ${htmlContent}
         </body>
       </html>
     `;
@@ -296,16 +333,15 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   const handleExportToTxt = () => {
     const editorInstance = editorRef.current?.getInstance();
-    const { title, content } = getValues();
-    const plainText =
-      editorInstance?.getText?.().trim() ||
-      (typeof content === "string"
-        ? content
-          ?.replace(/<[^>]+>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-        : "") ||
-      "";
+    const { title } = getValues();
+
+    let plainText = "";
+    if (editorInstance && !editorInstance.isEmpty) {
+      plainText = editorInstance.getText().trim();
+    } else {
+      const htmlFromEditor = getEditorHtml();
+      plainText = htmlFromEditor.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    }
 
     if (!plainText) {
       showNotification(formMessages.modal.noContent, "info");
@@ -346,10 +382,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }, []);
 
   const handleDownloadHtml = () => {
-    const editorInstance = editorRef.current?.getInstance();
-    const { title, content } = getValues();
-    const htmlFromEditor = editorInstance?.getHTML() || (typeof content === "string" ? content : "");
-    const safeHtml = typeof htmlFromEditor === "string" ? htmlFromEditor.trim() : "";
+    const { title } = getValues();
+    const htmlFromEditor = getEditorHtml();
+    const safeHtml = htmlFromEditor.trim();
 
     if (!safeHtml) {
       showNotification(formMessages.modal.noContent, "info");

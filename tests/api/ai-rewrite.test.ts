@@ -66,7 +66,6 @@ describe("POST /api/ai/rewrite", () => {
 
   it("should reject request when user is not authenticated", async () => {
     vi.mocked(auth).mockResolvedValueOnce({ userId: null } as any);
-    vi.mocked(getCurrentUser).mockResolvedValueOnce(null);
 
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",

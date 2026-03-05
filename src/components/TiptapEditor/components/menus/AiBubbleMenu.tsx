@@ -71,9 +71,8 @@ export function AiBubbleMenu() {
                   <button
                     onClick={() => setOpen(!open)}
                     disabled={isLoading || !isSignedIn}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20 ${
-                      !isSignedIn ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 whitespace-nowrap bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/20 ${!isSignedIn ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     {isLoading ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -82,9 +81,8 @@ export function AiBubbleMenu() {
                     )}
                     Reescrever IA
                     <ChevronDown
-                      className={`w-3 h-3 transition-transform ${
-                        open ? "rotate-180" : ""
-                      }`}
+                      className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""
+                        }`}
                     />
                   </button>
                   {isSignedIn && (
@@ -114,10 +112,15 @@ export function AiBubbleMenu() {
                 </div>
                 {(() => {
                   const toneIds = Object.keys(TONE_LABELS) as ToneId[];
-                  const activeToneIds = toneIds.filter((id) => activeTones[id]);
-                  const activeCustomTones = customTones.filter(
-                    (t) => t.isActive,
-                  );
+                  const activeToneIds = toneIds.filter((id, index) => {
+                    const isWithinLimit = userPlan !== "free" || index < 5;
+                    return activeTones[id] && isWithinLimit;
+                  });
+                  const activeCustomTones = customTones.filter((t, idx) => {
+                    const index = toneIds.length + idx;
+                    const isWithinLimit = userPlan !== "free" || index < 5;
+                    return t.isActive && isWithinLimit;
+                  });
 
                   if (
                     activeToneIds.length === 0 &&
