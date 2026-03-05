@@ -1,61 +1,72 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST } from "@/app/api/ai/rewrite/route";
 import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
+import { checkAiRateLimit } from "@/lib/ai-rate-limit";
+import { streamText } from "ai";
+import { ratelimit } from "@/lib/ratelimit";
 
-// Mock the clerk auth
+// Mock dependencies
 vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn().mockResolvedValue({ userId: "test_user_id" }),
+  auth: vi.fn(),
+}));
+
+vi.mock("@/lib/auth", () => ({
+  getCurrentUser: vi.fn(),
 }));
 
 vi.mock("ai", () => ({
   streamText: vi.fn(),
 }));
 
-// Mock the database
 vi.mock("@/lib/db", () => ({
   db: {
+    aiUsage: {
+      create: vi.fn().mockResolvedValue({}),
+    },
     user: {
-      findUnique: vi.fn().mockResolvedValue({
-        id: "db_test_user_id",
-        clerkId: "test_user_id",
-        subscription: { plan: "free" },
-      }),
+      update: vi.fn().mockResolvedValue({}),
     },
   },
 }));
 
-// Mock the auth lib
-vi.mock("@/lib/auth", () => ({
-  getCurrentUser: vi.fn().mockResolvedValue({
-    id: "db_test_user_id",
-    clerkId: "test_user_id",
-    subscription: { plan: "free" },
-  }),
-  getUserPlan: vi.fn(),
-}));
-
-// Mock the rate limit
 vi.mock("@/lib/ratelimit", () => ({
   ratelimit: {
     ai: {
-      limit: vi.fn().mockResolvedValue({ success: true }),
+      limit: vi.fn(),
     },
   },
 }));
 
-// Mock the AI rate limit
 vi.mock("@/lib/ai-rate-limit", () => ({
-  checkAiRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
+  checkAiRateLimit: vi.fn(),
+}));
+
+vi.mock("@/lib/ai-sanitize", () => ({
+  sanitizeAiInput: vi.fn((x) => x),
 }));
 
 describe("POST /api/ai/rewrite", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+
+    // Default mocks for each test to override as needed
+    vi.mocked(auth).mockResolvedValue({ userId: "test_user_id" } as any);
+    vi.mocked(getCurrentUser).mockResolvedValue({
+      id: "db_test_user_id",
+      clerkId: "test_user_id",
+      subscription: { plan: "free" },
+    } as any);
+    vi.mocked(checkAiRateLimit).mockResolvedValue({ allowed: true } as any);
+    vi.mocked(ratelimit.ai.limit).mockResolvedValue({ success: true } as any);
+    vi.mocked(streamText).mockResolvedValue({
+      toTextStreamResponse: () => new Response("AI response"),
+    } as any);
   });
 
   it("should reject request when user is not authenticated", async () => {
-    // Mock auth failure - need to mock it again if we want to change behavior
     vi.mocked(auth).mockResolvedValueOnce({ userId: null } as any);
+    vi.mocked(getCurrentUser).mockResolvedValueOnce(null);
 
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",
@@ -67,14 +78,10 @@ describe("POST /api/ai/rewrite", () => {
   });
 
   it("should reject request when rate limit exceeded", async () => {
-    // Mock rate limit failure
-    const { checkAiRateLimit } = await import("@/lib/ai-rate-limit");
     vi.mocked(checkAiRateLimit).mockResolvedValueOnce({
       allowed: false,
       usedDaily: 5,
       limitDaily: 5,
-      usedMonthlyPaid: 0,
-      limitMonthlyPaid: 0,
     } as any);
 
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
@@ -86,8 +93,7 @@ describe("POST /api/ai/rewrite", () => {
     });
 
     const response = await POST(mockRequest);
-    expect(response.status).toBe(429); // 429 Too Many Requests
-
+    expect(response.status).toBe(429);
     const json = await response.json();
     expect(json.error).toBe("Limite de uso gratuito atingido.");
   });
@@ -96,7 +102,7 @@ describe("POST /api/ai/rewrite", () => {
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",
       body: JSON.stringify({
-        tone: "romantic", // 6th tone (unauthorized for Free)
+        tone: "romantic", // romantic is not allowed for free users
         text: "hello",
       }),
     });
@@ -104,13 +110,10 @@ describe("POST /api/ai/rewrite", () => {
     const response = await POST(mockRequest);
     expect(response.status).toBe(403);
     const json = await response.json();
-    expect(json.error).toContain(
-      "Este tom não está disponível no plano gratuito",
-    );
+    expect(json.error).toContain("Este tom não está disponível no plano gratuito");
   });
 
   it("should allow any tone for Pro users", async () => {
-    const { getCurrentUser } = await import("@/lib/auth");
     vi.mocked(getCurrentUser).mockResolvedValueOnce({
       id: "db_test_user_id",
       clerkId: "test_user_id",
@@ -125,30 +128,19 @@ describe("POST /api/ai/rewrite", () => {
       }),
     });
 
-    // Mock completion response since it would try to talk to OpenAI
-    const { streamText } = await import("ai");
-    vi.mocked(streamText).mockResolvedValue({
-      toTextStreamResponse: () => new Response("AI response"),
-    } as any);
-
     const response = await POST(mockRequest);
     expect(response.status).toBe(200);
   });
 
   it("should reject request when Pro rate limit exceeded", async () => {
-    const { getCurrentUser } = await import("@/lib/auth");
     vi.mocked(getCurrentUser).mockResolvedValueOnce({
       id: "db_test_user_id",
       clerkId: "test_user_id",
       subscription: { plan: "pro" },
     } as any);
 
-    const { checkAiRateLimit } = await import("@/lib/ai-rate-limit");
     vi.mocked(checkAiRateLimit).mockResolvedValueOnce({
       allowed: false,
-      usedDaily: 5,
-      limitDaily: 5,
-      usedMonthlyPaid: 500,
       limitMonthlyPaid: 500,
     } as any);
 

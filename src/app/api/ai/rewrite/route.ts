@@ -73,12 +73,17 @@ export async function POST(req: Request) {
     }
 
     // 1. Autenticação e Sincronização de Usuário
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    }
+
     const { getCurrentUser } = await import("@/lib/auth");
     const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json(
-        { error: "Usuário não encontrado ou não autenticado." },
+        { error: "Usuário não encontrado." },
         { status: 404 },
       );
     }

@@ -18,12 +18,17 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     // 1. Autenticação e Sincronização de Usuário
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    }
+
     const { getCurrentUser } = await import("@/lib/auth");
     const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json(
-        { error: "Usuário não encontrado ou não autenticado." },
+        { error: "Usuário não encontrado." },
         { status: 404 },
       );
     }
@@ -34,7 +39,6 @@ export async function POST(req: Request) {
 
     // Reutilizar stripeCustomerId existente ou criar novo
     let customerId = user.stripeCustomerId;
-    const clerkId = user.clerkId;
 
     if (!customerId) {
       const customer = await stripe.customers.create({

@@ -184,8 +184,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const preparePdfExport = () => {
     const editorInstance = editorRef.current?.getInstance();
     const { title, content } = getValues();
-    const htmlFromEditor = editorInstance?.getHTML() ?? content;
-    const safeHtml = htmlFromEditor?.trim();
+    const htmlFromEditor = editorInstance?.getHTML() || (typeof content === "string" ? content : "");
+    const safeHtml = typeof htmlFromEditor === "string" ? htmlFromEditor.trim() : "";
 
     if (!safeHtml) {
       showNotification(formMessages.modal.noContent, "info");
@@ -299,10 +299,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const { title, content } = getValues();
     const plainText =
       editorInstance?.getText?.().trim() ||
-      content
-        ?.replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim() ||
+      (typeof content === "string"
+        ? content
+          ?.replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+        : "") ||
       "";
 
     if (!plainText) {
@@ -346,8 +348,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const handleDownloadHtml = () => {
     const editorInstance = editorRef.current?.getInstance();
     const { title, content } = getValues();
-    const htmlFromEditor = editorInstance?.getHTML() ?? content;
-    const safeHtml = htmlFromEditor?.trim();
+    const htmlFromEditor = editorInstance?.getHTML() || (typeof content === "string" ? content : "");
+    const safeHtml = typeof htmlFromEditor === "string" ? htmlFromEditor.trim() : "";
 
     if (!safeHtml) {
       showNotification(formMessages.modal.noContent, "info");
