@@ -153,8 +153,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
     if (typeof content === "object") {
       try {
-        // @ts-expect-error - content is JSON
-        return generateHTML(content, getExtensionKit(locale));
+        return generateHTML(content as any, getExtensionKit(locale));
       } catch (err) {
         console.error("Error generating HTML from JSON:", err);
         return "";

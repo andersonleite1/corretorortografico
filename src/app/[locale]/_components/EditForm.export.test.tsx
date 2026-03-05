@@ -44,8 +44,7 @@ describe("EditForm Export Logic - getEditorHtml", () => {
 
             if (typeof content === "object") {
                 try {
-                    // @ts-expect-error - content is JSON
-                    return generateHTML(content, getExtensionKit(mockLocale));
+                    return generateHTML(content as any, getExtensionKit(mockLocale));
                 } catch (err) {
                     console.error("Error generating HTML from JSON:", err);
                     return "";
