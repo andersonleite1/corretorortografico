@@ -142,8 +142,8 @@ const Header = ({ userButton }: HeaderProps) => {
                           type="button"
                           onClick={() => switchLocale(locale as Locale)}
                           className={`px-3 py-1 rounded-full transition ${isActive
-                              ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                              : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                            : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
                             }`}
                         >
                           {locale.toUpperCase()}
@@ -173,10 +173,11 @@ const Header = ({ userButton }: HeaderProps) => {
                           Entrar
                         </button>
                         <button
+                          disabled={true}
                           onClick={() =>
                             setAuthModal({ isOpen: true, view: "sign-up" })
                           }
-                          className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap h-9"
+                          className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap h-9 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Começar agora
                         </button>

@@ -43,13 +43,12 @@ export default function LandingCTA({ data }: Props) {
     <section className="landing-cta" aria-label="Chamada para ação final">
       <div className="landing-cta__inner">
         <h2 className="landing-cta__heading">{displayHeading}</h2>
-        <Link
-          href={displayHref}
-          onClick={handleClick}
-          className="landing-btn landing-btn--primary landing-btn--lg"
+        <button
+          disabled={true}
+          className="landing-btn landing-btn--primary landing-btn--lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {displayLabel}
-        </Link>
+        </button>
       </div>
 
       <AuthOverlay

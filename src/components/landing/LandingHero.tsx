@@ -45,13 +45,12 @@ export default function LandingHero({ data }: Props) {
             <h2 className="landing-hero__headline">{data.headline}</h2>
             <p className="landing-hero__subheadline">{data.subheadline}</p>
             <div className="landing-hero__actions">
-              <Link
-                href={data.ctaHref}
-                onClick={handleClick}
-                className="landing-btn landing-btn--primary"
+              <button
+                disabled={true}
+                className="landing-btn landing-btn--primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {data.ctaLabel}
-              </Link>
+              </button>
             </div>
             <p className="landing-hero__microcopy">{data.microcopy}</p>
           </div>
