@@ -17,10 +17,21 @@ vi.mock("@/lib/db", () => ({
     user: {
       findUnique: vi.fn().mockResolvedValue({
         id: "db_test_user_id",
+        clerkId: "test_user_id",
         subscription: { plan: "free" },
       }),
     },
   },
+}));
+
+// Mock the auth lib
+vi.mock("@/lib/auth", () => ({
+  getCurrentUser: vi.fn().mockResolvedValue({
+    id: "db_test_user_id",
+    clerkId: "test_user_id",
+    subscription: { plan: "free" },
+  }),
+  getUserPlan: vi.fn(),
 }));
 
 // Mock the rate limit
@@ -99,9 +110,10 @@ describe("POST /api/ai/rewrite", () => {
   });
 
   it("should allow any tone for Pro users", async () => {
-    const { db } = await import("@/lib/db");
-    vi.mocked(db.user.findUnique).mockResolvedValueOnce({
+    const { getCurrentUser } = await import("@/lib/auth");
+    vi.mocked(getCurrentUser).mockResolvedValueOnce({
       id: "db_test_user_id",
+      clerkId: "test_user_id",
       subscription: { plan: "pro" },
     } as any);
 
@@ -124,9 +136,10 @@ describe("POST /api/ai/rewrite", () => {
   });
 
   it("should reject request when Pro rate limit exceeded", async () => {
-    const { db } = await import("@/lib/db");
-    vi.mocked(db.user.findUnique).mockResolvedValueOnce({
+    const { getCurrentUser } = await import("@/lib/auth");
+    vi.mocked(getCurrentUser).mockResolvedValueOnce({
       id: "db_test_user_id",
+      clerkId: "test_user_id",
       subscription: { plan: "pro" },
     } as any);
 

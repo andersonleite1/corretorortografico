@@ -22,6 +22,10 @@ vi.mock("@clerk/nextjs/server", () => ({
   auth: vi.fn().mockResolvedValue({ userId: null }),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getCurrentUser: vi.fn().mockResolvedValue(null),
+}));
+
 vi.mock("@/lib/db", () => ({
   db: {
     user: {

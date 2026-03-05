@@ -3,9 +3,12 @@ import { db } from "./db";
 import { cache } from "react";
 import { redis } from "./redis";
 
+// Fallback para ambientes onde o cache do React não está disponível (ex: testes unitários)
+const cacheShim = typeof cache === "function" ? cache : <T extends Function>(fn: T) => fn;
+
 // `cache` evita múltiplos fetches do mesmo usuário no mesmo request.
 // Adicionamos um parâmetro opcional para permitir bypass do cache se necessário.
-export const getCurrentUser = cache(async (_forceRefresh: boolean = false) => {
+export const getCurrentUser = cacheShim(async (_forceRefresh: boolean = false) => {
   const { userId: clerkId } = await auth();
 
   if (!clerkId) return null;
@@ -36,7 +39,7 @@ export const getCurrentUser = cache(async (_forceRefresh: boolean = false) => {
 });
 
 // Helper para verificar plano com Cache distribuído (Redis)
-export const getUserPlan = cache(async (forceRefresh: boolean = false) => {
+export const getUserPlan = cacheShim(async (forceRefresh: boolean = false) => {
   const { userId: clerkId } = await auth();
   if (!clerkId) return "free";
 
