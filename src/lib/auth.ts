@@ -4,7 +4,7 @@ import { cache } from "react";
 import { redis } from "./redis";
 
 // Fallback para ambientes onde o cache do React não está disponível (ex: testes unitários)
-const cacheShim = typeof cache === "function" ? cache : <T extends Function>(fn: T) => fn;
+const cacheShim = typeof cache === "function" ? cache : <T extends (...args: any[]) => any>(fn: T) => fn;
 
 // `cache` evita múltiplos fetches do mesmo usuário no mesmo request.
 // Adicionamos um parâmetro opcional para permitir bypass do cache se necessário.
