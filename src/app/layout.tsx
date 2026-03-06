@@ -20,16 +20,7 @@ import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
 
-import dynamic from "next/dynamic";
-const CookieConsent = dynamic(
-  () =>
-    import("@/components/shared/CookieConsent").then(
-      (mod) => mod.CookieConsent,
-    ),
-  {
-    ssr: false,
-  },
-);
+import { CookieConsent } from "@/components/shared/CookieConsent";
 import { Analytics } from "@/components/shared/Analytics";
 
 export const metadata: Metadata = {
@@ -64,6 +55,7 @@ export default async function RootLayout({
     storedLocale && i18n.locales.includes(storedLocale)
       ? storedLocale
       : i18n.defaultLocale;
+  const cookieConsentGiven = cookieStore.get("cookie_consent")?.value === "true";
   const webAppSchema = getHomeWebAppSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
@@ -93,7 +85,7 @@ export default async function RootLayout({
               {children}
             </MainContent>
             <Toaster richColors position="top-right" />
-            <CookieConsent locale={locale} />
+            {!cookieConsentGiven && <CookieConsent locale={locale} />}
           </SidebarProvider>
         </ClerkThemeProvider>
       </body>
