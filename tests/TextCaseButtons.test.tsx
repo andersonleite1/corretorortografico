@@ -75,7 +75,7 @@ describe("TextCase Buttons", () => {
 
     it("CapitalizeButton chama o comando correto", () => {
         render(<CapitalizeButton />);
-        fireEvent.click(screen.getByText("Capitalize"));
+        fireEvent.click(screen.getByText("LetterCase"));
         expect(mockEditor.commands.setTextCase).toHaveBeenCalledWith("capitalize");
     });
 

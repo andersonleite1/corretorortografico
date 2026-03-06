@@ -22,6 +22,11 @@ const { mockEditor, mockRun } = vi.hoisted(() => {
 vi.mock("@/components/TiptapEditor/components/Provider", () => ({
     useTiptapContext: () => ({
         editor: mockEditor,
+        messages: {
+            toolbar: {
+                clearFormat: "Limpar formatação",
+            },
+        },
         contentElement: { current: document.createElement("div") },
     }),
 }));
