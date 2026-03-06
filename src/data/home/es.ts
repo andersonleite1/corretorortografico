@@ -7,13 +7,13 @@ const es: HomeContent = {
     description:
       "Editor de texto online gratuito, rápido y sin anuncios. Escribe, formatea y exporta tus textos fácilmente desde el navegador. Ideal para redactores, estudiantes y profesionales.",
     keywords: [
+      "editor de texto online",
+      "editor de texto en línea",
+      "editor de texto",
+      "editar texto online",
       "editor de texto online gratis",
       "editor de texto online sin descargar nada",
-      "bloc de notas online con contador de palabras",
       "eliminar formato de texto online",
-      "corrector de texto online gratis",
-      "exportar texto a PDF online",
-      "herramienta de escritura sin registro",
     ],
     openGraphTitle:
       "Editor de Texto Online: Escribe, Edita y Exporta Gratis",
@@ -32,11 +32,13 @@ const es: HomeContent = {
       "Compatible con dispositivos móviles",
     ],
     keywords: [
+      "editor de texto online",
+      "editor de texto en línea",
+      "editor de texto",
+      "editar texto online",
       "editor de texto online gratis",
-      "bloc de notas online con contador de palabras",
+      "editor de texto online sin descargar nada",
       "eliminar formato de texto online",
-      "reescribir texto con inteligencia artificial",
-      "exportar documento a PDF gratis online",
     ],
   },
   article: {
