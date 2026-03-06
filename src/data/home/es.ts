@@ -45,7 +45,7 @@ const es: HomeContent = {
     title:
       "Editor de Texto Online: Escribe, Edita y Exporta tus Textos Gratis",
     introHtml:
-      "El <strong>Editor de Texto Online</strong> es la herramienta que estabas buscando: sin instalaciones, sin costos ocultos y sin distracciones. Ya seas estudiante, redactor freelance o profesional, aquí puedes escribir, formatear y exportar tus documentos con toda la comodidad, directo desde el navegador.",
+      "Si buscas un <strong>editor de texto online gratis</strong>, esta es la herramienta que necesitas: sin costos ocultos, sin distracciones y completamente accesible. Ya seas estudiante, redactor freelance o profesional, nuestro <strong>editor de texto en línea</strong> te permite escribir, formatear y exportar tus documentos con total comodidad, directo desde el navegador.",
     sections: [
       {
         title: "¿Por qué usar nuestro Editor de Texto Online?",
@@ -82,7 +82,7 @@ const es: HomeContent = {
       {
         title: "Rápido, ligero y siempre disponible",
         description:
-          "Nuestro enfoque es combinar <strong>velocidad</strong>, <strong>simplicidad</strong> y <strong>potencia</strong> en una sola herramienta. No necesitas instalar nada ni pagar para empezar. Solo abre el navegador y escribe.",
+          "Nuestro enfoque es combinar <strong>velocidad</strong>, <strong>simplicidad</strong> y <strong>potencia</strong>. Al ser un <strong>editor de texto online sin descargar nada</strong>, no necesitas instalar programas pesados ni pagar para empezar. Solo abre tu navegador y comienza a escribir.",
       },
       {
         title: "Las ventajas que notarás desde el primer uso",
@@ -95,7 +95,7 @@ const es: HomeContent = {
       },
     ],
     finalNoteHtml:
-      "Probá el <strong>Editor de Texto Online</strong> ahora mismo y comprobá por qué es la herramienta favorita de redactores y estudiantes de toda Latinoamérica.",
+      "Prueba nuestro <strong>editor de texto</strong> ahora mismo y comprueba por qué es la herramienta favorita para <strong>editar texto online</strong> por redactores y estudiantes de toda Latinoamérica.",
   },
   faq: {
     label: "FAQ",
@@ -111,17 +111,17 @@ const es: HomeContent = {
       {
         question: "¿Cuál es la diferencia entre este editor y Word?",
         answer:
-          "Word está pensado para documentos complejos: maquetación, tablas de contenido, formatos de impresión. Nuestro editor va directo al grano: rápido, limpio y sin curva de aprendizaje. Perfecto para redactar, tomar apuntes o limpiar texto copiado de otras fuentes.",
+          "Word está pensado para documentos complejos: maquetación, tablas de contenido o formatos de impresión. Nuestro editor va directo al grano: es rápido, limpio y no tiene curva de aprendizaje. Es perfecto para redactar, tomar apuntes rápidos o <strong>eliminar formato de texto online</strong> al pegar contenido de otras fuentes.",
       },
       {
         question: "¿El editor es gratuito?",
         answer:
-          "Sí. Podés usar el editor, contar palabras, formatear texto y exportar archivos sin pagar nada ni crearte una cuenta. Si querés acceder a funciones avanzadas como reescritura con IA, más documentos en la nube o revisión gramatical extendida, tenemos el plan PRO.",
+          "Sí. Puedes usar el editor, contar palabras, formatear texto y exportar archivos sin pagar nada ni crearte una cuenta. Si quieres acceder a funciones avanzadas como reescritura con IA, más documentos en la nube o revisión gramatical extendida, contamos con el plan PRO.",
       },
       {
         question: "¿Puedo usar el editor desde el celular?",
         answer:
-          "Claro que sí. Está optimizado para Android e iOS. Podés escribir notas, listas o trabajos académicos desde el navegador del celular, con la misma experiencia que en la computadora y sin ocupar espacio en el teléfono.",
+          "Claro que sí. Está optimizado para Android e iOS. Puedes escribir notas, listas o trabajos académicos desde el navegador de tu celular, disfrutando la misma experiencia que en la computadora y sin ocupar espacio en tu dispositivo.",
       },
       {
         question: "¿Mis datos están seguros?",
