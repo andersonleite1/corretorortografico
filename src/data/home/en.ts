@@ -3,196 +3,201 @@ import { HomeContent } from "./types";
 const en: HomeContent = {
   locale: "en",
   seo: {
-    title: "Online Text Editor: Write, Format, and Publish Faster",
+    title: "Free Online Text Editor — Write, Format & Export Without Installing Anything",
     description:
-      "Use a modern online text editor optimized for writing blog posts, essays, newsletters, and code-friendly snippets without leaving the browser.",
+      "Free online text editor with word count, grammar check, and AI rewriting. No installs, no ads. Export to PDF or DOCX straight from your browser.",
     keywords: [
-      "online text editor",
       "free online text editor",
-      "write text online",
-      "best online text editor",
-      "blog post editor",
-      "plain text editor",
+      "online text editor no download",
+      "online notepad with word count",
+      "plain text editor online free",
+      "remove text formatting online",
+      "online word processor free",
+      "distraction-free writing tool",
     ],
-    openGraphTitle: "Online Text Editor: Write, Format, and Publish Faster",
+    openGraphTitle:
+      "Free Online Text Editor — Write, Format & Export Without Installing Anything",
     openGraphDescription:
-      "Draft, format, and export content directly from the browser with a lightweight online text editor—no installs or logins required.",
+      "Write, format, and export to PDF or Word right from your browser. Free, fast, and ad-free. No installs required.",
   },
   webAppSchema: {
-    name: "Online Text Editor",
+    name: "Free Online Text Editor",
     description:
-      "Free online tool to edit, format, and clean text. Includes word counter, case converter, and formatting removal.",
+      "A free online text editor for writing, formatting, and exporting documents directly in the browser. Includes real-time word count, grammar checking with LanguageTool, AI rewriting, and export to PDF, DOCX, TXT, and HTML.",
     applicationCategory: "UtilityApplication",
     featureList: [
-      "Advanced text editing",
-      "Export to PDF and DOCX",
-      "Minimalist and intuitive interface",
-      "Mobile compatible",
+      "Rich Text editing with tables, lists, and code blocks",
+      "Export to PDF, DOCX, TXT, and HTML",
+      "Real-time word and character counter",
+      "AI-powered text rewriting with 10+ tones",
+      "Grammar and spell check via LanguageTool",
+      "Works on mobile, tablet, and desktop",
     ],
     keywords: [
-      "online text editor",
-      "write text online",
-      "free text tool",
-      "export text to PDF",
-      "online document editor",
+      "free online text editor",
+      "online notepad with word count",
+      "remove text formatting online",
+      "export text to PDF online",
+      "AI writing tool free",
     ],
   },
   article: {
-    title: "Write, Edit, and Export Content with the Online Text Editor",
+    title:
+      "Free Online Text Editor: Write, Edit, and Export Your Documents Without Installing Anything",
     introHtml:
-      "Welcome to the <strong>Online Text Editor</strong>, a frictionless space for drafting ideas, formatting long-form posts, or cleaning up copy before publishing. Marketers, students, technical writers, and developers can all stay focused with a tool built specifically for browser-first writing.",
+      "The <strong>Free Online Text Editor</strong> is built for people who just want to write — no downloads, no bloated software, no unnecessary steps. Whether you're drafting a blog post, cleaning up pasted text, writing a report, or jotting down quick notes, everything you need is right here in the browser. Fast, clean, and free to start.",
     sections: [
       {
-        title: "Why choose this online text editor?",
+        title: "Why use this online text editor?",
         points: [
           {
-            highlight: "Simple by design:",
-            text: "A clean interface that keeps the focus on words and structure instead of menus.",
+            highlight: "Nothing to install:",
+            text: "Open a tab and start writing. No setup, no extensions, no account required to get going.",
           },
           {
-            highlight: "Productive workflow:",
-            text: "Preview post layouts, copy semantic HTML, or export to PDF/DOCX in seconds without extra plugins.",
+            highlight: "All the tools, none of the noise:",
+            text: "Format text, check grammar, rewrite with AI, and export to PDF or DOCX — all from a single, clutter-free interface.",
           },
           {
-            highlight: "Flexible:",
-            text: "Great for blog drafts, study notes, newsletter snippets, or quick documentation for product teams.",
+            highlight: "Works for everything:",
+            text: "Blog posts, academic essays, client briefs, meeting notes, email drafts — it handles them all.",
           },
           {
-            highlight: "Free forever:",
-            text: "All editing resources are available with no subscription, login, or watermarks.",
+            highlight: "Free to start, flexible if you grow:",
+            text: "Core features are free, no credit card needed. Upgrade to PRO when your workflow demands more.",
           },
         ],
       },
       {
-        title: "Everything you need to write well",
+        title: "What can you do with it?",
         description:
-          "From basic formatting to advanced export flows, the online editor adapts to your writing routine:",
+          "From a quick note to a full document, the editor adapts to whatever you're working on:",
         points: [
-          "Structure and format paragraphs effortlessly with familiar keyboard shortcuts;",
-          "Preview how the copy will look once published on a blog or CMS;",
-          "Download PDF or DOCX versions instantly for easy sharing;",
-          "Work from desktop, tablet, or mobile with the same experience anywhere.",
+          "Write and format with headings, lists, tables, and code blocks using Rich Text;",
+          "See exactly how your content will look before you publish or send it;",
+          "Download your work as a PDF or DOCX file in one click;",
+          "Switch between desktop, tablet, and mobile without missing a beat.",
         ],
       },
       {
-        title: "Lightweight yet powerful",
+        title: "Fast, lightweight, and always ready",
         description:
-          "We combine <strong>speed</strong>, <strong>clarity</strong>, and <strong>focus</strong> so you do not have to install heavy software, synchronize files, or deal with distractions.",
+          "We built this tool around <strong>speed</strong>, <strong>simplicity</strong>, and <strong>focus</strong>. No heavy software to load, no files to sync, no distractions to fight. Just open it and write.",
       },
       {
-        title: "Benefits for content teams",
-        description: "Choosing this online text editor unlocks:",
+        title: "Why writers, students, and pros keep coming back",
+        description: "Here's what makes it different from the rest:",
         points: [
-          "Browser-based access with zero setup or extensions;",
-          "Compatibility with phones, tablets, Chromebooks, and desktops alike;",
-          "A fast workflow even with limited connections or budget.",
+          "Zero setup — works instantly in any modern browser;",
+          "Equally smooth on a phone, a Chromebook, or a desktop;",
+          "Handles heavy documents without slowing down.",
         ],
       },
     ],
     finalNoteHtml:
-      "Start using the <strong>Online Text Editor</strong> today and see how enjoyable writing can be when the interface works with you. Keep every draft, newsletter, and landing-page update moving without leaving your browser.",
+      "Give the <strong>Free Online Text Editor</strong> a try — no sign-up needed to get started. It's the writing tool that gets out of your way and lets the words flow.",
   },
   faq: {
     label: "FAQ",
-    heading: "Frequently asked questions about the editor",
+    heading: "Frequently asked questions",
     description:
-      "Get quick answers about access, pricing, and how the editor behaves on different devices.",
+      "Quick answers about features, pricing, security, and getting the most out of the editor.",
     items: [
       {
-        question: "What is a text editor?",
+        question: "What is an online text editor?",
         answer:
-          "It is a tool made to create and manipulate plain-text files. Unlike full document processors, this editor prioritizes speed, clarity, and code-friendly formatting.",
+          "It's a writing tool that runs entirely in your browser — no download or installation needed. Unlike word processors like Word, the focus is on speed and simplicity: write, format, and export without the overhead.",
       },
       {
-        question: "How is it different from Word?",
+        question: "How is this different from Microsoft Word or Google Docs?",
         answer:
-          "Word focuses on complex layouts for printing. Our editor is lightweight, faster to load, and ideal for distraction-free drafting or cleaning formatting.",
+          "Word and Google Docs are full-featured document processors built around complex layouts and collaboration. This editor is lean and fast — perfect for drafting, cleaning up formatting, jotting notes, or writing content you'll paste somewhere else. Less friction, more focus.",
       },
       {
         question: "Is the editor really free?",
         answer:
-          "Yes. All counting, formatting, and export features are available without payments or sign-ups.",
+          "Yes. You can write, format, count words, and export to PDF or DOCX without paying anything or creating an account. If you need advanced features like unlimited AI rewrites, more cloud storage, or extended grammar review, the PRO plan covers that.",
       },
       {
         question: "Does it work on mobile?",
         answer:
-          "Absolutely. The interface is optimized for Android and iOS browsers, so you can capture ideas anywhere.",
+          "Absolutely. It's optimized for Android and iOS browsers, so you get the same smooth experience on your phone as you do on a laptop — without taking up any storage space.",
       },
       {
-        question: "Is my data secure?",
+        question: "Is my data safe?",
         answer:
-          "Yes. We use Clerk for secure authentication and Prisma with an encrypted database to store your documents. Your texts are never read or shared with third parties.",
+          "Yes. When you create an account, your documents are stored with secure authentication (Clerk) and an encrypted database (Prisma). Your writing is private and never shared with or sold to third parties.",
       },
       {
-        question: "Can I export to Word (.docx)?",
+        question: "Can I export my document to Word (.docx) or PDF?",
         answer:
-          "Yes! The editor offers native export to .docx (Word), as well as PDF, TXT, and HTML. Just click 'Export' and choose your preferred format.",
+          "Yes. Click 'Export' and choose from PDF, DOCX (fully compatible with Microsoft Word), TXT, or HTML. It's generated instantly right in the browser.",
       },
     ],
   },
   hero: {
-    headline: "Where Professional Writing Meets Artificial Intelligence.",
+    headline: "Write Smarter. Your Ideas, Polished by AI.",
     subheadline:
-      "Transform your ideas into impeccable documents with an advanced text editor, analytical grammar checker, and intelligent AI rewriting — all in one place.",
+      "A fast, free online text editor with grammar checking, AI rewriting, and one-click export to PDF or Word — all in one place, right in your browser.",
     ctaLabel: "Start Writing for Free",
     ctaHref: "#editor",
-    microcopy: "No credit card required · Available in PT, EN and ES",
+    microcopy: "No credit card required · Available in EN, PT, and ES",
   },
   problem: {
     eyebrow: "The problem",
-    heading: "Tired of switching between different tools?",
+    heading: "Tired of juggling tools just to write something?",
     pains: [
       {
         icon: "⏳",
-        title: "Time wasted on formatting",
+        title: "Formatting that eats your time",
         description:
-          "Hours lost adjusting margins, fonts, and styles instead of focusing on what really matters: the content.",
+          "You spend more time fighting margins, fonts, and inherited styles than actually writing. There's a better way.",
       },
       {
         icon: "📝",
-        title: "Grammar insecurity",
+        title: "Grammar mistakes that hurt your credibility",
         description:
-          "Sending emails, reports, or posts with grammar mistakes damages your professional image and credibility.",
+          "A typo in a client email or a grammar slip in a published post can undermine all the work you put in. Real-time corrections fix that.",
       },
       {
         icon: "🎯",
-        title: "Wrong tone for the audience",
+        title: "Same message, different audiences",
         description:
-          "Adapting the same text for a corporate email, blog post, or WhatsApp message takes unnecessary energy and time.",
+          "Rewriting the same content for a formal report, a casual blog post, and a quick Slack message takes far longer than it should.",
       },
     ],
   },
   features: {
     eyebrow: "Features",
-    heading: "Everything you need to write better, in one place",
+    heading: "Everything you need to write better, all in one place",
     pillars: [
       {
         icon: "✍️",
-        title: "Writing Without Barriers",
+        title: "Write Without Limits",
         description:
-          "Advanced Rich Text formatting with support for tables, lists, code blocks with Syntax Highlighting, and much more. Writing text online has never been so fluid and professional.",
+          "Full Rich Text support: headings, bullet lists, tables, inline code, and syntax-highlighted code blocks. The writing experience you'd expect from a pro tool, in a free browser tab.",
       },
       {
         icon: "🔍",
-        title: "Analytical and Smart Review",
+        title: "Grammar Check + AI Rewriter",
         description:
-          "Integration with LanguageTool for real-time grammar corrections in PT, EN, and ES. Over 10 AI rewriting tones to instantly adapt your text — plus the ability to create custom tones.",
+          "Catch grammar and spelling errors in real time with LanguageTool integration. Then refine your tone with 10+ AI rewriting styles — from formal to punchy — or build a custom one.",
       },
       {
         icon: "☁️",
-        title: "Portability and Flow",
+        title: "Export Anywhere, Anytime",
         description:
-          "Automatic saving, multi-language support, and direct export to PDF, DOCX, TXT, and HTML. Your documents always with you.",
+          "Auto-save keeps your work safe. When you're done, export to PDF, DOCX, TXT, or HTML with a single click. Works seamlessly on any device.",
       },
     ],
   },
   pricing: {
     eyebrow: "Pricing",
-    heading: "Simple plans, professional results",
+    heading: "Free to start. Built to scale with you.",
     tiers: [
       {
         name: "FREE",
-        focus: "For those just getting started",
+        focus: "For writers, students, and curious minds",
         price: null,
         items: [
           "Full Rich Text formatting",
@@ -202,7 +207,7 @@ const en: HomeContent = {
           "PDF and DOCX export",
           "No credit card required",
         ],
-        ctaLabel: "Start for Free",
+        ctaLabel: "Get Started Free",
         ctaHref: "/sign-up",
         highlighted: false,
       },
@@ -220,13 +225,13 @@ const en: HomeContent = {
           "Advanced grammar review",
           "Priority support",
         ],
-        ctaLabel: "Get PRO",
+        ctaLabel: "Upgrade to PRO",
         ctaHref: "/sign-up",
         highlighted: true,
       },
       {
         name: "TEAM",
-        focus: "For teams and companies",
+        focus: "For teams and organizations",
         price: "—",
         items: [
           "Everything in Pro",
@@ -234,7 +239,7 @@ const en: HomeContent = {
           "User management",
           "Advanced integrations",
         ],
-        ctaLabel: "Coming soon",
+        ctaLabel: "Coming Soon",
         ctaHref: "#",
         highlighted: false,
         comingSoon: true,
@@ -242,11 +247,11 @@ const en: HomeContent = {
     ],
   },
   cta: {
-    heading: "Ready to write faster and with much more quality?",
+    heading: "Ready to write faster and produce better work?",
     ctaLabel: "Create My Free Account",
     ctaHref: "/sign-up",
     loggedIn: {
-      heading: "Compare our plans and choose the best one for you",
+      heading: "Compare our plans and find the right fit for your workflow",
       ctaLabel: "View Plans",
       ctaHref: "#pricing",
     },

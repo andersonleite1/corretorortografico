@@ -3,126 +3,128 @@ import { HomeContent } from "./types";
 const es: HomeContent = {
   locale: "es",
   seo: {
-    title: "Editor de texto online: escribe, formatea y publica más rápido",
+    title: "Editor de Texto Online: Escribe, Edita y Exporta Gratis",
     description:
-      "Usa un editor de texto online moderno para redactar artículos, guiones, newsletters y notas técnicas directamente en el navegador.",
+      "Editor de texto online gratuito, rápido y sin anuncios. Escribe, formatea y exporta tus textos fácilmente desde el navegador. Ideal para redactores, estudiantes y profesionales.",
     keywords: [
-      "editor de texto online",
-      "editor de texto en línea gratis",
-      "escribir texto online",
-      "mejor editor de texto online",
-      "editor de blog online",
-      "editor web para textos",
+      "editor de texto online gratis",
+      "editor de texto online sin descargar nada",
+      "bloc de notas online con contador de palabras",
+      "eliminar formato de texto online",
+      "corrector de texto online gratis",
+      "exportar texto a PDF online",
+      "herramienta de escritura sin registro",
     ],
     openGraphTitle:
-      "Editor de texto online: escribe, formatea y publica más rápido",
+      "Editor de Texto Online: Escribe, Edita y Exporta Gratis",
     openGraphDescription:
-      "Organiza ideas, limpia el formato y exporta archivos PDF o DOCX con un editor de texto online ligero y sin instalaciones.",
+      "Redacta, edita y comparte tus textos con un editor online gratuito, directo en el navegador. Sin instalaciones, sin complicaciones.",
   },
   webAppSchema: {
     name: "Editor de Texto Online",
     description:
-      "El Editor de Texto Online es una herramienta gratuita para crear, editar y exportar textos de forma práctica y eficiente. Ideal para estudiantes, profesionales y escritores ocasionales.",
+      "El Editor de Texto Online es una herramienta gratuita para crear, editar y exportar textos de forma práctica y eficiente. Ideal para estudiantes, profesionales y redactores que buscan agilidad.",
     applicationCategory: "UtilityApplication",
     featureList: [
-      "Edición de texto avanzada",
+      "Edición de texto avanzada con Rich Text",
       "Exportación a PDF y DOCX",
       "Interfaz minimalista e intuitiva",
       "Compatible con dispositivos móviles",
     ],
     keywords: [
-      "editor de texto online",
-      "escribir texto online",
-      "herramienta gratuita para textos",
-      "exportar texto a PDF",
-      "editor de documentos online",
+      "editor de texto online gratis",
+      "bloc de notas online con contador de palabras",
+      "eliminar formato de texto online",
+      "reescribir texto con inteligencia artificial",
+      "exportar documento a PDF gratis online",
     ],
   },
   article: {
-    title: "Escribe, edita y exporta con el editor de texto online",
+    title:
+      "Editor de Texto Online: Escribe, Edita y Exporta tus Textos Gratis",
     introHtml:
-      "Bienvenido al <strong>Editor de Texto Online</strong>, un espacio pensado para redactar con agilidad, formatear publicaciones largas o depurar copys antes de enviarlos a un CMS. Estudiantes, equipos de marketing y desarrolladores mantienen el foco gracias a una herramienta creada para trabajar desde el navegador.",
+      "El <strong>Editor de Texto Online</strong> es la herramienta que estabas buscando: sin instalaciones, sin costos ocultos y sin distracciones. Ya seas estudiante, redactor freelance o profesional, aquí puedes escribir, formatear y exportar tus documentos con toda la comodidad, directo desde el navegador.",
     sections: [
       {
-        title: "Ventajas del editor de texto online",
+        title: "¿Por qué usar nuestro Editor de Texto Online?",
         points: [
           {
-            highlight: "Enfoque simple:",
-            text: "Una interfaz limpia que reduce distracciones y mantiene la concentración en las palabras.",
+            highlight: "Simple desde el primer clic:",
+            text: "Una interfaz limpia y sin ruido visual, pensada para mantener el foco donde debe estar: en tus palabras.",
           },
           {
-            highlight: "Flujo completo:",
-            text: "Previsualiza publicaciones, copia HTML semántico o exporta a PDF/DOCX sin plugins.",
+            highlight: "Completo cuando lo necesitas:",
+            text: "Edita, previsualiza, corrige con IA y exporta a PDF o DOCX, todo sin salir del navegador.",
           },
           {
-            highlight: "Versátil:",
-            text: "Útil para blogs, resúmenes, guiones, correos, newsletters y documentación técnica.",
+            highlight: "Para cualquier tipo de texto:",
+            text: "Artículos de blog, resúmenes académicos, correos profesionales, guiones — funciona para todo.",
           },
           {
-            highlight: "100 % gratuito:",
-            text: "Todas las funciones están abiertas sin registro, pagos ni marcas de agua.",
+            highlight: "Gratis para empezar:",
+            text: "Las funciones esenciales son gratuitas. Si tu trabajo exige más, tenemos planes pensados para eso.",
           },
         ],
       },
       {
-        title: "Funciones principales",
+        title: "¿Qué puedes hacer con el editor?",
         description:
-          "El editor ofrece lo esencial para trabajar con textos profesionales o personales en línea:",
+          "Desde una nota rápida hasta un documento profesional, el editor se adapta a lo que necesitas:",
         points: [
-          "Formatea títulos, listas y párrafos en segundos con atajos conocidos;",
-          "Visualiza la apariencia final antes de publicar en un blog o intranet;",
-          "Descarga archivos PDF o DOCX con un clic para compartir;",
-          "Trabaja desde móviles, tablets o computadoras sin perder rendimiento.",
+          "Escribir y formatear con atajos y herramientas de Rich Text;",
+          "Ver cómo quedará tu contenido antes de publicarlo;",
+          "Descargar tus documentos en PDF o DOCX con un solo clic;",
+          "Trabajar desde el celular, la tablet o la computadora sin perder nada.",
         ],
       },
       {
-        title: "Ligero y eficiente",
+        title: "Rápido, ligero y siempre disponible",
         description:
-          "Nos enfocamos en la <strong>velocidad</strong>, la <strong>claridad</strong> y la <strong>productividad</strong> para que puedas escribir desde cualquier dispositivo sin instalar software pesado.",
+          "Nuestro enfoque es combinar <strong>velocidad</strong>, <strong>simplicidad</strong> y <strong>potencia</strong> en una sola herramienta. No necesitas instalar nada ni pagar para empezar. Solo abre el navegador y escribe.",
       },
       {
-        title: "Beneficios clave",
-        description: "Al elegir este editor de texto online obtienes:",
+        title: "Las ventajas que notarás desde el primer uso",
+        description: "Estas son algunas razones por las que miles de usuarios ya lo prefieren:",
         points: [
-          "Acceso inmediato desde el navegador sin configuraciones;",
-          "Compatibilidad con iOS, Android, Chromebooks y equipos de escritorio;",
-          "Experiencia estable incluso con conexiones lentas o planes gratuitos.",
+          "Cero instalaciones: solo abre el navegador y empieza;",
+          "Funciona igual de bien en el celular que en la computadora;",
+          "Rápido y estable, incluso si tu conexión no lo es.",
         ],
       },
     ],
     finalNoteHtml:
-      "Prueba el <strong>Editor de Texto Online</strong> y descubre una manera más rápida de preparar y compartir documentos, newsletters y actualizaciones para tu sitio sin salir del navegador.",
+      "Probá el <strong>Editor de Texto Online</strong> ahora mismo y comprobá por qué es la herramienta favorita de redactores y estudiantes de toda Latinoamérica.",
   },
   faq: {
     label: "FAQ",
-    heading: "Preguntas frecuentes sobre el editor",
+    heading: "Preguntas frecuentes sobre el editor de texto online",
     description:
-      "Resolvemos dudas sobre uso, precio y funcionamiento en diferentes dispositivos.",
+      "Encuentra respuestas rápidas sobre funciones, precios y cómo usar el editor de forma productiva en cualquier dispositivo.",
     items: [
       {
         question: "¿Qué es un editor de texto?",
         answer:
-          "Es una herramienta para crear y modificar archivos en texto plano. Prioriza la agilidad y la limpieza del contenido frente a los procesadores tradicionales.",
+          "Es una herramienta diseñada para crear y editar texto de forma ágil, sin la complejidad de un procesador como Word. El objetivo es que puedas concentrarte en el contenido, no en configuraciones de formato.",
       },
       {
-        question: "¿En qué se diferencia de Word?",
+        question: "¿Cuál es la diferencia entre este editor y Word?",
         answer:
-          "Word está orientado a maquetaciones complejas. Nuestro editor es ligero, rápido y se centra en el contenido, ideal para borradores sin distracciones.",
+          "Word está pensado para documentos complejos: maquetación, tablas de contenido, formatos de impresión. Nuestro editor va directo al grano: rápido, limpio y sin curva de aprendizaje. Perfecto para redactar, tomar apuntes o limpiar texto copiado de otras fuentes.",
       },
       {
         question: "¿El editor es gratuito?",
         answer:
-          "Sí, todas las funciones se ofrecen sin coste y sin necesidad de crear cuentas.",
+          "Sí. Podés usar el editor, contar palabras, formatear texto y exportar archivos sin pagar nada ni crearte una cuenta. Si querés acceder a funciones avanzadas como reescritura con IA, más documentos en la nube o revisión gramatical extendida, tenemos el plan PRO.",
       },
       {
-        question: "¿Funciona en el móvil?",
+        question: "¿Puedo usar el editor desde el celular?",
         answer:
-          "Sí. Está optimizado para navegadores en Android e iOS para que puedas escribir en cualquier lugar.",
+          "Claro que sí. Está optimizado para Android e iOS. Podés escribir notas, listas o trabajos académicos desde el navegador del celular, con la misma experiencia que en la computadora y sin ocupar espacio en el teléfono.",
       },
       {
         question: "¿Mis datos están seguros?",
         answer:
-          "Sí. Usamos Clerk para la autenticación segura y Prisma con base de datos cifrada para guardar tus documentos. Tus textos nunca son leídos ni compartidos con terceros.",
+          "Sí. Si te registrás, tus documentos se almacenan con autenticación segura (Clerk) y en una base de datos cifrada (Prisma). Tus textos son completamente privados y nunca se comparten con terceros.",
       },
       {
         question: "¿Puedo exportar a Word (.docx)?",
@@ -132,13 +134,12 @@ const es: HomeContent = {
     ],
   },
   hero: {
-    headline:
-      "Donde la Escritura Profesional se Encuentra con la Inteligencia Artificial.",
+    headline: "Tu mente crea. Nuestra IA perfecciona.",
     subheadline:
       "Transforma tus ideas en documentos impecables con un editor de texto avanzado, corrector gramatical analítico y reescritura inteligente con IA — todo en un solo lugar.",
     ctaLabel: "Empezar a Escribir Gratis",
     ctaHref: "#editor",
-    microcopy: "Sin tarjeta de crédito · Disponible en PT, EN y ES",
+    microcopy: "Sin necesidad de tarjeta de crédito · Disponible en PT, EN y ES",
   },
   problem: {
     eyebrow: "El problema",
@@ -146,21 +147,21 @@ const es: HomeContent = {
     pains: [
       {
         icon: "⏳",
-        title: "Tiempo perdido con el formato",
+        title: "Tiempo que se va en formato, no en contenido",
         description:
-          "Horas perdidas ajustando márgenes, fuentes y estilos en lugar de centrarte en lo que realmente importa: el contenido.",
+          "Ajustar márgenes, fuentes y estilos que nadie pidió consume tiempo que deberías estar usando en escribir bien.",
       },
       {
         icon: "📝",
-        title: "Inseguridad gramatical",
+        title: "Errores que cuestan credibilidad",
         description:
-          "Enviar correos, informes o publicaciones con errores gramaticales daña tu imagen profesional y credibilidad.",
+          "Un error gramatical en un correo importante o en una publicación puede arruinar la impresión que querías dar. La corrección en tiempo real lo evita.",
       },
       {
         icon: "🎯",
-        title: "Tono incorrecto para la audiencia",
+        title: "El mismo texto, múltiples formatos",
         description:
-          "Adaptar el mismo texto para un correo corporativo, entrada de blog o mensaje de WhatsApp consume energía y tiempo innecesarios.",
+          "Adaptar un texto para un correo formal, un post de Instagram o una presentación es agotador sin las herramientas correctas.",
       },
     ],
   },
@@ -172,7 +173,7 @@ const es: HomeContent = {
         icon: "✍️",
         title: "Escritura Sin Barreras",
         description:
-          "Formato Rich Text avanzado con soporte para tablas, listas, bloques de código con Syntax Highlighting y mucho más. Escribir texto online nunca fue tan fluido y profesional.",
+          "Formateo Rich Text avanzado con soporte para tablas, listas, bloques de código con Syntax Highlighting y mucho más. Escribir online nunca fue tan fluido y profesional.",
       },
       {
         icon: "🔍",
@@ -184,7 +185,7 @@ const es: HomeContent = {
         icon: "☁️",
         title: "Portabilidad y Fluidez",
         description:
-          "Guardado automático, soporte multiidioma y exportación directa a PDF, DOCX, TXT y HTML. Tus documentos siempre contigo.",
+          "Guardado automático, soporte multiidioma y exportación directa a PDF, DOCX, TXT y HTML. Tus documentos siempre contigo, desde cualquier dispositivo.",
       },
     ],
   },
@@ -197,12 +198,12 @@ const es: HomeContent = {
         focus: "Para quienes están empezando",
         price: null,
         items: [
-          "Formato Rich Text completo",
+          "Formateo Rich Text completo",
           "5 reescrituras con IA por día",
           "5 tonos de reescritura",
           "Guardar documentos localmente",
           "Exportación PDF y DOCX",
-          "Sin tarjeta de crédito",
+          "Sin necesidad de tarjeta",
         ],
         ctaLabel: "Empezar Gratis",
         ctaHref: "/sign-up",
@@ -216,13 +217,13 @@ const es: HomeContent = {
         badge: "Más Popular",
         items: [
           "Todo del plan Free",
-          "500 reescrituras con IA/mes",
+          "500 reescrituras con IA / mes",
           "Tonos de reescritura personalizables",
           "50 documentos en la nube",
           "Revisión gramatical avanzada",
           "Soporte prioritario",
         ],
-        ctaLabel: "Obtener PRO",
+        ctaLabel: "Suscribirse al PRO",
         ctaHref: "/sign-up",
         highlighted: true,
       },
@@ -233,7 +234,7 @@ const es: HomeContent = {
         items: [
           "Todo del plan Pro",
           "Documentos compartidos",
-          "Gestión de usuarios",
+          "Administración de usuarios",
           "Integraciones avanzadas",
         ],
         ctaLabel: "Próximamente",
@@ -244,9 +245,14 @@ const es: HomeContent = {
     ],
   },
   cta: {
-    heading: "¿Listo para escribir más rápido y con mucha más calidad?",
+    heading: "¿Listo para escribir mejor, más rápido y sin complicaciones?",
     ctaLabel: "Crear Mi Cuenta Gratis",
     ctaHref: "/sign-up",
+    loggedIn: {
+      heading: "Compara nuestros planes y elige el mejor para ti",
+      ctaLabel: "Ver Planes",
+      ctaHref: "#pricing",
+    },
   },
 };
 
