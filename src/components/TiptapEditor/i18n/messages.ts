@@ -37,6 +37,7 @@ export type EditorMessages = {
     preview: string;
     importPdf: string;
     clearEditor: string;
+    clearFormat: string;
     copyEditor: string;
     save: string;
   };
@@ -204,6 +205,7 @@ export const editorMessages = withDefault({
       preview: "Visualizar",
       importPdf: "Importar PDF",
       clearEditor: "Limpar conteúdo",
+      clearFormat: "Limpar formatação",
       copyEditor: "Copiar conteúdo",
       save: "Salvar documento",
     },
@@ -367,6 +369,7 @@ export const editorMessages = withDefault({
       preview: "Preview",
       importPdf: "Import PDF",
       clearEditor: "Clear content",
+      clearFormat: "Clear formatting",
       copyEditor: "Copy content",
       save: "Save document",
     },
@@ -530,7 +533,8 @@ export const editorMessages = withDefault({
       preview: "Vista previa",
       importPdf: "Importar PDF",
       clearEditor: "Limpiar contenido",
-      copyEditor: "Copiar conteúdo",
+      clearFormat: "Borrar formato",
+      copyEditor: "Copiar contenido",
       save: "Guardar documento",
     },
     auth: {

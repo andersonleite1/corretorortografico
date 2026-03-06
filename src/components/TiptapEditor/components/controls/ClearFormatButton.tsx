@@ -4,7 +4,7 @@ import { useEditorState } from "@tiptap/react";
 import { useTiptapContext } from "../Provider";
 
 const ClearFormatButton = () => {
-  const { editor } = useTiptapContext();
+  const { editor, messages } = useTiptapContext();
 
   const state = useEditorState({
     editor,
@@ -18,7 +18,7 @@ const ClearFormatButton = () => {
   return (
     <MenuButton
       icon="Eraser"
-      tooltip="Clear Format"
+      tooltip={messages.toolbar.clearFormat}
       onClick={() =>
         editor.chain().focus().unsetAllMarks().clearNodes().run()
       }
