@@ -163,6 +163,25 @@ export default function EditPageContent({ content, userPlan }: Props) {
         maxWidthClass,
       )}
     >
+      {/* ── Schema ─────────────────────────────────────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faq.items.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          }),
+        }}
+      />
+
       {/* ── Editor ─────────────────────────────────────────────────────────── */}
       <div id="editor" className="landing-editor-section">
         <EditForm locale={content.locale} userPlan={userPlan} />
@@ -226,8 +245,6 @@ export default function EditPageContent({ content, userPlan }: Props) {
         id="faq"
         className="landing-faq"
         aria-labelledby="faq-heading"
-        itemScope
-        itemType="https://schema.org/FAQPage"
       >
         <div className="landing-faq__inner">
           <div className="landing-faq__header">
@@ -244,12 +261,9 @@ export default function EditPageContent({ content, userPlan }: Props) {
                 key={item.question}
                 className="landing-faq__item"
                 open={index === 0}
-                itemProp="mainEntity"
-                itemScope
-                itemType="https://schema.org/Question"
               >
                 <summary className="landing-faq__summary">
-                  <span itemProp="name">{item.question}</span>
+                  <span>{item.question}</span>
                   <svg
                     className="landing-faq__chevron"
                     viewBox="0 0 20 20"
@@ -266,13 +280,8 @@ export default function EditPageContent({ content, userPlan }: Props) {
                     />
                   </svg>
                 </summary>
-                <div
-                  className="landing-faq__answer"
-                  itemProp="acceptedAnswer"
-                  itemScope
-                  itemType="https://schema.org/Answer"
-                >
-                  <p itemProp="text">{item.answer}</p>
+                <div className="landing-faq__answer">
+                  <p>{item.answer}</p>
                 </div>
               </details>
             ))}
@@ -282,6 +291,6 @@ export default function EditPageContent({ content, userPlan }: Props) {
 
       {/* ── Final CTA ───────────────────────────────────────────────────────── */}
       {content.cta && <LandingCTA data={content.cta} />}
-    </div>
+    </div >
   );
 }

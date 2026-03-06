@@ -64,7 +64,6 @@ export default async function RootLayout({
     storedLocale && i18n.locales.includes(storedLocale)
       ? storedLocale
       : i18n.defaultLocale;
-  const faqSchema = getHomeFaqSchema(locale);
   const webAppSchema = getHomeWebAppSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
@@ -80,10 +79,6 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </head>
       <body>
