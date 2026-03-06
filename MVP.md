@@ -43,7 +43,7 @@ O núcleo da aplicação é baseado no motor Tiptap (ProseMirror), oferecendo um
 
 - **Salvamento Automático**: Persistência inteligente de rascunhos no `localStorage` do navegador para evitar perda de dados.
 - **Exportação Múltipla**:
-  - Exportação para PDF pronta para uso e impressão (`jspdf` + `html2canvas`).
+  - Exportação para PDF pronta para uso e impressão.
   - Exportação para arquivo Word padrão (`.docx`).
 
 ## ⚙️ Configurações e UI Geral
