@@ -19,7 +19,9 @@ const ClearFormatButton = () => {
     <MenuButton
       icon="Eraser"
       tooltip="Clear Format"
-      onClick={() => editor.chain().focus().unsetAllMarks().run()}
+      onClick={() =>
+        editor.chain().focus().unsetAllMarks().clearNodes().run()
+      }
       {...state}
     />
   );

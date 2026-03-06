@@ -37,6 +37,10 @@ import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
 import SettingsButton from "./controls/SettingsButton";
 import AiRewriteButton from "./controls/AiRewriteButton";
+import ClearFormatButton from "./controls/ClearFormatButton";
+import UppercaseButton from "./controls/UppercaseButton";
+import LowercaseButton from "./controls/LowercaseButton";
+import CapitalizeButton from "./controls/CapitalizeButton";
 
 const MenuBar = () => {
   const { exportActions, draftActions } = useTiptapContext();
@@ -58,13 +62,16 @@ const MenuBar = () => {
         {buttonVisibility.undo && <UndoButton />}
         {buttonVisibility.redo && <RedoButton />}
         {buttonVisibility.save && <SaveButton />}
-        {/* <ClearFormatButton /> */}
+        {buttonVisibility.clearFormat && <ClearFormatButton />}
 
         <ToolbarDivider />
 
         {buttonVisibility.bold && <BoldButton />}
         {buttonVisibility.italic && <ItalicButton />}
         {buttonVisibility.underline && <UnderlineButton />}
+        {buttonVisibility.uppercase && <UppercaseButton />}
+        {buttonVisibility.lowercase && <LowercaseButton />}
+        {buttonVisibility.capitalize && <CapitalizeButton />}
         {buttonVisibility.moreMark && <MoreMarkDropdown />}
 
         <ToolbarDivider />
@@ -82,12 +89,12 @@ const MenuBar = () => {
         <ToolbarDivider />
 
         {/* <BlockquoteButton /> */}
-        {buttonVisibility.link && <LinkButton />}
         {buttonVisibility.table && <TableButton />}
         {/* <ImageButton /> */}
         {/* <YoutubeButton /> */}
         {buttonVisibility.codeBlock && <CodeBlockButton />}
         {buttonVisibility.insert && <InsertDropdown />}
+        {buttonVisibility.link && <LinkButton />}
 
         <ToolbarDivider />
 

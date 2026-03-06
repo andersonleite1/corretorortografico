@@ -66,6 +66,9 @@ import {
   TbKeyboard,
   TbInfoCircle,
   TbAlertTriangle,
+  TbArrowBigDown,
+  TbArrowBigUp,
+  TbLetterCaseToggle,
 } from "react-icons/tb";
 import { MdHistory } from "react-icons/md";
 import { RiTextSpacing } from "react-icons/ri";
@@ -158,6 +161,9 @@ export const icons = {
   Keyboard: TbKeyboard,
   Info: TbInfoCircle,
   Alert: TbAlertTriangle,
+  Uppercase: TbArrowBigUp,
+  Lowercase: TbArrowBigDown,
+  Capitalize: TbLetterCaseToggle,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

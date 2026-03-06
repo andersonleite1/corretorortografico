@@ -21,6 +21,7 @@ import {
   Table,
   LanguageTool,
   Shortcuts,
+  TextCase,
 } from "./extensions";
 import { Locale, i18n } from "../../../i18n-config";
 
@@ -59,6 +60,7 @@ const createExtensionKit = (locale?: Locale) => [
   }),
   Selection,
   Shortcuts,
+  TextCase,
   CharacterCount,
   Superscript,
   Subscript,

@@ -39,6 +39,10 @@ export type ToolbarButtonId =
   | "sourceCode"
   | "fullScreen"
   | "aiRewrite"
+  | "uppercase"
+  | "lowercase"
+  | "capitalize"
+  | "clearFormat"
   | "shortcuts";
 
 export type ToneId =
@@ -99,6 +103,10 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
   sourceCode: true,
   fullScreen: true,
   aiRewrite: true,
+  uppercase: true,
+  lowercase: true,
+  capitalize: true,
+  clearFormat: true,
   shortcuts: true,
 };
 
@@ -153,6 +161,10 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
   sourceCode: "Código-fonte",
   fullScreen: "Tela cheia",
   aiRewrite: "Reescrever IA",
+  uppercase: "Maiúsculas",
+  lowercase: "Minúsculas",
+  capitalize: "Primeira Letra Maiúscula",
+  clearFormat: "Limpar Formatação",
   shortcuts: "Teclas de atalho",
 };
 

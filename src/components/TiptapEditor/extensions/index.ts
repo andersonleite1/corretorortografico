@@ -23,3 +23,4 @@ export { Image } from "./Image";
 export { Table } from "./Table";
 export { LanguageTool } from "./LanguageTool";
 export { Shortcuts } from "./Shortcuts";
+export { TextCase } from "./TextCase";
