@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export function Analytics() {
   const [shouldLoad, setShouldLoad] = useState(false);
@@ -35,21 +36,10 @@ export function Analytics() {
 
   return (
     <>
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-XFE7CNSV4S"
-        strategy="lazyOnload"
-      />
-      <Script id="google-analytics" strategy="lazyOnload">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-XFE7CNSV4S');
-        `}
-      </Script>
+      <GoogleAnalytics gaId="G-XFE7CNSV4S" />
       <Script
         id="ms-clarity"
-        strategy="lazyOnload"
+        strategy="worker"
         dangerouslySetInnerHTML={{
           __html: `(function(c,l,a,r,i,t,y){
                 c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };

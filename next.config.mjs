@@ -9,6 +9,9 @@ const __dirname = dirname(__filename);
 const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
+  experimental: {
+    nextScriptWorkers: true,
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
