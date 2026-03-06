@@ -26,7 +26,7 @@ const MoreMarkPopover = () => {
   return (
     <MenuButton
       type="popover"
-      icon="LetterCase"
+      icon="Capitalize"
       tooltip={messages.toolbar.moreFormats}
       disabled={isDisabled}
     >

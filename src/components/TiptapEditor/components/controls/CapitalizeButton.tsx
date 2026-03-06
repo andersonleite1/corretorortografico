@@ -17,7 +17,7 @@ const CapitalizeButton = () => {
 
     return (
         <MenuButton
-            icon="Capitalize"
+            icon="LetterCase"
             tooltip="Primeira Letra Maiúscula"
             onClick={() => (editor as any).commands.setTextCase("capitalize")}
             {...state}
