@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import { Locale } from "../../i18n-config";
+import { useUserPlan } from "@/components/providers/PlanProvider";
 
 import { EditorSettingsProvider } from "@/components/providers/EditorSettingsProvider";
 
@@ -20,27 +21,15 @@ interface MainContentProps {
   children: React.ReactNode;
   userButton: React.ReactNode;
   locale: Locale;
-  userPlan: "free" | "pro" | "team";
 }
 
 export const MainContent = ({
   children,
   userButton,
   locale,
-  userPlan: initialPlan,
 }: MainContentProps) => {
   const { isDocumentsDialogOpen, setIsDocumentsDialogOpen } = useSidebar();
-  const [userPlan, setUserPlan] = useState<"free" | "pro" | "team">(initialPlan);
-
-  // Fetch true plan client-side after initial paint to unblock TTFB
-  useEffect(() => {
-    fetch("/api/user/plan")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.plan) setUserPlan(data.plan);
-      })
-      .catch((err) => console.error("Error fetching user plan:", err));
-  }, []);
+  const { plan: userPlan } = useUserPlan();
 
   return (
     <EditorSettingsProvider>

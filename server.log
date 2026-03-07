@@ -1,0 +1,6 @@
+  ▲ Next.js 14.2.33
+  - Local:        http://localhost:3001
+
+ ✓ Starting...
+[@sentry/nextjs] DEPRECATION WARNING: autoInstrumentMiddleware is deprecated and will be removed in a future version. Use webpack.autoInstrumentMiddleware instead.
+ ✓ Ready in 1219ms

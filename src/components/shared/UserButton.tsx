@@ -5,19 +5,11 @@ import { UserButton as ClerkUserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { getCommonMessages } from "@/data/common";
 import { Locale } from "../../../i18n-config";
+import { useUserPlan } from "@/components/providers/PlanProvider";
 
 export function UserButton({ locale = "pt" }: { locale?: string }) {
-  const [plan, setPlan] = useState<string>("free");
+  const { plan } = useUserPlan();
   const t = getCommonMessages(locale as Locale);
-
-  useEffect(() => {
-    fetch("/api/user/plan")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.plan) setPlan(data.plan);
-      })
-      .catch((err) => console.error("Error fetching user plan in UserButton:", err));
-  }, []);
 
   return (
     <div className="flex items-center gap-3">

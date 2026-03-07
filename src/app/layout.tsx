@@ -25,6 +25,7 @@ import { getHomeFaqSchema, getHomeWebAppSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
+import { PlanProvider } from "@/components/providers/PlanProvider";
 
 const CookieConsent = dynamic(
   () => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent),
@@ -67,12 +68,6 @@ export default async function RootLayout({
   const cookieConsentGiven = cookieStore.get("cookie_consent")?.value === "true";
   const webAppSchema = getHomeWebAppSchema(locale);
 
-  // Sincroniza o usuário com o banco de dados (Fallback)
-  // syncUserWithDb(); // Removed to absolute unblock TTFB
-
-  // const userPlan = await getUserPlan(); // Removed to unblock TTFB
-  const userPlan = "free";
-
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <head>
@@ -84,18 +79,19 @@ export default async function RootLayout({
       </head>
       <body>
         <ClerkThemeProvider locale={locale}>
-          <SidebarProvider>
-            <Analytics />
-            <MainContent
-              userButton={<UserButton locale={locale} />}
-              locale={locale}
-              userPlan={userPlan}
-            >
-              {children}
-            </MainContent>
-            <Toaster richColors position="top-right" />
-            {!cookieConsentGiven && <CookieConsent locale={locale} />}
-          </SidebarProvider>
+          <PlanProvider>
+            <SidebarProvider>
+              <Analytics />
+              <MainContent
+                userButton={<UserButton locale={locale} />}
+                locale={locale}
+              >
+                {children}
+              </MainContent>
+              <Toaster richColors position="top-right" />
+              {!cookieConsentGiven && <CookieConsent locale={locale} />}
+            </SidebarProvider>
+          </PlanProvider>
         </ClerkThemeProvider>
       </body>
     </html>

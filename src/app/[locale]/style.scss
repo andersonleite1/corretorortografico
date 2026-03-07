@@ -327,10 +327,15 @@
   }
 
   &__visual {
+    display: none;
     flex: 1;
     animation: fadeInUp 0.7s 0.15s ease both;
     max-width: 560px;
     width: 100%;
+
+    @media (min-width: 1024px) {
+      display: block;
+    }
   }
 
   &__screenshot-wrap {
