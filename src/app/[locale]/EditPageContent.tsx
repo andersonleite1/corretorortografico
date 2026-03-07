@@ -182,13 +182,14 @@ export default function EditPageContent({ content, userPlan }: Props) {
         }}
       />
 
+      {/* ── New landing sections (Hero first for LCP) ────────────────────────── */}
+      {content.hero && <LandingHero data={content.hero} />}
+
       {/* ── Editor ─────────────────────────────────────────────────────────── */}
       <div id="editor" className="landing-editor-section">
         <EditForm locale={content.locale} userPlan={userPlan} />
       </div>
 
-      {/* ── New landing sections ────────────────────────────────────────────── */}
-      {content.hero && <LandingHero data={content.hero} />}
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}
       {content.pricing && <LandingPricing data={content.pricing} />}

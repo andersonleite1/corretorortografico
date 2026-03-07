@@ -1,6 +1,7 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
+import dynamic from "next/dynamic";
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -25,7 +26,10 @@ import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
 
-import { CookieConsent } from "@/components/shared/CookieConsent";
+const CookieConsent = dynamic(
+  () => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent),
+  { ssr: false }
+);
 import { Analytics } from "@/components/shared/Analytics";
 
 export const metadata: Metadata = {

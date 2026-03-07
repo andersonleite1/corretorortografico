@@ -12,9 +12,22 @@ interface CookieConsentProps {
 }
 
 export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const content = getCookieConsentContent(locale);
   const t = getCommonMessages(locale).cookieConsent;
+
+  React.useEffect(() => {
+    // Verificar se já foi aceito
+    const hasConsented = document.cookie.includes("cookie_consent=true") ||
+      localStorage.getItem("cookie_consent") === "true";
+
+    if (!hasConsented) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleAccept = () => {
     document.cookie = "cookie_consent=true; path=/; max-age=31536000; SameSite=Lax";
@@ -25,10 +38,9 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
   };
 
   if (!isVisible) return null;
-
   return (
-    <div className="fixed bottom-6 left-6 right-6 z-[9999] mx-auto max-w-4xl animate-in fade-in duration-500">
-      <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-white/20 bg-white/70 p-4 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/70 md:flex-row md:p-6">
+    <div className="fixed bottom-4 left-4 right-4 z-[9999] mx-auto max-w-4xl animate-in fade-in duration-500 md:bottom-6 md:left-6 md:right-6">
+      <div className="flex flex-col items-center justify-between gap-3 rounded-xl border border-white/20 bg-white/80 p-3 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/80 md:flex-row md:gap-4 md:rounded-2xl md:p-6">
         <div className="flex items-start gap-4">
           <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 sm:flex">
             <Cookie className="h-5 w-5" />
