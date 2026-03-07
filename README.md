@@ -36,7 +36,7 @@ Um editor de texto WYSIWYG moderno, robusto e altamente customizável construíd
 - **Engine do Editor**: [Tiptap](https://tiptap.dev/) / [ProseMirror](https://prosemirror.net/)
 - **Edição de Código**: [CodeMirror 6](https://codemirror.net/)
 - **Upload de Imagens**: [Cloudinary](https://cloudinary.com/)
-- **Exportação**: [html-docx-js](https://github.com/evidenceprime/html-docx-js)
+- **Exportação**: [PDF (API Externa)](https://editordetexto.online) e .docx nativo.
 
 ---
 

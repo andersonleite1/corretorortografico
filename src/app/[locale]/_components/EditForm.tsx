@@ -12,7 +12,6 @@ import { Controller, useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
 import { FaTimes, FaBug } from "react-icons/fa";
-import { v4 as uuidv4 } from "uuid";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
 import { getLocalDocumentById } from "@/lib/local-storage";
@@ -622,7 +621,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
       if (!docId) {
         // Fallback para localStorage se não houver docId
         const current = {
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           title: watch("title") || formMessages.defaults.draftTitle,
           content: watch("content") || "",
           date: new Date().toLocaleString(formMessages.dateLocale),
