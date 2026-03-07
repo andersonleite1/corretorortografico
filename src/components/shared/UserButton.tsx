@@ -1,12 +1,23 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { UserButton as ClerkUserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { getUserPlan } from "@/lib/auth";
 import { getCommonMessages } from "@/data/common";
 import { Locale } from "../../../i18n-config";
 
-export async function UserButton({ locale = "pt" }: { locale?: string }) {
-  const plan = await getUserPlan();
+export function UserButton({ locale = "pt" }: { locale?: string }) {
+  const [plan, setPlan] = useState<string>("free");
   const t = getCommonMessages(locale as Locale);
+
+  useEffect(() => {
+    fetch("/api/user/plan")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.plan) setPlan(data.plan);
+      })
+      .catch((err) => console.error("Error fetching user plan in UserButton:", err));
+  }, []);
 
   return (
     <div className="flex items-center gap-3">

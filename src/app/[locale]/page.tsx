@@ -30,7 +30,8 @@ export default async function LocaleHomePage({ params }: Props) {
   }
 
   const content = getHomeContent(locale);
-  const userPlan = await getUserPlan();
+  // const userPlan = await getUserPlan(); // Removed to improve TTFB
+  const userPlan = "free";
 
   return (
     <div className="px-3 py-6 sm:px-6">

@@ -5,8 +5,13 @@ import { cookies } from "next/headers";
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 });
-const fontSans = Open_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const fontSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 import { UserButton } from "@/components/shared/UserButton";
 import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
@@ -59,10 +64,10 @@ export default async function RootLayout({
   const webAppSchema = getHomeWebAppSchema(locale);
 
   // Sincroniza o usuário com o banco de dados (Fallback)
-  // Removido o await para não bloquear o rendering inicial do layout
-  syncUserWithDb();
+  // syncUserWithDb(); // Removed to absolute unblock TTFB
 
-  const userPlan = await getUserPlan();
+  // const userPlan = await getUserPlan(); // Removed to unblock TTFB
+  const userPlan = "free";
 
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import dynamic from "next/dynamic";
 import Header from "@/components/shared/Header";
 import Footer from "@/components/Footer/footer";
@@ -25,9 +27,20 @@ export const MainContent = ({
   children,
   userButton,
   locale,
-  userPlan,
+  userPlan: initialPlan,
 }: MainContentProps) => {
   const { isDocumentsDialogOpen, setIsDocumentsDialogOpen } = useSidebar();
+  const [userPlan, setUserPlan] = useState<"free" | "pro" | "team">(initialPlan);
+
+  // Fetch true plan client-side after initial paint to unblock TTFB
+  useEffect(() => {
+    fetch("/api/user/plan")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.plan) setUserPlan(data.plan);
+      })
+      .catch((err) => console.error("Error fetching user plan:", err));
+  }, []);
 
   return (
     <EditorSettingsProvider>
