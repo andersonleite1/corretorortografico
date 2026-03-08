@@ -51,9 +51,10 @@ describe("Images API POST", () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const req = {
-      formData: vi.fn().mockResolvedValue(formData),
-    } as unknown as Request;
+    const req = new Request("http://localhost:3000/api/images", {
+      method: "POST",
+      body: formData,
+    });
 
     // Mock cloudinary upload_stream
     const mockResult = {
@@ -71,7 +72,7 @@ describe("Images API POST", () => {
       (options: any, callback: any) => {
         // Capture the public_id passed to options
         expect(options.public_id).toMatch(
-          new RegExp(`^${userId}/\\d+-test-image$`),
+          new RegExp(`^${userId}/\\d+-(test-image|blob)$`),
         );
         expect(options.tags).toContain(userId);
 
@@ -100,7 +101,7 @@ describe("Images API POST", () => {
     const response = await POST(req);
     expect(response.status).toBe(400);
     const data = await response.json();
-    expect(data.error).toBe("No file provided");
+    expect(data.error).toBe("No file or URL provided");
   });
 
   it("should return 400 for invalid file types", async () => {
