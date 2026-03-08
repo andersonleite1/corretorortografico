@@ -1,11 +1,20 @@
 import { Editor } from "@tiptap/core";
 import { StarterKit } from "@tiptap/starter-kit";
 import TextCase from "@/components/TiptapEditor/extensions/TextCase";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 
 describe("TextCase extension", () => {
+    let editor: Editor | null = null;
+
+    afterEach(() => {
+        if (editor) {
+            editor.destroy();
+            editor = null;
+        }
+    });
+
     it("should convert text to uppercase", () => {
-        const editor = new Editor({
+        editor = new Editor({
             extensions: [StarterKit, TextCase],
             content: "<p>hello world</p>",
         });
@@ -17,7 +26,7 @@ describe("TextCase extension", () => {
     });
 
     it("should convert text to lowercase", () => {
-        const editor = new Editor({
+        editor = new Editor({
             extensions: [StarterKit, TextCase],
             content: "<p>HELLO WORLD</p>",
         });
@@ -29,7 +38,7 @@ describe("TextCase extension", () => {
     });
 
     it("should convert text to capitalize", () => {
-        const editor = new Editor({
+        editor = new Editor({
             extensions: [StarterKit, TextCase],
             content: "<p>hello world</p>",
         });
@@ -41,7 +50,7 @@ describe("TextCase extension", () => {
     });
 
     it("should not change anything if selection is empty", () => {
-        const editor = new Editor({
+        editor = new Editor({
             extensions: [StarterKit, TextCase],
             content: "<p>hello world</p>",
         });

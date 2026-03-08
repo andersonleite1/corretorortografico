@@ -58,6 +58,7 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`Status remoto: ${response.status} de api.editordetexto.cloud/api/pdf/html`);
       return new NextResponse(
         errorText || `Erro na API remota: ${response.status}`,
         { status: response.status },
