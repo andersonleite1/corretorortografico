@@ -84,7 +84,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const searchParams = useSearchParams();
   const docId = searchParams.get("docId");
   const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
   const { control, reset, watch, getValues, setValue } = useForm<PostForm>();
   const { form: formMessages } = useMemo(
     () => getEditMessages(locale),
@@ -163,9 +162,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     return "";
   }, [getValues, locale]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
@@ -670,11 +666,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 id: d.id,
                 title: d.title,
                 content: d.content,
-                date: isMounted
-                  ? new Date(d.createdAt).toLocaleString(
-                    locale === "pt" ? "pt-BR" : "en-US",
-                  )
-                  : "",
+                date: new Date(d.createdAt).toLocaleString(
+                  locale === "pt" ? "pt-BR" : "en-US",
+                ),
               }),
             ),
           );
@@ -695,9 +689,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           id: crypto.randomUUID(),
           title: watch("title") || formMessages.defaults.draftTitle,
           content: watch("content") || "",
-          date: isMounted
-            ? new Date().toLocaleString(formMessages.dateLocale)
-            : "",
+          date: new Date().toLocaleString(formMessages.dateLocale),
         };
 
         try {
@@ -761,11 +753,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 id: d.id,
                 title: d.title,
                 content: d.content,
-                date: isMounted
-                  ? new Date(d.createdAt).toLocaleString(
-                    locale === "pt" ? "pt-BR" : "en-US",
-                  )
-                  : "",
+                date: new Date(d.createdAt).toLocaleString(
+                  locale === "pt" ? "pt-BR" : "en-US",
+                ),
               }),
             ),
           );
@@ -1152,11 +1142,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                             User
                           </p>
                           <p className="text-xs">
-                            {isMounted
-                              ? new Date().toLocaleDateString(
-                                locale === "pt" ? "pt-BR" : "en-US",
-                              )
-                              : ""}
+                            {new Date().toLocaleDateString(
+                              locale === "pt" ? "pt-BR" : "en-US",
+                            )}
                           </p>
                         </div>
                         <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1" />

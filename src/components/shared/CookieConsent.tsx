@@ -22,10 +22,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
       localStorage.getItem("cookie_consent") === "true";
 
     if (!hasConsented) {
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 5000);
-      return () => clearTimeout(timer);
+      setIsVisible(true);
     }
   }, []);
 
