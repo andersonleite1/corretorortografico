@@ -12,6 +12,7 @@ import {
   ImageCaption,
   Youtube,
   Image,
+  ImageUpload,
   TextStyle,
   FontFamily,
   FontSize,
@@ -75,6 +76,7 @@ const createExtensionKit = (locale?: Locale) => [
   Highlight.configure({ multicolor: true }),
   Link,
   Image,
+  ImageUpload,
   ImageFigure,
   CodeBlock,
   Youtube,
@@ -82,7 +84,7 @@ const createExtensionKit = (locale?: Locale) => [
   LanguageTool.configure({
     checkDelay: 1000,
     minChars: 15,
-    enabled: false,
+    enabled: true,
     language: resolveLanguageToolCode(locale),
   }),
 ];

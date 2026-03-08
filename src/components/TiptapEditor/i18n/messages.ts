@@ -39,6 +39,7 @@ export type EditorMessages = {
     clearEditor: string;
     clearFormat: string;
     copyEditor: string;
+    pasteEditor: string;
     save: string;
   };
   auth: {
@@ -162,6 +163,7 @@ export type EditorMessages = {
   };
   notifications: {
     copySuccess: string;
+    pasteSuccess: string;
   };
 };
 
@@ -207,6 +209,7 @@ export const editorMessages = withDefault({
       clearEditor: "Limpar conteúdo",
       clearFormat: "Limpar formatação",
       copyEditor: "Copiar conteúdo",
+      pasteEditor: "Colar conteúdo",
       save: "Salvar documento",
     },
     auth: {
@@ -330,6 +333,7 @@ export const editorMessages = withDefault({
     },
     notifications: {
       copySuccess: "Conteúdo copiado para a área de transferência",
+      pasteSuccess: "Conteúdo colado com sucesso",
     },
   },
   en: {
@@ -371,6 +375,7 @@ export const editorMessages = withDefault({
       clearEditor: "Clear content",
       clearFormat: "Clear formatting",
       copyEditor: "Copy content",
+      pasteEditor: "Paste content",
       save: "Save document",
     },
     auth: {
@@ -494,6 +499,7 @@ export const editorMessages = withDefault({
     },
     notifications: {
       copySuccess: "Content copied to the clipboard",
+      pasteSuccess: "Content pasted successfully",
     },
   },
   es: {
@@ -535,6 +541,7 @@ export const editorMessages = withDefault({
       clearEditor: "Limpiar contenido",
       clearFormat: "Borrar formato",
       copyEditor: "Copiar contenido",
+      pasteEditor: "Pegar contenido",
       save: "Guardar documento",
     },
     auth: {
@@ -658,6 +665,7 @@ export const editorMessages = withDefault({
     },
     notifications: {
       copySuccess: "Contenido copiado al portapapeles",
+      pasteSuccess: "Contenido pegado correctamente",
     },
   },
 });

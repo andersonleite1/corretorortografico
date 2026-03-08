@@ -15,6 +15,7 @@ import {
   TbCheck,
   TbChevronDown,
   TbClipboard,
+  TbClipboardCheck,
   TbCode,
   TbColumnInsertLeft,
   TbColumnInsertRight,
@@ -164,6 +165,7 @@ export const icons = {
   Uppercase: TbArrowBigUp,
   Lowercase: TbArrowBigDown,
   Capitalize: TbLetterCaseToggle,
+  Paste: TbClipboardCheck,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };

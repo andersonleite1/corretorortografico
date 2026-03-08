@@ -50,57 +50,86 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    const contentType = req.headers.get("content-type") || "";
+    let file: File | null = null;
+    let imageUrl: string | null = null;
 
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      file = formData.get("file") as File | null;
+      imageUrl = formData.get("url") as string | null;
+    } else if (contentType.includes("application/json")) {
+      const body = await req.json();
+      imageUrl = body.url;
     }
 
-    const ALLOWED_TYPES = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
-    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!file && !imageUrl) {
       return NextResponse.json(
-        {
-          error:
-            "Tipo de arquivo não permitido. Apenas JPEG, PNG, WEBP e GIF são suportados.",
-        },
+        { error: "No file or URL provided" },
         { status: 400 },
       );
     }
 
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: "Arquivo muito grande (máx. 5 MB)." },
-        { status: 400 },
-      );
+    let result: any;
+
+    if (file) {
+      const ALLOWED_TYPES = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
+      const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return NextResponse.json(
+          {
+            error:
+              "Tipo de arquivo não permitido. Apenas JPEG, PNG, WEBP e GIF são suportados.",
+          },
+          { status: 400 },
+        );
+      }
+
+      if (file.size > MAX_SIZE) {
+        return NextResponse.json(
+          { error: "Arquivo muito grande (máx. 5 MB)." },
+          { status: 400 },
+        );
+      }
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            public_id: `${userId}/${Date.now()}-${file!.name.split(/\.\w+$/)[0]}`,
+            resource_type: "image",
+            invalidate: true,
+            tags: [userId],
+          },
+          (error, res) => {
+            if (error) reject(error);
+            else resolve(res);
+          },
+        );
+
+        uploadStream.end(buffer);
+      });
+    } else if (imageUrl) {
+      // Basic validation for URL
+      if (!imageUrl.startsWith("http")) {
+        return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+      }
+
+      result = await cloudinary.uploader.upload(imageUrl, {
+        public_id: `${userId}/${Date.now()}-external`,
+        resource_type: "image",
+        invalidate: true,
+        tags: [userId],
+      });
     }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const result: any = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          public_id: `${userId}/${Date.now()}-${file.name.split(/\.\w+$/)[0]}`,
-          resource_type: "image",
-          invalidate: true,
-          tags: [userId],
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        },
-      );
-
-      uploadStream.end(buffer);
-    });
 
     if (result) {
       return NextResponse.json({

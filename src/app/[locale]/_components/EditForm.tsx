@@ -84,7 +84,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const searchParams = useSearchParams();
   const docId = searchParams.get("docId");
   const [isLoading, setIsLoading] = useState(true);
-  const { control, reset, watch, getValues } = useForm<PostForm>();
+  const [isMounted, setIsMounted] = useState(false);
+  const { control, reset, watch, getValues, setValue } = useForm<PostForm>();
   const { form: formMessages } = useMemo(
     () => getEditMessages(locale),
     [locale],
@@ -163,6 +164,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }, [getValues, locale]);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     const isMobile = window.innerWidth <= 768;
     if (!isMobile) {
       setShouldLoadEditor(true);
@@ -235,6 +240,67 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 <html lang="${formMessages.pdfLang}">
 <head>
   <meta charset="utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.6;
+      color: #1f2328;
+    }
+    body {
+      padding: 40px;
+      margin: 0;
+    }
+    h1, h2, h3, h4, h5, h6 { margin-top: 1.5em; margin-bottom: 0.5em; line-height: 1.2; }
+    p { margin-bottom: 1em; }
+    
+    /* Tiptap Alignment */
+    .has-text-align-center { text-align: center; }
+    .has-text-align-right { text-align: right; }
+    .has-text-align-justify { text-align: justify; }
+    
+    /* Typography */
+    [style*="font-family"] { font-display: swap; }
+    
+    /* Marks */
+    mark { background-color: #ffcc00; color: black; padding: 0 2px; }
+    code { font-family: 'JetBrains Mono', monospace; background: #f0f0f0; padding: 2px 4px; border-radius: 4px; font-size: 0.9em; }
+    
+    /* Code Blocks */
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+      font-size: 0.85em;
+    }
+
+    /* Images & Figures */
+    img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 1em auto; }
+    figure { margin: 1em 0; text-align: center; }
+    figcaption { font-size: 0.9em; color: #666; margin-top: 8px; }
+
+    /* Lists */
+    ul, ol { padding-left: 1.5em; margin-bottom: 1em; }
+    li p { margin: 0; }
+
+    /* Tables */
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f8f9fa; }
+
+    /* Custom line height & font size */
+    [style*="line-height"] { display: inline-block; width: 100%; }
+  </style>
 </head>
 <body>
   ${safeHtml}
@@ -275,13 +341,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     setIsExportingPDF(true);
 
     try {
-      const blob = await requestPdfFromHtml(payload.htmlDocument);
-      const url = URL.createObjectURL(blob);
+      const originalBlob = await requestPdfFromHtml(payload.htmlDocument);
+      const pdfBlob = new Blob([originalBlob], { type: "application/pdf" });
+      const url = URL.createObjectURL(pdfBlob);
       setPdfPreview((prev) => {
         if (prev?.url) {
           URL.revokeObjectURL(prev.url);
         }
-        return { url, blob, fileName: payload.fileName };
+        return { url, blob: pdfBlob, fileName: payload.fileName };
       });
       setIsPreviewOpen(true);
     } catch (error) {
@@ -354,6 +421,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     saveAs(blob, `${safeTitle}.txt`);
     showNotification(formMessages.modal.txtSuccess);
   };
+
+
 
   const clearPdfPreview = useCallback(() => {
     setPdfPreview((prev) => {
@@ -601,9 +670,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 id: d.id,
                 title: d.title,
                 content: d.content,
-                date: new Date(d.createdAt).toLocaleString(
-                  locale === "pt" ? "pt-BR" : "en-US",
-                ),
+                date: isMounted
+                  ? new Date(d.createdAt).toLocaleString(
+                    locale === "pt" ? "pt-BR" : "en-US",
+                  )
+                  : "",
               }),
             ),
           );
@@ -624,7 +695,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           id: crypto.randomUUID(),
           title: watch("title") || formMessages.defaults.draftTitle,
           content: watch("content") || "",
-          date: new Date().toLocaleString(formMessages.dateLocale),
+          date: isMounted
+            ? new Date().toLocaleString(formMessages.dateLocale)
+            : "",
         };
 
         try {
@@ -688,9 +761,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 id: d.id,
                 title: d.title,
                 content: d.content,
-                date: new Date(d.createdAt).toLocaleString(
-                  locale === "pt" ? "pt-BR" : "en-US",
-                ),
+                date: isMounted
+                  ? new Date(d.createdAt).toLocaleString(
+                    locale === "pt" ? "pt-BR" : "en-US",
+                  )
+                  : "",
               }),
             ),
           );
@@ -1059,8 +1134,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                       </div>
                       <pre className="p-6 bg-gray-900 text-green-400 rounded-xl overflow-x-auto font-mono text-sm leading-relaxed border border-gray-700">
                         <code>
-                          {editorRef.current?.getInstance()?.getHTML() ||
-                            watch("content")}
+                          {getEditorHtml()}
                         </code>
                       </pre>
                     </div>
@@ -1078,9 +1152,11 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                             User
                           </p>
                           <p className="text-xs">
-                            {new Date().toLocaleDateString(
-                              locale === "pt" ? "pt-BR" : "en-US",
-                            )}
+                            {isMounted
+                              ? new Date().toLocaleDateString(
+                                locale === "pt" ? "pt-BR" : "en-US",
+                              )
+                              : ""}
                           </p>
                         </div>
                         <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1" />
@@ -1089,8 +1165,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                         </span>
                       </div>
                       <TiptapRenderer>
-                        {editorRef.current?.getInstance()?.getHTML() ||
-                          watch("content")}
+                        {getEditorHtml()}
                       </TiptapRenderer>
                     </div>
                   )}

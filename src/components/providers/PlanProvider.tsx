@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Plan = "free" | "pro" | "team";
+export type Plan = "free" | "pro" | "team";
 
 interface PlanContextType {
     plan: Plan;

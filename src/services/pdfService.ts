@@ -3,12 +3,12 @@
  * A API exige chave de acesso enviada via cabeçalho `x-api-key`.
  */
 export async function requestPdfFromHtml(htmlDocument: string): Promise<Blob> {
-  const response = await fetch("/api/pdf/export", {
+  const response = await fetch("/api/export-import/export-pdf", {
     method: "POST",
     headers: {
-      "Content-Type": "text/html",
+      "Content-Type": "application/json",
     },
-    body: htmlDocument,
+    body: JSON.stringify({ htmlContent: htmlDocument }),
   });
 
   if (!response.ok) {

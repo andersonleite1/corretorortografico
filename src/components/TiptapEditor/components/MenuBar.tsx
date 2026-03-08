@@ -35,6 +35,7 @@ import DocumentsButton from "./controls/DocumentsButton";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
+import PasteEditorButton from "./controls/PasteEditorButton";
 import SettingsButton from "./controls/SettingsButton";
 import AiRewriteButton from "./controls/AiRewriteButton";
 import ClearFormatButton from "./controls/ClearFormatButton";
@@ -109,10 +110,11 @@ const MenuBar = () => {
         {showExport && buttonVisibility.export && <ExportDropdown />}
         {showPreview && buttonVisibility.preview && <PreviewDropdown />}
         {buttonVisibility.documents && <DocumentsButton />}
-        {showDrafts && buttonVisibility.drafts && <DraftsDropdown />}
+        {buttonVisibility.drafts && showDrafts && <DraftsDropdown />}
         {buttonVisibility.importPdf && <ImportPdfButton />}
 
         {buttonVisibility.copyEditor && <CopyEditorButton />}
+        {buttonVisibility.copyEditor && <PasteEditorButton />}
         {exportActions?.onClear && buttonVisibility.clearEditor && (
           <ClearEditorButton />
         )}

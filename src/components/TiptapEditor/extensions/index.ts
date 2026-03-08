@@ -19,7 +19,7 @@ export { ImageFigure } from "./ImageFigure";
 export { Indent } from "./Indent";
 export { Selection } from "./Selection";
 export { Youtube } from "./Youtube/Youtube";
-export { Image } from "./Image";
+export { Image, ImageUpload } from "./Image";
 export { Table } from "./Table";
 export { LanguageTool } from "./LanguageTool";
 export { Shortcuts } from "./Shortcuts";

@@ -25,7 +25,7 @@ import { getHomeFaqSchema, getHomeWebAppSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
-import { PlanProvider } from "@/components/providers/PlanProvider";
+import { PlanProvider, Plan } from "@/components/providers/PlanProvider";
 
 const CookieConsent = dynamic(
   () => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent),
@@ -65,6 +65,7 @@ export default async function RootLayout({
     storedLocale && i18n.locales.includes(storedLocale)
       ? storedLocale
       : i18n.defaultLocale;
+  const userPlan = (cookieStore.get("user_plan")?.value as Plan) || "free";
   const cookieConsentGiven = cookieStore.get("cookie_consent")?.value === "true";
   const webAppSchema = getHomeWebAppSchema(locale);
 
@@ -79,7 +80,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ClerkThemeProvider locale={locale}>
-          <PlanProvider>
+          <PlanProvider initialPlan={userPlan}>
             <SidebarProvider>
               <Analytics />
               <MainContent

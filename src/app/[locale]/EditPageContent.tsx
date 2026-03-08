@@ -10,23 +10,23 @@ import LandingHero from "@/components/landing/LandingHero";
 const LandingProblem = dynamic(
   () => import("@/components/landing/LandingProblem"),
   {
-    ssr: false,
+    ssr: true,
   },
 );
 const LandingFeatures = dynamic(
   () => import("@/components/landing/LandingFeatures"),
   {
-    ssr: false,
+    ssr: true,
   },
 );
 const LandingPricing = dynamic(
   () => import("@/components/landing/LandingPricing"),
   {
-    ssr: false,
+    ssr: true,
   },
 );
 const LandingCTA = dynamic(() => import("@/components/landing/LandingCTA"), {
-  ssr: false,
+  ssr: true,
 });
 
 const EditForm = dynamic(() => import("./_components/EditForm"), {
