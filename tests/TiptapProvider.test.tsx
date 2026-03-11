@@ -9,6 +9,7 @@ import { useSidebar } from "@/components/providers/SidebarProvider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { useUserPlan } from "@/components/providers/PlanProvider";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
 const { mockEditor } = vi.hoisted(() => ({
@@ -77,12 +78,15 @@ vi.mock("@/components/providers/EditorSettingsProvider", () => ({
   EditorSettingsProvider: ({ children }: any) => <>{children}</>,
   useEditorSettings: vi.fn(),
 }));
-
 vi.mock("sonner", () => ({
   toast: {
     error: vi.fn(),
     success: vi.fn(),
   },
+}));
+
+vi.mock("@/components/providers/PlanProvider", () => ({
+  useUserPlan: vi.fn().mockReturnValue({ plan: "free", isLoading: false }),
 }));
 
 // ── Setup ─────────────────────────────────────────────────────────────────────
@@ -114,6 +118,8 @@ describe("TiptapProvider", () => {
         json: () => Promise.resolve({ id: "doc-123" }),
       }),
     );
+
+    (useUserPlan as any).mockReturnValue({ plan: "free", isLoading: false });
   });
 
   afterEach(() => {
@@ -124,6 +130,7 @@ describe("TiptapProvider", () => {
     (useSearchParams as any).mockReturnValue(
       new URLSearchParams("docId=existing-doc"),
     );
+    (useUserPlan as any).mockReturnValue({ plan: "pro", isLoading: false });
 
     render(
       <TiptapProvider editorOptions={{}} userPlan="pro">
