@@ -24,12 +24,25 @@ export async function syncUserWithDb() {
   }
 
   try {
-    // Verificar se o usuário já existe
-    const existingUser = await db.user.findUnique({
+    // Verificar se o usuário já existe pelo Clerk ID ou Email (evita P2002)
+    const existingByClerkId = await db.user.findUnique({
       where: { clerkId: user.id },
     });
 
-    if (existingUser) {
+    const existingByEmail = !existingByClerkId
+      ? await db.user.findUnique({ where: { email } })
+      : null;
+
+    if (existingByClerkId || existingByEmail) {
+      const existingUser = (existingByClerkId || existingByEmail)!;
+
+      // Se achou por email mas o clerkId tá diferente, atualiza
+      if (existingUser.clerkId !== user.id) {
+        return await db.user.update({
+          where: { id: existingUser.id },
+          data: { clerkId: user.id },
+        });
+      }
       return existingUser;
     }
 
@@ -52,7 +65,10 @@ export async function syncUserWithDb() {
     console.log(`✅ [Fallback] Usuário sincronizado no DB: ${email}`);
     return newUser;
   } catch (dbError) {
-    console.error("[syncUserWithDb] Erro ao sincronizar usuário no DB (possível race condition com webhook):", dbError);
+    console.error(
+      "[syncUserWithDb] Erro ao sincronizar usuário no DB:",
+      dbError,
+    );
     return null;
   }
 }

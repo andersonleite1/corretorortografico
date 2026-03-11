@@ -53,29 +53,45 @@ export async function POST(req: Request) {
     }
 
     try {
-      await db.user.upsert({
+      // Tenta encontrar o usuário pelo Clerk ID ou pelo Email (evita P2002)
+      const existingByClerkId = await db.user.findUnique({
         where: { clerkId: id },
-        create: {
-          clerkId: id,
-          email,
-          name: [first_name, last_name].filter(Boolean).join(" ") || null,
-          imageUrl: image_url || null,
-          subscription: {
-            create: {
-              plan: "free",
-              status: "active",
+      });
+
+      const existingByEmail = !existingByClerkId
+        ? await db.user.findUnique({ where: { email } })
+        : null;
+
+      if (existingByClerkId || existingByEmail) {
+        // Atualiza o usuário existente
+        await db.user.update({
+          where: { id: existingByClerkId?.id || existingByEmail?.id },
+          data: {
+            clerkId: id, // Garante que o clerkId está certo se achou por email
+            email,
+            name: [first_name, last_name].filter(Boolean).join(" ") || null,
+            imageUrl: image_url || null,
+          },
+        });
+        console.log(`✅ Usuário atualizado no DB: ${email}`);
+      } else {
+        // Cria novo usuário
+        await db.user.create({
+          data: {
+            clerkId: id,
+            email,
+            name: [first_name, last_name].filter(Boolean).join(" ") || null,
+            imageUrl: image_url || null,
+            subscription: {
+              create: {
+                plan: "free",
+                status: "active",
+              },
             },
           },
-        },
-        update: {
-          email,
-          name: [first_name, last_name].filter(Boolean).join(" ") || null,
-          imageUrl: image_url || null,
-        },
-      });
-      console.log(
-        `✅ Usuário ${type === "user.created" ? "criado" : "atualizado"} no DB: ${email}`,
-      );
+        });
+        console.log(`✅ Usuário criado no DB: ${email}`);
+      }
     } catch (dbError) {
       console.error(`Error processing user ${type}:`, dbError);
       return new NextResponse("Erro ao processar usuário no banco de dados.", {
@@ -88,7 +104,6 @@ export async function POST(req: Request) {
   if (type === "user.deleted") {
     const { id } = data;
 
-    // BUG-03: Valida se o ID é uma string válida antes de tentar deletar
     if (!id || typeof id !== "string") {
       console.error("ID de usuário inválido para deleção:", id);
       return new NextResponse("ID inválido.", { status: 400 });
@@ -97,9 +112,13 @@ export async function POST(req: Request) {
     try {
       await db.user.delete({ where: { clerkId: id } });
       console.log(`🗑️ Usuário deletado do DB: clerkId=${id}`);
-    } catch (dbError) {
+    } catch (dbError: any) {
+      // P2025: Record to delete does not exist.
+      if (dbError.code === "P2025") {
+        console.log(`ℹ️ [user.deleted] Usuário já não existia no DB: ${id}`);
+        return new NextResponse("OK", { status: 200 });
+      }
       console.error("Error deleting user:", dbError);
-      // We return 500 here so Clerk will retry the webhook if an actual DB failure occurred
       return new NextResponse("Erro ao deletar usuário no banco.", {
         status: 500,
       });
