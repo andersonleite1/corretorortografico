@@ -3,9 +3,17 @@ import { POST } from "@/app/api/webhooks/clerk/route";
 import { NextResponse } from "next/server";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockSvixVerify, mockUserUpsert, mockUserDelete } = vi.hoisted(() => ({
+const {
+  mockSvixVerify,
+  mockUserFindUnique,
+  mockUserUpdate,
+  mockUserCreate,
+  mockUserDelete,
+} = vi.hoisted(() => ({
   mockSvixVerify: vi.fn(),
-  mockUserUpsert: vi.fn(),
+  mockUserFindUnique: vi.fn(),
+  mockUserUpdate: vi.fn(),
+  mockUserCreate: vi.fn(),
   mockUserDelete: vi.fn(),
 }));
 
@@ -20,7 +28,9 @@ vi.mock("svix", () => ({
 vi.mock("@/lib/db", () => ({
   db: {
     user: {
-      upsert: (...args: any[]) => mockUserUpsert(...args),
+      findUnique: (...args: any[]) => mockUserFindUnique(...args),
+      update: (...args: any[]) => mockUserUpdate(...args),
+      create: (...args: any[]) => mockUserCreate(...args),
       delete: (...args: any[]) => mockUserDelete(...args),
     },
   },
@@ -80,7 +90,7 @@ describe("POST /api/webhooks/clerk", () => {
     });
   });
 
-  it("chama upsert quando o evento é user.created", async () => {
+  it("chama create quando o evento é user.created e o usuário não existe", async () => {
     mockSvixVerify.mockReturnValue({
       type: "user.created",
       data: {
@@ -92,10 +102,36 @@ describe("POST /api/webhooks/clerk", () => {
       },
     });
 
+    mockUserFindUnique.mockResolvedValue(null);
+
     const req = createRequest({ some: "payload" });
     const response = await POST(req);
 
     expect(response.status).toBe(200);
-    expect(mockUserUpsert).toHaveBeenCalled();
+    expect(mockUserCreate).toHaveBeenCalled();
+  });
+
+  it("chama update quando o evento é user.created e o usuário já existe por email", async () => {
+    mockSvixVerify.mockReturnValue({
+      type: "user.created",
+      data: {
+        id: "user_123",
+        email_addresses: [{ email_address: "test@example.com" }],
+        first_name: "John",
+        last_name: "Doe",
+        image_url: "https://example.com/image.png",
+      },
+    });
+
+    // Mock findUnique first for clerkId, then for email
+    mockUserFindUnique
+      .mockResolvedValueOnce(null) // clerkId search
+      .mockResolvedValueOnce({ id: "db_user_123", email: "test@example.com" }); // email search
+
+    const req = createRequest({ some: "payload" });
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    expect(mockUserUpdate).toHaveBeenCalled();
   });
 });
