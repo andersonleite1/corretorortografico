@@ -22,8 +22,8 @@ export async function POST(req: Request) {
     return new NextResponse("Cabeçalhos de webhook ausentes.", { status: 400 });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const payload = await req.text();
+  const body = payload;
 
   const wh = new Webhook(CLERK_WEBHOOK_SECRET);
   let event: WebhookEvent;
@@ -35,7 +35,8 @@ export async function POST(req: Request) {
       "svix-signature": svixSignature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Erro ao verificar webhook:", err);
+    console.error("[WEBHOOK_VERIFY_ERROR] Erro ao verificar webhook:", err);
+    console.error("Payload/Body length:", body.length);
     return new NextResponse("Webhook inválido.", { status: 400 });
   }
 
