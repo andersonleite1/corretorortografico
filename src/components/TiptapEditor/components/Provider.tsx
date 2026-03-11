@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import SaveNotification from "@/components/shared/SaveNotification";
 import { saveLocalDocument } from "@/lib/local-storage";
 import { getCommonMessages } from "@/data/common";
+import { useUserPlan } from "@/components/providers/PlanProvider";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -99,9 +100,11 @@ export const TiptapProvider = ({
   exportActions,
   draftActions,
   locale,
-  userPlan = "free",
+  userPlan: initialUserPlan = "free",
   documentTitle,
 }: TiptapProviderProps) => {
+  const { plan: fetchedPlan } = useUserPlan();
+  const userPlan = fetchedPlan || initialUserPlan;
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
   const [isFullScreen, setIsFullScreen] = useState(false);
