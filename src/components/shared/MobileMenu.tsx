@@ -67,8 +67,8 @@ const MobileMenu = ({
                         onClose();
                       }}
                       className={`flex items-center justify-center px-4 py-3 rounded-2xl transition-all ${isActive
-                          ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-lg"
-                          : "bg-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                        ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-lg"
+                        : "bg-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800"
                         }`}
                     >
                       {locale.toUpperCase()}
@@ -94,12 +94,11 @@ const MobileMenu = ({
                     Entrar
                   </button>
                   <button
-                    disabled={true}
                     onClick={() => {
                       setAuthModal({ isOpen: true, view: "sign-up" });
                       onClose();
                     }}
-                    className="flex items-center justify-center px-4 py-4 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center px-4 py-4 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-xl hover:opacity-90 transition-all"
                   >
                     Começar agora
                   </button>

@@ -44,8 +44,8 @@ export default function LandingCTA({ data }: Props) {
       <div className="landing-cta__inner">
         <h2 className="landing-cta__heading">{displayHeading}</h2>
         <button
-          disabled={true}
-          className="landing-btn landing-btn--primary landing-btn--lg disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleClick}
+          className="landing-btn landing-btn--primary landing-btn--lg"
         >
           {displayLabel}
         </button>

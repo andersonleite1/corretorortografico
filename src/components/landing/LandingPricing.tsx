@@ -125,11 +125,10 @@ export default function LandingPricing({ data }: Props) {
                   </ul>
                   {!tier.comingSoon ? (
                     <button
-                      disabled={true}
                       onClick={(e) =>
                         handleCtaClick(e, tier.name, tier.ctaHref)
                       }
-                      className={`landing-btn w-full ${tier.highlighted ? "landing-btn--primary" : "landing-btn--outline"} disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`landing-btn w-full ${tier.highlighted ? "landing-btn--primary" : "landing-btn--outline"}`}
                     >
                       {tier.ctaLabel}
                     </button>

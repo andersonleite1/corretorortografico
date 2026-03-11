@@ -257,10 +257,9 @@ export default function EmailSignIn({
                 <p className="text-center text-[13px] font-medium text-gray-500 dark:text-gray-400">
                   Não tem uma conta?{" "}
                   <button
-                    disabled={true}
                     type="button"
                     onClick={onSignUpClick}
-                    className="text-blue-500 hover:text-blue-600 font-bold underline decoration-2 underline-offset-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-blue-500 hover:text-blue-600 font-bold underline decoration-2 underline-offset-4"
                   >
                     Criar Cadastro
                   </button>
