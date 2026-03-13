@@ -250,8 +250,8 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
       enabled: true,
       language: "pt-BR",
       endpoint: "/api/languagetool",
-      checkDelay: 1000,
-      minChars: 20,
+      checkDelay: 3000,
+      minChars: 100,
     };
   },
 
@@ -278,53 +278,53 @@ export const LanguageTool = Extension.create<LanguageToolOptions>({
     return {
       applyLanguageToolSuggestion:
         ({ from, to, text }) =>
-        ({ chain }) => {
-          if (from < 0 || to < from) {
-            return false;
-          }
-          return chain().focus().insertContentAt({ from, to }, text).run();
-        },
+          ({ chain }) => {
+            if (from < 0 || to < from) {
+              return false;
+            }
+            return chain().focus().insertContentAt({ from, to }, text).run();
+          },
       setLanguageToolEnabled:
         (enabled: boolean) =>
-        ({ state, dispatch }) => {
-          if (!dispatch) {
-            return false;
-          }
+          ({ state, dispatch }) => {
+            if (!dispatch) {
+              return false;
+            }
 
-          const current = pluginKey.getState(state);
-          if (current?.enabled === enabled) {
-            const storage = getStorage();
-            storage.enabled = enabled;
+            const current = pluginKey.getState(state);
+            if (current?.enabled === enabled) {
+              const storage = getStorage();
+              storage.enabled = enabled;
+              return true;
+            }
+
+            const tr = state.tr.setMeta(pluginKey, {
+              type: "languageToolToggle",
+              enabled,
+            });
+            dispatch(tr);
             return true;
-          }
-
-          const tr = state.tr.setMeta(pluginKey, {
-            type: "languageToolToggle",
-            enabled,
-          });
-          dispatch(tr);
-          return true;
-        },
+          },
       toggleLanguageTool:
         () =>
-        ({ editor }) => {
-          const storage = getStorage();
-          const next = !storage.enabled;
-          return editor.commands.setLanguageToolEnabled(next);
-        },
+          ({ editor }) => {
+            const storage = getStorage();
+            const next = !storage.enabled;
+            return editor.commands.setLanguageToolEnabled(next);
+          },
       ignoreLanguageToolIssue:
         (id: string) =>
-        ({ state, dispatch }) => {
-          if (!dispatch || !id) {
-            return false;
-          }
-          const tr = state.tr.setMeta(pluginKey, {
-            type: "languageToolIgnore",
-            id,
-          });
-          dispatch(tr);
-          return true;
-        },
+          ({ state, dispatch }) => {
+            if (!dispatch || !id) {
+              return false;
+            }
+            const tr = state.tr.setMeta(pluginKey, {
+              type: "languageToolIgnore",
+              id,
+            });
+            dispatch(tr);
+            return true;
+          },
     };
   },
 
