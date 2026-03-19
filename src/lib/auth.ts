@@ -48,7 +48,7 @@ export const getUserPlan = cacheShim(async (forceRefresh: boolean = false) => {
   // Tenta buscar do Redis primeiro (se não for forceRefresh)
   if (!forceRefresh) {
     try {
-      const cachedPlan = await redis.get<string>(cacheKey);
+      const cachedPlan = await redis.get(cacheKey);
       if (cachedPlan) return cachedPlan as "free" | "pro" | "team";
     } catch (err) {
       console.error("[Redis Cache Error]:", err);
@@ -75,7 +75,7 @@ export const getUserPlan = cacheShim(async (forceRefresh: boolean = false) => {
 
   // Salva no Redis por 5 minutos
   try {
-    await redis.set(cacheKey, plan, { ex: 300 }); // 300 segundos = 5 min
+    await redis.set(cacheKey, plan, "EX", 300); // 300 segundos = 5 min
   } catch (err) {
     console.error("[Redis Cache Set Error]:", err);
   }

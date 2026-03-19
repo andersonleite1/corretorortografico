@@ -98,7 +98,8 @@ describe("getUserPlan", () => {
     expect(mockRedisSet).toHaveBeenCalledWith(
       expect.stringContaining("clerk-123"),
       "pro",
-      expect.anything(),
+      "EX",
+      300
     );
   });
 

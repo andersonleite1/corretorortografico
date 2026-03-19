@@ -64,9 +64,12 @@ describe("getUserPlan", () => {
     const plan = await getUserPlan();
 
     expect(plan).toBe("pro");
-    expect(redis.set).toHaveBeenCalledWith("user_plan:clerk_123", "pro", {
-      ex: 300,
-    });
+    expect(redis.set).toHaveBeenCalledWith(
+      "user_plan:clerk_123",
+      "pro",
+      "EX",
+      300
+    );
   });
 
   it("should return 'free' for 'past_due' status (BUG-04 fix verification)", async () => {

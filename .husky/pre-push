@@ -12,7 +12,7 @@ echo "────────────────────────�
 echo ""
 echo "🔷  [1/2] TypeScript — verificação de tipos"
 echo "──────────────────────────────────────────────────────────────────────────"
-npx tsc --noEmit
+npx -p typescript tsc --noEmit
 if [ $? -ne 0 ]; then
   echo "❌ Erro no TypeScript. Push cancelado."
   exit 1

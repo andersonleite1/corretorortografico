@@ -21,8 +21,9 @@ export const CodeBlock = TiptapCodeBlockLowlight.extend({
   addOptions() {
     return {
       ...this.parent?.(),
+      lowlight: {}, // Proativamente satisfaz a obrigatoriedade do tipo se necessário
       defaultLanguage: CODE_BLOCK_LANGUAGUE_SYNTAX_DEFAULT,
-    };
+    } as any;
   },
 
   addInputRules() {

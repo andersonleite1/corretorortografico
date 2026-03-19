@@ -259,9 +259,7 @@ function TimeSavedChart({
                   fontSize: "12px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                 }}
-                formatter={(
-                  value: number | string | (number | string)[] | undefined,
-                ) => [`${value ?? 0} min`, t.timeSaved]}
+                formatter={(value: any) => [`${value ?? 0} min`, t.timeSaved]}
                 cursor={{ stroke: "rgba(0,0,0,0.08)" }}
               />
               <Area
@@ -345,10 +343,7 @@ function ToneDistributionChart({
                   fontSize: "12px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                 }}
-                formatter={(
-                  value: number | string | (number | string)[] | undefined,
-                  name: string | number | (string | number)[] | undefined,
-                ) => [value ?? 0, name ?? ""]}
+                formatter={(value: any, name: any) => [value ?? 0, name ?? ""]}
               />
               <Legend
                 iconType="circle"

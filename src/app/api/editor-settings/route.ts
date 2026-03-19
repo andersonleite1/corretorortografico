@@ -69,7 +69,7 @@ export async function GET() {
 
     // Salva no cache por 5 minutos
     try {
-      await redis.set(cacheKey, responseData, { ex: 300 });
+      await redis.set(cacheKey, JSON.stringify(responseData), "EX", 300);
     } catch (err) {
       console.warn("[Redis Set Error]:", err);
     }
