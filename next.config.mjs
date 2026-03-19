@@ -11,6 +11,7 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   experimental: {
     nextScriptWorkers: true,
+    serverComponentsExternalPackages: ["isomorphic-dompurify"],
   },
   webpack: (config) => {
     config.module.rules.push({
