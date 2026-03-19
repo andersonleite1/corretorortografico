@@ -1,10 +1,11 @@
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
 
 /**
- * Cliente Redis para Upstash.
- * Estas variáveis devem ser configuradas no seu .env.local posteriormente.
+ * Cliente Redis para a VPS.
+ * Configure REDIS_URL no seu .env.local (ex: redis://:senha@host:6379)
  */
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || "",
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
+const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+
+export const redis = new Redis(redisUrl, {
+  maxRetriesPerRequest: null,
 });
