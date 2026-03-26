@@ -17,7 +17,16 @@ export default function useTiptapEditor({
   ...editorOptions
 }: UseTiptapEditorOptions) {
   const forceUpdate = useForceUpdate();
-  const editor = useEditor(editorOptions, []);
+  const editor = useEditor({
+    autofocus: "end",
+    onCreate({ editor }) {
+      // Garante que o foco seja aplicado após a montagem do DOM
+      setTimeout(() => {
+        editor.commands.focus("end");
+      }, 100);
+    },
+    ...editorOptions
+  }, []);
 
   useImperativeHandle(
     ref,
