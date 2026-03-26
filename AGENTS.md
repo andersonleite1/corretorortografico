@@ -4,7 +4,7 @@
 
 This Next.js 14 app uses the App Router under `src/app`, with feature routes such as `post-csr`, `post-pdf`, and `api` handlers for export utilities. Rich-text features live in `src/components/TiptapEditor`, while source mode and media tools sit in `src/components/SourceEditor` and `src/components/MediaLibrary`. Shared hooks (`src/hooks`), services (`src/services/post.ts`), and static data (`src/data`) keep cross-cutting logic isolated. Global styles (`src/styles/globals.scss`) and Tailwind tokens (`tailwind.config.js`) control theming, and static files belong in `public/`.
 
-## Build, Test, and Development Commands
+## Build, Test, and Development Commands 
 
 Install dependencies with `npm install`. Use:
 
