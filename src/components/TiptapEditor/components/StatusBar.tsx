@@ -16,7 +16,6 @@ const StatusBar = () => {
     toggleFullScreen,
     toggleSourceMode,
     messages,
-    draftActions,
     isMobile,
   } = useTiptapContext();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
@@ -105,30 +104,7 @@ const StatusBar = () => {
             {messages.statusBar.toggleHint}
           </span>
         )}
-        {draftActions?.savingStatus && draftActions.savingStatus !== "idle" && (
-          <div className="flex items-center gap-2 px-3 py-1 ml-4 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider animate-in fade-in duration-300">
-            <div
-              className={clsx(
-                "w-1.5 h-1.5 rounded-full",
-                draftActions.savingStatus === "saving" &&
-                  "bg-blue-500 animate-pulse",
-                draftActions.savingStatus === "saved" && "bg-green-500",
-                draftActions.savingStatus === "error" && "bg-red-500",
-              )}
-            />
-            <span
-              className={clsx(
-                draftActions.savingStatus === "saving" && "text-blue-500",
-                draftActions.savingStatus === "saved" && "text-green-500",
-                draftActions.savingStatus === "error" && "text-red-500",
-              )}
-            >
-              {draftActions.savingStatus === "saving" && "Salvando rascunho..."}
-              {draftActions.savingStatus === "saved" && "Rascunho salvo"}
-              {draftActions.savingStatus === "error" && "Erro no rascunho"}
-            </span>
-          </div>
-        )}
+
         <div className="flex items-center gap-2 px-3 py-1 ml-2 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider">
           <div
             className={clsx(

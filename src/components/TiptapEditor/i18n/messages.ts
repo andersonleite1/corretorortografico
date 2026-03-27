@@ -32,7 +32,6 @@ export type EditorMessages = {
     fontFamily: string;
     fontSize: string;
     lineHeight: string;
-    drafts: string;
     export: string;
     preview: string;
     importPdf: string;
@@ -80,12 +79,6 @@ export type EditorMessages = {
     pdf: string;
     post: string;
     generatingPdf: string;
-  };
-  drafts: {
-    save: string;
-    empty: string;
-    untitled: string;
-    delete: string;
   };
   link: {
     urlLabel: string;
@@ -202,7 +195,6 @@ export const editorMessages = withDefault({
       fontFamily: "Fonte",
       fontSize: "Tamanho da fonte",
       lineHeight: "Espaçamento entre linhas",
-      drafts: "Rascunhos",
       export: "Exportar",
       preview: "Visualizar",
       importPdf: "Importar PDF",
@@ -250,12 +242,6 @@ export const editorMessages = withDefault({
       pdf: "Pré-visualizar PDF",
       post: "Pré-visualizar post",
       generatingPdf: "Gerando PDF…",
-    },
-    drafts: {
-      save: "Salvar rascunho",
-      empty: "Nenhum rascunho salvo",
-      untitled: "Sem título",
-      delete: "Excluir rascunho",
     },
     link: {
       urlLabel: "Endereço",
@@ -368,7 +354,6 @@ export const editorMessages = withDefault({
       fontFamily: "Font",
       fontSize: "Font size",
       lineHeight: "Line spacing",
-      drafts: "Drafts",
       export: "Export",
       preview: "Preview",
       importPdf: "Import PDF",
@@ -416,12 +401,6 @@ export const editorMessages = withDefault({
       pdf: "Preview PDF",
       post: "Preview post",
       generatingPdf: "Generating PDF…",
-    },
-    drafts: {
-      save: "Save draft",
-      empty: "No drafts saved",
-      untitled: "Untitled",
-      delete: "Delete draft",
     },
     link: {
       urlLabel: "Address",
@@ -534,7 +513,6 @@ export const editorMessages = withDefault({
       fontFamily: "Fuente",
       fontSize: "Tamaño de fuente",
       lineHeight: "Interlineado",
-      drafts: "Borradores",
       export: "Exportar",
       preview: "Vista previa",
       importPdf: "Importar PDF",
@@ -582,12 +560,6 @@ export const editorMessages = withDefault({
       pdf: "Vista previa en PDF",
       post: "Vista previa del post",
       generatingPdf: "Generando PDF…",
-    },
-    drafts: {
-      save: "Guardar borrador",
-      empty: "Sin borradores guardados",
-      untitled: "Sin título",
-      delete: "Eliminar borrador",
     },
     link: {
       urlLabel: "Dirección",

@@ -46,16 +46,6 @@ const BugReportDialog = dynamic(
   },
 );
 
-const DraftComparison = dynamic(
-  () =>
-    import("@/components/Drafts/DraftComparison").then(
-      (mod) => mod.DraftComparison,
-    ),
-  {
-    ssr: false,
-  },
-);
-
 const SaveNotification = dynamic(
   () =>
     import("@/components/shared/SaveNotification").then(
@@ -98,9 +88,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     [formMessages.placeholders.content, formMessages.placeholders.imageCaption],
   );
 
-  const [drafts, setDrafts] = useState<
-    { id: string; title: string; content: string; date: string }[]
-  >([]);
+
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<{
     url: string;
@@ -110,14 +98,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isPostPreviewOpen, setIsPostPreviewOpen] = useState(false);
   const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
-  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
-  const [selectedDraftForComparison, setSelectedDraftForComparison] = useState<{
-    content: string | Record<string, unknown>;
-    id: string;
-  } | null>(null);
-  const [draftSavingStatus, setDraftSavingStatus] = useState<
-    "idle" | "saving" | "saved" | "error"
-  >("idle");
+
   const [isBugReportOpen, setIsBugReportOpen] = useState(false);
 
   const [notification, setNotification] = useState<{
@@ -649,200 +630,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     return () => subscription.unsubscribe();
   }, [watch, docId, getWordCount]);
 
-  // Carrega os rascunhos ao iniciar
-  useEffect(() => {
-    if (docId) {
-      fetch(`/api/documents/${docId}/drafts`)
-        .then((res) => res.json())
-        .then((data) => {
-          setDrafts(
-            data.map(
-              (d: {
-                id: string;
-                title: string;
-                content: string;
-                createdAt: string | number | Date;
-              }) => ({
-                id: d.id,
-                title: d.title,
-                content: d.content,
-                date: new Date(d.createdAt).toLocaleString(
-                  locale === "pt" ? "pt-BR" : "en-US",
-                ),
-              }),
-            ),
-          );
-        })
-        .catch(console.error);
-    } else {
-      const savedDrafts = JSON.parse(localStorage.getItem("drafts") || "[]");
-      setDrafts(savedDrafts);
-    }
-  }, [docId, locale]);
-
-  // Função para salvar o rascunho atual
-  const handleSaveDraft = useCallback(
-    async (isExplicit = false) => {
-      if (!docId) {
-        // Fallback para localStorage se não houver docId
-        const current = {
-          id: crypto.randomUUID(),
-          title: watch("title") || formMessages.defaults.draftTitle,
-          content: watch("content") || "",
-          date: new Date().toLocaleString(formMessages.dateLocale),
-        };
-
-        try {
-          let updatedDrafts = [current, ...drafts]; // Rascunho novo no topo
-          if (updatedDrafts.length > 5)
-            updatedDrafts = updatedDrafts.slice(0, 5); // Reduzido para 5 para economizar espaço (BUG-05)
-
-          localStorage.setItem("drafts", JSON.stringify(updatedDrafts));
-          setDrafts(updatedDrafts);
-          if (isExplicit) showNotification(formMessages.modal.draftSaved);
-        } catch (e) {
-          console.warn("Storage full, cleaning up drafts", e);
-          // Limpa tudo menos o mais recente se der erro de quota
-          localStorage.removeItem("drafts");
-          localStorage.setItem("drafts", JSON.stringify([current]));
-          setDrafts([current]);
-          if (isExplicit) showNotification(formMessages.modal.draftSaved);
-        }
-        return;
-      }
-
-      try {
-        if (!isExplicit) setDraftSavingStatus("saving");
-
-        const content = watch("content");
-        const stringifiedContent =
-          typeof content === "object" ? JSON.stringify(content) : content;
-
-        const res = await fetch(`/api/documents/${docId}/drafts`, {
-          method: "POST",
-          headers: {
-            "x-diagnose": "true",
-          },
-          body: JSON.stringify({
-            title: watch("title") || undefined,
-            content: stringifiedContent,
-            isExplicitSave: isExplicit,
-          }),
-        });
-
-        if (res.ok) {
-          if (!isExplicit) {
-            setDraftSavingStatus("saved");
-            setTimeout(() => {
-              setDraftSavingStatus("idle");
-            }, 3000);
-          }
-
-          await res.json();
-          // Refresh drafts list
-          const draftsRes = await fetch(`/api/documents/${docId}/drafts`);
-          const data = await draftsRes.json();
-          setDrafts(
-            data.map(
-              (d: {
-                id: string;
-                title: string;
-                content: string;
-                createdAt: string | number | Date;
-              }) => ({
-                id: d.id,
-                title: d.title,
-                content: d.content,
-                date: new Date(d.createdAt).toLocaleString(
-                  locale === "pt" ? "pt-BR" : "en-US",
-                ),
-              }),
-            ),
-          );
-          if (isExplicit) showNotification(formMessages.modal.draftSaved);
-        } else {
-          const errorText = await res.text();
-          throw new Error(errorText || "Error saving draft");
-        }
-      } catch (error) {
-        console.error(error);
-        if (!isExplicit) {
-          setDraftSavingStatus("error");
-        } else {
-          showNotification(
-            error instanceof Error ? error.message : "Erro ao salvar rascunho",
-            "error",
-          );
-        }
-      }
-    },
-    [docId, drafts, formMessages, locale, watch],
-  );
-
-  // Auto-save draft on content change (throttled by the API and debounced on frontend)
-  useEffect(() => {
-    let debounceTimer: NodeJS.Timeout;
-
-    const subscription = watch((_values, { name, type }) => {
-      if (type === "change") {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          handleSaveDraft(false);
-        }, 3000); // 3 seconds debounce
-      }
-    });
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(debounceTimer);
-    };
-  }, [watch, docId, handleSaveDraft]);
-
-  // Função para carregar um rascunho
-  const handleLoadDraft = (draftId: string) => {
-    const draft = drafts.find((d) => d.id === draftId);
-    if (!draft) return;
-
-    let content = draft.content;
-    // Ensure content is parsed if it's a stringified JSON
-    if (
-      typeof content === "string" &&
-      (content.startsWith("{") || content.startsWith("["))
-    ) {
-      try {
-        content = JSON.parse(content);
-      } catch {
-        // Fallback to string if parsing fails
-      }
-    }
-
-    reset({ title: draft.title, content });
-    editorRef.current?.getInstance()?.commands.setContent(content);
-    showNotification(formMessages.modal.draftLoaded);
-  };
-
-  // Função para excluir um rascunho
-  const handleDeleteDraft = async (draftId: string) => {
-    if (!docId) {
-      const updated = drafts.filter((d) => d.id !== draftId);
-      localStorage.setItem("drafts", JSON.stringify(updated));
-      setDrafts(updated);
-      showNotification(formMessages.modal.draftDeleted);
-      return;
-    }
-
-    // Nota: Precisamos da rota de DELETE ou apenas filtramos se for via API
-    // Por simplicidade neste MVP, vamos focar no salvamento/comparação.
-    // Mas vamos implementar o filtro local para UX imediata.
-    setDrafts((prev) => prev.filter((d) => d.id !== draftId));
-  };
-
-  const handleCompareDraft = (draftId: string) => {
-    const draft = drafts.find((d) => d.id === draftId);
-    if (draft) {
-      setSelectedDraftForComparison({ content: draft.content, id: draft.id });
-      setIsComparisonOpen(true);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -1014,18 +801,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                       onClear: handleClear,
                       isExportingPdf: isExportingPDF,
                     }}
-                    draftActions={{
-                      drafts: drafts.map(({ id, title, date }) => ({
-                        id,
-                        title,
-                        date,
-                      })),
-                      onSaveDraft: () => handleSaveDraft(true),
-                      onLoadDraft: handleLoadDraft,
-                      onDeleteDraft: handleDeleteDraft,
-                      onCompareDraft: handleCompareDraft,
-                      savingStatus: draftSavingStatus,
-                    }}
+
                     userPlan={userPlan}
                     documentTitle={watch("title")}
                     aria-label={formMessages.aria.content}
@@ -1191,21 +967,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         </div>
       )}
 
-      {isComparisonOpen && selectedDraftForComparison && (
-        <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="w-full max-w-5xl h-[85vh]">
-            <DraftComparison
-              oldContent={selectedDraftForComparison.content}
-              newContent={watch("content")}
-              onClose={() => setIsComparisonOpen(false)}
-              onRestore={() => {
-                handleLoadDraft(selectedDraftForComparison.id);
-                setIsComparisonOpen(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
 
       {isExportingPDF && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">

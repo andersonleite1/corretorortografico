@@ -76,24 +76,9 @@ model Document {
   slug        String?  @unique
   isPublished Boolean  @default(false)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  drafts      Draft[]
 
   @@index([userId])
   @@map("documents")
-}
-
-model Draft {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  documentId  String
-  title       String
-  content     String   // Tiptap JSON stringified
-  
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@index([documentId, createdAt])
-  @@map("drafts")
 }
 
 

@@ -38,20 +38,7 @@ export type ExportActions = {
   onExportTxt?: () => void | Promise<void>;
 };
 
-export type DraftSummary = {
-  id: string;
-  title: string;
-  date: string;
-};
 
-export type DraftActions = {
-  drafts: DraftSummary[];
-  onSaveDraft?: () => void;
-  onLoadDraft?: (id: string) => void;
-  onDeleteDraft?: (id: string) => void;
-  onCompareDraft?: (id: string) => void;
-  savingStatus?: "idle" | "saving" | "saved" | "error";
-};
 
 type TiptapContextType = {
   editor: Editor;
@@ -63,7 +50,6 @@ type TiptapContextType = {
   toggleSourceMode: () => void;
   setIsResizing: (value: boolean) => void;
   exportActions?: ExportActions;
-  draftActions?: DraftActions;
   messages: EditorMessages;
   locale: Locale;
   userPlan: "free" | "pro" | "team";
@@ -87,7 +73,6 @@ type TiptapProviderProps = {
   editorProps?: HTMLAttributes<HTMLDivElement>;
   children?: ReactNode;
   exportActions?: ExportActions;
-  draftActions?: DraftActions;
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
   documentTitle?: string;
@@ -98,7 +83,6 @@ export const TiptapProvider = ({
   slotBefore,
   slotAfter,
   exportActions,
-  draftActions,
   locale,
   userPlan: initialUserPlan = "free",
   documentTitle,
@@ -212,7 +196,6 @@ export const TiptapProvider = ({
       shortcuts: {
         // Arquivo e Controle
         onSave: handleSaveDocument,
-        onSaveDraft: draftActions?.onSaveDraft,
         onOpenDocuments: () => setIsDocumentsDialogOpen(true),
         onCopyAll: () => {
           if (
@@ -241,7 +224,6 @@ export const TiptapProvider = ({
   }, [
     editor,
     handleSaveDocument,
-    draftActions?.onSaveDraft,
     exportActions?.onClear,
     exportActions?.onExportPdf,
     exportActions?.onExportDoc,
@@ -373,7 +355,6 @@ export const TiptapProvider = ({
         toggleFullScreen: () => setIsFullScreen((prev) => !prev),
         toggleSourceMode: () => setIsSourceMode((prev) => !prev),
         exportActions,
-        draftActions,
         messages,
         locale: normalizedLocale,
         userPlan,

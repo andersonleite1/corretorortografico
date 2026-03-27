@@ -21,13 +21,9 @@ export type EditPageMessages = {
       pdfError: string;
       docSuccess: string;
       txtSuccess: string;
-      draftSaved: string;
-      draftLoaded: string;
-      draftDeleted: string;
     };
     defaults: {
       documentName: string;
-      draftTitle: string;
     };
     preview: {
       heading: string;
@@ -76,13 +72,9 @@ const editMessages: Record<Locale, EditPageMessages> = {
         pdfError: "Erro ao gerar o PDF.",
         docSuccess: "Documento exportado com sucesso!",
         txtSuccess: "Arquivo TXT exportado com sucesso!",
-        draftSaved: "Rascunho salvo com sucesso!",
-        draftLoaded: "Rascunho carregado!",
-        draftDeleted: "Rascunho excluído!",
       },
       defaults: {
         documentName: "Documento",
-        draftTitle: "Sem título",
       },
       preview: {
         heading: "Pré-visualização do PDF",
@@ -128,13 +120,9 @@ const editMessages: Record<Locale, EditPageMessages> = {
         pdfError: "We couldn't generate the PDF.",
         docSuccess: "Document exported successfully!",
         txtSuccess: "TXT file exported successfully!",
-        draftSaved: "Draft saved!",
-        draftLoaded: "Draft loaded!",
-        draftDeleted: "Draft removed!",
       },
       defaults: {
         documentName: "Document",
-        draftTitle: "Untitled",
       },
       preview: {
         heading: "PDF preview",
@@ -181,13 +169,9 @@ const editMessages: Record<Locale, EditPageMessages> = {
         pdfError: "No se pudo generar el PDF.",
         docSuccess: "Documento exportado correctamente.",
         txtSuccess: "Archivo TXT exportado correctamente.",
-        draftSaved: "Borrador guardado.",
-        draftLoaded: "Borrador cargado.",
-        draftDeleted: "Borrador eliminado.",
       },
       defaults: {
         documentName: "Documento",
-        draftTitle: "Sin título",
       },
       preview: {
         heading: "Vista previa del PDF",

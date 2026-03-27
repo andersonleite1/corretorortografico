@@ -30,7 +30,6 @@ import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
 import LanguageToolSidebarButton from "./controls/LanguageToolSidebarButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
-import DraftsDropdown from "./controls/DraftsDropdown";
 import DocumentsButton from "./controls/DocumentsButton";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
@@ -44,7 +43,7 @@ import LowercaseButton from "./controls/LowercaseButton";
 import CapitalizeButton from "./controls/CapitalizeButton";
 
 const MenuBar = () => {
-  const { exportActions, draftActions } = useTiptapContext();
+  const { exportActions } = useTiptapContext();
   const { buttonVisibility } = useEditorSettings();
 
   const showExport = Boolean(
@@ -55,7 +54,6 @@ const MenuBar = () => {
   const showPreview = Boolean(
     exportActions?.onPreviewPdf || exportActions?.onPreviewPost,
   );
-  const showDrafts = Boolean(draftActions);
 
   return (
     <div className="rte-menu-bar">
@@ -110,7 +108,6 @@ const MenuBar = () => {
         {showExport && buttonVisibility.export && <ExportDropdown />}
         {showPreview && buttonVisibility.preview && <PreviewDropdown />}
         {buttonVisibility.documents && <DocumentsButton />}
-        {buttonVisibility.drafts && showDrafts && <DraftsDropdown />}
         {buttonVisibility.importPdf && <ImportPdfButton />}
 
         {buttonVisibility.copyEditor && <CopyEditorButton />}

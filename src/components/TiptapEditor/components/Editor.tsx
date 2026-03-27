@@ -6,7 +6,6 @@ import { Content, type Editor } from "@tiptap/react";
 import dynamic from "next/dynamic";
 import TiptapProvider, {
   type ExportActions,
-  type DraftActions,
 } from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
@@ -65,7 +64,6 @@ export interface TiptapEditorProps {
   contentMaxHeight?: string | number;
   onContentChange?: (value: Content) => void;
   exportActions?: ExportActions;
-  draftActions?: DraftActions;
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
   documentTitle?: string;
@@ -87,7 +85,6 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       contentMaxHeight,
       onContentChange,
       exportActions,
-      draftActions,
       locale,
       userPlan = "free",
       documentTitle,
@@ -152,7 +149,6 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         slotBefore={!hideMenuBar && <MenuBar />}
         slotAfter={!hideStatusBar && <StatusBar />}
         exportActions={exportActions}
-        draftActions={draftActions}
         locale={locale}
         userPlan={userPlan}
         documentTitle={documentTitle}
