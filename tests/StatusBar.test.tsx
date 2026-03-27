@@ -29,7 +29,6 @@ const defaultContextValue = {
       },
     },
   },
-  draftActions: undefined as any,
   isMobile: false,
   documentTitle: undefined as string | undefined,
 };
@@ -113,7 +112,6 @@ describe("StatusBar", () => {
       message: null,
     };
     defaultContextValue.isMobile = false;
-    defaultContextValue.draftActions = undefined;
   });
 
   it("exibe a contagem de palavras", () => {
@@ -188,60 +186,7 @@ describe("StatusBar", () => {
     expect(screen.getByText("Indisponível")).toBeInTheDocument();
   });
 
-  describe("Status de rascunho", () => {
-    it('exibe "Salvando…" quando savingStatus="saving"', () => {
-      defaultContextValue.draftActions = {
-        savingStatus: "saving",
-        drafts: [],
-        onSaveDraft: vi.fn(),
-        onLoadDraft: vi.fn(),
-        onDeleteDraft: vi.fn(),
-        onCompareDraft: vi.fn(),
-      } as any;
-      render(<StatusBar />);
-      expect(screen.getByText("Salvando rascunho...")).toBeInTheDocument();
-    });
 
-    it('exibe "Salvo" quando savingStatus="saved"', () => {
-      defaultContextValue.draftActions = {
-        savingStatus: "saved",
-        drafts: [],
-        onSaveDraft: vi.fn(),
-        onLoadDraft: vi.fn(),
-        onDeleteDraft: vi.fn(),
-        onCompareDraft: vi.fn(),
-      } as any;
-      render(<StatusBar />);
-      expect(screen.getByText("Rascunho salvo")).toBeInTheDocument();
-    });
-
-    it('exibe "Erro ao salvar" quando savingStatus="error"', () => {
-      defaultContextValue.draftActions = {
-        savingStatus: "error",
-        drafts: [],
-        onSaveDraft: vi.fn(),
-        onLoadDraft: vi.fn(),
-        onDeleteDraft: vi.fn(),
-        onCompareDraft: vi.fn(),
-      } as any;
-      render(<StatusBar />);
-      expect(screen.getByText("Erro no rascunho")).toBeInTheDocument();
-    });
-
-    it('não exibe status quando savingStatus="idle"', () => {
-      defaultContextValue.draftActions = {
-        savingStatus: "idle",
-        drafts: [],
-        onSaveDraft: vi.fn(),
-        onLoadDraft: vi.fn(),
-        onDeleteDraft: vi.fn(),
-        onCompareDraft: vi.fn(),
-      } as any;
-      render(<StatusBar />);
-      expect(screen.queryByText("Salvando...")).not.toBeInTheDocument();
-      expect(screen.queryByText("Rascunho salvo")).not.toBeInTheDocument();
-    });
-  });
 
   describe("Status de Sincronização", () => {
     it('exibe "Sincronizado" quando documentTitle está presente', () => {
