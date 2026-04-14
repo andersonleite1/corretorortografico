@@ -73,6 +73,9 @@ export default async function RootLayout({
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <head>
         <link rel="preconnect" href="https://www.clarity.ms" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Preload background image so browser fetches it in parallel with CSS parsing */}
+        <link rel="preload" as="image" href="/background.webp" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}

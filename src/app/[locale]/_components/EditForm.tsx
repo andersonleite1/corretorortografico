@@ -6,12 +6,11 @@ import {
   useRef,
   useState,
 } from "react";
-import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 
 import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
-import { FaTimes, FaBug } from "react-icons/fa";
+import { X, Bug } from "lucide-react";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
 import { getLocalDocumentById } from "@/lib/local-storage";
@@ -822,7 +821,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-200 active:scale-95"
           aria-label={getCommonMessages(locale).editor.reportBug}
         >
-          <FaBug className="text-xs" />
+          <Bug className="text-xs" />
           {getCommonMessages(locale).editor.reportBug}
         </button>
       </div>
@@ -840,7 +839,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 className="inline-flex items-center justify-center p-2 text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
                 aria-label={formMessages.preview.closeAria}
               >
-                <FaTimes className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="flex-1 bg-gray-100 dark:bg-gray-800">
@@ -881,7 +880,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
               onClick={() => setIsPostPreviewOpen(false)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
             >
-              <FaTimes className="w-6 h-6 text-gray-500" />
+              <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>
 
@@ -974,12 +973,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
               {formMessages.loading.label}
             </h4>
-            <Image
-              src="/loading.gif"
-              alt={formMessages.loading.alt}
-              className="w-20 h-20 drop-shadow-md"
-              width={80}
-              height={80}
+            {/* CSS spinner — replaces loading.gif (23 KB) with zero-byte animation */}
+            <div
+              aria-label={formMessages.loading.alt}
+              role="status"
+              className="w-20 h-20 rounded-full border-4 border-white/20 border-t-white animate-spin drop-shadow-md"
+              style={{ animationDuration: "0.8s" }}
             />
           </div>
         </div>

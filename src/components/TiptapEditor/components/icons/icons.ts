@@ -1,5 +1,5 @@
 import { IconBaseProps, IconType } from "react-icons";
-import { AiOutlineMergeCells, AiOutlineSplitCells } from "react-icons/ai";
+import { Combine, Split, History, WrapText, FileType2, FileText, FileSearch, Eye } from "lucide-react";
 import {
   TbAlignCenter,
   TbAlignJustified,
@@ -71,9 +71,7 @@ import {
   TbArrowBigUp,
   TbLetterCaseToggle,
 } from "react-icons/tb";
-import { MdHistory } from "react-icons/md";
-import { RiTextSpacing } from "react-icons/ri";
-import { FaFilePdf, FaFileWord, FaFileAlt, FaRegEye } from "react-icons/fa";
+
 import IconCorner from "./Corner";
 import IconInlineCode from "./InlineCode";
 import IconQuote from "./Quote";
@@ -142,13 +140,13 @@ export const icons = {
   RowInsertBottom: TbRowInsertBottom,
   RowRemove: TbRowRemove,
   RowHeader: TbTableRow,
-  MergeCell: AiOutlineMergeCells,
-  SplitCell: AiOutlineSplitCells,
-  LineHeight: RiTextSpacing,
-  FileDoc: FaFileWord,
-  FilePdf: FaFilePdf,
-  FileTxt: FaFileAlt,
-  Eye: FaRegEye,
+  MergeCell: Combine as any,
+  SplitCell: Split as any,
+  LineHeight: WrapText as any,
+  FileDoc: FileText as any,
+  FilePdf: FileType2 as any,
+  FileTxt: FileSearch as any,
+  Eye: Eye as any,
   Drafts: TbNotebook,
   Save: TbDeviceFloppy,
   Columns: TbLayoutSidebar,
@@ -157,7 +155,7 @@ export const icons = {
   ChevronRight: TbChevronRight,
   CheckboxChecked: TbSquareCheck,
   CheckboxEmpty: TbSquare,
-  History: MdHistory,
+  History: History as any,
   Settings: TbSettings,
   Keyboard: TbKeyboard,
   Info: TbInfoCircle,

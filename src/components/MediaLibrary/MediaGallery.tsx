@@ -1,5 +1,5 @@
 import React from "react";
-import { LuCheck } from "react-icons/lu";
+import { Check as LuCheck } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import { useParams } from "next/navigation";
