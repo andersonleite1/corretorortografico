@@ -93,7 +93,7 @@ const editMessages: Record<Locale, EditPageMessages> = {
       },
       loading: {
         label: "Gerando PDF...",
-        alt: "Gerando PDF",
+        alt: "Animação de carregamento indicando o processamento da exportação de arquivo no Editor de Texto Online",
       },
       pdfLang: "pt-BR",
       dateLocale: "pt-BR",
@@ -141,7 +141,7 @@ const editMessages: Record<Locale, EditPageMessages> = {
       },
       loading: {
         label: "Generating PDF...",
-        alt: "Generating PDF",
+        alt: "Loading animation indicating file export processing in the Online Text Editor",
       },
       pdfLang: "en",
       dateLocale: "en-US",
@@ -190,7 +190,7 @@ const editMessages: Record<Locale, EditPageMessages> = {
       },
       loading: {
         label: "Generando PDF...",
-        alt: "Generando PDF",
+        alt: "Animación de carga que indica el procesamiento de exportación de archivos en o Editor de Texto Online",
       },
       pdfLang: "es",
       dateLocale: "es-ES",

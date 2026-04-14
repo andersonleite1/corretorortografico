@@ -187,7 +187,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
         <EditForm locale={content.locale} userPlan={userPlan} />
       </div>
 
-      {content.hero && <LandingHero data={content.hero} />}
+      {content.hero && <LandingHero data={content.hero} locale={content.locale} />}
 
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}

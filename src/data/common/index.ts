@@ -254,7 +254,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       title: "Nesta página",
     },
     footer: {
-      secureImageAlt: "Compra Segura SSL",
+      secureImageAlt:
+        "Selo de Compra Segura SSL - Garantia de proteção de dados no Editor de Texto Online",
     },
     pricing: {
       free: "Grátis",
@@ -356,7 +357,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
     landing: {
       heroAria: "Apresentação do editor de texto online",
       heroImageAlt:
-        "Mockup de um MacBook Pro mostrando a interface do editor de texto online",
+        "Editor de texto online gratuito - Interface simples e profissional exibida em um MacBook Pro",
       ctaAria: "Chamada para ação final",
     },
     editor: {
@@ -481,7 +482,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       title: "On this page",
     },
     footer: {
-      secureImageAlt: "Secure Purchase SSL",
+      secureImageAlt:
+        "Secure Purchase SSL Seal - Data protection guarantee at Editor de Texto Online",
     },
     pricing: {
       free: "Free",
@@ -583,7 +585,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
     landing: {
       heroAria: "Online text editor presentation",
       heroImageAlt:
-        "Mockup of a MacBook Pro showing the online text editor interface",
+        "Free online text editor - Simple and professional interface displayed on a MacBook Pro",
       ctaAria: "Final call to action",
     },
     editor: {
@@ -708,7 +710,8 @@ const commonMessages: Record<Locale, CommonMessages> = {
       title: "En esta página",
     },
     footer: {
-      secureImageAlt: "Compra Segura SSL",
+      secureImageAlt:
+        "Sello de Compra Segura SSL - Garantía de protección de datos en el Editor de Texto Online",
     },
     pricing: {
       free: "Gratis",
@@ -810,7 +813,7 @@ const commonMessages: Record<Locale, CommonMessages> = {
     landing: {
       heroAria: "Presentación del editor de texto en línea",
       heroImageAlt:
-        "Mockup de un MacBook Pro mostrando la interfaz del editor de texto en línea",
+        "Editor de texto gratis en línea - Interfaz simple y profesional mostrada en un MacBook Pro",
       ctaAria: "Llamado a la acción final",
     },
     editor: {

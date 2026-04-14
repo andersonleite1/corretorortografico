@@ -28,7 +28,7 @@ const PostHeader = ({
           src={"/avatar.jpg"}
           width={50}
           height={50}
-          alt=""
+          alt={author}
           className="rounded-full"
         />
         <div className="">
