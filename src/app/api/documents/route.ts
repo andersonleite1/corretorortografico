@@ -101,15 +101,22 @@ export async function GET(req: Request) {
       take: limit,
     });
 
-    return NextResponse.json({
-      documents,
-      metadata: {
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit),
-        currentPage: page,
-        limit,
+    return NextResponse.json(
+      {
+        documents,
+        metadata: {
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          limit,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "private, max-age=30, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error) {
     console.error("[DOCUMENTS_GET]", error);
     return new NextResponse("Erro Interno", { status: 500 });

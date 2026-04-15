@@ -6,12 +6,11 @@ import {
   useRef,
   useState,
 } from "react";
-import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 
 import dynamic from "next/dynamic";
 import { saveAs } from "file-saver";
-import { FaTimes, FaBug } from "react-icons/fa";
+import { X, Bug } from "lucide-react";
 import { getPost, savePost } from "@/services/post";
 import { requestPdfFromHtml } from "@/services/pdfService";
 import { getLocalDocumentById } from "@/lib/local-storage";
@@ -145,33 +144,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
 
   useEffect(() => {
-    const isMobile = window.innerWidth <= 768;
-    if (!isMobile) {
+    // Schedule editor to load shortly after mount, off the critical rendering path
+    // but without waiting for user interaction which worsens INP.
+    const timer = setTimeout(() => {
       setShouldLoadEditor(true);
-      return;
-    }
+    }, 150);
 
-    const loadEditor = () => {
-      if (shouldLoadEditor) return;
-      setShouldLoadEditor(true);
-      window.removeEventListener("scroll", loadEditor);
-      window.removeEventListener("touchstart", loadEditor);
-      window.removeEventListener("mousemove", loadEditor);
-    };
-
-    window.addEventListener("scroll", loadEditor, { passive: true });
-    window.addEventListener("touchstart", loadEditor, { passive: true });
-    window.addEventListener("mousemove", loadEditor, { passive: true });
-
-    const timer = setTimeout(loadEditor, 8000);
-
-    return () => {
-      window.removeEventListener("scroll", loadEditor);
-      window.removeEventListener("touchstart", loadEditor);
-      window.removeEventListener("mousemove", loadEditor);
-      clearTimeout(timer);
-    };
-  }, [shouldLoadEditor]);
+    return () => clearTimeout(timer);
+  }, []);
 
   const showNotification = (
     message: string,
@@ -634,13 +614,13 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 animate-pulse">
-        {/* ── Title input skeleton ── */}
+        {/* Title input skeleton */}
         <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
-        {/* ── Editor container skeleton ── */}
-        <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden">
-          {/* Toolbar row 1: undo/redo/save + basic formatting */}
-          <div className="h-[44px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+        {/* Editor container skeleton */}
+        <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden flex flex-col" style={{ minHeight: "480px" }}>
+          {/* Toolbar row 1 */}
+          <div className="h-[44px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -657,8 +637,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <span className="ml-auto h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
           </div>
 
-          {/* Toolbar row 2: paragraph/font/size/spell/export */}
-          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+          {/* Toolbar row 2 */}
+          <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -667,8 +647,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <span className="ml-auto h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
           </div>
 
-          {/* Toolbar row 3: view/docs/drafts/AI */}
-          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+          {/* Toolbar row 3 */}
+          <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -681,7 +661,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           </div>
 
           {/* Editor body: text area + sidebar */}
-          <div className="flex">
+          <div className="flex flex-1">
             {/* Main text area */}
             <div className="flex-1 min-h-[320px] p-5">
               <div className="h-4 w-3/4 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
@@ -691,7 +671,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             </div>
 
             {/* Sidebar skeleton */}
-            <div className="hidden md:flex flex-col w-[319px] border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
+            <div className="hidden md:flex flex-col w-[319px] shrink-0 border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
               {/* Tabs */}
               <div className="flex gap-3 border-b border-[#d1d9e0] dark:border-[#3d444d] pb-3">
                 <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -725,7 +705,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
+          <div className="shrink-0 border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
               <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -780,7 +760,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 }
               >
                 {!shouldLoadEditor ? (
-                  <div className="w-full h-[480px] bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d]" />
+                  <div className="w-full bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d]" style={{ minHeight: "480px" }} />
                 ) : (
                   <TiptapEditor
                     ref={editorRef}
@@ -822,7 +802,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-200 active:scale-95"
           aria-label={getCommonMessages(locale).editor.reportBug}
         >
-          <FaBug className="text-xs" />
+          <Bug className="text-xs" />
           {getCommonMessages(locale).editor.reportBug}
         </button>
       </div>
@@ -840,7 +820,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 className="inline-flex items-center justify-center p-2 text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
                 aria-label={formMessages.preview.closeAria}
               >
-                <FaTimes className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="flex-1 bg-gray-100 dark:bg-gray-800">
@@ -881,7 +861,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
               onClick={() => setIsPostPreviewOpen(false)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
             >
-              <FaTimes className="w-6 h-6 text-gray-500" />
+              <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>
 
@@ -974,12 +954,12 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <h4 className="text-white text-xl font-semibold animate-pulse tracking-wide">
               {formMessages.loading.label}
             </h4>
-            <Image
-              src="/loading.gif"
-              alt={formMessages.loading.alt}
-              className="w-20 h-20 drop-shadow-md"
-              width={80}
-              height={80}
+            {/* CSS spinner — replaces loading.gif (23 KB) with zero-byte animation */}
+            <div
+              aria-label={formMessages.loading.alt}
+              role="status"
+              className="w-20 h-20 rounded-full border-4 border-white/20 border-t-white animate-spin drop-shadow-md"
+              style={{ animationDuration: "0.8s" }}
             />
           </div>
         </div>

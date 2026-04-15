@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { LuCalendarDays, LuClock } from "react-icons/lu";
+import { CalendarDays as LuCalendarDays, Clock as LuClock } from "lucide-react";
 
 interface PostHeaderProps {
   title: string;
@@ -25,10 +25,10 @@ const PostHeader = ({
 
       <div className="flex items-center mt-6 gap-4">
         <Image
-          src={"/avatar.jpg"}
+          src={"/avatar.webp"}
           width={50}
           height={50}
-          alt=""
+          alt={author}
           className="rounded-full"
         />
         <div className="">

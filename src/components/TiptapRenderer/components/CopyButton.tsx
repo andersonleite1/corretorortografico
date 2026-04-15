@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { LuCheck, LuClipboard } from "react-icons/lu";
+import { Check as LuCheck, Clipboard as LuClipboard } from "lucide-react";
 
 const CopyButton = ({ code }: { code: string }) => {
   const [copied, setCopied] = useState(false);

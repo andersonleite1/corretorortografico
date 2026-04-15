@@ -116,18 +116,25 @@ export async function GET() {
       rewrites: val.rewrites,
     }));
 
-    return NextResponse.json({
-      totalDocuments,
-      plan,
-      totalTimeSavedSeconds: Math.round(totalTimeSavedSeconds),
-      topTones,
-      recentDocuments,
-      dailySeries,
-      usedDaily: rateStats.usedDaily,
-      limitDaily: rateStats.limitDaily,
-      usedMonthlyPaid: rateStats.usedMonthlyPaid,
-      limitMonthlyPaid: rateStats.limitMonthlyPaid,
-    });
+    return NextResponse.json(
+      {
+        totalDocuments,
+        plan,
+        totalTimeSavedSeconds: Math.round(totalTimeSavedSeconds),
+        topTones,
+        recentDocuments,
+        dailySeries,
+        usedDaily: rateStats.usedDaily,
+        limitDaily: rateStats.limitDaily,
+        usedMonthlyPaid: rateStats.usedMonthlyPaid,
+        limitMonthlyPaid: rateStats.limitMonthlyPaid,
+      },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=60, stale-while-revalidate=120",
+        },
+      }
+    );
   } catch (error) {
     console.error("[DASHBOARD_GET]", error);
     return new NextResponse("Erro Interno", { status: 500 });

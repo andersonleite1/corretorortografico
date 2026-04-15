@@ -30,16 +30,16 @@ const LandingCTA = dynamic(() => import("@/components/landing/LandingCTA"), {
 });
 
 const EditForm = dynamic(() => import("./_components/EditForm"), {
-  ssr: false,
+  ssr: true,
   loading: () => (
     <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 animate-pulse">
       {/* Title input */}
       <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
       {/* Editor container */}
-      <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden">
+      <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden flex flex-col" style={{ minHeight: "480px" }}>
         {/* Toolbar row 1 */}
-        <div className="h-[44px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+        <div className="h-[44px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
           <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -56,7 +56,7 @@ const EditForm = dynamic(() => import("./_components/EditForm"), {
           <span className="ml-auto h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
         </div>
         {/* Toolbar row 2 */}
-        <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+        <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
           <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -65,7 +65,7 @@ const EditForm = dynamic(() => import("./_components/EditForm"), {
           <span className="ml-auto h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
         </div>
         {/* Toolbar row 3 */}
-        <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+        <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
           <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
           <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -77,14 +77,14 @@ const EditForm = dynamic(() => import("./_components/EditForm"), {
           <span className="ml-auto h-7 w-32 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
         {/* Body: text area + sidebar */}
-        <div className="flex">
+        <div className="flex flex-1">
           <div className="flex-1 min-h-[320px] p-5">
             <div className="h-4 w-3/4 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
             <div className="h-4 w-full bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
             <div className="h-4 w-5/6 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
             <div className="h-4 w-2/3 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
           </div>
-          <div className="hidden md:flex flex-col w-[319px] border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
+          <div className="hidden md:flex flex-col w-[319px] shrink-0 border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
             <div className="flex gap-3 border-b border-[#d1d9e0] dark:border-[#3d444d] pb-3">
               <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
               <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -113,7 +113,7 @@ const EditForm = dynamic(() => import("./_components/EditForm"), {
           </div>
         </div>
         {/* Footer */}
-        <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
+        <div className="shrink-0 border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -187,7 +187,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
         <EditForm locale={content.locale} userPlan={userPlan} />
       </div>
 
-      {content.hero && <LandingHero data={content.hero} />}
+      {content.hero && <LandingHero data={content.hero} locale={content.locale} />}
 
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}

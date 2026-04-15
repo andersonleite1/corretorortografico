@@ -1,17 +1,21 @@
 import Image from "next/image";
 import { HeroContent } from "@/data/home/types";
 import { HeroActions } from "./HeroActions";
-import { useEffect, useState } from "react";
+import { getCommonMessages } from "@/data/common";
+import { Locale } from "../../../i18n-config";
 
 type Props = {
   data: HeroContent;
+  locale: Locale;
 };
 
-export default function LandingHero({ data }: Props) {
+export default function LandingHero({ data, locale }: Props) {
+  const t = getCommonMessages(locale).landing;
+
   return (
     <section
       className="landing-hero"
-      aria-label="Apresentação do editor de texto online"
+      aria-label={t.heroAria}
     >
       <div className="landing-hero__inner">
         <div className="landing-hero__text">
@@ -29,7 +33,7 @@ export default function LandingHero({ data }: Props) {
           <div className="landing-hero__screenshot-wrap">
             <Image
               src="/macbook-mockup.webp"
-              alt="Mockup de um MacBook Pro mostrando a interface do editor de texto online"
+              alt={t.heroImageAlt}
               width={960}
               height={960}
               sizes="(max-width: 640px) 90vw, (max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"

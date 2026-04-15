@@ -114,7 +114,7 @@ const Header = ({ userButton }: HeaderProps) => {
             <Link href="/">
               <Image
                 src={theme === "dark" ? "/logo-black.webp" : "/logo.webp"}
-                alt={t.appName}
+                alt={headerContent.logoAlt}
                 width={150}
                 height={90}
                 priority
@@ -123,6 +123,12 @@ const Header = ({ userButton }: HeaderProps) => {
           </div>
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
+              <Link
+                href={`/${currentLocale}/about`}
+                className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+              >
+                {headerContent.about}
+              </Link>
               <SignedIn>
                 <Link
                   href={`/${currentLocale}/dashboard`}
