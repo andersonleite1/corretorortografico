@@ -144,33 +144,14 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
 
   useEffect(() => {
-    const isMobile = window.innerWidth <= 768;
-    if (!isMobile) {
+    // Schedule editor to load shortly after mount, off the critical rendering path
+    // but without waiting for user interaction which worsens INP.
+    const timer = setTimeout(() => {
       setShouldLoadEditor(true);
-      return;
-    }
+    }, 150);
 
-    const loadEditor = () => {
-      if (shouldLoadEditor) return;
-      setShouldLoadEditor(true);
-      window.removeEventListener("scroll", loadEditor);
-      window.removeEventListener("touchstart", loadEditor);
-      window.removeEventListener("mousemove", loadEditor);
-    };
-
-    window.addEventListener("scroll", loadEditor, { passive: true });
-    window.addEventListener("touchstart", loadEditor, { passive: true });
-    window.addEventListener("mousemove", loadEditor, { passive: true });
-
-    const timer = setTimeout(loadEditor, 8000);
-
-    return () => {
-      window.removeEventListener("scroll", loadEditor);
-      window.removeEventListener("touchstart", loadEditor);
-      window.removeEventListener("mousemove", loadEditor);
-      clearTimeout(timer);
-    };
-  }, [shouldLoadEditor]);
+    return () => clearTimeout(timer);
+  }, []);
 
   const showNotification = (
     message: string,
@@ -633,13 +614,13 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 animate-pulse">
-        {/* ── Title input skeleton ── */}
+        {/* Title input skeleton */}
         <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
-        {/* ── Editor container skeleton ── */}
-        <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden">
-          {/* Toolbar row 1: undo/redo/save + basic formatting */}
-          <div className="h-[44px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+        {/* Editor container skeleton */}
+        <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden flex flex-col" style={{ minHeight: "480px" }}>
+          {/* Toolbar row 1 */}
+          <div className="h-[44px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -656,8 +637,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <span className="ml-auto h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
           </div>
 
-          {/* Toolbar row 2: paragraph/font/size/spell/export */}
-          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+          {/* Toolbar row 2 */}
+          <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -666,8 +647,8 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             <span className="ml-auto h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
           </div>
 
-          {/* Toolbar row 3: view/docs/drafts/AI */}
-          <div className="h-[40px] border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
+          {/* Toolbar row 3 */}
+          <div className="h-[40px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
             <span className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
             <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -680,7 +661,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           </div>
 
           {/* Editor body: text area + sidebar */}
-          <div className="flex">
+          <div className="flex flex-1">
             {/* Main text area */}
             <div className="flex-1 min-h-[320px] p-5">
               <div className="h-4 w-3/4 bg-gray-100 dark:bg-gray-700/50 rounded mb-3" />
@@ -690,7 +671,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
             </div>
 
             {/* Sidebar skeleton */}
-            <div className="hidden md:flex flex-col w-[319px] border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
+            <div className="hidden md:flex flex-col w-[319px] shrink-0 border-l border-[#d1d9e0] dark:border-[#3d444d] p-4 gap-4">
               {/* Tabs */}
               <div className="flex gap-3 border-b border-[#d1d9e0] dark:border-[#3d444d] pb-3">
                 <span className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -724,7 +705,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
+          <div className="shrink-0 border-t border-[#d1d9e0] dark:border-[#3d444d] px-4 py-2.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
               <span className="h-4 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -779,7 +760,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                 }
               >
                 {!shouldLoadEditor ? (
-                  <div className="w-full h-[480px] bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d]" />
+                  <div className="w-full bg-gray-100/70 dark:bg-[#111625] animate-pulse rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d]" style={{ minHeight: "480px" }} />
                 ) : (
                   <TiptapEditor
                     ref={editorRef}
