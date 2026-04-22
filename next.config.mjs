@@ -1,3 +1,4 @@
+import withSerwistInit from "@serwist/next";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -117,7 +118,13 @@ const nextConfig = {
 };
 import { withSentryConfig } from "@sentry/nextjs";
 
-export default withSentryConfig(nextConfig, {
+const withSerwist = withSerwistInit({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+});
+
+export default withSentryConfig(withSerwist(nextConfig), {
   org: "editordetexto",
   project: "javascript-nextjs",
   silent: !process.env.CI,

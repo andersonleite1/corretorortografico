@@ -1,5 +1,5 @@
 import { JetBrains_Mono, Open_Sans } from "next/font/google";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import dynamic from "next/dynamic";
 
@@ -33,6 +33,14 @@ const CookieConsent = dynamic(
 );
 import { Analytics } from "@/components/shared/Analytics";
 
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "Editor de Texto Online Grátis e Simples | EditorDeTexto.online",
   description:
@@ -49,6 +57,11 @@ export const metadata: Metadata = {
     siteName: "Editor de Texto Online",
     locale: "pt_BR",
     images: "/editor-de-texto.webp",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Editor",
   },
 };
 
