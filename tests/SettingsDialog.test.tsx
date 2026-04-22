@@ -255,24 +255,17 @@ describe("SettingsDialog", () => {
   });
 
   // ── Plan-based restrictions ──────────────────────────────────────────────
-  it("desabilita tons além dos primeiros 5 para usuários no plano Free", () => {
+  it("habilita todos os tons para usuários no plano Free (limitação é por uso/dia, não por tipo de tom)", () => {
     render(<SettingsDialog userPlan="free" />);
     const toneIds = Object.keys(DEFAULT_TONES);
 
-    // First 5 should be enabled
-    for (let i = 0; i < 5; i++) {
-      const toneLabel = TONE_LABELS[toneIds[i] as keyof typeof TONE_LABELS];
+    // All tones should be enabled — restriction is daily usage count, enforced server-side
+    toneIds.forEach((id) => {
+      const toneLabel = TONE_LABELS[id as keyof typeof TONE_LABELS];
       const toneButton = screen.getByText(toneLabel).closest("button")!;
       expect(toneButton).not.toBeDisabled();
-    }
-
-    // Remaining should be disabled
-    for (let i = 5; i < toneIds.length; i++) {
-      const toneLabel = TONE_LABELS[toneIds[i] as keyof typeof TONE_LABELS];
-      const toneButton = screen.getByText(toneLabel).closest("button")!;
-      expect(toneButton).toBeDisabled();
-      expect(toneButton).toHaveClass("opacity-40");
-    }
+      expect(toneButton).not.toHaveClass("opacity-40");
+    });
   });
 
   it("não desabilita tons para usuários no plano Pro", () => {

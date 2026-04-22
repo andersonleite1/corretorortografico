@@ -97,19 +97,18 @@ describe("POST /api/ai/rewrite", () => {
     expect(json.error).toBe("Limite de uso gratuito atingido.");
   });
 
-  it("should reject unauthorized tones for Free users", async () => {
+  it("deve aceitar qualquer tom para usuários Free (restrição é uso/dia, não tipo de tom)", async () => {
     const mockRequest = new Request("http://localhost:3000/api/ai/rewrite", {
       method: "POST",
       body: JSON.stringify({
-        tone: "romantic", // romantic is not allowed for free users
+        tone: "romantic", // Previously restricted; now allowed for all plans
         text: "hello",
       }),
     });
 
     const response = await POST(mockRequest);
-    expect(response.status).toBe(403);
-    const json = await response.json();
-    expect(json.error).toContain("Este tom não está disponível no plano gratuito");
+    // Free users can use any tone — the server enforces daily usage limit, not tone type
+    expect(response.status).toBe(200);
   });
 
   it("should allow any tone for Pro users", async () => {
