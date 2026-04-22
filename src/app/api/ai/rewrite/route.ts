@@ -33,29 +33,104 @@ const schema = z.object({
   language: z.string().default("pt-BR"),
 });
 
+// Sistema de prompts otimizado — cada tom possui instruções precisas de formato,
+// estilo e comportamento esperado, eliminando ambiguidade e melhorando consistência.
+const SYSTEM_PROMPT =
+  "Você é um editor de texto profissional especializado em reescrita e adaptação de conteúdo. " +
+  "Sua missão: transformar o texto do usuário ajustando exclusivamente o tom e estilo — " +
+  "preservando o significado, os fatos e a intenção originais.\n\n" +
+  "Regras obrigatórias:\n" +
+  "1. Retorne APENAS o texto reescrito — sem prefixos, aspas envolventes ou comentários explicativos\n" +
+  "2. Preserve a estrutura do documento: parágrafos, listas e títulos existentes\n" +
+  "3. Mantenha o idioma do texto original, salvo instrução explícita em contrário\n" +
+  "4. Se o texto tiver menos de 5 palavras, retorne-o exatamente como está\n" +
+  "5. Nunca adicione informações que não existam no texto original\n" +
+  "6. Comprimento da resposta: semelhante ao original, exceto quando o tom exigir diferente";
+
 const TONE_PROMPTS = {
-  professional: "de forma profissional, clara e objetiva",
-  casual: "de forma casual e descontraída",
-  concise: "de forma concisa, removendo redundâncias",
-  expanded: "de forma expandida, com mais contexto e exemplos",
-  creative: "de forma criativa, com metáforas e linguagem cativante",
-  prompt:
-    "de forma estruturada e descritiva, sendo o mais eficiente possível para ser usado como prompt ou lista de execução de ações por um agente de IA (LLM). Transforme o texto fornecido em instruções claras, diretas, livres de ambiguidades e orientadas à ação",
-  // Novos 14 tons padrão
-  formal: "de forma formal, profissional e polida",
-  academic: "de forma acadêmica, erudita e bem estruturada",
-  simplified: "de forma simples, direta e fácil de entender",
-  romantic: "de forma romântica, emotiva e apaixonada",
+  // --- Tons Formais ---
+  formal:
+    "Reescreva em tom formal e respeitoso. Use vocabulário preciso, evite contrações e expressões coloquiais. " +
+    "Frases completas e bem estruturadas. Adequado para cartas, e-mails corporativos e documentos oficiais.",
+
+  professional:
+    "Reescreva em tom profissional e direto ao ponto. Elimine ambiguidades e informalidade. " +
+    "Use voz ativa, frases objetivas e vocabulário de negócios. " +
+    "Adequado para relatórios, apresentações e comunicação corporativa.",
+
+  academic:
+    "Reescreva em tom acadêmico formal. Use terminologia técnica adequada ao assunto, " +
+    "construção argumentativa clara (premissa → desenvolvimento → conclusão) e linguagem impessoal. " +
+    "Evite jargões desnecessários e expressões coloquiais.",
+
+  // --- Tons Criativos ---
+  creative:
+    "Reescreva de forma criativa e expressiva. Use metáforas, figuras de linguagem, " +
+    "ritmo variado e escolhas lexicais originais que tornem o texto memorável. " +
+    "Surpreenda o leitor sem perder o sentido central.",
+
+  romantic:
+    "Reescreva em tom romântico e emotivo. Use linguagem sensorial, ritmo suave e " +
+    "palavras que evoquem sentimento, proximidade e emoção genuína. " +
+    "Adequado para cartas, declarações e textos afetivos.",
+
   narrative:
-    "de forma narrativa, como se estivesse contando uma história envolvente",
+    "Reescreva em estilo narrativo envolvente. Transforme o conteúdo em uma sequência com " +
+    "início, desenvolvimento e desfecho implícito. Use tempo verbal consistente, " +
+    "detalhes evocativos e transições fluidas entre ideias.",
+
+  // --- Tons Digitais ---
   instagram:
-    "em estilo de post para Instagram, visual, envolvente e com bom uso de emojis",
+    "Reescreva para Instagram. Formato obrigatório: gancho impactante na primeira linha → " +
+    "corpo com 2-3 ideias curtas → encerramento com pergunta ou call-to-action. " +
+    "Use 3-5 emojis posicionados estrategicamente para reforçar o contexto. " +
+    "Parágrafos curtos com linha em branco entre eles. Sem hashtags.",
+
   whatsapp:
-    "em estilo de mensagem de WhatsApp, direto, conversacional e prático",
-  tweet: "em estilo de Tweet, de forma concisa, impactante e curta",
+    "Reescreva como mensagem de WhatsApp: direta, conversacional e sem formalidade excessiva. " +
+    "Frases curtas. Use abreviações naturais quando cabível. " +
+    "Tom próximo e pessoal. Até 3 emojis se agregarem contexto.",
+
+  tweet:
+    "Reescreva como tweet. Limite estrito: 280 caracteres. Impactante desde a primeira palavra. " +
+    "Elimine tudo que não for essencial. Sem hashtags ou @menções.",
+
+  casual:
+    "Reescreva em tom casual e descontraído. Use linguagem cotidiana, contrações naturais " +
+    "e humor leve quando adequado ao contexto. Evite vocabulário rebuscado.",
+
+  friendly:
+    "Reescreva em tom amigável e acolhedor. Use 'você' diretamente, frases curtas e positivas, " +
+    "e empatia implícita. Evite impessoalidade. " +
+    "Crie a sensação de conversa com um amigo de confiança.",
+
+  // --- Tons Funcionais ---
+  concise:
+    "Reescreva de forma concisa. Elimine: redundâncias, explicações óbvias, advérbios fracos " +
+    "e construções passivas desnecessárias. Alvo: reduzir 30-50% sem perder nenhuma informação essencial.",
+
+  expanded:
+    "Reescreva de forma expandida. Adicione contexto explicativo, exemplos concretos, analogias " +
+    "e transições entre ideias. Aprofunde os pontos principais sem fugir do tema. " +
+    "Alvo: aumentar 50-100% mantendo coesão.",
+
+  simplified:
+    "Reescreva de forma simples e direta. Use vocabulário acessível, frases curtas (máximo 20 palavras), " +
+    "voz ativa e exemplos quando ajudar a clareza. Adequado para público geral.",
+
   persuasive:
-    "de forma persuasiva, convincente e focada em conversão/argumentação",
-  friendly: "de forma amigável, acolhedora, gentil e positiva",
+    "Reescreva de forma persuasiva. Estruture com: (1) gancho que cria conexão, " +
+    "(2) problema claro, (3) solução apresentada como benefício, (4) chamada à ação implícita. " +
+    "Use linguagem de benefício, não de característica. Persuasão honesta, sem manipulação.",
+
+  prompt:
+    "Transforme o texto em instruções claras para um agente de IA (LLM). Formato obrigatório:\n" +
+    "- Objetivo: [uma frase descrevendo a tarefa]\n" +
+    "- Contexto: [informações necessárias para execução]\n" +
+    "- Instruções: [lista numerada com ações específicas e mensuráveis, sem ambiguidade]\n" +
+    "- Restrições: [o que NÃO deve ser feito, se aplicável]\n" +
+    "- Saída esperada: [formato e conteúdo do resultado]\n" +
+    "Elimine linguagem vaga. Cada instrução deve ser executável de forma independente.",
 };
 
 export async function POST(req: Request) {
@@ -118,26 +193,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { text, tone, customInstructions, language } = schema.parse(body);
 
-    // RESTRICTION: Free plan only allowed first 5 tones
-    if (plan === "free") {
-      const allowedTones = [
-        "formal",
-        "casual",
-        "academic",
-        "creative",
-        "simplified",
-      ];
-      if (!allowedTones.includes(tone)) {
-        return NextResponse.json(
-          {
-            error:
-              "Este tom não está disponível no plano gratuito. Faça upgrade para Pro.",
-          },
-          { status: 403 },
-        );
-      }
-    }
-
     // Determinar o prompt de estilo
     const stylePrompt =
       TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] ||
@@ -158,12 +213,12 @@ export async function POST(req: Request) {
 
     const result = await streamText({
       model: openai(process.env.AI_MODEL ?? "gpt-4o-mini"),
-      system:
-        "Você é um assistente de escrita. Sua tarefa é reescrever o texto fornecido pelo usuário, mantendo o sentido original, mas ajustando o tom conforme solicitado. Retorne APENAS o texto reescrito, sem comentários, explicações ou aspas.",
+      system: SYSTEM_PROMPT,
       messages: [
         {
           role: "user",
-          content: `Reescreva o texto abaixo no idioma: ${language}.${extraPrompt}\n\nTexto original:\n${text}`,
+          content:
+            `Texto para reescrever (idioma: ${language}):\n---\n${text}\n---\n${extraPrompt}`,
         },
       ],
       onFinish: async ({ usage }) => {
