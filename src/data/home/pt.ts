@@ -3,7 +3,7 @@ import { HomeContent } from "./types";
 const pt: HomeContent = {
   locale: "pt",
   seo: {
-    title: "Editor de Texto: Escreva e Formate Online e Grátis",
+    title: "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
     description:
       "Use um editor de texto online gratuito, leve e sem anúncios. Escreva, edite e copie seus textos com facilidade, direto do navegador. Ideal para redatores, estudantes e profissionais.",
     keywords: [
@@ -133,9 +133,9 @@ const pt: HomeContent = {
     ],
   },
   hero: {
-    headline: "Sua mente cria, nossa IA aperfeiçoa.",
+    headline: "O Editor de Texto Online Rápido, Limpo e Gratuito.",
     subheadline:
-      "Transforme suas ideias em documentos impecáveis com um editor de texto avançado, revisor gramatical analítico e reescrita inteligente por IA — tudo em um só lugar.",
+      "Escreva, formate e exporte seus textos direto do navegador. E quando precisar, nossa IA ajuda você a revisar e melhorar as palavras em segundos.",
     ctaLabel: "Começar a Escrever Grátis",
     ctaHref: "#editor",
     microcopy:

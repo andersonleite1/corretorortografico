@@ -196,9 +196,9 @@ export default function EditPageContent({ content, userPlan }: Props) {
       {/* ── SEO Article ─────────────────────────────────────────────────────── */}
       <section className="landing-article" aria-labelledby="article-heading">
         <div className="landing-article__inner">
-          <h1 id="article-heading" className="landing-article__title">
+          <h2 id="article-heading" className="landing-article__title">
             {article.title}
-          </h1>
+          </h2>
           <p
             className="landing-article__intro"
             dangerouslySetInnerHTML={{ __html: article.introHtml }}
@@ -207,7 +207,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
           <div className="landing-article__grid">
             {article.sections.map((section, index) => (
               <div key={index} className="landing-article__card">
-                <h2 className="landing-article__card-title">{section.title}</h2>
+                <h3 className="landing-article__card-title">{section.title}</h3>
                 {section.description && (
                   <p
                     className="landing-article__card-desc"

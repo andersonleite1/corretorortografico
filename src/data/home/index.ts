@@ -71,13 +71,18 @@ export function getHomeWebAppSchema(locale: string) {
 
   return {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": "SoftwareApplication",
     name: webAppSchema.name,
     url: getLocaleUrl(normalizedLocale),
     description: webAppSchema.description,
     inLanguage: inLanguageMap[normalizedLocale],
     applicationCategory: webAppSchema.applicationCategory,
-    operatingSystem: "All",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "BRL",
+    },
     creator: {
       "@type": "Organization",
       name: "Editor de Texto Online",

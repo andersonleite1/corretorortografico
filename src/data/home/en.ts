@@ -136,9 +136,9 @@ const en: HomeContent = {
     ],
   },
   hero: {
-    headline: "Write Smarter. Your Ideas, Polished by AI.",
+    headline: "The Fast, Clean, and Free Online Text Editor.",
     subheadline:
-      "A fast, free online text editor with grammar checking, AI rewriting, and one-click export to PDF or Word — all in one place, right in your browser.",
+      "Write, format, and export your texts directly from your browser. And when you need it, our AI helps you review and improve your words in seconds.",
     ctaLabel: "Start Writing for Free",
     ctaHref: "#editor",
     microcopy: "No credit card required · Available in EN, PT, and ES",
