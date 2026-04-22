@@ -8,3 +8,12 @@
 @import "sidebar";
 @import "languagetool-sidebar";
 @import "languagetool-menu";
+
+.search-result {
+  background-color: rgba(255, 212, 0, 0.4);
+  border-bottom: 2px solid #ffd400;
+}
+.search-result-current {
+  background-color: rgba(255, 100, 0, 0.4);
+  border-bottom: 2px solid #ff6400;
+}

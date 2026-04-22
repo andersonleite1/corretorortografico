@@ -1,5 +1,5 @@
 import { IconBaseProps, IconType } from "react-icons";
-import { Combine, Split, History, WrapText, FileType2, FileText, FileSearch, Eye } from "lucide-react";
+import { Combine, Split, History, WrapText, FileType2, FileText, FileSearch, Eye, Search } from "lucide-react";
 import {
   TbAlignCenter,
   TbAlignJustified,
@@ -164,6 +164,7 @@ export const icons = {
   Lowercase: TbArrowBigDown,
   Capitalize: TbLetterCaseToggle,
   Paste: TbClipboardCheck,
+  Search: Search as any,
 } satisfies Record<string, IconType>;
 
 export type { IconBaseProps, IconType };
