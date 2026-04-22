@@ -2,10 +2,21 @@ import { useCompletion } from "@ai-sdk/react";
 import { type Editor } from "@tiptap/react";
 import { useState } from "react";
 import { useTiptapContext } from "../components/Provider";
+import { useParams } from "next/navigation";
 
 export function useAiRewrite() {
   const { editor } = useTiptapContext();
   const [showPreview, setShowPreview] = useState(false);
+  const params = useParams();
+
+  // Deriva o idioma a partir do locale da URL, evitando hardcode de pt-BR
+  const localeMap: Record<string, string> = {
+    en: "en-US",
+    es: "es-ES",
+    pt: "pt-BR",
+  };
+  const locale = (params?.locale as string) ?? "pt";
+  const language = localeMap[locale] ?? "pt-BR";
 
   const { complete, completion, isLoading, setCompletion } = useCompletion({
     api: "/api/ai/rewrite",
@@ -53,7 +64,7 @@ export function useAiRewrite() {
         text,
         tone: toneId,
         customInstructions,
-        language: "pt-BR",
+        language,
       },
     });
   };
