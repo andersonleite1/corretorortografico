@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { HomeContent } from "@/data/home";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
+import { useAuth } from "@clerk/nextjs";
 
 import "./style.scss";
 import LandingHero from "@/components/landing/LandingHero";
@@ -143,6 +144,7 @@ type Props = {
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
   const { isSidebarOpen, isLTSidebarOpen } = useSidebar();
+  const { userId } = useAuth();
 
   // Base width: 56rem (896px)
   // Left Sidebar: 260px (16.25rem)
@@ -191,7 +193,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
 
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}
-      {content.pricing && <LandingPricing data={content.pricing} />}
+      {userId && content.pricing && <LandingPricing data={content.pricing} />}
 
       {/* ── SEO Article ─────────────────────────────────────────────────────── */}
       <section className="landing-article" aria-labelledby="article-heading">
