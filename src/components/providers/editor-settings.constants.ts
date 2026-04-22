@@ -43,7 +43,8 @@ export type ToolbarButtonId =
   | "lowercase"
   | "capitalize"
   | "clearFormat"
-  | "shortcuts";
+  | "shortcuts"
+  | "searchReplace";
 
 export type ToneId =
   | "formal"
@@ -108,6 +109,7 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
   capitalize: true,
   clearFormat: true,
   shortcuts: true,
+  searchReplace: true,
 };
 
 export const DEFAULT_TONES: Record<ToneId, boolean> = {
@@ -166,6 +168,7 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
   capitalize: "Primeira Letra Maiúscula",
   clearFormat: "Limpar Formatação",
   shortcuts: "Teclas de atalho",
+  searchReplace: "Localizar e Substituir",
 };
 
 export const TONE_LABELS: Record<ToneId, string> = {

@@ -41,6 +41,7 @@ import ClearFormatButton from "./controls/ClearFormatButton";
 import UppercaseButton from "./controls/UppercaseButton";
 import LowercaseButton from "./controls/LowercaseButton";
 import CapitalizeButton from "./controls/CapitalizeButton";
+import SearchReplacePopover from "./controls/SearchReplacePopover";
 
 const MenuBar = () => {
   const { exportActions } = useTiptapContext();
@@ -115,6 +116,7 @@ const MenuBar = () => {
         {exportActions?.onClear && buttonVisibility.clearEditor && (
           <ClearEditorButton />
         )}
+        {buttonVisibility.searchReplace && <SearchReplacePopover />}
         <SettingsButton />
 
         <ToolbarDivider />
