@@ -3,7 +3,7 @@ import { HomeContent } from "./types";
 const es: HomeContent = {
   locale: "es",
   seo: {
-    title: "Editor de Texto Online: Escribe, Edita y Exporta Gratis",
+    title: "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
     description:
       "Editor de texto online gratuito, rápido y sin anuncios. Escribe, formatea y exporta tus textos fácilmente desde el navegador. Ideal para redactores, estudiantes y profesionales.",
     keywords: [
@@ -15,8 +15,7 @@ const es: HomeContent = {
       "editor de texto online sin descargar nada",
       "eliminar formato de texto online",
     ],
-    openGraphTitle:
-      "Editor de Texto Online: Escribe, Edita y Exporta Gratis",
+    openGraphTitle: "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
     openGraphDescription:
       "Redacta, edita y comparte tus textos con un editor online gratuito, directo en el navegador. Sin instalaciones, sin complicaciones.",
   },
