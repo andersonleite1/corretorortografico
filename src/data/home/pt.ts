@@ -15,7 +15,7 @@ const pt: HomeContent = {
       "editor leve",
       "editor sem login",
     ],
-    openGraphTitle: "Editor de Texto: Escreva e Formate Online e Grátis",
+    openGraphTitle: "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
     openGraphDescription:
       "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
   },
