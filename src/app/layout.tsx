@@ -63,6 +63,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Editor",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default async function RootLayout({
