@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { HomeContent } from "@/data/home";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
+import { useAuth } from "@clerk/nextjs";
 
 import "./style.scss";
 import LandingHero from "@/components/landing/LandingHero";
@@ -143,6 +144,7 @@ type Props = {
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
   const { isSidebarOpen, isLTSidebarOpen } = useSidebar();
+  const { userId } = useAuth();
 
   // Base width: 56rem (896px)
   // Left Sidebar: 260px (16.25rem)
@@ -191,14 +193,14 @@ export default function EditPageContent({ content, userPlan }: Props) {
 
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}
-      {content.pricing && <LandingPricing data={content.pricing} />}
+      {userId && content.pricing && <LandingPricing data={content.pricing} />}
 
       {/* ── SEO Article ─────────────────────────────────────────────────────── */}
       <section className="landing-article" aria-labelledby="article-heading">
         <div className="landing-article__inner">
-          <h1 id="article-heading" className="landing-article__title">
+          <h2 id="article-heading" className="landing-article__title">
             {article.title}
-          </h1>
+          </h2>
           <p
             className="landing-article__intro"
             dangerouslySetInnerHTML={{ __html: article.introHtml }}
@@ -207,7 +209,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
           <div className="landing-article__grid">
             {article.sections.map((section, index) => (
               <div key={index} className="landing-article__card">
-                <h2 className="landing-article__card-title">{section.title}</h2>
+                <h3 className="landing-article__card-title">{section.title}</h3>
                 {section.description && (
                   <p
                     className="landing-article__card-desc"

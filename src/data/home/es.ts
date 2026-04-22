@@ -136,9 +136,9 @@ const es: HomeContent = {
     ],
   },
   hero: {
-    headline: "Tu mente crea. Nuestra IA perfecciona.",
+    headline: "El Editor de Texto Online Rápido, Limpio y Gratuito.",
     subheadline:
-      "Transforma tus ideas en documentos impecables con un editor de texto avanzado, corrector gramatical analítico y reescritura inteligente con IA — todo en un solo lugar.",
+      "Escribe, formatea y exporta tus textos directamente desde el navegador. Y cuando lo necesites, nuestra IA te ayuda a revisar y mejorar tus palabras en segundos.",
     ctaLabel: "Empezar a Escribir Gratis",
     ctaHref: "#editor",
     microcopy: "Sin necesidad de tarjeta de crédito · Disponible en PT, EN y ES",

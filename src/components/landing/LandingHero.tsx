@@ -22,7 +22,7 @@ export default function LandingHero({ data, locale }: Props) {
           <p className="landing-hero__eyebrow">
             Editor de Texto Online Grátis
           </p>
-          <h2 className="landing-hero__headline">{data.headline}</h2>
+          <h1 className="landing-hero__headline">{data.headline}</h1>
           <p className="landing-hero__subheadline">{data.subheadline}</p>
 
           <HeroActions ctaLabel={data.ctaLabel} />
