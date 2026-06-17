@@ -5,8 +5,6 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/shared/Header";
 import Footer from "@/components/Footer/footer";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import { Locale } from "../../i18n-config";
 import { useUserPlan } from "@/components/providers/PlanProvider";
@@ -35,8 +33,6 @@ export const MainContent = ({
     <EditorSettingsProvider>
       <Header userButton={userButton} />
       <main>{children}</main>
-      <SpeedInsights />
-      <Analytics />
       <Footer initialLocale={locale} />
       <DocumentsDialog
         isOpen={isDocumentsDialogOpen}
