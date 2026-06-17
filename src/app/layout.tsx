@@ -94,7 +94,7 @@ export default async function RootLayout({
         {/* Preload background image so browser fetches it in parallel with CSS parsing */}
         <link rel="preload" as="image" href="/background.webp" />
         <Script
-          src="http://zerus-infra-umami-fafb79-72-61-51-76.sslip.io/script.js"
+          src="https://analytics.editordetexto.cloud/script.js"
           data-website-id="05f767c0-1174-400e-b467-256e102036c3"
           strategy="afterInteractive"
         />
