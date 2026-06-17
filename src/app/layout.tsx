@@ -2,6 +2,7 @@ import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import dynamic from "next/dynamic";
+import Script from "next/script";
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -92,6 +93,11 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Preload background image so browser fetches it in parallel with CSS parsing */}
         <link rel="preload" as="image" href="/background.webp" />
+        <Script
+          src="http://zerus-infra-umami-fafb79-72-61-51-76.sslip.io/script.js"
+          data-website-id="05f767c0-1174-400e-b467-256e102036c3"
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}

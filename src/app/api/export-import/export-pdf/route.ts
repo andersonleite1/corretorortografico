@@ -22,9 +22,18 @@ export async function POST(request: Request) {
         formData.append('paperHeight', '11.69'); // A4 Height
 
         const gotenbergUrl = process.env.GOTENBERG_URL || 'http://localhost:8080';
+        const gotenbergUsername = process.env.GOTENBERG_API_BASIC_AUTH_USERNAME;
+        const gotenbergPassword = process.env.GOTENBERG_API_BASIC_AUTH_PASSWORD;
+        const headers = new Headers();
+
+        if (gotenbergUsername && gotenbergPassword) {
+            const basicAuthToken = Buffer.from(`${gotenbergUsername}:${gotenbergPassword}`).toString('base64');
+            headers.set('Authorization', `Basic ${basicAuthToken}`);
+        }
 
         const response = await fetch(`${gotenbergUrl}/forms/chromium/convert/html`, {
             method: 'POST',
+            headers,
             body: formData,
         });
 
