@@ -45,16 +45,18 @@ describe("Images API POST", () => {
     const userId = "user_123";
     (auth as any).mockResolvedValue({ userId });
 
-    const file = new File(["dummy content"], "test-image.jpg", {
+    const file = {
+      name: "test-image.jpg",
       type: "image/jpeg",
-    });
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const req = new Request("http://localhost:3000/api/images", {
-      method: "POST",
-      body: formData,
-    });
+      size: 13,
+      arrayBuffer: async () => new TextEncoder().encode("dummy content").buffer,
+    } as File;
+    const req = {
+      headers: new Headers({ "content-type": "multipart/form-data" }),
+      formData: vi.fn().mockResolvedValue({
+        get: (field: string) => (field === "file" ? file : null),
+      }),
+    } as unknown as Request;
 
     // Mock cloudinary upload_stream
     const mockResult = {
@@ -106,16 +108,18 @@ describe("Images API POST", () => {
 
   it("should return 400 for invalid file types", async () => {
     (auth as any).mockResolvedValue({ userId: "user_123" });
-    const file = new File(["dummy content"], "test.pdf", {
+    const file = {
+      name: "test.pdf",
       type: "application/pdf",
-    });
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const req = new Request("http://localhost:3000/api/images", {
-      method: "POST",
-      body: formData,
-    });
+      size: 13,
+      arrayBuffer: async () => new TextEncoder().encode("dummy content").buffer,
+    } as File;
+    const req = {
+      headers: new Headers({ "content-type": "multipart/form-data" }),
+      formData: vi.fn().mockResolvedValue({
+        get: (field: string) => (field === "file" ? file : null),
+      }),
+    } as unknown as Request;
 
     const response = await POST(req);
     expect(response.status).toBe(400);

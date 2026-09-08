@@ -35,16 +35,19 @@ describe("POST /api/images", () => {
   });
 
   const createRequestWithFile = (name: string, type: string, size: number) => {
-    const file = new File(["content"], name, { type });
-    Object.defineProperty(file, "size", { value: size });
+    const file = {
+      name,
+      type,
+      size,
+      arrayBuffer: async () => new TextEncoder().encode("content").buffer,
+    } as File;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    return new Request("http://localhost/api/images", {
-      method: "POST",
-      body: formData,
-    });
+    return {
+      headers: new Headers({ "content-type": "multipart/form-data" }),
+      formData: vi.fn().mockResolvedValue({
+        get: (field: string) => (field === "file" ? file : null),
+      }),
+    } as unknown as Request;
   };
 
   it("retorna 500 quando o upload do Cloudinary retorna undefined (BUG-02 - FIX)", async () => {
