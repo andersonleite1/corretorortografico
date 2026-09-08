@@ -30,6 +30,7 @@ import { useUserPlan } from "@/components/providers/PlanProvider";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
+  onExportMarkdown?: () => void | Promise<void>;
   onExportPdf?: () => void | Promise<void>;
   onPreviewPdf?: () => void | Promise<void>;
   onPreviewPost?: () => void | Promise<void>;
@@ -37,6 +38,7 @@ export type ExportActions = {
   isExportingPdf?: boolean;
   onExportTxt?: () => void | Promise<void>;
 };
+export type EditorPageMode = "fluid" | "a4";
 
 
 
@@ -61,6 +63,9 @@ type TiptapContextType = {
   onSaveDocument: () => void;
   isSaving: boolean;
   isMobile: boolean;
+  onImportMarkdown?: () => void | Promise<void>;
+  pageMode: EditorPageMode;
+  togglePageMode: () => void;
 };
 
 const TiptapContext = createContext<TiptapContextType>({} as TiptapContextType);
@@ -76,6 +81,8 @@ type TiptapProviderProps = {
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
   documentTitle?: string;
+  onImportMarkdown?: () => void | Promise<void>;
+  pageMode?: EditorPageMode;
 };
 export const TiptapProvider = ({
   children,
@@ -86,6 +93,8 @@ export const TiptapProvider = ({
   locale,
   userPlan: initialUserPlan = "free",
   documentTitle,
+  onImportMarkdown,
+  pageMode: initialPageMode = "fluid",
 }: TiptapProviderProps) => {
   const { plan: fetchedPlan } = useUserPlan();
   const userPlan = fetchedPlan || initialUserPlan;
@@ -94,8 +103,10 @@ export const TiptapProvider = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isSourceMode, setIsSourceMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [pageMode, setPageMode] = useState<EditorPageMode>(initialPageMode);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const lastAutosavedContent = useRef<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
   const documentId = searchParams.get("docId");
@@ -284,16 +295,22 @@ export const TiptapProvider = ({
 
   // Auto-save document every 30 seconds
   useEffect(() => {
-    if (!documentId || !handleSaveDocument) {
+    if (!handleSaveDocument) {
       return;
     }
 
     const intervalId = setInterval(() => {
-      handleSaveDocument();
+      if (!editor) return;
+      const currentContent = JSON.stringify(editor.getJSON());
+      if (!currentContent || currentContent === lastAutosavedContent.current) {
+        return;
+      }
+      lastAutosavedContent.current = currentContent;
+      void handleSaveDocument();
     }, 30000);
 
     return () => clearInterval(intervalId);
-  }, [documentId, userPlan, handleSaveDocument]);
+  }, [editor, userPlan, handleSaveDocument]);
 
   if (!editor) {
     return null;
@@ -313,7 +330,8 @@ export const TiptapProvider = ({
   const editorContent = (
     <div
       className={clsx(
-        "rte-editor",
+      "rte-editor",
+        pageMode === "a4" && "rte-editor--page-a4",
         isFullScreen && "rte-editor--fullscreen",
         isSidebarOpen && "rte-editor--with-sidebar",
         isLTSidebarOpen && "rte-editor--with-lt-sidebar",
@@ -366,6 +384,9 @@ export const TiptapProvider = ({
         onSaveDocument: handleSaveDocument,
         isSaving,
         isMobile,
+        onImportMarkdown,
+        pageMode,
+        togglePageMode: () => setPageMode((mode) => (mode === "a4" ? "fluid" : "a4")),
       }}
     >
       {editorContent}

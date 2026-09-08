@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 
 import { Toolbar, ToolbarDivider } from "./ui/Toolbar";
+import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 
@@ -42,13 +43,15 @@ import UppercaseButton from "./controls/UppercaseButton";
 import LowercaseButton from "./controls/LowercaseButton";
 import CapitalizeButton from "./controls/CapitalizeButton";
 import SearchReplacePopover from "./controls/SearchReplacePopover";
+import EmojiButton from "./controls/EmojiButton";
 
 const MenuBar = () => {
-  const { exportActions } = useTiptapContext();
+  const { exportActions, messages, onImportMarkdown } = useTiptapContext();
   const { buttonVisibility } = useEditorSettings();
 
   const showExport = Boolean(
     exportActions?.onExportDoc ||
+    exportActions?.onExportMarkdown ||
     exportActions?.onExportPdf ||
     exportActions?.onExportTxt,
   );
@@ -110,6 +113,15 @@ const MenuBar = () => {
         {showPreview && buttonVisibility.preview && <PreviewDropdown />}
         {buttonVisibility.documents && <DocumentsButton />}
         {buttonVisibility.importPdf && <ImportPdfButton />}
+        {onImportMarkdown && (
+          <MenuButton
+            icon="FileDoc"
+            text="Importar Markdown"
+            hideText={false}
+            tooltip="Importar Markdown"
+            onClick={() => onImportMarkdown()}
+          />
+        )}
 
         {buttonVisibility.copyEditor && <CopyEditorButton />}
         {buttonVisibility.copyEditor && <PasteEditorButton />}
@@ -117,6 +129,7 @@ const MenuBar = () => {
           <ClearEditorButton />
         )}
         {buttonVisibility.searchReplace && <SearchReplacePopover />}
+        {buttonVisibility.emoji && <EmojiButton />}
         <SettingsButton />
 
         <ToolbarDivider />

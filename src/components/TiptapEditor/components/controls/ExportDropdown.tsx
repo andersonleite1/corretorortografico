@@ -6,11 +6,14 @@ import { useTiptapContext } from "../Provider";
 const ExportDropdown = () => {
   const { exportActions, messages } = useTiptapContext();
   const onExportDoc = exportActions?.onExportDoc;
+  const onExportMarkdown = exportActions?.onExportMarkdown;
   const onExportPdf = exportActions?.onExportPdf;
   const isExportingPdf = Boolean(exportActions?.isExportingPdf);
   const onExportTxt = exportActions?.onExportTxt;
 
-  const hasAnyAction = Boolean(onExportDoc || onExportPdf || onExportTxt);
+  const hasAnyAction = Boolean(
+    onExportDoc || onExportMarkdown || onExportPdf || onExportTxt,
+  );
   const handleExportDoc = useCallback(() => {
     onExportDoc?.();
   }, [onExportDoc]);
@@ -54,6 +57,16 @@ const ExportDropdown = () => {
           tooltip={false}
           onClick={handleExportTxt}
           disabled={!onExportTxt}
+        />
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild disabled={!onExportMarkdown}>
+        <MenuButton
+          text={messages.export.markdown}
+          icon="FileDoc"
+          hideText={false}
+          tooltip={false}
+          onClick={() => onExportMarkdown?.()}
+          disabled={!onExportMarkdown}
         />
       </DropdownMenuItem>
       <DropdownMenuItem asChild disabled={!onExportPdf}>

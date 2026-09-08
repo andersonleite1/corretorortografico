@@ -30,6 +30,15 @@ const InsertDropdown = () => {
     >
       <DropdownMenuItem asChild>
         <MenuButton
+          text="Bloco de destaque"
+          hideText={false}
+          tooltip={false}
+          icon="Quote"
+          onClick={() => editor.chain().focus().toggleCallout().run()}
+        />
+      </DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <MenuButton
           text={messages.insert.quote}
           hideText={false}
           tooltip={false}

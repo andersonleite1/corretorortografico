@@ -18,8 +18,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 import { getCommonMessages } from "@/data/common";
-import { generateHTML } from "@tiptap/react";
+import { generateHTML, generateJSON } from "@tiptap/react";
 import getExtensionKit from "@/components/TiptapEditor/kit";
+import { importMarkdown } from "@/lib/markdown-import";
+import { exportMarkdownDocument } from "@/components/TiptapEditor/markdown/exportMarkdown";
 
 const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
   ssr: false,
@@ -69,6 +71,7 @@ import type { TiptapEditorRef } from "@/components/TiptapEditor";
 
 export default function EditForm({ locale, userPlan }: EditFormProps) {
   const editorRef = useRef<TiptapEditorRef>(null);
+  const markdownInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const docId = searchParams.get("docId");
@@ -106,6 +109,41 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   } | null>(null);
 
   const [shouldLoadEditor, setShouldLoadEditor] = useState(false);
+
+  const handleExportMarkdown = useCallback(() => {
+    const content = editorRef.current?.getInstance()?.getJSON();
+    if (!content) return;
+    const result = exportMarkdownDocument(content);
+    const title = getValues("title")?.trim() || "documento";
+    const safeTitle = title.replace(/[\\/:*?"<>|]/g, "-") || "documento";
+    saveAs(
+      new Blob([result.markdown], { type: "text/markdown;charset=utf-8" }),
+      `${safeTitle}.md`,
+    );
+  }, [getValues]);
+
+  const handleImportMarkdown = useCallback(async () => {
+    const file = markdownInputRef.current?.files?.[0];
+    if (!file) return;
+    try {
+      const result = await importMarkdown({ fileName: file.name, content: await file.text() });
+      const content = generateJSON(result.html, getExtensionKit(locale));
+      setValue("content", content as any, { shouldDirty: true });
+      editorRef.current?.getInstance()?.commands.setContent(content);
+      const baseName = file.name.replace(/\.md$/i, "").trim();
+      if (!getValues("title") && baseName) setValue("title", baseName, { shouldDirty: true });
+      showNotification("Markdown importado com sucesso.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Falha ao importar Markdown";
+      showNotification(message, "error");
+    } finally {
+      if (markdownInputRef.current) markdownInputRef.current.value = "";
+    }
+  }, [getValues, locale, setValue]);
+
+  const requestMarkdownImport = useCallback(() => {
+    markdownInputRef.current?.click();
+  }, []);
 
   const getEditorHtml = useCallback(() => {
     const editorInstance = editorRef.current?.getInstance();
@@ -728,7 +766,16 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 pb-6">
+    <>
+      <input
+        ref={markdownInputRef}
+        type="file"
+        accept=".md,text/markdown"
+        className="hidden"
+        onChange={() => void handleImportMarkdown()}
+        aria-label="Importar arquivo Markdown"
+      />
+      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 pb-6">
       <div>
         <Controller
           control={control}
@@ -774,6 +821,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                     initialContent={field.value}
                     exportActions={{
                       onExportDoc: handleSaveDOC,
+                      onExportMarkdown: handleExportMarkdown,
                       onExportPdf: handleExportToPDF,
                       onExportTxt: handleExportToTxt,
                       onPreviewPdf: handlePreviewPdf,
@@ -781,6 +829,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
                       onClear: handleClear,
                       isExportingPdf: isExportingPDF,
                     }}
+                    onImportMarkdown={requestMarkdownImport}
 
                     userPlan={userPlan}
                     documentTitle={watch("title")}
@@ -978,6 +1027,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         isOpen={isBugReportOpen}
         onClose={() => setIsBugReportOpen(false)}
       />
-    </div>
+      </div>
+    </>
   );
 }

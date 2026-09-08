@@ -25,3 +25,4 @@ export { LanguageTool } from "./LanguageTool";
 export { Shortcuts } from "./Shortcuts";
 export { TextCase } from "./TextCase";
 export { SearchAndReplace } from "./SearchAndReplace";
+export { Callout } from "./Callout";

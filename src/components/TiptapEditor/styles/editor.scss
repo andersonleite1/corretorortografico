@@ -55,6 +55,22 @@
       padding-inline: 1rem;
     }
   }
+
+  &--page-a4 {
+    .rte-editor__container {
+      padding-inline: 1rem;
+    }
+
+    .rte-editor__content {
+      max-width: 794px;
+      min-height: 1123px;
+      margin-block: 2rem;
+      padding: 3rem 4rem;
+      background: $bg-color;
+      border: 1px solid $border-color;
+      box-shadow: $shadow-1;
+    }
+  }
 }
 
 .rte-menu-bar,

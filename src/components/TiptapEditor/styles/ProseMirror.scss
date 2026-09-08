@@ -15,6 +15,14 @@
   width: 100%;
   white-space: pre-wrap;
   position: relative;
+
+  aside[data-type="callout"] {
+    margin-block: 1rem;
+    padding: 0.875rem 1rem;
+    border-left: 4px solid $primary-color;
+    border-radius: 0.5rem;
+    background: rgba($primary-color, 0.09);
+  }
   padding-block: 1.75rem;
 
   // Editable content styles

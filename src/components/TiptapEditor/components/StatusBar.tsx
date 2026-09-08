@@ -17,6 +17,8 @@ const StatusBar = () => {
     toggleSourceMode,
     messages,
     isMobile,
+    pageMode,
+    togglePageMode,
   } = useTiptapContext();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const { buttonVisibility } = useEditorSettings();
@@ -79,6 +81,12 @@ const StatusBar = () => {
             onClick={toggleSourceMode}
           />
         )}
+        <MenuButton
+          icon="FileDoc"
+          tooltip={pageMode === "a4" ? "Usar modo fluido" : "Usar modo A4"}
+          active={pageMode === "a4"}
+          onClick={togglePageMode}
+        />
         {/* Shortcuts Dialog Button — only visible on desktop, before fullscreen */}
         {!isMobile && buttonVisibility.shortcuts && (
           <MenuButton

@@ -71,6 +71,7 @@ export type EditorMessages = {
   };
   export: {
     doc: string;
+    markdown: string;
     txt: string;
     pdf: string;
     generatingPdf: string;
@@ -234,6 +235,7 @@ export const editorMessages = withDefault({
     },
     export: {
       doc: "Exportar Word (DOC)",
+      markdown: "Exportar Markdown",
       txt: "Exportar TXT",
       pdf: "Exportar PDF",
       generatingPdf: "Gerando PDF…",
@@ -393,6 +395,7 @@ export const editorMessages = withDefault({
     },
     export: {
       doc: "Export Word",
+      markdown: "Export Markdown",
       txt: "Export TXT",
       pdf: "Export PDF",
       generatingPdf: "Generating PDF…",
@@ -552,6 +555,7 @@ export const editorMessages = withDefault({
     },
     export: {
       doc: "Exportar Word",
+      markdown: "Exportar Markdown",
       txt: "Exportar TXT",
       pdf: "Exportar PDF",
       generatingPdf: "Generando PDF…",

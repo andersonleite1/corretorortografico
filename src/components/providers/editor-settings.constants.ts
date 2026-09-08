@@ -44,7 +44,8 @@ export type ToolbarButtonId =
   | "capitalize"
   | "clearFormat"
   | "shortcuts"
-  | "searchReplace";
+  | "searchReplace"
+  | "emoji";
 
 export type ToneId =
   | "formal"
@@ -110,6 +111,7 @@ export const DEFAULT_SETTINGS: Record<ToolbarButtonId, boolean> = {
   clearFormat: true,
   shortcuts: true,
   searchReplace: true,
+  emoji: true,
 };
 
 export const DEFAULT_TONES: Record<ToneId, boolean> = {
@@ -169,6 +171,7 @@ export const TOOLBAR_BUTTON_LABELS: Record<ToolbarButtonId, string> = {
   clearFormat: "Limpar Formatação",
   shortcuts: "Teclas de atalho",
   searchReplace: "Localizar e Substituir",
+  emoji: "Inserir emoji",
 };
 
 export const TONE_LABELS: Record<ToneId, string> = {

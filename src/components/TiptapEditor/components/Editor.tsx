@@ -5,6 +5,7 @@ import { Content, type Editor } from "@tiptap/react";
 
 import dynamic from "next/dynamic";
 import TiptapProvider, {
+  type EditorPageMode,
   type ExportActions,
 } from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
@@ -67,6 +68,8 @@ export interface TiptapEditorProps {
   locale?: Locale;
   userPlan?: "free" | "pro" | "team";
   documentTitle?: string;
+  onImportMarkdown?: () => void | Promise<void>;
+  pageMode?: EditorPageMode;
 }
 
 const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
@@ -80,7 +83,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       placeholder,
       hideMenuBar = false,
       hideStatusBar = false,
-      hideBubbleMenu = true,
+      hideBubbleMenu = false,
       contentMinHeight = 200,
       contentMaxHeight,
       onContentChange,
@@ -88,11 +91,13 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       locale,
       userPlan = "free",
       documentTitle,
+      onImportMarkdown,
+      pageMode = "fluid",
     },
     ref,
   ) => {
     const isEditable = !readonly && !disabled;
-    const displayBubbleMenu = isEditable && hideBubbleMenu;
+    const displayBubbleMenu = isEditable && !hideBubbleMenu;
 
     const handleUpdate = useCallback(
       (editor: Editor) => {
@@ -152,6 +157,8 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
         locale={locale}
         userPlan={userPlan}
         documentTitle={documentTitle}
+        onImportMarkdown={onImportMarkdown}
+        pageMode={pageMode}
       >
         {menus}
         <Resizer />

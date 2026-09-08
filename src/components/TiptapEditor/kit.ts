@@ -24,6 +24,7 @@ import {
   Shortcuts,
   TextCase,
   SearchAndReplace,
+  Callout,
 } from "./extensions";
 import { Locale, i18n } from "../../../i18n-config";
 
@@ -89,6 +90,7 @@ const createExtensionKit = (locale?: Locale) => [
     language: resolveLanguageToolCode(locale),
   }),
   SearchAndReplace,
+  Callout,
 ];
 
 export default createExtensionKit;
