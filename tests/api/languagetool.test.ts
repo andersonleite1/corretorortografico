@@ -53,6 +53,29 @@ describe("POST /api/languagetool", () => {
     expect(global.fetch).toHaveBeenCalled();
   });
 
+  it("usa o próximo upstream quando o primeiro responde com erro 5xx", async () => {
+    (global.fetch as any)
+      .mockResolvedValueOnce({ ok: false, status: 503, text: async () => "offline" })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ matches: [] }),
+      });
+
+    const response = await POST(createRequest(validBody));
+
+    expect(response.status).toBe(200);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("retorna 503 quando todos os upstreams falham", async () => {
+    (global.fetch as any).mockRejectedValue(new Error("network error"));
+
+    const response = await POST(createRequest(validBody));
+
+    expect(response.status).toBe(503);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("retorna 429 quando o rate limit por IP é excedido (SEG-02)", async () => {
     mockRateLimitLimit.mockResolvedValue({
       success: false,

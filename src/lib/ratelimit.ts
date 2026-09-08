@@ -83,12 +83,56 @@ class SlidingWindowRatelimit {
 }
 
 /**
+ * Rate limit provisório sem dependência externa.
+ *
+ * O estado é local ao processo/instância. Isso é adequado como fallback
+ * temporário, mas deve ser substituído por Redis ou PostgreSQL quando houver
+ * múltiplas instâncias e necessidade de contagem global.
+ */
+class InMemorySlidingWindowRatelimit {
+  private requests = new Map<string, number[]>();
+
+  constructor(
+    private readonly limitCount: number,
+    private readonly windowMs: number,
+  ) {}
+
+  async limit(identifier: string): Promise<RatelimitResponse> {
+    const now = Date.now();
+    const windowStart = now - this.windowMs;
+    const timestamps = (this.requests.get(identifier) ?? []).filter(
+      (timestamp) => timestamp >= windowStart,
+    );
+    const success = timestamps.length < this.limitCount;
+
+    if (success) {
+      timestamps.push(now);
+      this.requests.set(identifier, timestamps);
+    } else {
+      this.requests.set(identifier, timestamps);
+    }
+
+    return {
+      success,
+      limit: this.limitCount,
+      remaining: Math.max(0, this.limitCount - timestamps.length),
+      reset: (timestamps[0] ?? now) + this.windowMs,
+    };
+  }
+}
+
+/**
  * Utilitário de rate limit persistido no PostgreSQL.
  * O lock advisory por chave mantém o count e o insert atômicos.
  */
 export const ratelimit = {
   bugReports: new SlidingWindowRatelimit(5, "1 h", "ratelimit:bug-reports"),
-  languageTool: new SlidingWindowRatelimit(60, "1 m", "ratelimit:languagetool"),
+  // Temporário: evita que a indisponibilidade do banco derrube o corretor.
+  // Defina LANGUAGETOOL_RATE_LIMIT_MODE=database para restaurar o modo antigo.
+  languageTool:
+    process.env.LANGUAGETOOL_RATE_LIMIT_MODE === "database"
+      ? new SlidingWindowRatelimit(60, "1 m", "ratelimit:languagetool")
+      : new InMemorySlidingWindowRatelimit(60, 60_000),
   ai: new SlidingWindowRatelimit(10, "10 m", "ratelimit:ai"),
   pdfExport: new SlidingWindowRatelimit(10, "1 m", "ratelimit:pdf"),
 };

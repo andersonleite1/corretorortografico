@@ -4,7 +4,14 @@ import { LanguageToolResponse } from "@/types/languageTool";
 import { ratelimit } from "@/lib/ratelimit";
 
 const MAX_TEXT_LENGTH = 20000;
-const apiEndpoint = "https://languagetool.editordetexto.cloud/v2/check";
+const apiEndpoints = (
+  process.env.LANGUAGETOOL_ENDPOINTS ||
+  "https://languagetool.editordetexto.cloud/v2/check,https://languagetool.andersonleite.dev.br/v2/check"
+)
+  .split(",")
+  .map((endpoint) => endpoint.trim())
+  .filter(Boolean);
+const upstreamTimeoutMs = 4000;
 const supportedLanguages = new Set(["pt-BR", "en-US", "es"]);
 const defaultLanguage = "pt-BR";
 
@@ -70,38 +77,63 @@ export async function POST(request: NextRequest) {
     params.append("text", trimmedText);
     params.append("language", language);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    let lastError: unknown;
 
-    const ltResponse = await fetch(apiEndpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-      cache: "no-store",
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!ltResponse.ok) {
-      const details = await ltResponse.text();
-      return respond(
-        {
-          error: "Falha ao consultar LanguageTool.",
-          details,
-        },
-        { status: ltResponse.status },
+    for (const apiEndpoint of apiEndpoints) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        upstreamTimeoutMs,
       );
+
+      try {
+        const ltResponse = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+          cache: "no-store",
+          signal: controller.signal,
+        });
+
+        if (ltResponse.ok) {
+          const data = (await ltResponse.json()) as LanguageToolResponse;
+          console.info(`[LanguageTool API] Upstream usado: ${apiEndpoint}`);
+          return respond({
+            matches: data.matches ?? [],
+            language: data.language?.code ?? language,
+          });
+        }
+
+        const details = await ltResponse.text();
+        lastError = new Error(
+          `Upstream ${apiEndpoint} respondeu ${ltResponse.status}`,
+        );
+
+        // Erros de requisição não serão mascarados pelo segundo upstream.
+        if (ltResponse.status < 500) {
+          return respond(
+            { error: "Falha ao consultar LanguageTool.", details },
+            { status: ltResponse.status },
+          );
+        }
+      } catch (error) {
+        lastError = error;
+        console.warn(
+          `[LanguageTool API] Falha no upstream ${apiEndpoint}; tentando o próximo.`,
+          error,
+        );
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
 
-    const data = (await ltResponse.json()) as LanguageToolResponse;
-
-    return respond({
-      matches: data.matches ?? [],
-      language: data.language?.code ?? language,
-    });
+    console.error("[LanguageTool API] Todos os upstreams falharam:", lastError);
+    return respond(
+      { error: "Serviço de verificação temporariamente indisponível." },
+      { status: 503 },
+    );
   } catch (error: any) {
     if (error.name === "AbortError") {
       return respond(
