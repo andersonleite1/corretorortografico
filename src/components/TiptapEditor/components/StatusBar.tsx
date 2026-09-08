@@ -96,14 +96,6 @@ const StatusBar = () => {
             onClick={toggleFullScreen}
           />
         )}
-        {buttonVisibility.fullScreen && (
-          <span
-            className="rte-word-count hidden sm:inline"
-            onClick={toggleFullScreen}
-          >
-            {messages.statusBar.toggleHint}
-          </span>
-        )}
 
         <div className="flex items-center gap-2 px-3 py-1 ml-2 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider">
           <div
