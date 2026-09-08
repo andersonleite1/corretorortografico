@@ -111,8 +111,8 @@
 - **Claims/metadata do JWT utilizados:** {ex: `userId`, `orgId`, ou "nenhum"}
 - **Lógica de autorização por plano:** {ex: "Apenas plano `pro` pode acessar. Verificar via `getUserPlan()`"}
 
-#### Upstash Redis
-- **Chaves Redis utilizadas:** {ex: `feature_x:{userId}`, TTL, estratégia de invalidação}
+#### Rate limit e cache
+- **Persistência:** PostgreSQL via Prisma, quando necessário; evitar dependências externas de cache por padrão.
 - **Rate limit necessário:** {Sim/Não. Se sim, qual janela e limite?}
 
 #### Vercel AI SDK (se aplicável)
@@ -206,7 +206,7 @@ export interface {EntityName} {
 | **Método** | `GET` \| `POST` \| `PATCH` \| `DELETE` |
 | **Rota** | `/api/{caminho}` |
 | **Auth** | Clerk JWT obrigatório (`auth()` no Route Handler) |
-| **Rate Limit** | {ex: 10 req / 1 min via Redis ZSET, ou "não aplicável"} |
+| **Rate Limit** | {ex: 10 req / 1 min via PostgreSQL, ou "não aplicável"} |
 | **Request Body** | Ver `{FeatureName}RequestSchema` acima |
 | **Response 200** | Ver `{FeatureName}ResponseSchema` acima |
 | **Response 400** | `{ error: "validation_error", details: ZodError.issues }` |
@@ -269,8 +269,8 @@ export interface {EntityName} {
 - [ ] Route Handlers adicionados ao `config.matcher` do `src/middleware.ts` se forem protegidos
 - [ ] `getUserPlan()` é chamado antes de qualquer lógica que depende do plano do usuário
 - [ ] Queries Prisma sempre incluem filtro `userId` (sem vazamento cross-tenant)
-- [ ] Redis utilizado para cache/rate-limit conforme especificado na Seção 3.1
-- [ ] Erros de DB/Redis têm fallback documentado (ex: Redis MISS → query no DB)
+- [ ] Rate limit/cache persistido conforme especificado na Seção 3.1
+- [ ] Erros de banco têm fallback documentado
 
 ### 5.4 Qualidade e Segurança
 

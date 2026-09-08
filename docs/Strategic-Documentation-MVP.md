@@ -82,7 +82,7 @@ mindmap
 > **RN-003**: Limite de payload por requisição de IA: **5.000 caracteres** (validação Zod em todas as rotas `/api/ai/*`).
 
 > [!IMPORTANT]
-> **RN-004**: Rate limit global por IP (via Upstash Redis) como camada de segurança adicional, antes da verificação de cota individual.
+> **RN-004**: Rate limit global por IP (persistido no PostgreSQL) como camada de segurança adicional, antes da verificação de cota individual.
 
 > [!IMPORTANT]
 > **RN-005**: O registro de uso (`db.aiUsage.create`) ocorre **após** o término do streaming da IA. Falha no DB pode permitir uso excedente (bug conhecido, não intencional).
@@ -137,7 +137,7 @@ Essa métrica captura simultaneamente:
 │  │              │  │              │  │  4o-mini      │       │
 │  └──────────────┘  └──────────────┘  └──────────────┘       │
 │  ORM: Prisma 5 → PostgreSQL (Supabase)                       │
-│  Rate Limiting: Upstash Redis + @upstash/ratelimit           │
+│  Rate Limiting: PostgreSQL + Prisma                          │
 │  Webhooks: Svix (Clerk events)                               │
 ├─────────────────────────────────────────────────────────────┤
 │                      INFRAESTRUTURA                          │
@@ -160,7 +160,7 @@ Essa métrica captura simultaneamente:
 | IA | `ai` (Vercel SDK) | 6.0.91 | Streaming de respostas LLM | 🟢 Model agnostic |
 | IA Model | `@ai-sdk/openai` | 3.0.30 | Conector OpenAI | 🟢 Plugável |
 | DB | `@prisma/client` | 5.16.1 | ORM + Migrations | 🟡 Lock-in moderado |
-| Cache | `@upstash/redis` | 1.36.3 | Rate limiting + cache | 🟢 Substituível |
+| Rate limit | `@prisma/client` | 5.16.1 | Rate limiting por IP persistido no PostgreSQL | 🟢 Integrado |
 | PWA | `@serwist/next` | 9.5.7 | Service Worker + offline | 🟢 Padrão aberto |
 | Monitoring | `@sentry/nextjs` | 10.39.0 | Error tracking | 🟢 Substituível |
 

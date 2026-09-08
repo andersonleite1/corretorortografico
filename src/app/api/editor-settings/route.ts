@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 import {
@@ -38,17 +37,6 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Tenta buscar do Cache primeiro (ESC-03)
-    const cacheKey = `editor_settings:${user.id}`;
-    try {
-      const cached = await redis.get(cacheKey);
-      if (cached) {
-        return NextResponse.json(cached);
-      }
-    } catch (err) {
-      console.warn("[Redis Cache Error]:", err);
-    }
-
     const settings = await db.editorSettings.findUnique({
       where: {
         userId: user.id,
@@ -66,13 +54,6 @@ export async function GET() {
           activeTones: settings.activeTones ?? DEFAULT_TONES,
           customTones: settings.customTones ?? [],
         };
-
-    // Salva no cache por 5 minutos
-    try {
-      await redis.set(cacheKey, JSON.stringify(responseData), "EX", 300);
-    } catch (err) {
-      console.warn("[Redis Set Error]:", err);
-    }
 
     return NextResponse.json(responseData);
   } catch (error) {
@@ -140,13 +121,6 @@ export async function PUT(req: Request) {
         ...(customTones !== undefined && { customTones: customTones as any }),
       },
     });
-
-    // Invalida o cache (ESC-03)
-    try {
-      await redis.del(`editor_settings:${user.id}`);
-    } catch (err) {
-      console.warn("[Redis Cache Invalidation Error]:", err);
-    }
 
     return NextResponse.json({
       toolbarSettings: settings.toolbarSettings,

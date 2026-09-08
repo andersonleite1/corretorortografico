@@ -1,4 +1,7 @@
-import { redis } from "./redis";
+import { db } from "./db";
+
+const MAX_WINDOW_SECONDS = 60 * 60;
+let lastCleanupAt = 0;
 
 export interface RatelimitResponse {
   success: boolean;
@@ -29,40 +32,59 @@ class SlidingWindowRatelimit {
     const key = `${this.prefix}:${identifier}`;
     const now = Date.now();
     const windowStart = now - (this.windowSeconds * 1000);
-    const clearBefore = windowStart;
 
-    const multi = redis.multi();
-    // Remove old requests that fall outside the current window
-    multi.zremrangebyscore(key, 0, clearBefore);
-    // Add current request
-    multi.zadd(key, now, `${now}-${Math.random()}`);
-    // Count current valid requests
-    multi.zcard(key);
-    // Set expiry to clean up memory automatically if inactive
-    multi.expire(key, this.windowSeconds);
-
-    const results = await multi.exec();
-    
-    let count = 0;
-    // ZCARD is the 3rd operation (index 2)
-    if (results && results[2] && results[2][1] !== null) {
-      count = results[2][1] as number;
+    // Evita o crescimento indefinido da tabela sem exigir um serviço externo.
+    if (now - lastCleanupAt > 60_000) {
+      lastCleanupAt = now;
+      void db.rateLimitRequest
+        .deleteMany({
+          where: {
+            createdAt: {
+              lt: new Date(now - MAX_WINDOW_SECONDS * 1000),
+            },
+          },
+        })
+        .catch((error) =>
+          console.warn(
+            "[Rate limit cleanup] Falha ao remover registros antigos:",
+            error,
+          ),
+        );
     }
 
-    const success = count <= this.limitCount;
+    const result = await db.$transaction(async (tx) => {
+      // Serializa requisições da mesma chave para que o count e o insert
+      // sejam atômicos mesmo com múltiplas instâncias do servidor.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))`;
+
+      await tx.rateLimitRequest.deleteMany({
+        where: { key, createdAt: { lt: new Date(windowStart) } },
+      });
+
+      const count = await tx.rateLimitRequest.count({
+        where: { key, createdAt: { gte: new Date(windowStart) } },
+      });
+      const success = count < this.limitCount;
+
+      if (success) {
+        await tx.rateLimitRequest.create({ data: { key } });
+      }
+
+      return { count: success ? count + 1 : count, success };
+    });
     
     return {
-      success,
+      success: result.success,
       limit: this.limitCount,
-      remaining: Math.max(0, this.limitCount - count),
+      remaining: Math.max(0, this.limitCount - result.count),
       reset: now + (this.windowSeconds * 1000),
     };
   }
 }
 
 /**
- * Utilitário de Rate Limit usando ioredis.
- * Estado persiste via ZSET no Redis.
+ * Utilitário de rate limit persistido no PostgreSQL.
+ * O lock advisory por chave mantém o count e o insert atômicos.
  */
 export const ratelimit = {
   bugReports: new SlidingWindowRatelimit(5, "1 h", "ratelimit:bug-reports"),

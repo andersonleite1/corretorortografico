@@ -29,22 +29,22 @@ model User {
 /// Garante isolamento completo de dados entre tenants:
 /// cada registro pertence exclusivamente a um userId.
 model EditorSettings {
-  id                String   @id @default(cuid())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   /// FK para o usuário dono destas configurações (tenant key)
-  userId            String   @unique
+  userId          String   @unique
   /// Visibilidade dos botões da barra de ferramentas
   /// Ex: { "bold": true, "italic": false, ... }
-  toolbarSettings   Json     @default("{}")
+  toolbarSettings Json     @default("{}")
   /// Tons de IA ativos
   /// Ex: { "formal": true, "casual": false, ... }
-  activeTones       Json     @default("{}")
+  activeTones     Json     @default("{}")
   /// Tons personalizados criados pelo usuário (máx. 5)
   /// Ex: [{ "id": "custom-123", "name": "...", ... }]
-  customTones       Json     @default("[]")
+  customTones     Json     @default("[]")
 
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   /// Índice no userId para lookups O(log n) garantidos
   @@index([userId])
@@ -52,16 +52,16 @@ model EditorSettings {
 }
 
 model Subscription {
-  id                     String   @id @default(cuid())
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  userId                 String   @unique
-  stripeSubscriptionId   String?  @unique
+  id                     String    @id @default(cuid())
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  userId                 String    @unique
+  stripeSubscriptionId   String?   @unique
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
-  status                 String   @default("active")
-  plan                   String   @default("free")
-  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status                 String    @default("active")
+  plan                   String    @default("free")
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
 }
@@ -80,7 +80,6 @@ model Document {
   @@index([userId])
   @@map("documents")
 }
-
 
 /// Relatórios de bugs submetidos por usuários.
 model BugReport {
@@ -125,14 +124,26 @@ model AiUsage {
   @@map("ai_usage")
 }
 
+/// Requisições temporárias usadas para rate limit por IP.
+/// Registros antigos são removidos durante a verificação da janela.
+model RateLimitRequest {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+  @@map("rate_limit_requests")
+}
+
 model Waitlist {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  
-  email     String   @unique
-  region    String?
-  device    String?
-  info      Json?
+
+  email  String  @unique
+  region String?
+  device String?
+  info   Json?
 
   @@map("waitlist")
 }

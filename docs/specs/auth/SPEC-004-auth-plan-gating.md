@@ -34,7 +34,7 @@ Precisamos garantir que usuários acessem apenas recursos permitidos pelo seu pl
 - [ ] Autenticação robusta via Clerk (SSO, Magic Links, Social).
 - [ ] Sincronização automática entre os dados do Clerk e o banco de dados Neon (PostgreSQL).
 - [ ] Gating de recursos (ex: limites de reescrita por IA) baseado no plano do usuário.
-- [ ] Cache de performance usando Redis para evitar queries excessivas ao banco de dados durante a verificação de permissões.
+- [x] Verificação de plano usando `React.cache`; a fonte de verdade é o PostgreSQL.
 
 ### 2.3 O que está FORA do escopo
 
@@ -47,7 +47,7 @@ Precisamos garantir que usuários acessem apenas recursos permitidos pelo seu pl
 |---|---|---|
 | Prisma ORM | `blocker` | `done` |
 | Clerk Next.js SDK | `blocker` | `done` |
-| Upstash Redis | `blocker` | `done` |
+| PostgreSQL | `blocker` | `done` |
 
 ---
 
@@ -61,9 +61,7 @@ Precisamos garantir que usuários acessem apenas recursos permitidos pelo seu pl
 
 ### 3.2 Lógica de Planos (`getUserPlan()`)
 
-A verificação de plano deve seguir esta hierarquia de cache:
-1.  **Redis (L1)**: Tenta buscar a chave `user_plan:{clerkId}` (TTL de 5 minutos).
-2.  **Prisma (L2)**: Se a chave expirar ou não existir, consulta a tabela `Subscription` no DB.
+ A verificação de plano consulta o PostgreSQL através do Prisma, com `React.cache` evitando chamadas duplicadas na mesma renderização.
 3.  **Validadores**: Considera `active` ou `trialing` como planos válidos. Planos expirados ou cancelados revertem para `free`.
 
 ### 3.3 Filtro Anti-Leakage (Multi-tenant)
@@ -90,7 +88,7 @@ type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled" | "unp
 ```typescript
 /**
  * Retorna o plano atual do usuário de forma performática.
- * @param forceRefresh - Se true, ignora o cache do Redis e força consulta ao DB.
+ * @param forceRefresh - Mantido por compatibilidade para forçar uma nova chamada lógica.
  */
 export async function getUserPlan(forceRefresh?: boolean): Promise<Plan>;
 ```
@@ -108,7 +106,7 @@ export async function getUserPlan(forceRefresh?: boolean): Promise<Plan>;
 - [ ] O webhook do Stripe (se implementado ou futuro) deve ser a fonte da verdade para atualizar a tabela `Subscription`.
 
 ### 5.3 Performance
-- [ ] A verificação de plano não deve adicionar mais de 50ms ao request (usar Redis).
+- [ ] A verificação de plano não deve adicionar mais de 50ms ao request.
 - [ ] Utilizar `React.cache` no componente de servidor (`getCurrentUser()`) para evitar duplicar requests na mesma renderização.
 
 ---

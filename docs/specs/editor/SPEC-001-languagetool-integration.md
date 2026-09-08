@@ -40,7 +40,7 @@ A ausência de verificação gramatical in-editor forçava o usuário a depender
 - [x] Status da verificação exibido na `StatusBar` do editor (idle, checking, ready, error, rate_limited)
 - [x] Ação "Ignorar" por issue individual, que remove a decoração do editor
 - [x] Route Handler público em `/api/languagetool` que faz proxy para o servidor self-hosted em `languagetool.editordetexto.cloud`
-- [x] Rate limit de 60 requisições por minuto por IP via Redis ZSET (sliding window)
+- [x] Rate limit de 60 requisições por minuto por IP via PostgreSQL (sliding window)
 - [x] Proteção de Origin Check no endpoint (apenas origens do próprio domínio)
 - [x] Timeout de 8 segundos na chamada ao servidor LanguageTool externo, com resposta 504
 
@@ -60,7 +60,7 @@ A ausência de verificação gramatical in-editor forçava o usuário a depender
 | Dependência | Tipo | Status |
 |---|---|---|
 | Servidor LanguageTool self-hosted em `languagetool.editordetexto.cloud` | `blocker` | `done` |
-| Upstash Redis via `src/lib/redis.ts` (singleton ioredis) | `blocker` | `done` |
+| PostgreSQL via `src/lib/ratelimit.ts` | `blocker` | `done` |
 | Extension `CharacterCount` do Tiptap (usada na sidebar para stats) | `soft` | `done` |
 | `TiptapContext` em `Provider.tsx` (fornece `editor`, `setIsLTSidebarOpen`, `messages`) | `blocker` | `done` |
 
@@ -95,11 +95,11 @@ A ausência de verificação gramatical in-editor forçava o usuário a depender
 - **Claims/metadata do JWT utilizados:** nenhum
 - **Lógica de autorização por plano:** nenhuma
 
-#### Upstash Redis
-- **Chaves Redis utilizadas:** `ratelimit:languagetool:{ip}` — ZSET com timestamps dos requests
+#### PostgreSQL
+- **Chave utilizada:** `ratelimit:languagetool:{ip}` — registros temporários em `rate_limit_requests`
 - **Rate limit:** Sim — 60 requisições por janela de 1 minuto (sliding window via `SlidingWindowRatelimit`)
 - **IP extraído de:** `x-forwarded-for` (primeiro da lista) → fallback `x-real-ip` → fallback `"unknown"`
-- **TTL:** `expire(key, windowSeconds)` — 60 segundos de expiração automática
+- **Limpeza:** registros fora da janela são removidos durante a verificação
 
 #### Vercel AI SDK
 - Não aplicável — a feature não usa LLMs.
@@ -259,7 +259,7 @@ interface LanguageToolStorage {
 | **Método** | `POST` |
 | **Rota** | `/api/languagetool` |
 | **Auth** | **Não requerida.** Origin Check por `origin` / `referer` header. |
-| **Rate Limit** | 60 req / 1 min por IP via Redis ZSET sliding window. Chave: `ratelimit:languagetool:{ip}` |
+| **Rate Limit** | 60 req / 1 min por IP via PostgreSQL sliding window. Chave: `ratelimit:languagetool:{ip}` |
 | **Request Body** | `Content-Type: application/json` → `{ text: string, language?: "pt-BR" \| "en-US" \| "es" }` |
 | **Tamanho máximo de texto** | 20.000 caracteres (truncado silenciosamente se exceder) |
 | **Timeout upstream** | 8 segundos (AbortController) |
@@ -307,8 +307,8 @@ interface LanguageToolStorage {
 - [x] `/api/languagetool` **não** está no `config.matcher` de rotas protegidas do `src/middleware.ts` — correto por design (endpoint público)
 - [x] `getUserPlan()` não é chamado — correto, pois a feature não possui gating por plano
 - [x] Nenhuma query Prisma realizada — sem risco de vazamento cross-tenant
-- [x] Redis utilizado para rate limit conforme Seção 3.1 — chave `ratelimit:languagetool:{ip}`, sliding window 60 req/1 min
-- [x] Fallback de Redis: se Redis falhar, a `ratelimit.languageTool.limit()` lançará erro que é capturado pelo `try/catch` do route handler — retorna 500
+- [x] PostgreSQL utilizado para rate limit conforme Seção 3.1 — chave `ratelimit:languagetool:{ip}`, sliding window 60 req/1 min
+- [x] Falha no rate limit é capturada pelo `try/catch` do route handler e retorna 500
 
 ### 5.4 Qualidade e Segurança
 
@@ -338,7 +338,7 @@ interface LanguageToolStorage {
 
 **Problema:** O fluxo padrão do projeto exige `auth()` + `userId` em todos os Route Handlers.
 
-**Decisão:** O endpoint `/api/languagetool` foi intencionalmente deixado público. A proteção é feita via Origin Check (header `origin`/`referer`) + rate limit por IP (Redis ZSET). O comentário no código referencia a regra de segurança `SEG-02`.
+**Decisão:** O endpoint `/api/languagetool` foi intencionalmente deixado público. A proteção é feita via Origin Check (header `origin`/`referer`) + rate limit por IP persistido no PostgreSQL. O comentário no código referencia a regra de segurança `SEG-02`.
 
 **Trade-off:** Usuários anônimos (não logados) se beneficiam da verificação gramatical, o que é desejável para aumentar o valor percebido do editor antes do cadastro. O risco de abuso é mitigado pelo rate limit de 60 req/min por IP.
 

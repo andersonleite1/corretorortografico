@@ -53,7 +53,7 @@ describe("POST /api/languagetool", () => {
     expect(global.fetch).toHaveBeenCalled();
   });
 
-  it("retorna 429 quando o rate limit por IP é excedido (SEG-02 - REDIS)", async () => {
+  it("retorna 429 quando o rate limit por IP é excedido (SEG-02)", async () => {
     mockRateLimitLimit.mockResolvedValue({
       success: false,
       reset: Date.now() + 60000,

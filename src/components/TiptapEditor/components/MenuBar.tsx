@@ -117,7 +117,6 @@ const MenuBar = () => {
           <MenuButton
             icon="FileDoc"
             text="Importar Markdown"
-            hideText={false}
             tooltip="Importar Markdown"
             onClick={() => onImportMarkdown()}
           />

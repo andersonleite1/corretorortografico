@@ -48,7 +48,7 @@ A integração de IA é o maior custo variável do projeto e o maior risco de se
 |---|---|---|
 | Vercel AI SDK Core | `blocker` | `done` |
 | OpenAI API Key | `blocker` | `done` |
-| Upstash Redis (Ratelimit) | `blocker` | `done` |
+| PostgreSQL (Ratelimit) | `blocker` | `done` |
 | SPEC-004 (Auth) | `blocker` | `done` |
 
 ---
@@ -58,7 +58,7 @@ A integração de IA é o maior custo variável do projeto e o maior risco de se
 ### 3.1 Camada de Segurança (The Guardrails)
 
 Todo Route Handler de IA (`/api/ai/*`) deve seguir obrigatoriamente esta ordem de middleware interno:
-1.  **Global IP Rate Limit**: Proteção contra ataques de negação de serviço (DoS) usando Redis.
+1.  **Global IP Rate Limit**: Proteção contra ataques de negação de serviço (DoS) usando PostgreSQL.
 2.  **Auth Check**: Verificação de `userId` via Clerk.
 3.  **Plan Limit Check**: Verificação de saldo de uso (`checkAiRateLimit`) no banco de dados.
 4.  **Input Sanitization**: Aplicação de `sanitizeAiInput()` em qualquer string vinda do usuário que vá compor o prompt final.

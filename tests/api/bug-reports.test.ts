@@ -61,7 +61,7 @@ describe("POST /api/bug-reports", () => {
     notificationEmail: "test@example.com",
   };
 
-  it("retorna 429 quando o rate limit por IP é excedido (SEG-01 - REDIS)", async () => {
+  it("retorna 429 quando o rate limit por IP é excedido (SEG-01)", async () => {
     mockRateLimitLimit.mockResolvedValue({
       success: false,
       reset: Date.now() + 60000,

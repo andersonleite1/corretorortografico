@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserPlan } from "./auth";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "./db";
-import { redis } from "./redis";
 
 // Mock dependencies
 vi.mock("@clerk/nextjs/server", () => ({
@@ -14,13 +13,6 @@ vi.mock("./db", () => ({
     user: {
       findUnique: vi.fn(),
     },
-  },
-}));
-
-vi.mock("./redis", () => ({
-  redis: {
-    get: vi.fn(),
-    set: vi.fn(),
   },
 }));
 
@@ -39,20 +31,20 @@ describe("getUserPlan", () => {
     expect(plan).toBe("free");
   });
 
-  it("should return cached plan from redis if available", async () => {
+  it("should return the plan from the database", async () => {
     (auth as any).mockResolvedValue({ userId: "clerk_123" });
-    (redis.get as any).mockResolvedValue("pro");
+    (db.user.findUnique as any).mockResolvedValue({
+      subscription: { status: "active", plan: "pro", stripeCurrentPeriodEnd: null },
+    });
 
     const plan = await getUserPlan();
 
     expect(plan).toBe("pro");
-    expect(redis.get).toHaveBeenCalledWith("user_plan:clerk_123");
-    expect(db.user.findUnique).not.toHaveBeenCalled();
+    expect(db.user.findUnique).toHaveBeenCalled();
   });
 
   it("should return 'pro' for active subscription", async () => {
     (auth as any).mockResolvedValue({ userId: "clerk_123" });
-    (redis.get as any).mockResolvedValue(null);
     (db.user.findUnique as any).mockResolvedValue({
       subscription: {
         status: "active",
@@ -64,17 +56,10 @@ describe("getUserPlan", () => {
     const plan = await getUserPlan();
 
     expect(plan).toBe("pro");
-    expect(redis.set).toHaveBeenCalledWith(
-      "user_plan:clerk_123",
-      "pro",
-      "EX",
-      300
-    );
   });
 
   it("should return 'free' for 'past_due' status (BUG-04 fix verification)", async () => {
     (auth as any).mockResolvedValue({ userId: "clerk_123" });
-    (redis.get as any).mockResolvedValue(null);
     (db.user.findUnique as any).mockResolvedValue({
       subscription: {
         status: "past_due",
@@ -90,7 +75,6 @@ describe("getUserPlan", () => {
 
   it("should return 'pro' for 'trialing' status", async () => {
     (auth as any).mockResolvedValue({ userId: "clerk_123" });
-    (redis.get as any).mockResolvedValue(null);
     (db.user.findUnique as any).mockResolvedValue({
       subscription: {
         status: "trialing",
@@ -106,7 +90,6 @@ describe("getUserPlan", () => {
 
   it("should return 'free' if subscription is expired", async () => {
     (auth as any).mockResolvedValue({ userId: "clerk_123" });
-    (redis.get as any).mockResolvedValue(null);
     (db.user.findUnique as any).mockResolvedValue({
       subscription: {
         status: "active",

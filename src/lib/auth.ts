@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { cache } from "react";
-import { redis } from "./redis";
 
 // Fallback para ambientes onde o cache do React não está disponível (ex: testes unitários)
 const cacheShim = typeof cache === "function" ? cache : <T extends (...args: any[]) => any>(fn: T) => fn;
@@ -38,24 +37,11 @@ export const getCurrentUser = cacheShim(async (_forceRefresh: boolean = false) =
   }
 });
 
-// Helper para verificar plano com Cache distribuído (Redis)
+// Helper para verificar o plano do usuário.
 export const getUserPlan = cacheShim(async (forceRefresh: boolean = false) => {
   const { userId: clerkId } = await auth();
   if (!clerkId) return "free";
 
-  const cacheKey = `user_plan:${clerkId}`;
-
-  // Tenta buscar do Redis primeiro (se não for forceRefresh)
-  if (!forceRefresh) {
-    try {
-      const cachedPlan = await redis.get(cacheKey);
-      if (cachedPlan) return cachedPlan as "free" | "pro" | "team";
-    } catch (err) {
-      console.error("[Redis Cache Error]:", err);
-    }
-  }
-
-  // Fallback para o DB (através do getCurrentUser)
   const user = await getCurrentUser(forceRefresh);
   if (!user) return "free";
 
@@ -71,13 +57,6 @@ export const getUserPlan = cacheShim(async (forceRefresh: boolean = false) => {
     if (!isExpired) {
       plan = sub.plan as "free" | "pro" | "team";
     }
-  }
-
-  // Salva no Redis por 5 minutos
-  try {
-    await redis.set(cacheKey, plan, "EX", 300); // 300 segundos = 5 min
-  } catch (err) {
-    console.error("[Redis Cache Set Error]:", err);
   }
 
   return plan;

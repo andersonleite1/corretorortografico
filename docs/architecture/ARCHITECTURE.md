@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — editordetexto.online
 
-> **Versão:** 1.1.0 · **Stack:** Next.js 14 (App Router) · Tiptap v3.10 · CodeMirror 6 · Clerk v6.38 · Prisma v5.16 · Upstash Redis · Vercel AI SDK v6
+> **Versão:** 1.1.0 · **Stack:** Next.js 14 (App Router) · Tiptap v3.10 · CodeMirror 6 · Clerk v6.38 · Prisma v5.16 · PostgreSQL · Vercel AI SDK v6
 
 ---
 
@@ -31,7 +31,7 @@ O projeto é uma **SaaS de editor de texto rico** com modelo freemium (Free → 
 | **Offline-first** | `localStorage` como fonte primária de verdade + sync para Postgres quando autenticado |
 | **Edge-compatible middleware** | `src/middleware.ts` roda no Cloudflare Edge (sem Node.js APIs); i18n e Clerk coexistem sem `next-intl` |
 | **Multi-tenant por isolamento de dados** | Toda query ao Prisma filtra por `userId` extraído do Clerk token; sem RLS no Postgres |
-| **Degradação graceful** | Redis offline → fallback para DB; LanguageTool timeout → editor continua funcional |
+| **Degradação graceful** | Rate limit persistido no PostgreSQL; LanguageTool timeout → editor continua funcional |
 | **Separação WYSIWYG/Source** | Tiptap (ProseMirror) e CodeMirror 6 são instâncias totalmente separadas; sincronização explícita via HTML string |
 
 ---
@@ -155,9 +155,8 @@ editordetexto/                         ← Raiz do monorepo
 │   │
 │   ├── lib/                           ← Utilitários server-side puros
 │   │   ├── db.ts                      ← Singleton PrismaClient (global cache em dev)
-│   │   ├── redis.ts                   ← Singleton ioredis
-│   │   ├── auth.ts                    ← getCurrentUser() + getUserPlan() com React.cache + Redis
-│   │   ├── ratelimit.ts               ← SlidingWindowRatelimit via ZSET Redis
+│   │   ├── auth.ts                    ← getCurrentUser() + getUserPlan() com React.cache
+│   │   ├── ratelimit.ts               ← Rate limit por janela no PostgreSQL
 │   │   ├── ai-rate-limit.ts           ← Limite diário (free) + mensal (pro) via AiUsage table
 │   │   ├── ai-sanitize.ts             ← DOMPurify server-side (isomorphic-dompurify)
 │   │   ├── local-storage.ts           ← CRUD de LocalDocument[] no localStorage
@@ -225,14 +224,12 @@ C4Container
     System_Ext(sentry, "Sentry", "Error tracking (client + server + edge)")
 
     ContainerDb(postgres, "PostgreSQL", "Neon Serverless Postgres", "Users, Documents, Subscriptions, AiUsage, EditorSettings")
-    ContainerDb(redis_cache, "Upstash Redis", "ioredis client", "Cache de plano de usuário (TTL 5m). Rate limit via ZSET sliding window")
     ContainerDb(localstorage, "LocalStorage", "Browser API", "Documentos offline: LocalDocument[]. Fallback sem autenticação")
 
     Rel(user, edge_mw, "HTTPS request", "HTTP/2")
     Rel(edge_mw, clerk, "Valida JWT", "JWKS endpoint")
     Rel(edge_mw, next_server, "Forwarda request autenticado")
     Rel(next_server, postgres, "Queries", "Prisma Client / TCP-TLS")
-    Rel(next_server, redis_cache, "GET/ZADD/ZCARD", "ioredis / TLS")
     Rel(next_server, openai, "streamText()", "HTTPS SSE")
     Rel(next_server, languagetool, "POST /v2/check", "HTTPS proxy")
     Rel(next_server, cloudinary, "upload()", "HTTPS")
@@ -248,10 +245,9 @@ C4Container
 | Contêiner | Runtime | Responsabilidade | Acesso a dados |
 |---|---|---|---|
 | **Edge Middleware** | Cloudflare Edge (V8) | Validação JWT Clerk, i18n rewrite/redirect, bloqueio de rotas protegidas | Somente JWKS Clerk — **zero DB** |
-| **Next.js Server** | Node.js 20 (Vercel Function, 60s timeout) | Server Components, Route Handlers, streaming AI, exports | Postgres via Prisma, Redis via ioredis |
+| **Next.js Server** | Node.js 20 (Vercel Function, 60s timeout) | Server Components, Route Handlers, streaming AI, exports | PostgreSQL via Prisma |
 | **Service Worker** | Browser (Serwist/Workbox) | Precache shell PWA, cache-first para assets, offline fallback | Cache API + LocalStorage |
 | **PostgreSQL** | Neon Serverless | Persistência durável de documentos, usuários, planos, uso de IA | — |
-| **Upstash Redis** | Redis 7 (TLS) | Cache de `getUserPlan()` (TTL 5min), rate limit sliding window | — |
 | **LocalStorage** | Browser | Documentos offline de usuários não autenticados ou sem conexão | — |
 
 ---
@@ -377,7 +373,7 @@ runCheck() [assíncrono]
       │
       ├── fetch("/api/languagetool", { method: "POST", body: { text, language } })
       │   ↓ (proxy em src/app/api/languagetool/route.ts)
-      │   └── POST api.languagetool.org/v2/check (rate-limited: 60 req/min via Redis ZSET)
+      │   └── POST api.languagetool.org/v2/check (rate-limited: 60 req/min via PostgreSQL)
       │
       ├── response.matches[] → toDecorationSet(matches, map, state)
       │   ├── findDocPosition(blocks, match.offset) → ProseMirror `from`
@@ -497,7 +493,7 @@ editor.onUpdate ({ editor })
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 5.4 Cache Redis para `getUserPlan()`
+### 5.4 Verificação de plano no PostgreSQL
 
 ```
 GET /api/ai/rewrite
@@ -505,16 +501,9 @@ GET /api/ai/rewrite
       ▼
 getUserPlan(forceRefresh=false)
       │
-      ├── redis.get("user_plan:{clerkId}")
-      │   ├── HIT → retorna "free" | "pro" | "team" (sem query no DB)
-      │   └── MISS ↓
-      │
       ├── db.user.findUnique({ include: { subscription: true } })
       │   └── Verifica sub.status ∈ ["active", "trialing"]
       │       e sub.stripeCurrentPeriodEnd > now()
-      │
-      └── redis.set("user_plan:{clerkId}", plan, "EX", 300)
-          → TTL 5 minutos
 ```
 
 ---
@@ -560,22 +549,22 @@ src/middleware.ts (Edge Runtime)
 
 ### 6.2 Rate Limiting — Implementação
 
-O rate limit usa **Sliding Window** implementado manualmente via Redis ZSET (não usa o SDK do Upstash diretamente — usa `ioredis` com comandos raw):
+O rate limit usa uma janela deslizante persistida no PostgreSQL. Cada requisição elegível é registrada em `rate_limit_requests`; registros expirados são removidos e um advisory lock por chave garante consistência entre instâncias:
 
 ```typescript
 // src/lib/ratelimit.ts — SlidingWindowRatelimit.limit(identifier)
 
-MULTI
-  ZREMRANGEBYSCORE key 0 (now - windowMs)   // Remove requests expirados
-  ZADD key now "{now}-{random}"              // Registra request atual
-  ZCARD key                                  // Conta requests no window
-  EXPIRE key windowSeconds                   // TTL para cleanup automático
-EXEC
+BEGIN
+  pg_advisory_xact_lock(hashtext(key))       // Serializa a mesma chave
+  DELETE FROM rate_limit_requests ...        // Remove requests expirados
+  SELECT COUNT(*) ...                        // Conta a janela atual
+  INSERT INTO rate_limit_requests ...        // Registra se permitido
+COMMIT
 ```
 
 **Limites configurados:**
 
-| Endpoint | Limite | Janela | Chave Redis |
+| Endpoint | Limite | Janela | Chave |
 |---|---|---|---|
 | `/api/languagetool` | 60 req | 1 minuto | `ratelimit:languagetool:{identifier}` |
 | `/api/ai/*` (infra) | 10 req | 10 minutos | `ratelimit:ai:{identifier}` |
@@ -806,7 +795,7 @@ src/app/[locale]/
 | Decisão | Alternativa rejeitada | Razão da escolha |
 |---|---|---|
 | **Monolito Next.js** vs microserviços | Serviços separados (NestJS, FastAPI) | Zero overhead de infra. Route Handlers suficientes para o volume atual. Vercel Functions escalam horizontalmente. |
-| **ioredis** vs SDK Upstash | `@upstash/redis` (HTTP-based) | ioredis é TCP-based → latência ~2x menor. Funciona em Node.js serverless com `?connection_limit=1`. |
+| **Rate limit PostgreSQL** vs serviço externo | Serviço de cache externo | Centraliza a persistência no banco já utilizado pelo projeto e elimina uma dependência operacional. |
 | **Clerk** vs Auth.js (NextAuth) | Auth.js + Prisma Adapter | Clerk entrega login social, MFA, webhooks e UI pronta. Auth.js exigiria implementar toda a camada de sessão e UI. |
 | **Tiptap v3** vs Slate.js / Quill | Slate, Quill, Editor.js | ProseMirror foundation = extensibilidade real. Extensions tipadas. Ecossistema ativo v3. Quill e Slate não escalam para features como Table resize e LanguageTool decorations. |
 | **CodeMirror 6 read-only** vs bidirectional sync | Edição direta no Source | Sync bidirecional ProseMirror ↔ CodeMirror é complexo: requer mapeamento de posições em duas direções. Decisão de MVP: Source = visualização apenas. |
