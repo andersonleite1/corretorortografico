@@ -1,15 +1,88 @@
-import { JetBrains_Mono, Open_Sans } from "next/font/google";
 import { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import dynamic from "next/dynamic";
+import localFont from "next/font/local";
+import Script from "next/script";
 
-const fontMono = JetBrains_Mono({
-  subsets: ["latin"],
+const fontMono = localFont({
+  src: [
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-100-normal.woff2",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-200-normal.woff2",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-300-normal.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-400-normal.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-500-normal.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-600-normal.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-700-normal.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/jetbrains-mono-latin-800-normal.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
   variable: "--font-mono",
   display: "swap",
 });
-const fontSans = Open_Sans({
-  subsets: ["latin"],
+const fontSans = localFont({
+  src: [
+    {
+      path: "../../public/fonts/open-sans-latin-300-normal.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/open-sans-latin-400-normal.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/open-sans-latin-500-normal.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/open-sans-latin-600-normal.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/open-sans-latin-700-normal.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/open-sans-latin-800-normal.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
   variable: "--font-sans",
   display: "swap",
 });
@@ -89,9 +162,13 @@ export default async function RootLayout({
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
       <head>
         <link rel="preconnect" href="https://www.clarity.ms" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Preload background image so browser fetches it in parallel with CSS parsing */}
         <link rel="preload" as="image" href="/background.webp" />
+        <Script
+          src="https://analytics.editordetexto.cloud/script.js"
+          data-website-id="05f767c0-1174-400e-b467-256e102036c3"
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
