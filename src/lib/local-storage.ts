@@ -1,7 +1,7 @@
 export interface LocalDocument {
   id: string;
   title: string;
-  content: any; // Tiptap JSON content
+  content: unknown; // Preserve Tiptap JSON and legacy HTML.
   updatedAt: string;
   createdAt: string;
 }
@@ -12,16 +12,20 @@ export const getLocalDocuments = (): LocalDocument[] => {
   if (typeof window === "undefined") return [];
   const docs = localStorage.getItem(LOCAL_DOCS_KEY);
   if (!docs) return [];
-  try {
-    return JSON.parse(docs);
-  } catch (error) {
-    console.error("Error parsing local documents:", error);
-    return [];
+  const parsed: unknown = JSON.parse(docs);
+  if (
+    !Array.isArray(parsed) ||
+    !parsed.every(
+      (doc) => doc && typeof doc === "object" && typeof doc.id === "string",
+    )
+  ) {
+    throw new Error("storage_read_failed");
   }
+  return parsed as LocalDocument[];
 };
 
 export const saveLocalDocument = (
-  doc: Partial<LocalDocument> & { content: any },
+  doc: Partial<LocalDocument> & { content: unknown },
 ) => {
   const docs = getLocalDocuments();
   const now = new Date().toISOString();
@@ -78,3 +82,37 @@ export const getLocalDocumentById = (id: string) => {
   const docs = getLocalDocuments();
   return docs.find((d) => d.id === id);
 };
+
+/** Plain text only: no HTML from browser storage is injected into the page. */
+export function getLocalDocumentText(content: unknown): string {
+  if (typeof content === "string") {
+    if (/^\s*[\[{]/.test(content)) {
+      try {
+        return getLocalDocumentText(JSON.parse(content));
+      } catch {
+        /* Legacy plain text. */
+      }
+    }
+    if (typeof DOMParser !== "undefined")
+      return (
+        new DOMParser()
+          .parseFromString(content, "text/html")
+          .body.textContent?.replace(/\s+/g, " ")
+          .trim() || ""
+      );
+    return content
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  if (!content || typeof content !== "object") return "";
+  const node = content as { text?: unknown; content?: unknown[] };
+  if (typeof node.text === "string") return node.text;
+  return (
+    node.content
+      ?.map(getLocalDocumentText)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim() || ""
+  );
+}

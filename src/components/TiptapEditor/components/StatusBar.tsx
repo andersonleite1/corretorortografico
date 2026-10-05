@@ -1,12 +1,11 @@
 import React, { memo, useState } from "react";
-import clsx from "clsx";
+import { getAcquisitionContent } from "@/data/acquisition";
 import { useEditorState } from "@tiptap/react";
 import { Toolbar } from "./ui/Toolbar";
 import MenuButton from "./MenuButton";
 import { useTiptapContext } from "./Provider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { ShortcutsDialog } from "@/components/shared/ShortcutsDialog";
-import { useSidebar } from "@/components/providers/SidebarProvider";
 
 const StatusBar = () => {
   const {
@@ -19,8 +18,11 @@ const StatusBar = () => {
     isMobile,
     pageMode,
     togglePageMode,
+    locale,
+    saveStatus,
+    lastSavedAt,
   } = useTiptapContext();
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const localMessages = getAcquisitionContent(locale);
   const { buttonVisibility } = useEditorSettings();
   const [isShortcutsDialogOpen, setIsShortcutsDialogOpen] = useState(false);
   const counter = useEditorState({
@@ -65,14 +67,6 @@ const StatusBar = () => {
   return (
     <div className="rte-status-bar">
       <Toolbar dense>
-        {!isMobile && buttonVisibility.documents && (
-          <MenuButton
-            icon="Columns"
-            tooltip="Mostrar na Lateral Meus Documentos"
-            active={isSidebarOpen}
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-        )}
         {buttonVisibility.sourceCode && (
           <MenuButton
             icon="SourceCode"
@@ -105,30 +99,17 @@ const StatusBar = () => {
           />
         )}
 
-        <div className="flex items-center gap-2 px-3 py-1 ml-2 rounded-full bg-gray-100 dark:bg-white/5 text-[10px] font-bold uppercase tracking-wider">
-          <div
-            className={clsx(
-              "w-1.5 h-1.5 rounded-full",
-              !!useTiptapContext().documentTitle ||
-                !!new URLSearchParams(window.location.search).get("docId")
-                ? "bg-green-500"
-                : "bg-amber-500",
-            )}
-          />
-          <span
-            className={clsx(
-              !!useTiptapContext().documentTitle ||
-                !!new URLSearchParams(window.location.search).get("docId")
-                ? "text-green-500"
-                : "text-amber-500",
-            )}
-          >
-            {!!useTiptapContext().documentTitle ||
-            !!new URLSearchParams(window.location.search).get("docId")
-              ? "Sincronizado"
-              : "Local"}
-          </span>
-        </div>
+        <span
+          className="rte-local-status"
+          role="status"
+          aria-live="polite"
+          data-status={saveStatus}
+          title={`${localMessages.savedHint}. ${localMessages.localNote}`}
+        >
+          {saveStatus === "saved" && lastSavedAt
+            ? `${localMessages.savedAt} ${new Date(lastSavedAt).toLocaleTimeString(locale === "pt" ? "pt-BR" : locale, { hour: "2-digit", minute: "2-digit" })}`
+            : localMessages[saveStatus === "error" ? "saveError" : saveStatus]}
+        </span>
       </Toolbar>
 
       <div className="rte-counter">

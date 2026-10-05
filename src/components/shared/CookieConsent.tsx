@@ -12,38 +12,40 @@ interface CookieConsentProps {
 }
 
 export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const content = getCookieConsentContent(locale);
   const t = getCommonMessages(locale).cookieConsent;
 
   React.useEffect(() => {
     // Verificar se já foi aceito
-    const hasConsented = document.cookie.includes("cookie_consent=true") ||
-      localStorage.getItem("cookie_consent") === "true";
-
-    if (!hasConsented) {
-      setIsVisible(true);
+    let hasConsented = document.cookie.includes("cookie_consent=true");
+    try {
+      hasConsented ||= localStorage.getItem("cookie_consent") === "true";
+    } catch {
+      // The server-rendered notice remains usable without browser storage.
     }
+    if (hasConsented) setIsVisible(false);
   }, []);
 
   const handleAccept = () => {
-    document.cookie = "cookie_consent=true; path=/; max-age=31536000; SameSite=Lax";
+    document.cookie =
+      "cookie_consent=true; path=/; max-age=31536000; SameSite=Lax";
     try {
       localStorage.setItem("cookie_consent", "true");
-    } catch { }
+    } catch {}
     setIsVisible(false);
   };
 
   if (!isVisible) return null;
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-[9999] mx-auto max-w-4xl animate-in fade-in duration-500 md:bottom-6 md:left-6 md:right-6">
-      <div className="flex flex-col items-center justify-between gap-3 rounded-xl border border-white/20 bg-white/80 p-3 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/80 md:flex-row md:gap-4 md:rounded-2xl md:p-6">
+    <div className="fixed bottom-2 left-2 right-2 z-[9999] mx-auto max-w-4xl animate-in fade-in duration-500 md:bottom-6 md:left-6 md:right-6">
+      <div className="flex flex-col items-center justify-between gap-3 rounded-xl border border-white/20 bg-white/80 p-3 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/80 md:flex-row md:gap-3 md:rounded-2xl md:p-3">
         <div className="flex items-start gap-4">
           <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 sm:flex">
             <Cookie className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+            <p className="text-xs leading-relaxed md:text-sm text-gray-700 dark:text-gray-300">
               {content.message}
               <Link
                 href={`/${locale}/privacidade`}
@@ -57,7 +59,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ locale }) => {
         <div className="flex w-full shrink-0 gap-2 md:w-auto">
           <button
             onClick={handleAccept}
-            className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95 dark:bg-blue-500 dark:hover:bg-blue-600 md:flex-none"
+            className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95 dark:bg-blue-500 dark:hover:bg-blue-600 md:flex-none"
           >
             {content.button}
           </button>

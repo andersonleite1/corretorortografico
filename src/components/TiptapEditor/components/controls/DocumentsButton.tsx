@@ -1,32 +1,28 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import MenuButton from "../MenuButton";
 import { useSidebar } from "@/components/providers/SidebarProvider";
-import { useAuth } from "@clerk/nextjs";
 import { useTiptapContext } from "../Provider";
+import { getAcquisitionContent } from "@/data/acquisition";
 
-const DocumentsButton = () => {
-  const {
-    setIsDocumentsDialogOpen,
-    isSidebarOpen,
-    setIsSidebarOpen,
-    isMobile,
-  } = useSidebar();
-  const { isSignedIn } = useAuth();
-  const {} = useTiptapContext();
-
-  if (!isSignedIn) return null;
-
+function DocumentsButton() {
+  const { setIsDocumentsDialogOpen } = useSidebar();
+  const { locale } = useTiptapContext();
+  const t = getAcquisitionContent(locale);
   return (
-    <>
-      <MenuButton
-        text="Documentos"
-        icon="Drafts"
-        hideText={false}
-        tooltip="Meus Documentos"
-        onClick={() => setIsDocumentsDialogOpen(true)}
-      />
-    </>
+    <MenuButton
+      icon="Drafts"
+      text={t.myTexts}
+      hideText={false}
+      tooltip={t.documents}
+      onClick={() => {
+        if (
+          window.dispatchEvent(
+            new Event("editordetexto:before-leave", { cancelable: true }),
+          )
+        )
+          setIsDocumentsDialogOpen(true);
+      }}
+    />
   );
-};
-
+}
 export default memo(DocumentsButton);

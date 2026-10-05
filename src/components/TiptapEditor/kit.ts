@@ -49,7 +49,7 @@ const createExtensionKit = (locale?: Locale) => [
   }),
   Placeholder.configure({
     includeChildren: true,
-    showOnlyCurrent: true,
+    showOnlyCurrent: false,
     placeholder: ({ editor, node }) => {
       // @ts-expect-error - placeholder is a custom extension property
       const placeholder = editor.options.editorProps["placeholder"];

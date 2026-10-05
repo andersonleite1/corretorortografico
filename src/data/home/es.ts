@@ -3,7 +3,8 @@ import { HomeContent } from "./types";
 const es: HomeContent = {
   locale: "es",
   seo: {
-    title: "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
+    title:
+      "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
     description:
       "Editor de texto online gratuito, rápido y sin anuncios. Escribe, formatea y exporta tus textos fácilmente desde el navegador. Ideal para redactores, estudiantes y profesionales.",
     keywords: [
@@ -15,7 +16,8 @@ const es: HomeContent = {
       "editor de texto online sin descargar nada",
       "eliminar formato de texto online",
     ],
-    openGraphTitle: "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
+    openGraphTitle:
+      "Editor de Texto Online Gratis — Escribe y Formatea sin Instalar Nada",
     openGraphDescription:
       "Redacta, edita y comparte tus textos con un editor online gratuito, directo en el navegador. Sin instalaciones, sin complicaciones.",
   },
@@ -23,7 +25,7 @@ const es: HomeContent = {
     name: "Editor de Texto Online",
     description:
       "El Editor de Texto Online es una herramienta gratuita para crear, editar y exportar textos de forma práctica y eficiente. Ideal para estudiantes, profesionales y redactores que buscan agilidad.",
-    applicationCategory: "UtilityApplication",
+    applicationCategory: "UtilitiesApplication",
     featureList: [
       "Edición de texto avanzada con Rich Text",
       "Exportación a PDF y DOCX",
@@ -41,8 +43,7 @@ const es: HomeContent = {
     ],
   },
   article: {
-    title:
-      "Editor de Texto Online: Escribe, Edita y Exporta tus Textos Gratis",
+    title: "Editor de Texto Online: Escribe, Edita y Exporta tus Textos Gratis",
     introHtml:
       "Si buscas un <strong>editor de texto online gratis</strong>, esta es la herramienta que necesitas: sin costos ocultos, sin distracciones y completamente accesible. Ya seas estudiante, redactor freelance o profesional, nuestro <strong>editor de texto en línea</strong> te permite escribir, formatear y exportar tus documentos con total comodidad, directo desde el navegador.",
     sections: [
@@ -85,7 +86,8 @@ const es: HomeContent = {
       },
       {
         title: "Las ventajas que notarás desde el primer uso",
-        description: "Estas son algunas razones por las que miles de usuarios ya lo prefieren:",
+        description:
+          "Estas son algunas razones por las que miles de usuarios ya lo prefieren:",
         points: [
           "Cero instalaciones: solo abre el navegador y empieza;",
           "Funciona igual de bien en el celular que en la computadora;",
@@ -115,7 +117,7 @@ const es: HomeContent = {
       {
         question: "¿El editor es gratuito?",
         answer:
-          "Sí. Puedes usar el editor, contar palabras, formatear texto y exportar archivos sin pagar nada ni crearte una cuenta. Si quieres acceder a funciones avanzadas como reescritura con IA, más documentos en la nube o revisión gramatical extendida, contamos con el plan PRO.",
+          "Sí. Puedes usar el editor, contar palabras, formatear texto y exportar archivos sin pagar nada ni crearte una cuenta. Para organizar documentos y usar funciones de IA, conoce Zerus, otro producto con sus propios planes y límites.",
       },
       {
         question: "¿Puedo usar el editor desde el celular?",
@@ -125,7 +127,7 @@ const es: HomeContent = {
       {
         question: "¿Mis datos están seguros?",
         answer:
-          "Sí. Si te registrás, tus documentos se almacenan con autenticación segura (Clerk) y en una base de datos cifrada (Prisma). Tus textos son completamente privados y nunca se comparten con terceros.",
+          "Los borradores se guardan en este navegador, sin cuenta. Recursos online, como la corrección gramatical y la exportación PDF, pueden procesar el texto para realizar la acción solicitada. Consulta nuestra Política de Privacidad.",
       },
       {
         question: "¿Puedo exportar a Word (.docx)?",
@@ -137,10 +139,11 @@ const es: HomeContent = {
   hero: {
     headline: "El Editor de Texto Online Rápido, Limpio y Gratuito.",
     subheadline:
-      "Escribe, formatea y exporta tus textos directamente desde el navegador. Y cuando lo necesites, nuestra IA te ayuda a revisar y mejorar tus palabras en segundos.",
+      "Escribe, formatea y exporta tus textos directamente desde el navegador. Y cuando necesites IA para revisar y mejorar tus palabras, conoce Zerus.",
     ctaLabel: "Empezar a Escribir Gratis",
     ctaHref: "#editor",
-    microcopy: "Sin necesidad de tarjeta de crédito · Disponible en PT, EN y ES",
+    microcopy:
+      "Sin necesidad de tarjeta de crédito · Disponible en PT, EN y ES",
   },
   problem: {
     eyebrow: "El problema",
@@ -180,7 +183,7 @@ const es: HomeContent = {
         icon: "🔍",
         title: "Revisión Analítica e Inteligente",
         description:
-          "Integración con LanguageTool para correcciones gramaticales en tiempo real en PT, EN y ES. Más de 10 tonos de reescritura con IA para adaptar tu texto al instante, con la posibilidad de crear tonos personalizados.",
+          "Integración con LanguageTool para correcciones gramaticales en tiempo real en PT, EN y ES. Para reescribir y adaptar el tono de tus textos con IA, conoce los recursos disponibles en Zerus.",
       },
       {
         icon: "☁️",

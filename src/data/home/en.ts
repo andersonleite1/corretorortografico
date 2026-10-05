@@ -3,7 +3,8 @@ import { HomeContent } from "./types";
 const en: HomeContent = {
   locale: "en",
   seo: {
-    title: "Free Online Text Editor — Write, Format & Export Without Installing Anything",
+    title:
+      "Free Online Text Editor — Write, Format & Export",
     description:
       "Free online text editor with word count, grammar check, and AI rewriting. No installs, no ads. Export to PDF or DOCX straight from your browser.",
     keywords: [
@@ -23,8 +24,8 @@ const en: HomeContent = {
   webAppSchema: {
     name: "Free Online Text Editor",
     description:
-      "A free online text editor for writing, formatting, and exporting documents directly in the browser. Includes real-time word count, grammar checking with LanguageTool, AI rewriting, and export to PDF, DOCX, TXT, and HTML.",
-    applicationCategory: "UtilityApplication",
+      "A free online text editor for writing, formatting, and exporting documents directly in the browser. Includes real-time word count, grammar checking with LanguageTool, export to PDF, DOCX, TXT, and HTML, and access to AI writing tools on Zerus.",
+    applicationCategory: "UtilitiesApplication",
     featureList: [
       "Rich Text editing with tables, lists, and code blocks",
       "Export to PDF, DOCX, TXT, and HTML",
@@ -116,7 +117,7 @@ const en: HomeContent = {
       {
         question: "Is the editor really free?",
         answer:
-          "Yes. You can write, format, count words, and export to PDF or DOCX without paying anything or creating an account. If you need advanced features like unlimited AI rewrites, more cloud storage, or extended grammar review, the PRO plan covers that.",
+          "Yes. You can write, format, count words, and export to PDF or DOCX without paying anything or creating an account. For document organization and AI features, explore Zerus, a separate product with its own plans and limits.",
       },
       {
         question: "Does it work on mobile?",
@@ -126,7 +127,7 @@ const en: HomeContent = {
       {
         question: "Is my data safe?",
         answer:
-          "Yes. When you create an account, your documents are stored with secure authentication (Clerk) and an encrypted database (Prisma). Your writing is private and never shared with or sold to third parties.",
+          "Drafts are saved in this browser without an account. Online features, such as grammar checking and PDF export, may process text to perform the requested action. See our Privacy Policy.",
       },
       {
         question: "Can I export my document to Word (.docx) or PDF?",
@@ -138,7 +139,7 @@ const en: HomeContent = {
   hero: {
     headline: "The Fast, Clean, and Free Online Text Editor.",
     subheadline:
-      "Write, format, and export your texts directly from your browser. And when you need it, our AI helps you review and improve your words in seconds.",
+      "Write, format, and export your texts directly from your browser. And when you need AI to review and improve your words, explore Zerus.",
     ctaLabel: "Start Writing for Free",
     ctaHref: "#editor",
     microcopy: "No credit card required · Available in EN, PT, and ES",
@@ -181,7 +182,7 @@ const en: HomeContent = {
         icon: "🔍",
         title: "Grammar Check + AI Rewriter",
         description:
-          "Catch grammar and spelling errors in real time with LanguageTool integration. Then refine your tone with 10+ AI rewriting styles — from formal to punchy — or build a custom one.",
+          "Catch grammar and spelling errors in real time with LanguageTool integration. For AI rewriting and tone adaptation, explore the features available in Zerus.",
       },
       {
         icon: "☁️",

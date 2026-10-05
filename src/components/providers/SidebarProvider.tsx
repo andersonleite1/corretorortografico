@@ -37,16 +37,13 @@ export const SidebarProvider = ({
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("rte-sidebar-open");
-      if (stored === "true" && window.innerWidth >= 1024) {
-        setIsSidebarOpen(true);
-      }
-      const storedLT = localStorage.getItem("rte-lt-sidebar-open");
-      if (storedLT === "true" && window.innerWidth >= 1024) {
-        setIsLTSidebarOpen(true);
-      } else if (storedLT === null && window.innerWidth >= 1024) {
-        // Open by default for new users on desktop
+    if (window.innerWidth >= 1024) {
+      // New visitors see the review panel; an explicit dismissal is preserved.
+      try {
+        setIsLTSidebarOpen(
+          localStorage.getItem("rte-lt-sidebar-open") !== "false",
+        );
+      } catch {
         setIsLTSidebarOpen(true);
       }
     }
@@ -63,7 +60,11 @@ export const SidebarProvider = ({
   const toggleLTSidebar = (value: boolean) => {
     if (isMobile && value) return; // Prevent opening on mobile
     setIsLTSidebarOpen(value);
-    localStorage.setItem("rte-lt-sidebar-open", String(value));
+    try {
+      localStorage.setItem("rte-lt-sidebar-open", String(value));
+    } catch {
+      // The panel remains usable when browser storage is unavailable.
+    }
   };
 
   return (

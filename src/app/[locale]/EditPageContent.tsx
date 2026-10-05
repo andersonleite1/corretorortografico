@@ -4,7 +4,10 @@ import dynamic from "next/dynamic";
 import { HomeContent } from "@/data/home";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import clsx from "clsx";
-import { useAuth } from "@clerk/nextjs";
+import ZerusBridge from "@/components/landing/ZerusBridge";
+import { getAcquisitionContent } from "@/data/acquisition";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import "./style.scss";
 import LandingHero from "@/components/landing/LandingHero";
@@ -16,12 +19,6 @@ const LandingProblem = dynamic(
 );
 const LandingFeatures = dynamic(
   () => import("@/components/landing/LandingFeatures"),
-  {
-    ssr: true,
-  },
-);
-const LandingPricing = dynamic(
-  () => import("@/components/landing/LandingPricing"),
   {
     ssr: true,
   },
@@ -38,7 +35,10 @@ const EditForm = dynamic(() => import("./_components/EditForm"), {
       <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
       {/* Editor container */}
-      <div className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden flex flex-col" style={{ minHeight: "480px" }}>
+      <div
+        className="w-full rounded-[2rem] border border-[#d1d9e0] dark:border-[#3d444d] bg-white dark:bg-[#0d1017] shadow-sm overflow-hidden flex flex-col"
+        style={{ minHeight: "480px" }}
+      >
         {/* Toolbar row 1 */}
         <div className="h-[44px] shrink-0 border-b border-[#d1d9e0] dark:border-[#3d444d] px-3 flex items-center gap-2">
           <span className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -144,7 +144,14 @@ type Props = {
 export default function EditPageContent({ content, userPlan }: Props) {
   const { article, faq } = content;
   const { isSidebarOpen, isLTSidebarOpen } = useSidebar();
-  const { userId } = useAuth();
+  const searchParams = useSearchParams();
+  const t = getAcquisitionContent(content.locale);
+  const hasLegacyDocument = Boolean(
+    searchParams.get("docId") &&
+    !searchParams.get("docId")?.startsWith("local-"),
+  );
+  const showLegacyNotice =
+    searchParams.get("legacy") === "account" || hasLegacyDocument;
 
   // Base width: 56rem (896px)
   // Left Sidebar: 260px (16.25rem)
@@ -161,7 +168,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
   return (
     <div
       className={clsx(
-        "w-full mx-auto py-10 px-3 md:px-6 sm:px-0 transition-all duration-300 ease-in-out",
+        "w-full mx-auto py-3 md:py-6 px-1 md:px-6 sm:px-0 transition-[max-width] duration-300 ease-in-out",
         maxWidthClass,
       )}
     >
@@ -185,15 +192,39 @@ export default function EditPageContent({ content, userPlan }: Props) {
       />
 
       {/* ── Editor ─────────────────────────────────────────────────────────── */}
+      {showLegacyNotice && (
+        <aside
+          className="mb-4 rounded-xl border border-neutral-200 bg-white/90 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+          role="status"
+        >
+          <p>{hasLegacyDocument ? t.missing : t.legacy}</p>
+          <Link
+            href={
+              content.locale === "pt"
+                ? "/contato"
+                : `/${content.locale}/contato`
+            }
+            className="mt-2 inline-block underline"
+          >
+            {t.contact}
+          </Link>
+        </aside>
+      )}
       <div id="editor" className="landing-editor-section">
         <EditForm locale={content.locale} userPlan={userPlan} />
       </div>
 
-      {content.hero && <LandingHero data={content.hero} locale={content.locale} />}
+      <p className="mt-3 text-center text-xs text-neutral-500 dark:text-neutral-400">
+        {t.localNote}
+      </p>
+      <ZerusBridge locale={content.locale} />
+
+      {content.hero && (
+        <LandingHero data={content.hero} locale={content.locale} />
+      )}
 
       {content.problem && <LandingProblem data={content.problem} />}
       {content.features && <LandingFeatures data={content.features} />}
-      {userId && content.pricing && <LandingPricing data={content.pricing} />}
 
       {/* ── SEO Article ─────────────────────────────────────────────────────── */}
       <section className="landing-article" aria-labelledby="article-heading">
@@ -243,11 +274,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
       </section>
 
       {/* ── FAQ ─────────────────────────────────────────────────────────────── */}
-      <section
-        id="faq"
-        className="landing-faq"
-        aria-labelledby="faq-heading"
-      >
+      <section id="faq" className="landing-faq" aria-labelledby="faq-heading">
         <div className="landing-faq__inner">
           <div className="landing-faq__header">
             <p className="landing-faq__eyebrow">{faq.label}</p>
@@ -292,7 +319,7 @@ export default function EditPageContent({ content, userPlan }: Props) {
       </section>
 
       {/* ── Final CTA ───────────────────────────────────────────────────────── */}
-      {content.cta && <LandingCTA data={content.cta} />}
-    </div >
+      {content.cta && <LandingCTA data={content.cta} locale={content.locale} />}
+    </div>
   );
 }

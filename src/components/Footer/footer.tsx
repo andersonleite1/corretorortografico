@@ -3,16 +3,7 @@
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  FaStripe,
-  FaCcVisa,
-  FaCcMastercard,
-  FaInstagram,
-  FaYoutube,
-  FaLinkedin,
-} from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { getAcquisitionContent } from "@/data/acquisition";
 
 import { getFooterContent } from "@/data/footer";
 import { getCommonMessages } from "@/data/common";
@@ -72,44 +63,6 @@ const Footer = ({ initialLocale }: FooterProps) => {
                 {content.brandName}
               </span>
             </Link>
-            <div className="flex items-center gap-4 text-gray-400">
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#E4405F] transition-colors"
-                title="Instagram"
-              >
-                <FaInstagram size={20} />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#FF0000] transition-colors"
-                title="YouTube"
-              >
-                <FaYoutube size={20} />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors"
-                title="X (Twitter)"
-              >
-                <FaXTwitter size={20} />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#0077B5] transition-colors"
-                title="LinkedIn"
-              >
-                <FaLinkedin size={20} />
-              </a>
-            </div>
           </div>
           <div className="flex flex-col gap-2 mb-4 sm:mb-0">
             <ul className="flex flex-wrap items-center text-sm font-medium text-gray-400">
@@ -125,9 +78,7 @@ const Footer = ({ initialLocale }: FooterProps) => {
               })}
             </ul>
             <p className="text-xs text-gray-500 italic">
-              {currentLocale === "pt"
-                ? "Suas informações estão seguras e criptografadas."
-                : "Your information is secure and encrypted."}
+              {getAcquisitionContent(currentLocale).storage}
             </p>
           </div>
         </div>
@@ -144,34 +95,6 @@ const Footer = ({ initialLocale }: FooterProps) => {
                 v{version}
               </span>
             </span>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Payment Methods */}
-            <div className="flex items-center gap-3 text-gray-500 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
-              <FaStripe size={32} title="Stripe" />
-              <FaCcVisa size={28} title="Visa" />
-              <FaCcMastercard size={28} title="Mastercard" />
-              <svg
-                viewBox="0 0 512 512"
-                className="w-8 h-8 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <title>Pix</title>
-                <path d="M141.5 130.41l39.54-39.54a79.22 79.22 0 0 1 112 0l39.46 39.46 29.58-29.58-39.52-39.52a121.05 121.05 0 0 0-171.2 0L121.84 90.75l19.66 39.66zM370.43 141.5l39.54 39.54a79.22 79.22 0 0 1 0 112l-39.46 39.46 29.58 29.58 39.52-39.52a121.05 121.05 0 0 0 0-171.2l-39.52-39.52-29.66 29.66zM141.5 370.43l-39.54-39.54a79.22 79.22 0 0 1 0-112l39.52-39.52-29.64-29.64-39.46 39.46a121.05 121.05 0 0 0 0 171.2l39.52 39.52 29.6-29.48zM370.43 370.43l-39.54 39.54a79.22 79.22 0 0 1-112 0l-39.46-39.46-29.58 29.58 39.52 39.52a121.05 121.05 0 0 0 171.2 0l39.52-39.52-29.46-29.66zM256 186.27l-69.73 69.73L256 325.73l69.73-69.73L256 186.27z" />
-              </svg>
-            </div>
-
-            {/* Security Badge */}
-            <div className="opacity-40 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0 border-l border-gray-800 pl-6 h-10 flex items-center">
-              <Image
-                src="/comprasegurassl.webp"
-                alt={t.secureImageAlt}
-                width={60}
-                height={20}
-                className="h-auto w-[50px] md:w-[60px]"
-              />
-            </div>
           </div>
         </div>
       </div>

@@ -60,35 +60,20 @@ export function getHomeSeo(locale: string) {
   };
 }
 
-export function getHomeWebAppSchema(locale: string) {
-  const { webAppSchema } = getHomeContent(locale);
-  const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
-  const inLanguageMap: Record<Locale, string> = {
-    pt: "pt-BR",
-    en: "en",
-    es: "es",
-  };
+// App rich results require genuine ratings/reviews. Describe the site until
+// those exist, and render this schema only on the localized home pages.
+export function getHomeWebsiteSchema(locale: string) {
+  const content = getHomeContent(locale);
+  const url = getLocaleUrl(content.locale);
 
   return {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: webAppSchema.name,
-    url: getLocaleUrl(normalizedLocale),
-    description: webAppSchema.description,
-    inLanguage: inLanguageMap[normalizedLocale],
-    applicationCategory: webAppSchema.applicationCategory,
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "BRL",
-    },
-    creator: {
-      "@type": "Organization",
-      name: "Editor de Texto Online",
-    },
-    featureList: webAppSchema.featureList,
-    keywords: webAppSchema.keywords,
+    "@type": "WebSite",
+    "@id": `${url}#website`,
+    name: content.webAppSchema.name,
+    url,
+    description: content.webAppSchema.description,
+    inLanguage: hrefLangMap[content.locale],
   };
 }
 

@@ -1,47 +1,115 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState, useId } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface DialogProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  title?: string;
 }
-
-const Dialog = ({ children, open, onOpenChange, className }: DialogProps) => {
+const Dialog = ({
+  children,
+  open,
+  onOpenChange,
+  className,
+  title,
+}: DialogProps) => {
   const [mounted, setMounted] = useState(false);
-
+  const ref = useRef<HTMLDivElement>(null);
+  const onChange = useRef(onOpenChange);
+  onChange.current = onOpenChange;
+  const headingId = useId();
+  const reducedMotion = useReducedMotion();
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const onDismiss = () => {
-    onOpenChange?.(false);
-  };
-
+  useEffect(() => {
+    if (!mounted || !open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const heading = ref.current?.querySelector<HTMLElement>("h2,h3");
+    if (heading && !title) heading.id = headingId;
+    ref.current?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onChange.current?.(false);
+      }
+      if (event.key !== "Tab") return;
+      // Nested Radix portals own their keyboard interactions.
+      if (
+        (event.target as HTMLElement)?.closest?.(
+          "[data-radix-popper-content-wrapper]",
+        )
+      )
+        return;
+      const targets = Array.from(
+        ref.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+        ) || [],
+      ).filter((el) => el.getClientRects().length > 0);
+      if (!targets.length) {
+        event.preventDefault();
+        return;
+      }
+      const first = targets[0],
+        last = targets[targets.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first ||
+          document.activeElement === ref.current ||
+          !ref.current?.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last ||
+          document.activeElement === ref.current ||
+          !ref.current?.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", keydown);
+      previous?.focus();
+    };
+  }, [open, mounted, headingId, title]);
   if (!mounted) return null;
-
   return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
-          role="dialog"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex flex-col items-center bg-black/20 dark:bg-black/40 backdrop-blur-md px-4 py-8 overflow-y-auto"
-          onClick={onDismiss}
+          transition={{ duration: reducedMotion ? 0 : 0.15 }}
+          className="fixed inset-0 z-[100] flex flex-col items-center bg-black/30 dark:bg-black/60 backdrop-blur-sm px-3 py-4 overflow-y-auto"
+          onClick={() => onChange.current?.(false)}
         >
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 10 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 10 }}
-            transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className={`relative bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-2xl rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)] border border-white/20 dark:border-white/5 my-auto w-full overflow-hidden ${className || "max-w-fit"}`}
-            onClick={(e) => e.stopPropagation()}
+            ref={ref}
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
+            aria-labelledby={title ? undefined : headingId}
+            tabIndex={-1}
+            initial={{ scale: reducedMotion ? 1 : 0.98, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.15 }}
+            className={`relative bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 my-auto w-full overflow-hidden outline-none ${className || "max-w-fit"}`}
+            onClick={(event) => event.stopPropagation()}
           >
             {children}
           </motion.div>
@@ -51,5 +119,4 @@ const Dialog = ({ children, open, onOpenChange, className }: DialogProps) => {
     document.body,
   );
 };
-
 export default Dialog;

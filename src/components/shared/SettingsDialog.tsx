@@ -35,7 +35,7 @@ export const SettingsDialog = ({
     toggleCustomToneActivation,
   } = useEditorSettings();
   const [activeTab, setActiveTab] = useState<"tones" | "toolbar" | "general">(
-    "tones",
+    "toolbar",
   );
   const [isCreateToneDialogOpen, setIsCreateToneDialogOpen] = useState(false);
 
@@ -77,7 +77,6 @@ export const SettingsDialog = ({
   };
 
   const tabs = [
-    { id: "tones", label: ts.tabs.tones, icon: "Palette" as const },
     { id: "toolbar", label: ts.tabs.toolbar, icon: "Columns" as const },
     { id: "general", label: ts.tabs.general, icon: "Settings" as const },
   ];
@@ -216,7 +215,9 @@ export const SettingsDialog = ({
                             }`}
                           >
                             <button
-                              onClick={() => toggleCustomToneActivation(tone.id)}
+                              onClick={() =>
+                                toggleCustomToneActivation(tone.id)
+                              }
                               className="absolute inset-0 z-0"
                             />
                             <button

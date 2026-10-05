@@ -1,10 +1,12 @@
 import React, { useCallback } from "react";
+import { getAcquisitionContent } from "@/data/acquisition";
 import MenuButton from "../MenuButton";
 import { DropdownMenuItem } from "../ui/DropdownMenu";
 import { useTiptapContext } from "../Provider";
 
 const ExportDropdown = () => {
-  const { exportActions, messages } = useTiptapContext();
+  const { exportActions, messages, locale } = useTiptapContext();
+  const t = getAcquisitionContent(locale);
   const onExportDoc = exportActions?.onExportDoc;
   const onExportMarkdown = exportActions?.onExportMarkdown;
   const onExportPdf = exportActions?.onExportPdf;
@@ -41,7 +43,7 @@ const ExportDropdown = () => {
     >
       <DropdownMenuItem asChild disabled={!onExportDoc}>
         <MenuButton
-          text={messages.export.doc}
+          text={t.wordDocx}
           icon="FileDoc"
           hideText={false}
           tooltip={false}
@@ -49,6 +51,12 @@ const ExportDropdown = () => {
           disabled={!onExportDoc}
         />
       </DropdownMenuItem>
+      <p
+        className="px-3 py-2 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300"
+        style={{ maxWidth: "17rem" }}
+      >
+        {t.wordHint}
+      </p>
       <DropdownMenuItem asChild disabled={!onExportTxt}>
         <MenuButton
           text={messages.export.txt}

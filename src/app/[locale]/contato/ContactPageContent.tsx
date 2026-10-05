@@ -1,3 +1,4 @@
+import { PublicContactEmail } from "@/components/shared/PublicContactEmail";
 import { BackHomeButton } from "@/components/shared/BackHomeButton";
 import { getContactContent } from "@/data/pages/contact";
 import { getCommonMessages } from "@/data/common";
@@ -101,12 +102,7 @@ export default function ContactPageContent({
 
           <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-50">
             <p className="text-xs uppercase tracking-[0.3em]">{t.email}</p>
-            <a
-              href="mailto:contato@editordetexto.online"
-              className="mt-2 inline-flex items-center gap-2 text-lg font-semibold hover:underline"
-            >
-              {content.altContactEmailLabel}
-            </a>
+            <PublicContactEmail className="mt-2 inline-flex items-center gap-2 text-lg font-semibold hover:underline" />
           </div>
         </aside>
       </section>

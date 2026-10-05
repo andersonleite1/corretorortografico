@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextFetchEvent } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { i18n } from "../i18n-config";
+import { i18n, type Locale } from "../i18n-config";
+import { getZerusHref } from "@/lib/zerus";
+import { STRICT_TRANSPORT_SECURITY } from "@/lib/security-headers.mjs";
 
 const PUBLIC_FILE = /\.[^/]+$/;
 
 // Rotas que requerem autenticação
 const isProtectedRoute = createRouteMatcher([
-  "/:locale/editor(.*)", // Editor principal (com locale)
-  "/editor(.*)", // Editor principal (sem locale)
-  "/:locale/dashboard(.*)", // Dashboard
-  "/dashboard(.*)",
-  "/:locale/settings(.*)", // Configurações
-  "/settings(.*)",
-  "/api/ai(.*)", // APIs de IA
+  "/api/ai(.*)",
   "/api/documents(.*)",
-  "/api/editor-settings(.*)", // Configurações do editor (multi-tenant)
+  "/api/editor-settings(.*)",
   "/api/images(.*)",
+  "/api/dashboard(.*)",
+  "/api/user(.*)",
+  "/api/stripe/checkout(.*)",
+  "/api/stripe/portal(.*)",
 ]);
 
 /**
@@ -45,20 +45,6 @@ function getLocale(request: NextRequest): string {
 function i18nMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { locales, defaultLocale } = i18n;
-
-  // Redirecionamento de /pricing para /#pricing (Legado -> Home)
-  if (pathname.endsWith("/pricing")) {
-    const locale =
-      locales.find((l) => pathname.startsWith(`/${l}/`)) || defaultLocale;
-    const newPath =
-      pathname === "/pricing" || pathname === `/${locale}/pricing`
-        ? `/${locale}`
-        : pathname.replace("/pricing", "");
-    const url = new URL(newPath, request.url);
-    url.hash = "pricing";
-    url.search = request.nextUrl.search;
-    return NextResponse.redirect(url);
-  }
 
   // Pular arquivos estáticos e rotas internas
   if (
@@ -96,7 +82,7 @@ function i18nMiddleware(request: NextRequest) {
   // Se não tem locale, resolve qual usar
   const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
   const locale =
-    cookieLocale && locales.includes(cookieLocale as any)
+    cookieLocale && locales.includes(cookieLocale as Locale)
       ? cookieLocale
       : pathname === "/"
         ? defaultLocale
@@ -120,28 +106,76 @@ const clerkHof = clerkMiddleware(async (auth, request) => {
   if (isProtectedRoute(request)) {
     const authObj = await auth();
     if (!authObj.userId) {
-      const signInUrl = new URL("/sign-in", request.url);
-      signInUrl.searchParams.set("redirect_url", request.url);
-      return NextResponse.redirect(signInUrl);
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
   }
   return i18nMiddleware(request);
 });
 
-export default async function middleware(request: NextRequest, event: any) {
+export default async function middleware(
+  request: NextRequest,
+  event: NextFetchEvent,
+) {
+  // Next.js 14 config redirects omit custom headers. Send HSTS explicitly.
+  const hostname = request.headers.get("host")?.split(":")[0].toLowerCase();
+  if (hostname === "www.editordetexto.online") {
+    const canonicalUrl = new URL("https://editordetexto.online");
+    canonicalUrl.pathname = request.nextUrl.pathname;
+    canonicalUrl.search = request.nextUrl.search;
+    const response = NextResponse.redirect(canonicalUrl, 308);
+    response.headers.set("Strict-Transport-Security", STRICT_TRANSPORT_SECURITY);
+    return response;
+  }
+
+  const pathname = request.nextUrl.pathname;
+  if (!pathname.startsWith("/api/") && !pathname.startsWith("/trpc")) {
+    const segments = pathname.split("/").filter(Boolean);
+    const hasLocale = i18n.locales.includes(segments[0] as Locale);
+    const preferredLocale = request.cookies.get("NEXT_LOCALE")?.value;
+    const locale = hasLocale
+      ? (segments[0] as Locale)
+      : i18n.locales.includes(preferredLocale as Locale)
+        ? (preferredLocale as Locale)
+        : (getLocale(request) as Locale);
+    const route = segments[hasLocale ? 1 : 0];
+    if (
+      route === "sign-in" ||
+      route === "sign-up" ||
+      route === "sso-callback"
+    ) {
+      return NextResponse.redirect(getZerusHref(locale, "legacy_auth"));
+    }
+    if (route === "dashboard" || route === "settings" || route === "editor") {
+      const home = locale === i18n.defaultLocale ? "/" : `/${locale}`;
+      const url = new URL(home, request.url);
+      if (route === "editor") {
+        const docId = request.nextUrl.searchParams.get("docId");
+        if (docId) url.searchParams.set("docId", docId);
+        url.hash = "editor";
+      } else {
+        url.searchParams.set("legacy", "account");
+      }
+      return NextResponse.redirect(url);
+    }
+    if (route === "pricing")
+      return NextResponse.redirect(getZerusHref(locale, "legacy_auth"));
+    return i18nMiddleware(request);
+  }
   try {
     return await clerkHof(request, event);
-  } catch (err: any) {
-    console.error("Middleware Error caught:", err);
-    // Retorna uma resposta amigável com o erro no header para debugarmos sem quebrar o Edge Runtime
-    const res = NextResponse.next();
-    res.headers.set("x-middleware-error", encodeURIComponent(err.message || String(err)));
-    return res;
+  } catch {
+    // Never bypass authorization when Clerk is unavailable.
+    return NextResponse.json({ error: "service_unavailable" }, { status: 503 });
   }
 }
 
 export const config = {
   matcher: [
+    // Canonicalize every www path, including assets skipped by the normal matcher.
+    {
+      source: "/:path*",
+      has: [{ type: "host", value: "www\\.editordetexto\\.online" }],
+    },
     // Pular Next.js internals e arquivos estáticos
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Sempre rodar para API routes

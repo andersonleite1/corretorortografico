@@ -1,395 +1,351 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import clsx from "clsx";
-import { motion, AnimatePresence } from "framer-motion";
-import { Icon } from "../TiptapEditor/components/ui/Icon";
-import { useSidebar } from "../providers/SidebarProvider";
-import { ToolbarDivider } from "../TiptapEditor/components/ui/Toolbar";
+import {
+  X,
+  Pencil,
+  Trash2,
+  Eye,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Dialog from "../TiptapEditor/components/ui/Dialog";
-import { EmptyState } from "./EmptyState";
-import { getLocalDocuments, deleteLocalDocument } from "@/lib/local-storage";
-
-interface Document {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { getAcquisitionContent } from "@/data/acquisition";
+import { type Locale } from "../../../i18n-config";
+import {
+  getLocalDocuments,
+  getLocalDocumentText,
+  saveLocalDocument,
+  deleteLocalDocument,
+  type LocalDocument,
+} from "@/lib/local-storage";
 
 interface DocumentsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   userPlan?: "free" | "pro" | "team";
 }
-
-export const DocumentsDialog = ({
-  isOpen,
-  onClose,
-  userPlan = "free",
-}: DocumentsDialogProps) => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0,
-  });
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+export const DocumentsDialog = ({ isOpen, onClose }: DocumentsDialogProps) => {
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string;
-
-  const fetchDocuments = async (page = 1) => {
-    setIsLoading(true);
+  const locale = (params.locale as Locale) || "pt";
+  const t = getAcquisitionContent(locale);
+  const [documents, setDocuments] = useState<LocalDocument[]>([]);
+  const [readError, setReadError] = useState(false);
+  const [page, setPage] = useState(1);
+  const [preview, setPreview] = useState<LocalDocument | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [renameId, setRenameId] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const reload = () => {
     try {
-      if (userPlan === "free") {
-        const localDocs = getLocalDocuments();
-        const limit = 6;
-        const totalCount = localDocs.length;
-        const totalPages = Math.ceil(totalCount / limit);
-        const start = (page - 1) * limit;
-        const documentsSlice = localDocs.slice(start, start + limit);
-
-        setDocuments(
-          documentsSlice.map((doc) => ({
-            ...doc,
-            content: typeof doc.content === "string" ? doc.content : "", // Simplificação: s/ preview p/ JSON local
-          })),
-        );
-        setPagination({
-          currentPage: page,
-          totalPages,
-          totalCount,
-        });
-        return;
-      }
-
-      const response = await fetch(`/api/documents?page=${page}&limit=6`);
-      if (!response.ok) throw new Error("Erro ao carregar documentos");
-      const data = await response.json();
-      setDocuments(data.documents);
-      setPagination({
-        currentPage: data.metadata.currentPage,
-        totalPages: data.metadata.totalPages,
-        totalCount: data.metadata.totalCount,
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao carregar documentos");
-    } finally {
-      setIsLoading(false);
+      setDocuments(
+        [...getLocalDocuments()].sort(
+          (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt),
+        ),
+      );
+      setReadError(false);
+    } catch {
+      setReadError(true);
     }
   };
-
   useEffect(() => {
     if (isOpen) {
-      fetchDocuments(pagination.currentPage);
-    }
-  }, [isOpen, pagination.currentPage]);
-
-  const handleDelete = async (id: string) => {
-    try {
-      if (userPlan === "free") {
-        deleteLocalDocument(id);
-        toast.success("Documento excluído (local)");
-        setDocuments(documents.filter((doc) => doc.id !== id));
-        setConfirmDelete(null);
-        return;
+      try {
+        setDocuments(
+          [...getLocalDocuments()].sort(
+            (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt),
+          ),
+        );
+        setReadError(false);
+      } catch {
+        setReadError(true);
       }
-
-      const response = await fetch(`/api/documents/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Erro ao excluir documento");
-      toast.success("Documento excluído");
-      setDocuments(documents.filter((doc) => doc.id !== id));
+      setPage(1);
+      setPreview(null);
       setConfirmDelete(null);
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao excluir documento");
+      setRenameId(null);
     }
+  }, [isOpen]);
+  const pages = Math.max(1, Math.ceil(documents.length / 6));
+  const currentPage = Math.min(page, pages);
+  const visible = useMemo(
+    () => documents.slice((currentPage - 1) * 6, currentPage * 6),
+    [documents, currentPage],
+  );
+  const date = (value: string) => {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime())
+      ? "—"
+      : parsed.toLocaleString(locale === "pt" ? "pt-BR" : locale, {
+          dateStyle: "short",
+          timeStyle: "short",
+        });
   };
-
-  const handleEdit = (id: string) => {
-    router.push(`/${locale}?docId=${id}`);
+  const openDocument = (id: string) => {
+    if (
+      !window.dispatchEvent(
+        new Event("editordetexto:before-leave", { cancelable: true }),
+      )
+    )
+      return;
+    router.push(
+      `${locale === "pt" ? "/" : `/${locale}`}?docId=${encodeURIComponent(id)}`,
+      { scroll: false },
+    );
     onClose();
   };
-
+  const rename = (doc: LocalDocument) => {
+    if (!name.trim()) return;
+    try {
+      saveLocalDocument({ ...doc, title: name.trim() });
+      window.dispatchEvent(
+        new CustomEvent("editordetexto:rename-document", {
+          detail: { id: doc.id, title: name.trim() },
+        }),
+      );
+      setRenameId(null);
+      reload();
+    } catch {
+      toast.error(t.renameError);
+    }
+  };
+  const remove = (id: string) => {
+    try {
+      deleteLocalDocument(id);
+      window.dispatchEvent(
+        new CustomEvent("editordetexto:delete-document", { detail: id }),
+      );
+      setConfirmDelete(null);
+      reload();
+    } catch {
+      toast.error(t.deleteError);
+    }
+  };
+  const button =
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800";
   return (
-    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
-      <div className="w-full max-w-3xl flex flex-col relative outline-none">
-        {/* Overlay de Pré-visualização (Quick Look Style) */}
-        <AnimatePresence>
-          {previewDoc && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute inset-0 z-[120] bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-3xl flex flex-col overflow-hidden"
-            >
-              <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-black/20">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate max-w-md">
-                    {previewDoc.title || "Sem título"}
-                  </h3>
-                  <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-widest">
-                    Pŕe-visualização •{" "}
-                    {new Date(previewDoc.updatedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setPreviewDoc(null)}
-                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors"
-                >
-                  <Icon name="Close" size={24} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-8 md:p-12 prose prose-slate dark:prose-invert max-w-none">
-                <div
-                  dangerouslySetInnerHTML={{ __html: previewDoc.content }}
-                  className="bg-white/50 dark:bg-black/20 p-10 rounded-[24px] shadow-sm border border-gray-100 dark:border-white/5"
-                />
-              </div>
-              <div className="p-6 border-t border-gray-100 dark:border-white/5 flex justify-center gap-3 bg-white/50 dark:bg-black/20">
-                <button
-                  onClick={() => {
-                    handleEdit(previewDoc.id);
-                    setPreviewDoc(null);
-                  }}
-                  className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95"
-                >
-                  <Icon name="Edit" size={18} />
-                  Editar Agora
-                </button>
-                <button
-                  onClick={() => setPreviewDoc(null)}
-                  className="px-8 py-3 bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-bold rounded-full hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
-                >
-                  Fechar
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Overlay de Confirmação de Exclusão */}
-        <AnimatePresence>
-          {confirmDelete && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[110] bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-md flex items-center justify-center p-8"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="max-w-xs w-full text-center space-y-6"
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      title={t.documents}
+      className="max-w-2xl w-full"
+    >
+      <div className="flex items-start justify-between gap-4 border-b border-neutral-200 p-5 dark:border-neutral-700">
+        <div>
+          <h2 className="m-0 text-xl font-bold text-neutral-900 dark:text-white">
+            {t.documents}
+          </h2>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+            {t.local} · {documents.length}
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label={t.close}
+          className={button}
+          onClick={onClose}
+        >
+          <X size={18} />
+        </button>
+      </div>
+      <div className="max-h-[60dvh] overflow-y-auto p-4 sm:p-5">
+        {readError ? (
+          <p role="alert" className="text-sm text-red-800 dark:text-red-200">
+            {t.loadError}
+          </p>
+        ) : preview ? (
+          <section>
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+              {preview.title || t.untitled}
+            </h3>
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+              {t.updated} {date(preview.updatedAt)}
+            </p>
+            <p className="my-4 whitespace-pre-wrap break-words text-base leading-relaxed text-neutral-800 dark:text-neutral-100">
+              {getLocalDocumentText(preview.content) || t.emptyText}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className={button}
+                onClick={() => openDocument(preview.id)}
               >
-                <div className="flex justify-center">
-                  <div className="p-5 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500">
-                    <Icon name="Trash" size={32} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    Excluir documento?
-                  </h3>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Essa ação é permanente e não pode ser desfeita.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => handleDelete(confirmDelete)}
-                    className="w-full py-3.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
-                  >
-                    Excluir Permanentemente
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(null)}
-                    className="w-full py-3.5 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-bold rounded-2xl transition-all"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Header do Diálogo */}
-        <div className="px-8 py-8 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Meus Documentos
-            </h2>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-widest">
-              {userPlan === "free" ? "Local / Navegador" : "Nuvem"} •{" "}
-              {pagination.totalCount} itens
+                {t.open}
+              </button>
+              <button className={button} onClick={() => setPreview(null)}>
+                {t.close}
+              </button>
+            </div>
+          </section>
+        ) : documents.length === 0 ? (
+          <div className="py-8 text-center">
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+              {t.emptyLibrary}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+              {t.emptyLibraryHint}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-all active:scale-90"
-          >
-            <Icon name="Close" size={24} />
-          </button>
-        </div>
-
-        {/* Lista de Documentos */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-3">
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-20 w-full rounded-[24px] bg-gray-100 dark:bg-white/5 animate-pulse"
-                />
-              ))}
-            </div>
-          ) : documents.length === 0 ? (
-            <EmptyState
-              icon="Drafts"
-              title="Sua galeria está vazia"
-              description={
-                userPlan === "free"
-                  ? "Você ainda não salvou nenhum documento localmente. Seus textos ficam apenas no seu navegador."
-                  : "Você ainda não salvou nenhum documento na nuvem. Que tal começar um agora?"
-              }
-              action={{
-                label: "Criar Novo",
-                onClick: onClose,
-              }}
-            />
-          ) : (
-            documents.map((doc) => (
-              <motion.div
+        ) : (
+          <div className="space-y-3">
+            {visible.map((doc) => (
+              <article
                 key={doc.id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => handleEdit(doc.id)}
-                className="group flex items-center justify-between p-5 rounded-[24px] bg-white dark:bg-white/5 hover:bg-blue-50 dark:hover:bg-blue-500/10 cursor-pointer transition-all border border-gray-100 dark:border-white/5 hover:border-blue-200 dark:hover:border-blue-500/20 shadow-sm"
+                className="rounded-2xl border border-neutral-200 p-4 dark:border-neutral-700"
               >
-                <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="text-[18px] font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {doc.title || "Sem título"}
-                  </h3>
-                  <div className="mt-1.5 flex items-center gap-4 text-[13px] font-medium text-gray-400 dark:text-gray-500">
-                    <span className="flex items-center gap-1.5">
-                      Criado: {new Date(doc.createdAt).toLocaleDateString()}
-                    </span>
-                    <span className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800"></span>
-                    <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                      Salvo: {new Date(doc.updatedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPreviewDoc(doc);
+                {renameId === doc.id ? (
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      rename(doc);
                     }}
-                    className="p-2.5 rounded-full bg-white dark:bg-black/20 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 shadow-sm border border-gray-100 dark:border-white/5 transition-all"
-                    title="Quick Look"
+                    className="space-y-3"
                   >
-                    <Icon name="Eye" size={18} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(doc.id);
-                    }}
-                    className="p-2.5 rounded-full bg-white dark:bg-black/20 text-gray-400 hover:text-emerald-500 shadow-sm border border-gray-100 dark:border-white/5 transition-all"
-                    title="Editar"
-                  >
-                    <Icon name="Edit" size={18} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setConfirmDelete(doc.id);
-                    }}
-                    className="p-2.5 rounded-full bg-white dark:bg-black/20 text-gray-400 hover:text-red-500 shadow-sm border border-gray-100 dark:border-white/5 transition-all"
-                    title="Excluir"
-                  >
-                    <Icon name="Trash" size={18} />
-                  </button>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
-
-        {/* Rodapé do Diálogo */}
-        <div className="px-8 py-6 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex items-center justify-between">
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={clsx(
-              "flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm",
-              isSidebarOpen
-                ? "bg-blue-500 text-white shadow-blue-500/20"
-                : "bg-white dark:bg-white/10 text-gray-600 dark:text-gray-400 border border-gray-100 dark:border-white/5 hover:bg-gray-50",
-            )}
-          >
-            <Icon name="Columns" size={18} />
-            {isSidebarOpen ? "Fixar Lateral" : "Fixar na Lateral"}
-          </button>
-
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center gap-4 bg-white dark:bg-white/5 px-4 py-2 rounded-full border border-gray-100 dark:border-white/5 shadow-sm">
+                    <label
+                      className="block text-sm font-medium text-neutral-900 dark:text-white"
+                      htmlFor={`rename-${doc.id}`}
+                    >
+                      {t.titleLabel}
+                    </label>
+                    <input
+                      id={`rename-${doc.id}`}
+                      autoFocus
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      maxLength={200}
+                      className="w-full rounded-lg border border-neutral-300 bg-white p-3 text-base text-neutral-900 focus:outline-emerald-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        className={button}
+                        type="submit"
+                        disabled={!name.trim()}
+                      >
+                        {t.save}
+                      </button>
+                      <button
+                        className={button}
+                        type="button"
+                        onClick={() => setRenameId(null)}
+                      >
+                        {t.cancel}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <h3 className="break-words text-base font-semibold text-neutral-900 dark:text-white">
+                      {doc.title || t.untitled}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 break-words text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                      {getLocalDocumentText(doc.content) || t.emptyText}
+                    </p>
+                    <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">
+                      {t.updated} {date(doc.updatedAt)}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        className={button}
+                        onClick={() => openDocument(doc.id)}
+                      >
+                        <ArrowRight size={16} />
+                        {t.open}
+                      </button>
+                      <button
+                        className={button}
+                        onClick={() => {
+                          setRenameId(doc.id);
+                          setName(doc.title || "");
+                        }}
+                      >
+                        <Pencil size={16} />
+                        {t.rename}
+                      </button>
+                      <button
+                        className={button}
+                        aria-label={`${t.preview}: ${doc.title || t.untitled}`}
+                        onClick={() => setPreview(doc)}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
+                        className={button}
+                        aria-label={`${t.delete}: ${doc.title || t.untitled}`}
+                        onClick={() => setConfirmDelete(doc.id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    {confirmDelete === doc.id && (
+                      <div className="mt-3 rounded-xl bg-red-50 p-3 dark:bg-red-950/40">
+                        <h4 className="font-semibold text-red-900 dark:text-red-100">
+                          {t.deleteQuestion}
+                        </h4>
+                        <p className="mt-1 text-sm text-red-900 dark:text-red-100">
+                          {t.deleteWarning}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            className={button}
+                            onClick={() => remove(doc.id)}
+                          >
+                            {t.delete}
+                          </button>
+                          <button
+                            className={button}
+                            onClick={() => setConfirmDelete(null)}
+                          >
+                            {t.cancel}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col gap-3 border-t border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-700 dark:bg-neutral-900">
+        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+          {t.localNote}
+        </p>
+        <div className="flex items-center justify-between gap-2">
+          {pages > 1 ? (
+            <div className="flex items-center gap-2">
               <button
-                onClick={() =>
-                  setPagination((prev) => ({
-                    ...prev,
-                    currentPage: Math.max(1, prev.currentPage - 1),
-                  }))
-                }
-                disabled={pagination.currentPage === 1 || isLoading}
-                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 disabled:opacity-30 transition-colors"
+                className={button}
+                aria-label={t.previous}
+                disabled={currentPage === 1}
+                onClick={() => setPage(currentPage - 1)}
               >
-                <Icon name="ChevronLeft" size={20} />
+                <ChevronLeft size={18} />
               </button>
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest min-w-[40px] text-center">
-                {pagination.currentPage} / {pagination.totalPages}
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                {currentPage}/{pages}
               </span>
               <button
-                onClick={() =>
-                  setPagination((prev) => ({
-                    ...prev,
-                    currentPage: Math.min(
-                      prev.totalPages,
-                      prev.currentPage + 1,
-                    ),
-                  }))
-                }
-                disabled={
-                  pagination.currentPage === pagination.totalPages || isLoading
-                }
-                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 disabled:opacity-30 transition-colors"
+                className={button}
+                aria-label={t.next}
+                disabled={currentPage === pages}
+                onClick={() => setPage(currentPage + 1)}
               >
-                <Icon name="ChevronRight" size={20} />
+                <ChevronRight size={18} />
               </button>
             </div>
+          ) : (
+            <span />
           )}
-
-          <button
-            onClick={onClose}
-            className="px-8 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-sm font-bold rounded-full hover:opacity-90 transition-opacity active:scale-95"
-          >
-            Concluído
+          <button className={button} onClick={onClose}>
+            {t.done}
           </button>
         </div>
       </div>
     </Dialog>
   );
 };
-
 export default DocumentsDialog;

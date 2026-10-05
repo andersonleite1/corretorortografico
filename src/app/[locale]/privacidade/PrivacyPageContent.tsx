@@ -1,3 +1,4 @@
+import { PublicContactEmail } from "@/components/shared/PublicContactEmail";
 import { BackHomeButton } from "@/components/shared/BackHomeButton";
 import { getPrivacyContent } from "@/data/pages/privacy";
 import { Locale } from "../../../../i18n-config";
@@ -40,7 +41,13 @@ export default function PrivacyPageContent({
             </h2>
             <div className="mt-4 space-y-4 text-base text-slate-600 dark:text-slate-300">
               {section.paragraphs.map((paragraph, index) => (
-                <p key={`${section.title}-paragraph-${index}`}>{paragraph}</p>
+                <p key={`${section.title}-paragraph-${index}`}>
+                  {paragraph === "contato@editordetexto.online" ? (
+                    <PublicContactEmail className="hover:underline" />
+                  ) : (
+                    paragraph
+                  )}
+                </p>
               ))}
               {section.list && (
                 <ul className="list-disc space-y-2 pl-5">

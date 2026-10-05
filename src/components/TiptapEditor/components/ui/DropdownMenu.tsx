@@ -25,13 +25,15 @@ const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(({ className, align = "start", sideOffset = 4, ...props }, ref) => (
-  <DropdownMenuPrimitive.Content
-    ref={ref}
-    align={align}
-    sideOffset={sideOffset}
-    className={clsx("rte-dropdown", className)}
-    {...props}
-  />
+  <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      className={clsx("rte-dropdown", className)}
+      {...props}
+    />
+  </DropdownMenuPrimitive.Portal>
 ));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 

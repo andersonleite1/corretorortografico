@@ -1,4 +1,5 @@
 import withSerwistInit from "@serwist/next";
+import { STRICT_TRANSPORT_SECURITY } from "./src/lib/security-headers.mjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -78,7 +79,7 @@ const nextConfig = {
           },
           {
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
+            value: STRICT_TRANSPORT_SECURITY,
           },
           {
             key: "X-Frame-Options",

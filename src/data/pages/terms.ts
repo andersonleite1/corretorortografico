@@ -93,7 +93,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       },
     ],
     contactHtml:
-      'Em caso de dúvidas sobre estes Termos de Uso ou disputas comerciais, entre em contato pelo e-mail: <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
+      'Em caso de dúvidas sobre estes Termos de Uso ou disputas comerciais, entre em contato pelo e-mail: <!--email_off--><a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a><!--/email_off-->.',
     lastUpdatedLabel: "Última atualização",
     lastUpdatedValue: "02 de Março de 2026",
   },
@@ -155,7 +155,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       },
     ],
     contactHtml:
-      'If you have any questions about these Terms of Use, please email us at <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
+      'If you have any questions about these Terms of Use, please email us at <!--email_off--><a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a><!--/email_off-->.',
     lastUpdatedLabel: "Last update",
     lastUpdatedValue: "March 02, 2026",
   },
@@ -217,7 +217,7 @@ const termsContentMap: Record<Locale, TermsPageContent> = {
       },
     ],
     contactHtml:
-      'Si tienes dudas o reclamos sobre estos Términos de Uso, escríbenos a <a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a>.',
+      'Si tienes dudas o reclamos sobre estos Términos de Uso, escríbenos a <!--email_off--><a href="mailto:contato@editordetexto.online" class="text-blue-500 hover:underline">contato@editordetexto.online</a><!--/email_off-->.',
     lastUpdatedLabel: "Última actualización",
     lastUpdatedValue: "02 de Marzo de 2026",
   },

@@ -1,6 +1,5 @@
 import { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
-import dynamic from "next/dynamic";
 import localFont from "next/font/local";
 import Script from "next/script";
 
@@ -49,6 +48,7 @@ const fontMono = localFont({
   ],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
 const fontSans = localFont({
   src: [
@@ -87,31 +87,21 @@ const fontSans = localFont({
   display: "swap",
 });
 
-import { UserButton } from "@/components/shared/UserButton";
-import { ClerkThemeProvider } from "@/components/providers/ClerkThemeProvider";
 import { SidebarProvider } from "@/components/providers/SidebarProvider";
-import { syncUserWithDb } from "@/lib/sync-user";
-import { getUserPlan } from "@/lib/auth";
 
 import "@/styles/globals.scss";
-import { getHomeFaqSchema, getHomeWebAppSchema } from "@/data/home";
 import { i18n, Locale } from "../../i18n-config";
 import { MainContent } from "./MainContent";
 import { Toaster } from "sonner";
-import { PlanProvider, Plan } from "@/components/providers/PlanProvider";
+import { PlanProvider } from "@/components/providers/PlanProvider";
 
-const CookieConsent = dynamic(
-  () => import("@/components/shared/CookieConsent").then((mod) => mod.CookieConsent),
-  { ssr: false }
-);
+import { CookieConsent } from "@/components/shared/CookieConsent";
 import { Analytics } from "@/components/shared/Analytics";
 
 export const viewport: Viewport = {
   themeColor: "#2563eb",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -154,9 +144,8 @@ export default async function RootLayout({
     storedLocale && i18n.locales.includes(storedLocale)
       ? storedLocale
       : i18n.defaultLocale;
-  const userPlan = (cookieStore.get("user_plan")?.value as Plan) || "free";
-  const cookieConsentGiven = cookieStore.get("cookie_consent")?.value === "true";
-  const webAppSchema = getHomeWebAppSchema(locale);
+  const cookieConsentGiven =
+    cookieStore.get("cookie_consent")?.value === "true";
 
   return (
     <html lang={locale} className={`${fontMono.variable} ${fontSans.variable}`}>
@@ -169,27 +158,16 @@ export default async function RootLayout({
           data-website-id="05f767c0-1174-400e-b467-256e102036c3"
           strategy="afterInteractive"
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-        />
       </head>
       <body>
-        <ClerkThemeProvider locale={locale}>
-          <PlanProvider initialPlan={userPlan}>
-            <SidebarProvider>
-              <Analytics />
-              <MainContent
-                userButton={<UserButton locale={locale} />}
-                locale={locale}
-              >
-                {children}
-              </MainContent>
-              <Toaster richColors position="top-right" />
-              {!cookieConsentGiven && <CookieConsent locale={locale} />}
-            </SidebarProvider>
-          </PlanProvider>
-        </ClerkThemeProvider>
+        <PlanProvider>
+          <SidebarProvider>
+            <Analytics />
+            <MainContent locale={locale}>{children}</MainContent>
+            <Toaster richColors position="top-right" />
+            {!cookieConsentGiven && <CookieConsent locale={locale} />}
+          </SidebarProvider>
+        </PlanProvider>
       </body>
     </html>
   );

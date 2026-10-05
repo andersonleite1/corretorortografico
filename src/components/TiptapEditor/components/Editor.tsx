@@ -1,6 +1,11 @@
 "use client";
 
-import React, { forwardRef, useCallback, useEffect, useMemo } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useMemo,
+  type CSSProperties,
+} from "react";
 import { Content, type Editor } from "@tiptap/react";
 
 import dynamic from "next/dynamic";
@@ -10,8 +15,8 @@ import TiptapProvider, {
 } from "./Provider";
 import { type UseTiptapEditorOptions } from "../hooks/useTiptapEditor";
 
-const MenuBar = dynamic(() => import("./MenuBar"), { ssr: false });
-const StatusBar = dynamic(() => import("./StatusBar"), { ssr: false });
+import MenuBar from "./MenuBar";
+import StatusBar from "./StatusBar";
 const Resizer = dynamic(() => import("./Resizer"), { ssr: false });
 
 const LinkMenu = dynamic(
@@ -36,7 +41,6 @@ const AiBubbleMenu = dynamic(
 );
 
 import getExtensionKit from "../kit";
-import { cssVar } from "../utils/cssVar";
 import { type Locale } from "../../../../i18n-config";
 
 import "../styles/index.scss";
@@ -131,11 +135,6 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       },
     };
 
-    useEffect(() => {
-      cssVar("--rte-editor-min-height", `${contentMinHeight}px`);
-      cssVar("--rte-editor-max-height", `${contentMaxHeight}px`);
-    }, [contentMaxHeight, contentMinHeight]);
-
     const menus = displayBubbleMenu && (
       <>
         {/* <TextMenu  /> */}
@@ -151,6 +150,18 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
     return (
       <TiptapProvider
         editorOptions={editorOptions}
+        editorProps={{
+          style: {
+            "--rte-editor-min-height":
+              typeof contentMinHeight === "number"
+                ? `${contentMinHeight}px`
+                : contentMinHeight,
+            "--rte-editor-max-height":
+              typeof contentMaxHeight === "number"
+                ? `${contentMaxHeight}px`
+                : (contentMaxHeight ?? "none"),
+          } as CSSProperties,
+        }}
         slotBefore={!hideMenuBar && <MenuBar />}
         slotAfter={!hideStatusBar && <StatusBar />}
         exportActions={exportActions}

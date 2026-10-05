@@ -17,16 +17,18 @@ export default function useTiptapEditor({
   ...editorOptions
 }: UseTiptapEditorOptions) {
   const forceUpdate = useForceUpdate();
-  const editor = useEditor({
-    autofocus: "end",
-    onCreate({ editor }) {
-      // Garante que o foco seja aplicado após a montagem do DOM
-      setTimeout(() => {
-        editor.commands.focus("end");
-      }, 100);
+  const editor = useEditor(
+    {
+      autofocus: "end",
+      ...editorOptions,
+      editorProps: {
+        ...editorOptions.editorProps,
+        // @ts-expect-error - placeholder is consumed by our extension kit
+        placeholder,
+      },
     },
-    ...editorOptions
-  }, []);
+    [],
+  );
 
   useImperativeHandle(
     ref,
@@ -76,8 +78,11 @@ export default function useTiptapEditor({
       return;
     }
 
-    // @ts-expect-error - placeholder is a custom property in editorProps
-    editor.setOptions({ editorProps: { placeholder } });
+    editor.setOptions({
+      // @ts-expect-error - placeholder is consumed by our extension kit
+      editorProps: { ...editor.options.editorProps, placeholder },
+    });
+    editor.view.dispatch(editor.state.tr);
     prevPlaceholderRef.current = placeholder;
     forceUpdate();
   }, [editor, placeholder, forceUpdate]);

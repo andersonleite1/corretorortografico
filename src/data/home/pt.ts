@@ -3,7 +3,8 @@ import { HomeContent } from "./types";
 const pt: HomeContent = {
   locale: "pt",
   seo: {
-    title: "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
+    title:
+      "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
     description:
       "Use um editor de texto online gratuito, leve e sem anúncios. Escreva, edite e copie seus textos com facilidade, direto do navegador. Ideal para redatores, estudantes e profissionais.",
     keywords: [
@@ -15,7 +16,8 @@ const pt: HomeContent = {
       "editor leve",
       "editor sem login",
     ],
-    openGraphTitle: "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
+    openGraphTitle:
+      "Editor de Texto Online Grátis — Escreva e Formate sem Instalar Nada",
     openGraphDescription:
       "Escreva seus textos com facilidade usando um editor de texto online gratuito e direto no navegador. Rápido, leve e sem distrações.",
   },
@@ -23,7 +25,7 @@ const pt: HomeContent = {
     name: "Editor de Texto Online",
     description:
       "O Editor de Texto Online é uma ferramenta gratuita para criar, editar e exportar textos de forma prática e eficiente. Ideal para estudantes, profissionais e escritores casuais.",
-    applicationCategory: "UtilityApplication",
+    applicationCategory: "UtilitiesApplication",
     featureList: [
       "Edição de texto avançada",
       "Exportação para PDF e DOCX",
@@ -123,7 +125,7 @@ const pt: HomeContent = {
       {
         question: "Meus dados estão seguros?",
         answer:
-          "Sim. Usamos Clerk para autenticação segura e Prisma com banco de dados criptografado para armazenar seus documentos. Seus textos nunca são lidos ou compartilhados com terceiros.",
+          "Os rascunhos são salvos neste navegador, sem cadastro. Recursos online, como correção gramatical e exportação PDF, podem processar o texto para realizar a ação solicitada. Consulte nossa Política de Privacidade.",
       },
       {
         question: "Posso exportar para o Word (.docx)?",
@@ -135,7 +137,7 @@ const pt: HomeContent = {
   hero: {
     headline: "O Editor de Texto Online Rápido, Limpo e Gratuito.",
     subheadline:
-      "Escreva, formate e exporte seus textos direto do navegador. E quando precisar, nossa IA ajuda você a revisar e melhorar as palavras em segundos.",
+      "Escreva, formate e exporte seus textos direto do navegador. E quando precisar de IA para revisar e melhorar as palavras, conheça o Zerus.",
     ctaLabel: "Começar a Escrever Grátis",
     ctaHref: "#editor",
     microcopy:
@@ -179,7 +181,7 @@ const pt: HomeContent = {
         icon: "🔍",
         title: "Revisão Analítica e Inteligente",
         description:
-          "Integração com LanguageTool para correções gramaticais em tempo real em PT, EN e ES. Mais de 10 tons de reescrita com IA para adaptar seu texto instantaneamente — e a possibilidade de criar tons personalizados.",
+          "Integração com LanguageTool para correções gramaticais em tempo real em PT, EN e ES. Para reescrever e adaptar o tom dos seus textos com IA, conheça os recursos disponíveis no Zerus.",
       },
       {
         icon: "☁️",

@@ -14,19 +14,23 @@ import useTiptapEditor, {
   type UseTiptapEditorOptions,
 } from "../hooks/useTiptapEditor";
 import clsx from "clsx";
-import CodeMirrorEditor from "@/components/SourceEditor/Editor";
+import dynamic from "next/dynamic";
+const CodeMirrorEditor = dynamic(
+  () => import("@/components/SourceEditor/Editor"),
+  {
+    ssr: false,
+  },
+);
 import { type Locale, i18n } from "../../../../i18n-config";
 import { getEditorMessages, type EditorMessages } from "../i18n/messages";
-import SideBar from "./SideBar";
 import LanguageToolSidebar from "./LanguageToolSidebar";
 import { useSidebar } from "@/components/providers/SidebarProvider";
 import { useEditorSettings } from "@/components/providers/EditorSettingsProvider";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SaveNotification from "@/components/shared/SaveNotification";
-import { saveLocalDocument } from "@/lib/local-storage";
-import { getCommonMessages } from "@/data/common";
-import { useUserPlan } from "@/components/providers/PlanProvider";
+import { saveLocalDocument, getLocalDocumentById } from "@/lib/local-storage";
+import { getAcquisitionContent } from "@/data/acquisition";
 
 export type ExportActions = {
   onExportDoc?: () => void | Promise<void>;
@@ -39,8 +43,6 @@ export type ExportActions = {
   onExportTxt?: () => void | Promise<void>;
 };
 export type EditorPageMode = "fluid" | "a4";
-
-
 
 type TiptapContextType = {
   editor: Editor;
@@ -60,8 +62,10 @@ type TiptapContextType = {
   setIsSidebarOpen: (value: boolean) => void;
   isLTSidebarOpen: boolean;
   setIsLTSidebarOpen: (value: boolean) => void;
-  onSaveDocument: () => void;
+  onSaveDocument: () => boolean;
+  lastSavedAt: string | null;
   isSaving: boolean;
+  saveStatus: "local" | "pending" | "saving" | "saved" | "error";
   isMobile: boolean;
   onImportMarkdown?: () => void | Promise<void>;
   pageMode: EditorPageMode;
@@ -87,17 +91,16 @@ type TiptapProviderProps = {
 export const TiptapProvider = ({
   children,
   editorOptions,
+  editorProps,
   slotBefore,
   slotAfter,
   exportActions,
   locale,
-  userPlan: initialUserPlan = "free",
   documentTitle,
   onImportMarkdown,
   pageMode: initialPageMode = "fluid",
 }: TiptapProviderProps) => {
-  const { plan: fetchedPlan } = useUserPlan();
-  const userPlan = fetchedPlan || initialUserPlan;
+  const userPlan = "free";
   const contentElement = useRef<HTMLDivElement>(null);
   const editor = useTiptapEditor(editorOptions);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -105,11 +108,17 @@ export const TiptapProvider = ({
   const [isResizing, setIsResizing] = useState(false);
   const [pageMode, setPageMode] = useState<EditorPageMode>(initialPageMode);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<
+    "local" | "pending" | "saving" | "saved" | "error"
+  >("local");
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const lastAutosavedContent = useRef<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
   const documentId = searchParams.get("docId");
+  const savedIdRef = useRef<string | undefined>(undefined);
+  const savingRef = useRef(false);
 
   const {
     isSidebarOpen,
@@ -123,82 +132,171 @@ export const TiptapProvider = ({
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
-  const t = getCommonMessages(normalizedLocale).editor;
+  const localMessages = getAcquisitionContent(normalizedLocale);
 
   // Sync spellcheck attribute with settings
   useEffect(() => {
     if (!editor) return;
     editor.setOptions({
       editorProps: {
+        ...editor.options.editorProps,
         attributes: {
+          ...editor.options.editorProps.attributes,
           spellcheck: buttonVisibility.browserSpellcheck ? "true" : "false",
         },
       },
     });
   }, [editor, buttonVisibility.browserSpellcheck]);
 
-  const handleSaveDocument = useCallback(async () => {
-    setIsSaving(true);
-    try {
-      const content = editor.getJSON();
+  const snapshot = useCallback(
+    () =>
+      JSON.stringify({
+        content: editor?.getJSON(),
+        title: documentTitle?.trim() || localMessages.untitled,
+      }),
+    [editor, documentTitle, localMessages.untitled],
+  );
 
-      if (userPlan === "free") {
-        // Salvar localmente para usuários Free
-        const savedDoc = saveLocalDocument({
-          id: documentId || undefined,
-          content,
-          title: documentTitle || "Sem título",
-        });
-
-        setShowSuccess(true);
-
-        if (!documentId && savedDoc.id) {
-          router.push(`/${normalizedLocale}?docId=${savedDoc.id}`);
+  useEffect(() => {
+    const localId = documentId?.startsWith("local-") ? documentId : undefined;
+    if (savedIdRef.current === localId && localId) return;
+    savedIdRef.current = localId;
+    lastAutosavedContent.current = "";
+    setLastSavedAt(null);
+    setSaveStatus("local");
+    if (localId) {
+      try {
+        const doc = getLocalDocumentById(localId);
+        if (doc) {
+          lastAutosavedContent.current = JSON.stringify({
+            content: doc.content,
+            title: doc.title,
+          });
+          setLastSavedAt(doc.updatedAt);
         }
+      } catch {
+        setSaveStatus("error");
+      }
+    }
+  }, [documentId]);
+
+  const handleSaveDocument = useCallback(
+    (notify = true): boolean => {
+      if (!editor) return true;
+      if (savingRef.current) return false;
+      if (editor.isEmpty && !documentTitle?.trim() && !savedIdRef.current)
+        return true;
+      const current = snapshot();
+      if (current === lastAutosavedContent.current) {
+        setSaveStatus("saved");
+        return true;
+      }
+      savingRef.current = true;
+      setIsSaving(true);
+      setSaveStatus("saving");
+      try {
+        const savedDoc = saveLocalDocument({
+          id: savedIdRef.current,
+          content: editor.getJSON(),
+          title: documentTitle?.trim() || localMessages.untitled,
+        });
+        savedIdRef.current = savedDoc.id;
+        lastAutosavedContent.current = current;
+        setLastSavedAt(savedDoc.updatedAt);
+        setSaveStatus("saved");
+        if (notify) setShowSuccess(true);
+        if (documentId !== savedDoc.id) {
+          const home = normalizedLocale === "pt" ? "/" : `/${normalizedLocale}`;
+          router.replace(`${home}?docId=${encodeURIComponent(savedDoc.id)}`, {
+            scroll: false,
+          });
+        }
+        return true;
+      } catch {
+        setSaveStatus("error");
+        if (notify) toast.error(localMessages.saveError);
+        return false;
+      } finally {
+        savingRef.current = false;
+        setIsSaving(false);
+      }
+    },
+    [
+      editor,
+      documentId,
+      documentTitle,
+      snapshot,
+      router,
+      normalizedLocale,
+      localMessages.untitled,
+      localMessages.saveError,
+    ],
+  );
+
+  useEffect(() => {
+    if (!editor) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      clearTimeout(timer);
+      if (editor.isEmpty && !documentTitle?.trim() && !savedIdRef.current) {
+        setSaveStatus("local");
         return;
       }
+      setSaveStatus("pending");
+      timer = setTimeout(() => handleSaveDocument(false), 1500);
+    };
+    editor.on("update", schedule);
+    schedule();
+    return () => {
+      clearTimeout(timer);
+      editor.off("update", schedule);
+    };
+  }, [editor, documentTitle, snapshot, handleSaveDocument]);
 
-      // Salvar na nuvem para usuários Pro/Team
-      const stringifiedContent = JSON.stringify(content);
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: documentId || undefined,
-          content: stringifiedContent,
-          title: documentTitle || "Sem título",
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Erro ao salvar o documento");
+  useEffect(() => {
+    const persistBeforeLeave = (event: Event) => {
+      if (!handleSaveDocument(false)) {
+        event.preventDefault();
+        toast.error(localMessages.saveError);
       }
-
-      const savedDoc = await response.json();
-
-      setShowSuccess(true);
-
-      if (!documentId && savedDoc.id) {
-        router.push(`/${normalizedLocale}?docId=${savedDoc.id}`);
+    };
+    const persistWhenHidden = () => {
+      if (document.visibilityState === "hidden") handleSaveDocument(false);
+    };
+    const persistBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!handleSaveDocument(false)) {
+        event.preventDefault();
+        event.returnValue = "";
       }
-    } catch (error: unknown) {
-      console.error(error);
-      if (error instanceof Error) {
-        if (error.message === "storage_limit_exceeded") {
-          toast.error(t.localLimitReached);
-        } else {
-          toast.error(error.message || t.saveError);
-        }
-      } else {
-        toast.error(t.saveError);
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  }, [editor, userPlan, documentId, router, documentTitle, normalizedLocale]);
+    };
+    window.addEventListener("editordetexto:before-leave", persistBeforeLeave);
+    window.addEventListener("beforeunload", persistBeforeUnload);
+    document.addEventListener("visibilitychange", persistWhenHidden);
+    return () => {
+      window.removeEventListener(
+        "editordetexto:before-leave",
+        persistBeforeLeave,
+      );
+      window.removeEventListener("beforeunload", persistBeforeUnload);
+      document.removeEventListener("visibilitychange", persistWhenHidden);
+    };
+  }, [handleSaveDocument, localMessages.saveError]);
+
+  useEffect(() => {
+    const forgetDeleted = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== savedIdRef.current) return;
+      savedIdRef.current = undefined;
+      lastAutosavedContent.current = "";
+      setLastSavedAt(null);
+      setSaveStatus("local");
+    };
+    window.addEventListener("editordetexto:delete-document", forgetDeleted);
+    return () =>
+      window.removeEventListener(
+        "editordetexto:delete-document",
+        forgetDeleted,
+      );
+  }, []);
 
   // Update shortcuts extension options
   useEffect(() => {
@@ -207,7 +305,14 @@ export const TiptapProvider = ({
       shortcuts: {
         // Arquivo e Controle
         onSave: handleSaveDocument,
-        onOpenDocuments: () => setIsDocumentsDialogOpen(true),
+        onOpenDocuments: () => {
+          if (
+            window.dispatchEvent(
+              new Event("editordetexto:before-leave", { cancelable: true }),
+            )
+          )
+            setIsDocumentsDialogOpen(true);
+        },
         onCopyAll: () => {
           if (
             typeof navigator !== "undefined" &&
@@ -254,7 +359,12 @@ export const TiptapProvider = ({
       // Ctrl/Cmd + O → Meus Documentos (prevents OS file-open dialog)
       if (isMod && !e.shiftKey && e.key === "o") {
         e.preventDefault();
-        setIsDocumentsDialogOpen(true);
+        if (
+          window.dispatchEvent(
+            new Event("editordetexto:before-leave", { cancelable: true }),
+          )
+        )
+          setIsDocumentsDialogOpen(true);
         return;
       }
 
@@ -293,25 +403,6 @@ export const TiptapProvider = ({
     setIsDocumentsDialogOpen,
   ]);
 
-  // Auto-save document every 30 seconds
-  useEffect(() => {
-    if (!handleSaveDocument) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      if (!editor) return;
-      const currentContent = JSON.stringify(editor.getJSON());
-      if (!currentContent || currentContent === lastAutosavedContent.current) {
-        return;
-      }
-      lastAutosavedContent.current = currentContent;
-      void handleSaveDocument();
-    }, 30000);
-
-    return () => clearInterval(intervalId);
-  }, [editor, userPlan, handleSaveDocument]);
-
   if (!editor) {
     return null;
   }
@@ -329,15 +420,24 @@ export const TiptapProvider = ({
 
   const editorContent = (
     <div
+      {...editorProps}
+      style={
+        isFullScreen
+          ? ({
+              ...editorProps?.style,
+              "--rte-editor-min-height": "auto",
+              "--rte-editor-max-height": "none",
+            } as React.CSSProperties)
+          : editorProps?.style
+      }
       className={clsx(
-      "rte-editor",
+        "rte-editor",
         pageMode === "a4" && "rte-editor--page-a4",
         isFullScreen && "rte-editor--fullscreen",
         isSidebarOpen && "rte-editor--with-sidebar",
         isLTSidebarOpen && "rte-editor--with-lt-sidebar",
       )}
     >
-      <SideBar isOpen={isSidebarOpen} />
       <div className="rte-editor__main">
         {slotBefore}
         <div
@@ -357,7 +457,7 @@ export const TiptapProvider = ({
         {children}
         {slotAfter}
       </div>
-      <LanguageToolSidebar isOpen={isLTSidebarOpen} />
+      {isLTSidebarOpen && <LanguageToolSidebar isOpen />}
     </div>
   );
 
@@ -381,18 +481,21 @@ export const TiptapProvider = ({
         setIsSidebarOpen,
         isLTSidebarOpen,
         setIsLTSidebarOpen,
-        onSaveDocument: handleSaveDocument,
+        onSaveDocument: () => handleSaveDocument(true),
+        lastSavedAt,
         isSaving,
+        saveStatus,
         isMobile,
         onImportMarkdown,
         pageMode,
-        togglePageMode: () => setPageMode((mode) => (mode === "a4" ? "fluid" : "a4")),
+        togglePageMode: () =>
+          setPageMode((mode) => (mode === "a4" ? "fluid" : "a4")),
       }}
     >
       {editorContent}
       {showSuccess && (
         <SaveNotification
-          message={documentId ? "Documento atualizado" : "Documento salvo"}
+          message={localMessages.saved}
           onClose={() => setShowSuccess(false)}
         />
       )}

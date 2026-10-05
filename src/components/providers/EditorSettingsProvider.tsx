@@ -1,14 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from "react";
-import { useUser } from "@clerk/nextjs";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import {
   ToolbarButtonId,
   ToneId,
@@ -122,8 +114,6 @@ export const EditorSettingsProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { isSignedIn, isLoaded: isClerkLoaded } = useUser();
-
   const [buttonVisibility, setButtonVisibility] = useState<
     Record<ToolbarButtonId, boolean>
   >({ ...DEFAULT_SETTINGS });
@@ -134,118 +124,21 @@ export const EditorSettingsProvider = ({
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
-  // Ref para debounce de sincronização com o banco
-  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Ref para rastrear o último estado de autenticação que iniciamos o carregamento
-  // Previne chamadas duplicadas quando há re-renders, mas permite corretamente
-  // detectar mudanças reais (ex: login/logout).
-  const loadedForSignedIn = useRef<boolean | null | undefined>(null);
-  const [clerkTimeout, setClerkTimeout] = useState(false);
-
-  // Timeout para evitar skeleton infinito se Clerk demorar a responder
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isClerkLoaded) {
-        console.warn(
-          "[EditorSettings] Clerk demorou mais de 2s para carregar. Usando defaults.",
-        );
-        setClerkTimeout(true);
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [isClerkLoaded]);
+    const local = loadFromLocalStorage();
+    setButtonVisibility(local.buttonVisibility);
+    setActiveTones(local.activeTones);
+    setCustomTones(local.customTones);
+    setIsLoadingSettings(false);
+  }, []);
 
   // -----------------------------------------------------------------------
-  // Carregamento inicial das configurações
-  // -----------------------------------------------------------------------
-  useEffect(() => {
-    // Aguardar Clerk resolver o estado de auth (ou timeout)
-    if (!isClerkLoaded && !clerkTimeout) return;
-
-    // Evitar recarregar se já carregamos para este mesmo estado de auth
-    if (loadedForSignedIn.current === isSignedIn) return;
-    loadedForSignedIn.current = isSignedIn;
-
-    if (isSignedIn) {
-      // Usuário autenticado — carrega do banco (isolamento multi-tenant)
-      setIsLoadingSettings(true);
-      fetch("/api/editor-settings")
-        .then((res) => {
-          if (!res.ok)
-            throw new Error(
-              `HTTP ${res.status}: Falha ao carregar configurações`,
-            );
-          return res.json();
-        })
-        .then((data) => {
-          setButtonVisibility({
-            ...DEFAULT_SETTINGS,
-            ...(data.toolbarSettings ?? {}),
-          });
-          setActiveTones({ ...DEFAULT_TONES, ...(data.activeTones ?? {}) });
-          setCustomTones(
-            Array.isArray(data.customTones) ? data.customTones : [],
-          );
-        })
-        .catch((err) => {
-          console.error(
-            "[EditorSettings] Erro ao carregar do banco, usando localStorage como fallback:",
-            err,
-          );
-          // Fallback para localStorage em caso de erro de rede
-          const local = loadFromLocalStorage();
-          setButtonVisibility(local.buttonVisibility);
-          setActiveTones(local.activeTones);
-          setCustomTones(local.customTones);
-        })
-        .finally(() => setIsLoadingSettings(false));
-    } else {
-      // Usuário anônimo — usa apenas localStorage
-      const local = loadFromLocalStorage();
-      setButtonVisibility(local.buttonVisibility);
-      setActiveTones(local.activeTones);
-      setCustomTones(local.customTones);
-      // Garante que não ficamos travados em loading se formos anônimos
-      setIsLoadingSettings(false);
-    }
-  }, [isClerkLoaded, isSignedIn]);
-
-  // -----------------------------------------------------------------------
-  // Sincronização com o banco (debounced — 600ms após a última alteração)
-  // -----------------------------------------------------------------------
-  const syncToDatabase = useCallback(
-    (payload: {
-      toolbarSettings?: Record<ToolbarButtonId, boolean>;
-      activeTones?: Record<ToneId, boolean>;
-      customTones?: CustomTone[];
-    }) => {
-      if (!isSignedIn) return;
-
-      if (syncTimer.current) clearTimeout(syncTimer.current);
-      syncTimer.current = setTimeout(() => {
-        fetch("/api/editor-settings", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }).catch((err) =>
-          console.error(
-            "[EditorSettings] Erro ao sincronizar com o banco:",
-            err,
-          ),
-        );
-      }, 600);
-    },
-    [isSignedIn],
-  );
-
-  // -----------------------------------------------------------------------
-  // Ações — escrevem no localStorage (imediato) + sincronizam banco (debounce)
+  // Preferências locais: nenhuma conta ou sincronização remota.
   // -----------------------------------------------------------------------
   const toggleButtonVisibility = (id: ToolbarButtonId) => {
     setButtonVisibility((prev) => {
       const next = { ...prev, [id]: !prev[id] };
       localStorage.setItem(LS_TOOLBAR, JSON.stringify(next));
-      syncToDatabase({ toolbarSettings: next });
       return next;
     });
   };
@@ -254,7 +147,6 @@ export const EditorSettingsProvider = ({
     setActiveTones((prev) => {
       const next = { ...prev, [id]: !prev[id] };
       localStorage.setItem(LS_TONES, JSON.stringify(next));
-      syncToDatabase({ activeTones: next });
       return next;
     });
   };
@@ -269,7 +161,6 @@ export const EditorSettingsProvider = ({
       };
       const next = [...prev, newTone];
       localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
-      syncToDatabase({ customTones: next });
       return next;
     });
   };
@@ -278,7 +169,6 @@ export const EditorSettingsProvider = ({
     setCustomTones((prev) => {
       const next = prev.filter((t) => t.id !== id);
       localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
-      syncToDatabase({ customTones: next });
       return next;
     });
   };
@@ -289,7 +179,6 @@ export const EditorSettingsProvider = ({
         t.id === id ? { ...t, isActive: !t.isActive } : t,
       );
       localStorage.setItem(LS_CUSTOM, JSON.stringify(next));
-      syncToDatabase({ customTones: next });
       return next;
     });
   };
