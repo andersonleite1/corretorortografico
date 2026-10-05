@@ -99,3 +99,8 @@ Implementação registrada em docs/architecture/PUBLIC_EDITOR_ROLLOUT.md. TypeSc
 ## 7. Histórico
 
 2026-10-04 — Plano aprovado pelo usuário na conversa e registrado para implementação.
+
+
+## 8. Manutenção de testes autorizada
+
+2026-10-04 — Usuário solicitou investigar/corrigir falhas do pre-push. Escopo adicional permitido: tests/middleware.test.ts, tests/TiptapProvider.test.tsx, tests/AiRewriteButton.test.tsx, tests/SettingsDialog.test.tsx, tests/StatusBar.test.tsx e src/app/[locale]/_components/EditForm.localStorage.test.tsx. Reuse Assessment: extend-existing das suites, substituir expectativas antigas pelos contratos acima; não alterar código de produção apenas para satisfazer mocks. Impacto: somente testes/documentação; cobertura de autorização, persistência e navegação. Sensores: suíte unitária completa e TypeScript, sem bypass do hook. Evidências em MOBILE_PERFORMANCE_ROLLOUT.md.

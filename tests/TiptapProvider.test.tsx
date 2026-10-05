@@ -12,10 +12,15 @@ import { toast } from "sonner";
 import { useUserPlan } from "@/components/providers/PlanProvider";
 
 // ── Hoisted Mocks ─────────────────────────────────────────────────────────────
-const { mockEditor } = vi.hoisted(() => ({
+const { mockEditor, mockRouter } = vi.hoisted(() => ({
+  mockRouter: { push: vi.fn(), replace: vi.fn() },
   mockEditor: {
     getJSON: vi.fn().mockReturnValue({ type: "doc", content: [] }),
     setOptions: vi.fn(),
+    options: { editorProps: { attributes: {} } },
+    on: vi.fn(),
+    off: vi.fn(),
+    isEmpty: false,
     storage: { languageTool: { enabled: false } },
     commands: { setLanguageToolEnabled: vi.fn() },
     getText: vi.fn().mockReturnValue(""),
@@ -28,7 +33,9 @@ vi.mock("@/components/TiptapEditor/hooks/useTiptapEditor", () => ({
 }));
 
 vi.mock("@/lib/local-storage", () => ({
-  saveLocalDocument: vi.fn().mockReturnValue({ id: "local-123" }),
+  saveLocalDocument: vi
+    .fn()
+    .mockReturnValue({ id: "local-123", updatedAt: "2026-10-04T12:00:00Z" }),
   getLocalDocuments: vi.fn().mockReturnValue([]),
   deleteLocalDocument: vi.fn(),
   getLocalDocumentById: vi.fn(),
@@ -67,7 +74,7 @@ vi.mock("@/components/shared/SaveNotification", () => ({
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
   useSearchParams: vi.fn().mockReturnValue(new URLSearchParams()),
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => mockRouter,
 }));
 
 vi.mock("@/components/providers/SidebarProvider", () => ({
@@ -107,6 +114,7 @@ describe("TiptapProvider", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
+    mockEditor.isEmpty = false;
     (useSidebar as any).mockReturnValue(mockUseSidebar);
     (useEditorSettings as any).mockReturnValue(mockUseEditorSettings);
     (useSearchParams as any).mockReturnValue(new URLSearchParams());
@@ -126,28 +134,98 @@ describe("TiptapProvider", () => {
     vi.useRealTimers();
   });
 
-  it("tenta salvar automaticamente a cada 30 segundos se for usuário Pro e tiver docId", async () => {
+  it("salva localmente após 1,5s mesmo com plano legado Pro e ID remoto", async () => {
     (useSearchParams as any).mockReturnValue(
       new URLSearchParams("docId=existing-doc"),
     );
-    (useUserPlan as any).mockReturnValue({ plan: "pro", isLoading: false });
-
     render(
       <TiptapProvider editorOptions={{}} userPlan="pro">
         <div />
       </TiptapProvider>,
     );
-
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+    expect(saveLocalDocument).not.toHaveBeenCalled();
     await act(async () => {
-      vi.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(1499);
     });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/documents",
-      expect.objectContaining({
-        method: "POST",
-      }),
+    expect(saveLocalDocument).not.toHaveBeenCalled();
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(saveLocalDocument).toHaveBeenCalledWith(
+      expect.objectContaining({ id: undefined }),
     );
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("reschedules saves without serializing on each update", async () => {
+    render(
+      <TiptapProvider editorOptions={{}}>
+        <div />
+      </TiptapProvider>,
+    );
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+    const update = mockEditor.on.mock.calls.find(
+      (call) => call[0] === "update",
+    )![1];
+    act(() => {
+      vi.advanceTimersByTime(1000);
+      update();
+    });
+    expect(mockEditor.getJSON).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1499);
+    });
+    expect(saveLocalDocument).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(saveLocalDocument).toHaveBeenCalledOnce();
+  });
+
+  it("does not create an empty untitled document automatically", async () => {
+    mockEditor.isEmpty = true;
+    render(
+      <TiptapProvider editorOptions={{}}>
+        <div />
+      </TiptapProvider>,
+    );
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(saveLocalDocument).not.toHaveBeenCalled();
+  });
+
+  it("flushes changes before leaving without waiting for debounce", async () => {
+    render(
+      <TiptapProvider editorOptions={{}}>
+        <div />
+      </TiptapProvider>,
+    );
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+    act(() => {
+      window.dispatchEvent(new Event("beforeunload"));
+    });
+    expect(saveLocalDocument).toHaveBeenCalledOnce();
+  });
+
+  it("cancels navigation if storage fails", async () => {
+    const { saveLocalDocument } = await import("@/lib/local-storage");
+    vi.mocked(saveLocalDocument).mockImplementationOnce(() => {
+      throw new Error("quota");
+    });
+    render(
+      <TiptapProvider editorOptions={{}}>
+        <div />
+      </TiptapProvider>,
+    );
+    const event = new Event("editordetexto:before-leave", { cancelable: true });
+    act(() => {
+      window.dispatchEvent(event);
+    });
+    expect(event.defaultPrevented).toBe(true);
+    expect(toast.error).toHaveBeenCalled();
   });
 
   it("salva localmente para usuários do plano free", async () => {

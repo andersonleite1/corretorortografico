@@ -31,6 +31,9 @@ const defaultContextValue = {
   },
   isMobile: false,
   documentTitle: undefined as string | undefined,
+  locale: "pt",
+  saveStatus: "local",
+  lastSavedAt: null as string | null,
 };
 
 let mockEditorStateReturn = {
@@ -112,6 +115,8 @@ describe("StatusBar", () => {
       message: null,
     };
     defaultContextValue.isMobile = false;
+    defaultContextValue.saveStatus = "local";
+    defaultContextValue.lastSavedAt = null;
   });
 
   it("exibe a contagem de palavras", () => {
@@ -186,20 +191,25 @@ describe("StatusBar", () => {
     expect(screen.getByText("Indisponível")).toBeInTheDocument();
   });
 
-
-
-  describe("Status de Sincronização", () => {
-    it('exibe "Sincronizado" quando documentTitle está presente', () => {
-      defaultContextValue.documentTitle = "Meu Documento";
+  describe("Status de salvamento local", () => {
+    it.each([
+      ["local", "Neste navegador"],
+      ["pending", "Alterações pendentes"],
+      ["saving", "Salvando…"],
+      ["error", "Não foi possível salvar neste navegador"],
+    ])("exibe o estado %s", (status, label) => {
+      defaultContextValue.saveStatus = status;
       render(<StatusBar />);
-      expect(screen.getByText("Sincronizado")).toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent(label);
+      expect(screen.queryByText("Sincronizado")).not.toBeInTheDocument();
     });
-
-    it('exibe "Local" quando não há documentTitle nem docId', () => {
-      defaultContextValue.documentTitle = undefined;
-      // Note: window.location.search mock is tricky, but let's assume it's empty by default
+    it("exibe horário somente após gravar", () => {
+      defaultContextValue.saveStatus = "saved";
+      defaultContextValue.lastSavedAt = "2026-10-04T12:00:00Z";
       render(<StatusBar />);
-      expect(screen.getByText("Local")).toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Salvo neste navegador às",
+      );
     });
   });
 });

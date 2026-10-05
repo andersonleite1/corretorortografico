@@ -47,3 +47,16 @@ Ainda não há nota Lighthouse/PSI após os ajustes: o código não foi publicad
 Após publicação, repetir PageSpeed no celular e desktop, com a mesma URL e múltiplas execuções; comparar métricas, não apenas a nota. Verificar digitação/persistência em aparelho real. Acompanhar Core Web Vitals de campo, cuja janela de 28 dias levará tempo para refletir a versão nova. Não há garantia de recuperação do tráfego orgânico por estes ajustes.
 
 Rollback: consultar o snapshot inicial e reverter somente as alterações desta entrega; preservar trabalhos anteriores, dependências e documentos locais.
+
+
+## Verificação do pre-push após solicitação do usuário
+
+Em 04/10/2026, o usuário solicitou investigar a falha do hook. No ambiente Node 26.5.0, o commit 0a92468 reproduziu 27 falhas em 6 arquivos (216 testes aprovados). O commit pai 10c3bcf, executado em cópia isolada com as mesmas dependências, reproduziu 2 falhas em um teste de localStorage (241 aprovados); essas duas falhas eram preexistentes neste ambiente.
+
+As outras 25 falhas correspondiam a contratos antigos e mocks incompletos: assinatura do middleware Clerk, dashboard autenticado em vez de retorno à landing, redirect de APIs ao login em vez de 401 JSON, autosave remoto Pro em vez de local, tons/reescrita removidos da interface pública, status de sincronização em nuvem e editor mockado sem options/on/off. Nenhuma correção de código de produção foi necessária para resolver essas falhas.
+
+Os testes foram atualizados para os contratos aprovados, sem desativar suites ou contornar o hook. Acrescentada cobertura de 401 nas oito famílias de APIs protegidas, autorização que falha com 503, redirect www/HSTS, locale no destino Zerus sem query privada, cancelamento de navegação quando armazenamento falha, debounce sem serialização por tecla, flush de saída, documento vazio e preservação de conteúdo formatado/quota. O teste que copiava um algoritmo antigo de rascunhos agora usa a implementação real de local-storage com storage explicitamente controlado pelo teste.
+
+Guardrail: mudanças futuras no contrato público devem atualizar suas expectativas e mocks na mesma entrega e executar o pre-push quando testes forem autorizados. A aprovação do build, isoladamente, não confirma aprovação da suíte unitária.
+
+Resultado final: `sh .husky/pre-push` concluído com exit 0 — TypeScript aprovado e 255 testes aprovados em 42 arquivos. `git diff --check` também aprovado. Nenhuma alteração de código de produção, dependências ou hook nesta correção; a alteração preexistente no package-lock.json permanece fora do commit. O hook foi executado diretamente para validar o bloqueio, sem efetuar push.
