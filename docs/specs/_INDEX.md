@@ -25,3 +25,5 @@
 _Última atualização: 2026-04-24_
 
 | SPEC-012 | `mobile-performance` | editor | `approved` | Codex / Anderson Leite (chat) | 2026-10-04 | Desempenho mobile com preservação de desktop e SEO |
+
+| SPEC-013 | `pre-launch-seo` | infra | `approved` | Codex / Anderson Leite (chat) | 2026-10-24 | Conteúdo, idiomas, contato, imagem social e preparação para Google/Bing |

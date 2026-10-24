@@ -14,7 +14,7 @@ Pessoas que pesquisam na internet por correção ortográfica ou revisão de tex
 - Salvamento local do rascunho no navegador, sem conta e sem sincronização entre dispositivos.
 - Uma landing responsiva que apresenta o corretor e explica como usar a ferramenta.
 - Conteúdo e metadados em português brasileiro, otimizados para o tema principal e termos relacionados sem repetição artificial.
-- Suporte de revisão em português, inglês e espanhol, conforme suportado pela integração atual.
+- Revisão configurada para português brasileiro na interface pública desta versão.
 
 ## Fora do escopo
 
@@ -22,7 +22,7 @@ Pessoas que pesquisam na internet por correção ortográfica ou revisão de tex
 - Banco de dados, Prisma e persistência no servidor.
 - Documentos, dashboard, configurações de conta e salvamento/sincronização de textos.
 - Assinaturas, pagamentos, planos e funcionalidades de IA.
-- Páginas de landing localizadas em inglês e espanhol nesta primeira versão. O corretor pode revisar textos nesses idiomas conforme a integração atual.
+- Páginas de landing localizadas e seleção de revisão em inglês ou espanhol nesta primeira versão. Os mapeamentos de idioma no código não representam opções disponíveis ao público.
 
 ## Regras de conteúdo
 

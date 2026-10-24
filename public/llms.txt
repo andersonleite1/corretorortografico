@@ -4,12 +4,17 @@
 
 ## Visão geral
 
-O CorretorOrtografico.online oferece um editor de texto online com sugestões de ortografia, gramática e estilo pelo LanguageTool. A landing está em português brasileiro; o corretor também aceita português, inglês e espanhol conforme as opções disponíveis no editor.
+O CorretorOrtografico.online oferece um editor de texto online com sugestões de ortografia, gramática e estilo pelo LanguageTool. A interface e a revisão desta versão estão configuradas para português brasileiro.
 
 - URL canônica: https://corretorortografico.online/
 - Editor e página principal: https://corretorortografico.online/#editor
 - Uso: gratuito e sem login
 - Salvamento: rascunhos locais no navegador, sem sincronização com servidor
+- Como usar: https://corretorortografico.online/#como-usar
+- Exemplos de revisão: https://corretorortografico.online/#exemplos
+- Sobre e contato: https://corretorortografico.online/#sobre
+- Informações de privacidade: https://corretorortografico.online/#privacidade
+- Contato público: contato@corretorortografico.online
 
 ## Privacidade e limitações
 
@@ -18,6 +23,7 @@ O CorretorOrtografico.online oferece um editor de texto online com sugestões de
 - Ao exportar como PDF, o documento é enviado ao serviço de conversão configurado pelo site.
 - O site não oferece contas, salvamento em nuvem, documentos sincronizados, pagamentos ou reescrita por IA.
 - As sugestões são apoio à revisão; cabe ao usuário avaliar e aplicar as alterações.
+- As sugestões não garantem a identificação de todos os erros e não atribuem notas a redações.
 
 ## Termos relacionados
 

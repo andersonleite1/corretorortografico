@@ -21,6 +21,12 @@ export const metadata: Metadata = {
   description:
     "Use um corretor ortográfico online com sugestões de ortografia, gramática e estilo pelo LanguageTool.",
   icons: { icon: "/icon.svg" },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION?.trim() || undefined,
+    other: process.env.BING_SITE_VERIFICATION?.trim()
+      ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION.trim() }
+      : undefined,
+  },
 };
 
 export const viewport: Viewport = {

@@ -10,7 +10,7 @@ A landing terá o editor como funcionalidade central, com revisão integrada pel
 - API própria para intermediar as chamadas do editor ao LanguageTool e uma rota sem banco para exportação em PDF.
 - A rota LanguageTool valida a origem, limita o tamanho do texto e aplica rate limit em memória.
 - Salvamento local no navegador, sem sincronização entre dispositivos.
-- Idioma da interface e conteúdo da landing: português brasileiro. LanguageTool também aceita os idiomas suportados pela integração, atualmente português, inglês e espanhol.
+- Idioma da interface, conteúdo da landing e revisão pública: português brasileiro. Mapeamentos internos para inglês e espanhol não representam opções selecionáveis nesta versão.
 - Nenhuma dependência ativa de Clerk, Prisma ou `DATABASE_URL`.
 
 ## Removido da aplicação
