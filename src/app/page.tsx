@@ -1,5 +1,14 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import {
+  ArrowUpRight,
+  Check,
+  CheckCheck,
+  PenLine,
+  ShieldCheck,
+  SpellCheck,
+} from "lucide-react";
+import styles from "./landing.module.css";
 import EditForm from "./[locale]/_components/EditForm";
 import "./[locale]/style.scss";
 
@@ -82,35 +91,46 @@ export default function HomePage() {
           __html: JSON.stringify(faqSchema).replace(/</g, "\\u003c"),
         }}
       />
-      <header className="border-b border-slate-200 bg-white">
+      <header className={styles.header}>
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-6 py-4">
-          <a href="#inicio" className="text-lg font-bold tracking-tight">
-            <span className="text-blue-700">Corretor</span>Ortografico.online
+          <a href="#inicio" className={styles.brand}>
+            <span className={styles.brandMark} aria-hidden="true">
+              <SpellCheck size={22} />
+            </span>
+            <span>
+              <span className="text-blue-700">Corretor</span>Ortografico.online
+            </span>
           </a>
-          <a
-            href="#duvidas"
-            className="text-sm font-semibold text-slate-600 hover:text-blue-700"
-          >
-            Dúvidas frequentes
-          </a>
+          <nav aria-label="Navegação principal" className={styles.navigation}>
+            <a href="#como-usar">Como funciona</a>
+            <a href="#duvidas">Dúvidas frequentes</a>
+            <a href="/sobre" className={styles.aboutLink}>
+              Sobre
+            </a>
+          </nav>
         </div>
       </header>
 
-      <section id="inicio" className="px-4 pb-6 pt-8 sm:px-6 sm:pt-10">
+      <section id="inicio" className={styles.hero}>
         <div className="mx-auto max-w-7xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-700">
-            Revisão de texto em português
-          </p>
+          <p className={styles.eyebrow}>Revisão de texto em português</p>
           <h1 className="mx-auto mt-4 max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Corretor ortográfico online grátis
+            Corretor ortográfico <span>online grátis</span>
           </h1>
           <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">
             Escreva ou cole seu texto no editor e confira sugestões de
             ortografia, gramática e estilo.
           </p>
-          <p className="mt-4 text-sm font-semibold text-slate-600">
-            Grátis · Sem cadastro · Português brasileiro
-          </p>
+          <ul className={styles.benefits} aria-label="Benefícios da ferramenta">
+            {["Grátis", "Sem cadastro", "Português brasileiro"].map(
+              (benefit) => (
+                <li key={benefit}>
+                  <Check size={14} aria-hidden="true" />
+                  {benefit}
+                </li>
+              ),
+            )}
+          </ul>
         </div>
       </section>
 
@@ -135,7 +155,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-white px-6 py-16 sm:py-20">
+      <section className={styles.intro}>
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[0.8fr_1.2fr]">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-700">
@@ -144,6 +164,28 @@ export default function HomePage() {
             <h2 className="mt-3 text-3xl font-bold tracking-tight">
               Revise a ortografia e a gramática do seu texto
             </h2>
+            <div className={styles.paperIllustration} aria-hidden="true">
+              <div className={styles.paperTop}>
+                <PenLine size={18} />
+                <span>O cuidado está nos detalhes</span>
+                <span className={styles.paperDots}>•••</span>
+              </div>
+              <p>
+                <span className={styles.misspelling}>Precizamos</span> revisar o
+                texto
+                <br />
+                antes de enviar.
+              </p>
+              <div className={styles.correction}>
+                <CheckCheck size={20} />
+                <span>Precisamos</span>
+                <span>Ortografia</span>
+              </div>
+              <div className={styles.paperLines}>
+                <i />
+                <i />
+              </div>
+            </div>
           </div>
           <div className="space-y-5 text-base leading-7 text-slate-600">
             <p>
@@ -165,8 +207,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="como-usar" className="px-6 py-16 sm:py-20">
+      <section id="como-usar" className={styles.steps}>
         <div className="mx-auto max-w-6xl">
+          <p className={styles.sectionLabel}>
+            DA PRIMEIRA PALAVRA À REVISÃO FINAL
+          </p>
           <h2 className="text-3xl font-bold tracking-tight">
             Como corrigir seu texto online
           </h2>
@@ -211,7 +256,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-16 sm:py-20">
+      <section className={styles.features}>
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold tracking-tight">
             O que você pode revisar
@@ -235,6 +280,13 @@ export default function HomePage() {
                 key={title}
                 className="rounded-2xl border border-slate-200 bg-white p-6"
               >
+                <span className={styles.featureMark} aria-hidden="true">
+                  {title === "Ortografia"
+                    ? "Aa"
+                    : title === "Gramática"
+                      ? "Ab"
+                      : "?!"}
+                </span>
                 <h3 className="text-lg font-bold">{title}</h3>
                 <p className="mt-3 leading-7 text-slate-600">{text}</p>
               </article>
@@ -243,11 +295,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section
-        id="exemplos"
-        className="border-y border-slate-200 bg-white px-6 py-16 sm:py-20"
-      >
+      <section id="exemplos" className={styles.examples}>
         <div className="mx-auto max-w-6xl">
+          <p className={styles.sectionLabel}>NA PRÁTICA</p>
           <h2 className="text-3xl font-bold tracking-tight">
             Exemplos de correção ortográfica, gramatical e de pontuação
           </h2>
@@ -313,7 +363,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-16 sm:py-20">
+      <section className={styles.useCases}>
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold tracking-tight">
             Revise textos do dia a dia
@@ -345,14 +395,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section
-        id="duvidas"
-        className="border-y border-slate-200 bg-white px-6 py-16 sm:py-20"
-      >
+      <section id="duvidas" className={styles.faq}>
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Dúvidas frequentes sobre o corretor ortográfico online
-          </h2>
+          <div className={styles.faqHeading}>
+            <p className={styles.sectionLabel}>PODE PERGUNTAR</p>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Dúvidas frequentes sobre o corretor ortográfico online
+            </h2>
+            <a href="#editor" className={styles.textLink}>
+              Voltar ao editor <ArrowUpRight size={18} aria-hidden="true" />
+            </a>
+          </div>
           <div className="mt-8 divide-y divide-slate-200">
             {faqs.map(([question, answer]) => (
               <article key={question} className="py-6">
@@ -364,7 +417,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="sobre" className="px-6 py-16 sm:py-20">
+      <section id="sobre" className={styles.about}>
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
           <div className="min-w-0">
             <h2 className="text-3xl font-bold tracking-tight">
@@ -401,11 +454,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section
-        id="privacidade"
-        className="border-y border-slate-200 bg-white px-6 py-16 sm:py-20"
-      >
+      <section id="privacidade" className={styles.privacy}>
         <div className="mx-auto max-w-6xl">
+          <ShieldCheck
+            className={styles.privacyIcon}
+            size={28}
+            aria-hidden="true"
+          />
           <h2 className="text-3xl font-bold tracking-tight">
             Privacidade: como seus textos são tratados
           </h2>
@@ -444,10 +499,14 @@ export default function HomePage() {
             navegador durante a análise ou a conversão em PDF. Para esclarecer
             dúvidas sobre esse processamento, use o contato acima.
           </p>
+          <a href="/privacidade" className={styles.textLink}>
+            Leia a política de privacidade{" "}
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
         </div>
       </section>
 
-      <footer className="px-6 py-8">
+      <footer className={styles.footer}>
         <div className="mx-auto flex max-w-6xl flex-col gap-5 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} CorretorOrtografico.online</p>
           <nav
