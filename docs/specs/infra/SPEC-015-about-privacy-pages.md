@@ -35,6 +35,7 @@ Fora do escopo: inventar nome civil ou razão social do operador, afirmar confor
 - `src/app/sitemap.ts`
 - `src/app/page.tsx`
 - `src/components/shared/SiteInfoPage.tsx`
+- `tests/sitemap.test.ts`
 - `docs/specs/_INDEX.md`
 - `docs/specs/infra/SPEC-015-about-privacy-pages.md`
 
@@ -52,6 +53,7 @@ Fora do escopo: inventar nome civil ou razão social do operador, afirmar confor
 - [x] Conteúdo de privacidade corresponde ao comportamento implementado e não promete retenção/anonimato não confirmados.
 - [x] Navegação entre páginas e home funciona por links comuns.
 - [x] Sitemap lista as rotas institucionais.
+- [x] Teste do sitemap cobre a landing e as páginas institucionais.
 - [x] Build, TypeScript e lint concluem sem erro.
 
 Evidência: `npm run build` gerou `/sobre` e `/privacidade` como páginas estáticas; HTML local contém títulos e canonical; bundle do sitemap inclui ambas as URLs. ESLint dos arquivos alterados e `git diff --check` passaram.
