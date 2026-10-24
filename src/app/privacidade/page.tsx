@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     url: "https://corretorortografico.online/privacidade",
     title: "Privacidade | CorretorOrtografico.online",
     description:
-      "Informações sobre os dados usados pelo editor, LanguageTool, serviço de PDF e Umami.",
+      "Informações sobre rascunhos locais, revisão de textos, exportação em PDF e estatísticas de visitas.",
     siteName: "CorretorOrtografico.online",
     locale: "pt_BR",
   },
@@ -102,11 +102,11 @@ export default function PrivacyPage() {
           Estatísticas de visitas
         </h2>
         <p className="mt-3">
-          O site utiliza o Umami para medir visitas. O tracker só é ativado no
-          domínio corretorortografico.online e seus pageviews excluem parâmetros
-          e fragmentos da URL. O código do site não envia o texto digitado nem o
-          título do rascunho ao Umami. O navegador se conecta ao servidor de
-          métricas em umami.andersonleite.dev.br para essa função.
+          O site utiliza um serviço de estatísticas para medir visitas. As
+          páginas acessadas são contabilizadas sem os parâmetros e fragmentos da
+          URL. Como em outras conexões à internet, o serviço pode receber dados
+          técnicos da conexão, como endereço IP e navegador. O código do site
+          não envia o texto digitado nem o título do rascunho para essa medição.
         </p>
       </section>
 

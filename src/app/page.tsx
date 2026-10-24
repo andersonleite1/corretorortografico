@@ -106,7 +106,7 @@ export default function HomePage() {
           </h1>
           <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">
             Escreva ou cole seu texto no editor e confira sugestões de
-            ortografia, gramática e estilo com o LanguageTool.
+            ortografia, gramática e estilo.
           </p>
           <p className="mt-4 text-sm font-semibold text-slate-600">
             Grátis · Sem cadastro · Português brasileiro
@@ -409,7 +409,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold tracking-tight">
             Privacidade: como seus textos são tratados
           </h2>
-          <div className="mt-8 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-8 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
             <div>
               <h3 className="text-lg font-semibold">Rascunho no navegador</h3>
               <p className="mt-3 leading-7 text-slate-600">
@@ -436,15 +436,6 @@ export default function HomePage() {
                 Quando você escolhe exportar em PDF, o documento é enviado ao
                 serviço de conversão configurado pelo site. Esse envio ocorre
                 para gerar o arquivo solicitado.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Estatísticas de visitas</h3>
-              <p className="mt-3 leading-7 text-slate-600">
-                Usamos o Umami para medir visitas e uso do site. O contador de
-                páginas não inclui parâmetros nem fragmentos da URL, e o
-                conteúdo digitado ou o nome do rascunho não é enviado pelo
-                código de analytics.
               </p>
             </div>
           </div>

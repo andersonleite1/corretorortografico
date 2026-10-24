@@ -7,6 +7,7 @@ import Input from "../ui/Input";
 import ColorButton from "./ColorButton";
 import { MORE_COLORS, COLORS } from "../../constants/color";
 import { PopoverClose } from "@radix-ui/react-popover";
+import { useTiptapContext } from "../Provider";
 
 interface ColorPickerProps {
   color: string;
@@ -15,8 +16,14 @@ interface ColorPickerProps {
 }
 
 const ColorPicker = (props: ColorPickerProps) => {
+  const { locale } = useTiptapContext();
   const [activeTab, setActiveTab] = useState<"swatches" | "custom">("swatches");
   const [color, setColor] = useState(props.color);
+  const tabLabels = {
+    pt: { swatches: "Paleta", custom: "Personalizada" },
+    en: { swatches: "Palette", custom: "Custom" },
+    es: { swatches: "Paleta", custom: "Personalizada" },
+  }[locale];
 
   const normalizeColor = (color: string): string => {
     const normalized = color.startsWith("#") ? color : `#${color}`;
@@ -66,7 +73,7 @@ const ColorPicker = (props: ColorPickerProps) => {
             onClick={() => setActiveTab(tab as "swatches" | "custom")}
             className={`rte-cp__tab`}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tabLabels[tab as "swatches" | "custom"]}
           </Button>
         ))}
       </div>
