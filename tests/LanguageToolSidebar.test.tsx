@@ -182,9 +182,9 @@ describe("LanguageToolSidebar", () => {
     expect(suggestionButtons.length).toBe(3);
   });
 
-  it('"Corrigir todos" aplica primeira sugestão de cada issue com replacements', async () => {
+  it('"Aplicar sugestões" aplica a primeira sugestão de cada issue com replacements', async () => {
     render(<LanguageToolSidebar isOpen={true} />);
-    fireEvent.click(screen.getByText("Corrigir todos"));
+    fireEvent.click(screen.getByRole("button", { name: /Aplicar sugestões/ }));
     await waitFor(() => {
       expect(mockInsertContentAt).toHaveBeenCalled();
       expect(mockRun).toHaveBeenCalled();

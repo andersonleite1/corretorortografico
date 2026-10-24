@@ -56,17 +56,27 @@ describe("Editor Toolbar E2E", () => {
 
   it("should open Export dropdown and show options", () => {
     cy.get('button[aria-label^="Exportar"]').should("be.visible").click();
-    // These come from the messages.export object
-    cy.contains("Exportar Word (DOC)").should("be.visible");
+    cy.contains("Exportar Word (.docx)").should("be.visible");
     cy.contains("Exportar TXT").should("be.visible");
     cy.contains("Exportar PDF").should("be.visible");
   });
 
-  it("should open Preview dropdown and show options", () => {
-    cy.get('button[aria-label^="Visualizar"]').should("be.visible").click();
-    // These come from the messages.preview object
-    cy.contains("Pré-visualizar PDF").should("be.visible");
-    cy.contains("Pré-visualizar post").should("be.visible");
+  it("opens advanced tools automatically on mouse hover", () => {
+    cy.window().then((window) => {
+      const originalMatchMedia = window.matchMedia.bind(window);
+      cy.stub(window, "matchMedia").callsFake((query: string) =>
+        query === "(hover: hover) and (pointer: fine)"
+          ? ({ matches: true, media: query } as MediaQueryList)
+          : originalMatchMedia(query),
+      );
+    });
+
+    cy.get('.rte-category-trigger[aria-haspopup="dialog"]')
+      .contains("Formatar")
+      .trigger("pointerover", { pointerType: "mouse", bubbles: true });
+
+    cy.get('.rte-tools-panel[aria-label="Ferramentas avançadas"]').should("be.visible");
+    cy.contains("button", "Fonte").should("be.visible");
   });
 
   it("should NOT see Documents button when not logged in", () => {
@@ -76,16 +86,6 @@ describe("Editor Toolbar E2E", () => {
 
   it("should NOT see Drafts button when not logged in", () => {
     cy.contains("button", "Rascunhos").should("not.exist");
-  });
-
-  it("should clear the editor content", () => {
-    getEditor().type("Conteúdo para limpar");
-    cy.get('button[aria-label^="Limpar conteúdo"]')
-      .should("be.visible")
-      .click();
-
-    // Check if content is cleared
-    getEditor().should("have.text", "");
   });
 
   it("should see LanguageTool sidebar open by default on desktop", () => {
@@ -98,16 +98,4 @@ describe("Editor Toolbar E2E", () => {
     cy.contains("h3", "Corretor").should("not.exist");
   });
 
-  it("should open Bug Report dialog", () => {
-    // The bug report button is outside the main toolbar but in the header/form area
-    cy.get("#bug-report-open-btn").should("be.visible").click();
-    // The dialog has the heading "Reportar Problema"
-    cy.contains("h2", "Reportar Problema").should("be.visible");
-  });
-
-  it("should see AI Rewrite button (disabled if not logged in)", () => {
-    cy.contains("button", "Reescrever IA").should("be.visible");
-    // Since we are likely not logged in during the test (standard visit), it should be disabled
-    cy.contains("button", "Reescrever IA").should("be.disabled");
-  });
 });

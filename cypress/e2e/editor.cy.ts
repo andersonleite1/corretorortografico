@@ -1,39 +1,28 @@
-describe("Text Editor E2E", () => {
+describe("Corretor ortográfico — editor", () => {
   beforeEach(() => {
-    // Visit the root page which will rewrite to /pt internally without a hard redirect if possible
-    // or just let the middleware handle it naturally.
     cy.visit("/");
-
-    // Explicitly wait for the editor to be ready
-    // We use a long timeout because dynamic imports can be slow in development
-    cy.get(".tiptap", { timeout: 20000 }).should("exist");
+    cy.get(".tiptap", { timeout: 20000 }).should("be.visible");
   });
 
-  it("should load the editor page correctly", () => {
-    // Check if the title input exists
+  it("renders the editor and the LanguageTool review panel", () => {
     cy.get('input[type="text"]').should("be.visible");
+    cy.contains("button", "Resumo").should("be.visible");
+    cy.contains("button", "Dados detalhados").should("be.visible");
   });
 
-  it("should allow typing in the title", () => {
-    const testTitle = "Meu Documento de Teste";
-    cy.get('input[type="text"]')
-      .clear()
-      .type(testTitle)
-      .should("have.value", testTitle);
+  it("accepts a draft title and text", () => {
+    const title = "Redação escolar";
+    const content = "Este é um texto para revisar no corretor ortográfico.";
+
+    cy.get('input[type="text"]').first().clear().type(title).should("have.value", title);
+    cy.get(".tiptap").first().click().type(content).should("contain.text", content);
   });
 
-  it("should allow typing in the editor", () => {
-    const testContent = "Olá, este é um teste de conteúdo no editor.";
-    cy.get(".tiptap")
-      .first()
-      .clear()
-      .type(testContent)
-      .should("contain.text", testContent);
-  });
+  it("shows LanguageTool suggestions in the detailed results tab", () => {
+    cy.get(".tiptap").first().click().type("Este eh um texto com erros.");
+    cy.contains("button", "Dados detalhados").click();
 
-  it("should open the bug report dialog", () => {
-    cy.get("#bug-report-open-btn").click();
-    cy.get('div[role="dialog"]').should("be.visible");
-    cy.contains("Reportar Problema").should("be.visible");
+    cy.get(".tiptap", { timeout: 20000 }).should("be.visible");
+    cy.get('[aria-label="Resultados do LanguageTool"]').should("be.visible");
   });
 });

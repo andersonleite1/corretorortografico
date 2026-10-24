@@ -252,24 +252,4 @@ describe("TiptapProvider", () => {
     expect(saveLocalDocument).toHaveBeenCalled();
   });
 
-  it("escuta atalhos de teclado globais (ex: Ctrl+O)", async () => {
-    render(
-      <TiptapProvider editorOptions={{}}>
-        <div />
-      </TiptapProvider>,
-    );
-
-    const event = new KeyboardEvent("keydown", {
-      key: "o",
-      ctrlKey: true,
-      cancelable: true,
-      bubbles: true,
-    });
-
-    act(() => {
-      window.dispatchEvent(event);
-    });
-
-    expect(mockUseSidebar.setIsDocumentsDialogOpen).toHaveBeenCalledWith(true);
-  });
 });

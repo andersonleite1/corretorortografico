@@ -7,13 +7,10 @@ describe("Security Configuration - CSP (SEG-06)", () => {
     const configPath = path.join(process.cwd(), "next.config.mjs");
     const content = fs.readFileSync(configPath, "utf8");
 
-    // Procura pela string da CSP
-    const cspMatch = content.match(
-      /value:\s*process\.env\.NODE_ENV\s*===\s*"development"\s*\?\s*"[^"]+"\s*:\s*"([^"]+)"/,
-    );
-    expect(cspMatch).not.toBeNull();
-
-    const cspValue = cspMatch![1];
+    const cspValue = content.match(
+      /key:\s*"Content-Security-Policy",\s*value:\s*"([^"]+)"/s,
+    )?.[1];
+    expect(cspValue).toBeDefined();
 
     // Verifica ausência de 'unsafe-eval'
     expect(cspValue).not.toContain("'unsafe-eval'");
@@ -27,12 +24,19 @@ describe("Security Configuration - CSP (SEG-06)", () => {
     const configPath = path.join(process.cwd(), "next.config.mjs");
     const content = fs.readFileSync(configPath, "utf8");
 
-    const cspMatch = content.match(
-      /value:\s*process\.env\.NODE_ENV\s*===\s*"development"\s*\?\s*"[^"]+"\s*:\s*"([^"]+)"/,
-    );
-    const cspValue = cspMatch![1];
+    const cspValue = content.match(
+      /key:\s*"Content-Security-Policy",\s*value:\s*"([^"]+)"/s,
+    )?.[1];
+    expect(cspValue).toBeDefined();
 
-    expect(cspValue).toContain("script-src 'self' 'unsafe-inline'");
-    expect(cspValue).toContain("style-src 'self' 'unsafe-inline'");
+    const directives = Object.fromEntries(
+      cspValue!.split(";").map((directive) => {
+        const [name, ...values] = directive.trim().split(/\s+/);
+        return [name, values];
+      }),
+    );
+    expect(directives["script-src"]).toContain("'unsafe-inline'");
+    expect(directives["style-src"]).toContain("'unsafe-inline'");
+    expect(directives["default-src"]).not.toContain("'unsafe-inline'");
   });
 });
