@@ -41,7 +41,9 @@ Uma frase inicial de vocativo não foi sinalizada pelo serviço e não foi usada
 3. Executar um novo build/deploy após definir os códigos: a home e suas metatags são pré-renderizadas.
 4. Conferir `google-site-verification` e `msvalidate.01` no HTML publicado, concluir a verificação nos painéis e enviar `https://corretorortografico.online/sitemap.xml`.
 
-As variáveis não verificam a conta automaticamente. Não foram utilizados tokens fictícios nem IDs de analytics herdados. O componente legado de analytics continua sem montagem; não existe coleta nova de textos, títulos ou IDs de rascunhos nesta entrega.
+As variáveis não verificam a conta automaticamente. O Umami foi instalado posteriormente conforme a [SPEC-014](../specs/infra/SPEC-014-umami-site-analytics.md). O tracker só executa no domínio canônico, exclui query string e fragmento dos pageviews, e a landing explica a medição. A configuração do servidor de métricas é a URL fornecida pelo usuário; o serviço precisa estar acessível no lançamento. Nenhum conteúdo de texto ou título de rascunho é passado ao código de analytics.
+
+Validação do Umami: build de produção e ESLint concluídos; HTML prerenderizado contém o bootstrap `beforeInteractive` no `<head>` com o ID e atributos configurados. A CSP de produção autoriza `script-src` e `connect-src` apenas para o host de métricas informado. A coleta de uma visita real depende de domínio público e disponibilidade do servidor Umami, ainda não confirmada antes do lançamento.
 
 ## Verificações
 
@@ -83,6 +85,8 @@ Relatórios brutos temporários: `/tmp/corretor-seo-desktop-final.json` e `/tmp/
 O site ainda não está em produção. Antes do lançamento, vincular o domínio à hospedagem, conferir DNS e TLS entre Cloudflare e origem e validar HTTP → HTTPS e `www` → domínio principal. A auditoria prévia observou erro público 525; isso é uma pendência de preparação do domínio, não uma regressão deste código.
 
 Depois do lançamento, verificar HTML/headers e a imagem usando o domínio público, confirmar acesso dos crawlers e inspecionar a URL nos painéis. Enviar o sitemap e acompanhar indexação/canonical escolhida. IndexNow pode ser configurado depois com a chave da propriedade para comunicar mudanças de URLs públicas; nenhuma chamada ou integração IndexNow foi criada nesta entrega.
+
+O arquivo de autenticação XML do Bing foi adicionado como `public/BingSiteAuth.xml`. O build local o serve com `200 OK`; no domínio público, a URL ainda responde `404` em 2026-10-24. Publique esta versão e depois conclua a verificação pelo Bing Webmaster Tools.
 
 Acompanhar consultas, impressões, cliques, CTR e posição média por página, país Brasil e dispositivo. Para busca com IA, consultar os relatórios de IA generativa no Google e AI Performance no Bing. Citação e visita não são a mesma métrica. Nenhuma posição, citação ou resultado de Core Web Vitals de campo foi demonstrado por esta implementação local.
 

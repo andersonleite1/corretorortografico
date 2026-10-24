@@ -36,7 +36,7 @@ Não configure `DATABASE_URL`: a aplicação não precisa de banco de dados.
 
 A home entrega o conteúdo público no HTML inicial, incluindo instruções, exemplos, FAQ, contato e informações de privacidade. O editor permanece no cliente. Há canonical, sitemap, robots.txt e imagem Open Graph gerada pelo Next.
 
-As variáveis de verificação são opcionais. Preencha apenas o token informado pelo painel do buscador, antes de executar o build; sem valor, a metatag não é emitida. Se a propriedade for verificada por DNS, esses campos podem ficar vazios. A configuração não cadastra a propriedade nem envia o sitemap automaticamente.
+As variáveis de verificação por metatag são opcionais. Preencha apenas o token informado pelo painel do buscador, antes de executar o build; sem valor, a metatag não é emitida. Para a verificação XML do Bing, o arquivo `public/BingSiteAuth.xml` é servido na raiz como `/BingSiteAuth.xml`. A propriedade precisa estar publicada para os buscadores validarem os métodos ou receberem o sitemap.
 
 ```bash
 npm run build
@@ -45,4 +45,4 @@ npm run start -- -p 3001
 
 Antes de publicar, conferir o HTML e a imagem `/opengraph-image` no build de produção. Após a publicação, validar domínio/TLS, enviar `/sitemap.xml` nos painéis e acompanhar consultas, dispositivos e presença nos relatórios de IA. O roteiro completo está em [PRE_LAUNCH_SEO_ROLLOUT.md](docs/architecture/PRE_LAUNCH_SEO_ROLLOUT.md).
 
-O componente legado de analytics não é montado. Qualquer ativação futura deve usar as propriedades deste projeto e preservar o conteúdo dos rascunhos. O contato público da ferramenta é contato@corretorortografico.online.
+O Umami registra estatísticas de visita apenas no domínio público. A configuração exclui parâmetros e fragmentos da URL dos pageviews e não envia o texto ou o título do rascunho pelo código de analytics. O contato público da ferramenta é contato@corretorortografico.online.

@@ -88,3 +88,5 @@ Implementação e evidências registradas em `docs/architecture/PRE_LAUNCH_SEO_R
 ## 7. Histórico
 
 2026-10-24 — Recomendações apresentadas na auditoria e aprovadas no chat para implementação; contato público fornecido pelo usuário.
+
+2026-10-24 — A instalação posterior do Umami foi especificada separadamente em SPEC-014, autorizada pelo usuário; a exclusão original de analytics não descreve mais o estado atual do projeto.

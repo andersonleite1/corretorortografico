@@ -18,7 +18,7 @@ const nextConfig = {
             ? [{
                 key: "Content-Security-Policy",
                 value:
-                  "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'",
+                  "default-src 'self'; script-src 'self' 'unsafe-inline' https://umami.andersonleite.dev.br; connect-src 'self' https://umami.andersonleite.dev.br; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'",
               }]
             : []),
         ],

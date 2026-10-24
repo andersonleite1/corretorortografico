@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 import EditorShellProviders from "@/components/providers/EditorShellProviders";
 import "@/styles/globals.scss";
@@ -40,6 +41,17 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={`${fontSans.variable} ${fontMono.variable}`}>
+      <head>
+        <Script
+          id="umami-analytics"
+          src="https://umami.andersonleite.dev.br/script.js"
+          data-website-id="2da7b158-1b49-4e89-8cc9-4d1d85485c37"
+          data-domains="corretorortografico.online"
+          data-exclude-search="true"
+          data-exclude-hash="true"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body>
         <EditorShellProviders>{children}</EditorShellProviders>
       </body>

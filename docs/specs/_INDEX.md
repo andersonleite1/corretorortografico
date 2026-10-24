@@ -27,3 +27,6 @@ _Última atualização: 2026-04-24_
 | SPEC-012 | `mobile-performance` | editor | `approved` | Codex / Anderson Leite (chat) | 2026-10-04 | Desempenho mobile com preservação de desktop e SEO |
 
 | SPEC-013 | `pre-launch-seo` | infra | `approved` | Codex / Anderson Leite (chat) | 2026-10-24 | Conteúdo, idiomas, contato, imagem social e preparação para Google/Bing |
+| SPEC-014 | `umami-site-analytics` | infra | `approved` | Codex / Anderson Leite (chat) | 2026-10-24 | Umami na home, restrito ao domínio público e sem query/hash nos pageviews |
+| SPEC-015 | `about-privacy-pages` | infra | `approved` | Codex / Anderson Leite (chat) | 2026-10-24 | Páginas Sobre e Privacidade; links de navegação e sitemap |
+| SPEC-016 | `bing-xml-verification` | infra | `approved` | Codex / Anderson Leite (chat) | 2026-10-24 | Arquivo de verificação do Bing em `public/` |
