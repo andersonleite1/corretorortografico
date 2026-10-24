@@ -13,7 +13,7 @@ const LanguageToolSidebarButton = () => {
     setIsLTSidebarOpen,
     contentElement,
     editor,
-    isMobile,
+    locale,
   } = useTiptapContext();
 
   // Sincronizar painel com o estado do LanguageTool
@@ -23,6 +23,11 @@ const LanguageToolSidebarButton = () => {
       const storage = (ctx.editor.storage as any).languageTool;
       return storage?.enabled ?? false;
     },
+  });
+  const issueCount = useEditorState({
+    editor,
+    selector: (ctx: { editor: any }) =>
+      (ctx.editor.storage as any).languageTool?.issues?.length ?? 0,
   });
 
   // Sincronizar painel com o estado do corretor:
@@ -48,11 +53,11 @@ const LanguageToolSidebarButton = () => {
     setIsLTSidebarOpen(nextState);
   };
 
-  if (isMobile) return null;
-
-  const label = isLTSidebarOpen
-    ? "Fechar Painel de Erros"
-    : "Abrir Painel de Erros";
+  const label = locale === "en"
+    ? (isLTSidebarOpen ? "Hide suggestions" : `Suggestions (${issueCount})`)
+    : locale === "es"
+      ? (isLTSidebarOpen ? "Ocultar sugerencias" : `Sugerencias (${issueCount})`)
+      : (isLTSidebarOpen ? "Ocultar sugestões" : `Sugestões (${issueCount})`);
 
   return (
     <Tooltip
@@ -62,10 +67,10 @@ const LanguageToolSidebarButton = () => {
       <button
         type="button"
         className={clsx(
-          "rte-toolbar-button",
+          "rte-toolbar-button rte-lt-results-trigger",
           isLTSidebarOpen
-            ? "bg-emerald-50 text-emerald-600"
-            : "hover:bg-emerald-50",
+            ? "bg-blue-50 text-blue-700"
+            : "hover:bg-blue-50",
         )}
         onClick={handleToggle}
         aria-pressed={isLTSidebarOpen}
@@ -75,10 +80,10 @@ const LanguageToolSidebarButton = () => {
           name={isLTSidebarOpen ? "CheckboxChecked" : "CheckboxEmpty"}
           size={20}
           className={clsx(
-            isLTSidebarOpen ? "text-emerald-600" : "text-neutral-400",
+            isLTSidebarOpen ? "text-blue-700" : "text-neutral-400",
           )}
         />
-        <span className="sr-only">{label}</span>
+        <span className="rte-lt-results-trigger__text">{label}</span>
       </button>
     </Tooltip>
   );

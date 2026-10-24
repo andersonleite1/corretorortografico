@@ -1,3 +1,5 @@
+"use client";
+
 import {
   type CSSProperties,
   useCallback,
@@ -9,19 +11,14 @@ import {
 import { Controller, useForm } from "react-hook-form";
 
 import dynamic from "next/dynamic";
-import { saveAs } from "file-saver";
-import { X, Bug } from "lucide-react";
+import { X } from "lucide-react";
 import { getPost, savePost } from "@/services/post";
-import { requestPdfFromHtml } from "@/services/pdfService";
 import { getLocalDocumentById } from "@/lib/local-storage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type Locale } from "../../../../i18n-config";
 import { getEditMessages } from "@/data/edit/messages";
 import { getAcquisitionContent } from "@/data/acquisition";
 import { useId } from "react";
-import { getCommonMessages } from "@/data/common";
-import { generateHTML, generateJSON } from "@tiptap/react";
-import getExtensionKit from "@/components/TiptapEditor/kit";
 
 const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
   ssr: false,
@@ -32,16 +29,6 @@ const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), {
 
 const TiptapRenderer = dynamic(
   () => import("@/components/TiptapRenderer/ClientRenderer"),
-  {
-    ssr: false,
-  },
-);
-
-const BugReportDialog = dynamic(
-  () =>
-    import("@/components/shared/BugReportDialog").then(
-      (mod) => mod.BugReportDialog,
-    ),
   {
     ssr: false,
   },
@@ -68,6 +55,11 @@ interface EditFormProps {
 }
 
 import type { TiptapEditorRef } from "@/components/TiptapEditor";
+
+async function saveFile(blob: Blob, fileName: string) {
+  const { saveAs } = await import("file-saver");
+  saveAs(blob, fileName);
+}
 
 export default function EditForm({ locale, userPlan }: EditFormProps) {
   const t = getAcquisitionContent(locale);
@@ -102,8 +94,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   const [isPostPreviewOpen, setIsPostPreviewOpen] = useState(false);
   const [isPreviewHtmlMode, setIsPreviewHtmlMode] = useState(false);
 
-  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
-
   const [notification, setNotification] = useState<{
     message: string;
     type: "success" | "error" | "info";
@@ -119,7 +109,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const result = exportMarkdownDocument(content);
     const title = getValues("title")?.trim() || "documento";
     const safeTitle = title.replace(/[\\/:*?"<>|]/g, "-") || "documento";
-    saveAs(
+    await saveFile(
       new Blob([result.markdown], { type: "text/markdown;charset=utf-8" }),
       `${safeTitle}.md`,
     );
@@ -134,6 +124,10 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         fileName: file.name,
         content: await file.text(),
       });
+      const [{ generateJSON }, getExtensionKit] = await Promise.all([
+        import("@tiptap/react"),
+        import("@/components/TiptapEditor/kit").then((module) => module.default),
+      ]);
       const content = generateJSON(result.html, getExtensionKit(locale));
       setValue("content", content as any, { shouldDirty: true });
       editorRef.current?.getInstance()?.commands.setContent(content);
@@ -178,16 +172,13 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     }
 
     if (typeof content === "object") {
-      try {
-        return generateHTML(content as any, getExtensionKit(locale));
-      } catch (err) {
-        console.error("Error generating HTML from JSON:", err);
-        return "";
-      }
+      // Export actions are only available after the editor has mounted, so its
+      // instance should provide HTML before this serialized fallback is needed.
+      return "";
     }
 
     return "";
-  }, [getValues, locale]);
+  }, [getValues]);
 
   useEffect(() => {
     // Schedule editor to load shortly after mount, off the critical rendering path
@@ -225,9 +216,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     showNotification(formMessages.modal.cleared);
   };
 
-  const preparePdfExport = () => {
+  const preparePdfExport = async () => {
     const { title } = getValues();
-    const htmlFromEditor = getEditorHtml();
+    const htmlFromEditor = await getEditorHtml();
     const safeHtml = htmlFromEditor.trim();
 
     if (!safeHtml) {
@@ -332,14 +323,15 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   const handleExportToPDF = async () => {
-    const payload = preparePdfExport();
+    const payload = await preparePdfExport();
     if (!payload) return;
 
     setIsExportingPDF(true);
 
     try {
+      const { requestPdfFromHtml } = await import("@/services/pdfService");
       const blob = await requestPdfFromHtml(payload.htmlDocument);
-      saveAs(blob, payload.fileName);
+      await saveFile(blob, payload.fileName);
       showNotification(formMessages.modal.pdfSuccess);
     } catch (error) {
       console.error("Erro ao exportar PDF:", error);
@@ -353,12 +345,13 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
   };
 
   const handlePreviewPdf = async () => {
-    const payload = preparePdfExport();
+    const payload = await preparePdfExport();
     if (!payload) return;
 
     setIsExportingPDF(true);
 
     try {
+      const { requestPdfFromHtml } = await import("@/services/pdfService");
       const originalBlob = await requestPdfFromHtml(payload.htmlDocument);
       const pdfBlob = new Blob([originalBlob], { type: "application/pdf" });
       const url = URL.createObjectURL(pdfBlob);
@@ -394,7 +387,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
     try {
       const { createWordDocument } = await import("@/lib/docx-export");
-      saveAs(createWordDocument(htmlContent, docTitle), `${docTitle}.docx`);
+      await saveFile(createWordDocument(htmlContent, docTitle), `${docTitle}.docx`);
     } catch {
       showNotification(t.exportError, "error");
       return;
@@ -402,7 +395,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     showNotification(formMessages.modal.docSuccess);
   };
 
-  const handleExportToTxt = () => {
+  const handleExportToTxt = async () => {
     const editorInstance = editorRef.current?.getInstance();
     const { title } = getValues();
 
@@ -427,7 +420,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     const safeTitle = baseTitle.replace(/[\\/:*?"<>|]/g, "-") || fallbackName;
 
     const blob = new Blob([plainText], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, `${safeTitle}.txt`);
+    await saveFile(blob, `${safeTitle}.txt`);
     showNotification(formMessages.modal.txtSuccess);
   };
 
@@ -445,9 +438,9 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     clearPdfPreview();
   }, [clearPdfPreview]);
 
-  const handleDownloadPreviewPdf = useCallback(() => {
+  const handleDownloadPreviewPdf = useCallback(async () => {
     if (!pdfPreview) return;
-    saveAs(pdfPreview.blob, pdfPreview.fileName);
+    await saveFile(pdfPreview.blob, pdfPreview.fileName);
   }, [pdfPreview]);
 
   const handlePreviewPost = useCallback(() => {
@@ -455,7 +448,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
     setIsPreviewHtmlMode(false);
   }, []);
 
-  const handleDownloadHtml = () => {
+  const handleDownloadHtml = async () => {
     const { title } = getValues();
     const htmlFromEditor = getEditorHtml();
     const safeHtml = htmlFromEditor.trim();
@@ -489,7 +482,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 </html>`;
 
     const blob = new Blob([htmlDocument], { type: "text/html;charset=utf-8" });
-    saveAs(blob, `${safeTitle}.html`);
+    await saveFile(blob, `${safeTitle}.html`);
     showNotification(formMessages.modal.docSuccess);
   };
 
@@ -500,100 +493,43 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    const checkRecovery = (serverData: {
-      title?: string;
-      content?: unknown;
-      updatedAt?: string | number | Date;
-    }) => {
-      const localDataStr = localStorage.getItem("post");
-      if (!localDataStr) return serverData;
-
+    let cancelled = false;
+    const loadDraft = async () => {
       try {
-        const localData = JSON.parse(localDataStr);
-        // Se o docId bater ou for nulo (pra docs novos) e o timestamp local for maior
-        const isSameDoc = localData.docId === docId;
-        const serverUpdateAt = serverData?.updatedAt
-          ? new Date(serverData.updatedAt).getTime()
-          : 0;
-        const localUpdatedAt = localData.lastSaved || 0;
+        let post;
 
-        if (isSameDoc && localUpdatedAt > serverUpdateAt) {
-          return localData;
+        if (docId?.startsWith("local-")) {
+          try {
+            const localDoc = getLocalDocumentById(docId);
+            if (localDoc) {
+              post = { title: localDoc.title, content: localDoc.content };
+            }
+          } catch (error) {
+            // A malformed browser draft must not prevent the editor from opening.
+            console.error("[EditForm] Could not read local document:", error);
+          }
         }
-      } catch (e) {
-        console.error("Erro ao verificar recuperação:", e);
+
+        if (!post) post = await getPost();
+        if (cancelled) return;
+
+        reset({ title: post?.title ?? "", content: post?.content ?? "" });
+        const instance = editorRef.current?.getInstance();
+        if (instance && post?.content) {
+          instance.commands.setContent(post.content);
+        }
+      } catch (error) {
+        console.error("[EditForm] Error loading local draft:", error);
+        if (!cancelled) reset({ title: "", content: "" });
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-      return serverData;
     };
 
-    if (docId) {
-      if (docId.startsWith("local-")) {
-        const localDoc = getLocalDocumentById(docId);
-        if (localDoc) {
-          const recovered = checkRecovery({
-            title: localDoc.title,
-            content: localDoc.content,
-            updatedAt: localDoc.updatedAt,
-          });
-
-          reset({ title: recovered.title, content: recovered.content });
-
-          const instance = editorRef.current?.getInstance();
-          if (instance) {
-            const currentContent = instance.getJSON();
-            const newContentString =
-              typeof recovered.content === "string"
-                ? recovered.content
-                : JSON.stringify(recovered.content);
-            const currentContentString = JSON.stringify(currentContent);
-
-            if (newContentString !== currentContentString) {
-              instance.commands.setContent(recovered.content);
-            }
-          }
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // Account documents need recovery through support; keep the browser draft intact.
-      getPost()
-        .then((post) => {
-          reset({ ...post });
-          const instance = editorRef.current?.getInstance();
-          if (instance) instance.commands.setContent(post.content || "");
-        })
-        .catch((error) =>
-          console.error("[EditForm] Could not recover local draft:", error),
-        )
-        .finally(() => setIsLoading(false));
-    } else {
-      getPost()
-        .then((post) => {
-          reset({ ...post });
-          const instance = editorRef.current?.getInstance();
-          if (instance) {
-            const currentContent = instance.getJSON();
-            const newContentString =
-              typeof post.content === "string"
-                ? post.content
-                : JSON.stringify(post.content);
-            const currentContentString = JSON.stringify(currentContent);
-
-            if (newContentString !== currentContentString) {
-              instance.commands.setContent(post.content || "");
-            }
-          }
-        })
-        .catch((err) => {
-          console.error("[EditForm] Error loading post:", err);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
+    void loadDraft();
 
     return () => {
+      cancelled = true;
       clearPdfPreview();
     };
   }, [clearPdfPreview, reset, docId]);
@@ -652,7 +588,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 animate-pulse">
+      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content px-2 md:px-8 sm:px-0 animate-pulse">
         {/* Title input skeleton */}
         <div className="w-full h-[50px] bg-gray-100 dark:bg-gray-700/60 rounded-full shadow border border-[#d1d9e0] dark:border-[#3d444d]" />
 
@@ -761,10 +697,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           </div>
         </div>
 
-        {/* ── "Reportar Problema" button skeleton ── */}
-        <div className="flex justify-center pb-2">
-          <span className="h-9 w-40 bg-gray-100 dark:bg-gray-700/50 rounded-full border border-gray-200 dark:border-white/10" />
-        </div>
       </div>
     );
   }
@@ -779,7 +711,7 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
         onChange={() => void handleImportMarkdown()}
         aria-label="Importar arquivo Markdown"
       />
-      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content bg-white dark:bg-gray-800 px-2 md:px-8 sm:px-0 pb-6">
+      <div className="flex flex-col gap-6 order-2 min-w-full prose prose-blue dark:prose-invert prose-headings:scroll-m-20 article-content px-2 md:px-8 sm:px-0 pb-6">
         <div className="editor-title-field">
           <label htmlFor={titleId}>{t.titleLabel}</label>
           <Controller
@@ -849,20 +781,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
               );
             }}
           />
-        </div>
-
-        {/* ── Botão Reportar Problema ── */}
-        <div className="flex justify-center pb-2">
-          <button
-            id="bug-report-open-btn"
-            type="button"
-            onClick={() => setIsBugReportOpen(true)}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-200 active:scale-95"
-            aria-label={getCommonMessages(locale).editor.reportBug}
-          >
-            <Bug className="text-xs" />
-            {getCommonMessages(locale).editor.reportBug}
-          </button>
         </div>
 
         {isPreviewOpen && pdfPreview && (
@@ -1026,10 +944,6 @@ export default function EditForm({ locale, userPlan }: EditFormProps) {
           />
         )}
 
-        {/* ── Diálogo de Reporte de Problemas ── */}
-        {isBugReportOpen && (
-          <BugReportDialog isOpen onClose={() => setIsBugReportOpen(false)} />
-        )}
       </div>
     </>
   );

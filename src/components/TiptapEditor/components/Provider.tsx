@@ -46,7 +46,7 @@ export type EditorPageMode = "fluid" | "a4";
 
 type TiptapContextType = {
   editor: Editor;
-  contentElement: RefObject<Element>;
+  contentElement: RefObject<HTMLDivElement | null>;
   isFullScreen: boolean;
   isResizing: boolean;
   isSourceMode: boolean;
@@ -126,9 +126,8 @@ export const TiptapProvider = ({
     isLTSidebarOpen,
     setIsLTSidebarOpen,
     isMobile,
-    setIsDocumentsDialogOpen,
   } = useSidebar();
-  const { buttonVisibility, setIsSettingsDialogOpen } = useEditorSettings();
+  const { buttonVisibility } = useEditorSettings();
 
   const normalizedLocale = (locale ?? i18n.defaultLocale) as Locale;
   const messages = getEditorMessages(normalizedLocale);
@@ -305,14 +304,7 @@ export const TiptapProvider = ({
       shortcuts: {
         // Arquivo e Controle
         onSave: handleSaveDocument,
-        onOpenDocuments: () => {
-          if (
-            window.dispatchEvent(
-              new Event("editordetexto:before-leave", { cancelable: true }),
-            )
-          )
-            setIsDocumentsDialogOpen(true);
-        },
+        onOpenDocuments: undefined,
         onCopyAll: () => {
           if (
             typeof navigator !== "undefined" &&
@@ -331,7 +323,7 @@ export const TiptapProvider = ({
           exportActions?.onPreviewPost ??
           exportActions?.onPreviewPdf ??
           undefined,
-        onOpenSettings: () => setIsSettingsDialogOpen(true),
+        onOpenSettings: undefined,
         onAiRewrite: undefined, // AiRewriteButton manages its own popover state
         onInsertImage: undefined,
         onInsertTable: undefined,
@@ -345,8 +337,6 @@ export const TiptapProvider = ({
     exportActions?.onExportDoc,
     exportActions?.onPreviewPost,
     exportActions?.onPreviewPdf,
-    setIsDocumentsDialogOpen,
-    setIsSettingsDialogOpen,
   ]);
 
   // Global keydown listener for browser-intercepted shortcuts
@@ -355,18 +345,6 @@ export const TiptapProvider = ({
 
     const handleGlobalKeydown = (e: KeyboardEvent) => {
       const isMod = e.metaKey || e.ctrlKey;
-
-      // Ctrl/Cmd + O → Meus Documentos (prevents OS file-open dialog)
-      if (isMod && !e.shiftKey && e.key === "o") {
-        e.preventDefault();
-        if (
-          window.dispatchEvent(
-            new Event("editordetexto:before-leave", { cancelable: true }),
-          )
-        )
-          setIsDocumentsDialogOpen(true);
-        return;
-      }
 
       // Ctrl/Cmd + P → Exportar (prevents browser print dialog)
       if (isMod && !e.shiftKey && e.key === "p") {
@@ -400,7 +378,6 @@ export const TiptapProvider = ({
     exportActions,
     isLTSidebarOpen,
     setIsLTSidebarOpen,
-    setIsDocumentsDialogOpen,
   ]);
 
   if (!editor) {

@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo, useMemo } from "react";
+import React, { CSSProperties, memo, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 
 import Tooltip from "./ui/Tooltip";
@@ -31,6 +31,7 @@ interface MenuButtonProps extends Omit<
   buttonStyle?: CSSProperties;
   dropdownClass?: string;
   dropdownStyle?: CSSProperties;
+  openOnHover?: boolean;
 }
 
 const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
@@ -50,19 +51,56 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
       buttonStyle,
       dropdownClass,
       dropdownStyle,
+      openOnHover,
       disabled,
       ...props
     },
     ref,
   ) => {
     const { editor, contentElement } = useTiptapContext();
+    const shouldOpenOnHover =
+      openOnHover ?? (type === "dropdown" || type === "popover");
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const hoverOpen = useRef(false);
+    const clickFromHover = useRef(false);
+
+    const clearCloseTimer = () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    };
+    const scheduleHoverClose = () => {
+      if (!hoverOpen.current) return;
+      clearCloseTimer();
+      closeTimer.current = setTimeout(() => {
+        hoverOpen.current = false;
+        setDropdownOpen(false);
+      }, 250);
+    };
+    React.useEffect(
+      () => () => {
+        if (closeTimer.current) clearTimeout(closeTimer.current);
+      },
+      [],
+    );
+    const handlePointerEnter = (event: React.PointerEvent<HTMLButtonElement>) => {
+      props.onPointerEnter?.(event);
+      if (
+        !shouldOpenOnHover ||
+        event.pointerType !== "mouse" ||
+        !window.matchMedia("(hover: hover) and (pointer: fine)").matches
+      ) return;
+      clearCloseTimer();
+      hoverOpen.current = true;
+      setDropdownOpen(true);
+    };
 
     const hasArrowIcon =
       type === "dropdown" || (type === "popover" && !hideArrow);
     const hasIconOnly = hideText && !hasArrowIcon;
 
     const tooltipContent = useMemo(() => {
-      if (tooltip === false) return null;
+      if (shouldOpenOnHover || tooltip === false) return null;
       const content = {
         title: typeof tooltip === "string" ? tooltip : text,
         shortcuts: shortcuts
@@ -71,7 +109,7 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
       };
 
       return `${content.title} ${content.shortcuts}`;
-    }, [tooltip, text, shortcuts]);
+    }, [shouldOpenOnHover, tooltip, text, shortcuts]);
 
     const renderIcon = useMemo(
       () => (icon ? <Icon name={icon} className="rte-button-icon" /> : null),
@@ -112,6 +150,26 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
         }
         disabled={!editor.isEditable || disabled}
         {...props}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={(event) => {
+          props.onPointerLeave?.(event);
+          scheduleHoverClose();
+        }}
+        onPointerDownCapture={(event) => {
+          props.onPointerDownCapture?.(event);
+          if (hoverOpen.current) {
+            clearCloseTimer();
+            clickFromHover.current = true;
+          }
+        }}
+        onClick={(event) => {
+          props.onClick?.(event);
+          if (clickFromHover.current && event.detail > 0 && hoverOpen.current) {
+            event.preventDefault();
+            hoverOpen.current = false;
+          }
+          clickFromHover.current = false;
+        }}
       >
         {hasIconOnly ? renderIcon : !hideText && text}
       </Button>
@@ -130,11 +188,26 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
 
     if (type === "dropdown") {
       return (
-        <DropdownMenu modal={false}>
+        <DropdownMenu
+          modal={false}
+          open={shouldOpenOnHover ? dropdownOpen : undefined}
+          onOpenChange={shouldOpenOnHover ? (nextOpen) => {
+            if (!nextOpen) {
+              clearCloseTimer();
+              hoverOpen.current = false;
+            }
+            setDropdownOpen(nextOpen);
+          } : undefined}
+        >
           <DropdownMenuTrigger asChild>{renderContent}</DropdownMenuTrigger>
           <DropdownMenuContent
             className={dropdownClass}
             style={dropdownStyle}
+            onEntryFocus={(event) => {
+              if (hoverOpen.current) event.preventDefault();
+            }}
+            onPointerEnter={clearCloseTimer}
+            onPointerLeave={scheduleHoverClose}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
             {children}
@@ -145,11 +218,26 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
 
     if (type === "popover") {
       return (
-        <Popover modal={false}>
+        <Popover
+          modal={false}
+          open={shouldOpenOnHover ? dropdownOpen : undefined}
+          onOpenChange={shouldOpenOnHover ? (nextOpen) => {
+            if (!nextOpen) {
+              clearCloseTimer();
+              hoverOpen.current = false;
+            }
+            setDropdownOpen(nextOpen);
+          } : undefined}
+        >
           <PopoverTrigger asChild>{renderContent}</PopoverTrigger>
           <PopoverContent
             className={dropdownClass}
             style={dropdownStyle}
+            onOpenAutoFocus={(event) => {
+              if (hoverOpen.current) event.preventDefault();
+            }}
+            onPointerEnter={clearCloseTimer}
+            onPointerLeave={scheduleHoverClose}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
             {children}

@@ -1,3 +1,5 @@
+import type React from "react";
+
 // Via https://cloudinary.com/documentation/media_library_widget
 
 export interface MediaLibraryOptions {
@@ -33,7 +35,7 @@ export interface MediaLibraryOptions {
 }
 
 export interface MediaLibraryProps {
-  children?: (options: MediaLibraryCallbackOptions) => JSX.Element;
+  children?: (options: MediaLibraryCallbackOptions) => React.JSX.Element;
   onClose?: (options: any) => void;
   onInsert?: (data: any, options?: any) => void;
   onOpen?: (options: any) => void;

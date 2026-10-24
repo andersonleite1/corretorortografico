@@ -9,8 +9,8 @@ import {
 } from "./upload-widget.type";
 
 const UploadWidget = ({ children, onSuccess, onError }: UploadWidgetProps) => {
-  const cloudinary = useRef<CloudinaryInstance>();
-  const widget = useRef<UploadWidgetInstance>();
+  const cloudinary = useRef<CloudinaryInstance | undefined>(undefined);
+  const widget = useRef<UploadWidgetInstance | undefined>(undefined);
 
   const uploadOptions = {
     cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,

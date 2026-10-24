@@ -24,6 +24,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
         issues: (storage?.issues as LanguageToolIssue[]) || [],
         status: storage?.status || "idle",
         enabled: storage?.enabled ?? false,
+        message: storage?.message ?? null,
       };
     },
   });
@@ -58,6 +59,20 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
     };
   }, [ltState.issues, editor]);
 
+  const statusMessage = (() => {
+    if (!ltState.enabled) return t.waitingForText;
+    if (ltState.status === "checking") return t.checking;
+    if (ltState.status === "error") return ltState.message || t.errorMessage;
+    if (ltState.status === "rate_limited") return t.rateLimited;
+    if (ltState.status === "ready") {
+      return stats.total ? t.suggestionsCount(stats.total) : t.noErrorsFound;
+    }
+    return t.waitingForText;
+  })();
+  const suggestionsCount = ltState.issues.filter(
+    (issue) => issue.replacements?.length,
+  ).length;
+
   const handleApplySuggestion = (from: number, to: number, text: string) => {
     editor.commands.applyLanguageToolSuggestion({ from, to, text });
   };
@@ -87,11 +102,12 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="rte-lt-sidebar animate-in slide-in-from-right duration-300 relative">
+    <div className="rte-lt-sidebar animate-in slide-in-from-right duration-300 relative" role="region" aria-label="Resultados do LanguageTool">
       <button
         onClick={() => setIsLTSidebarOpen(false)}
         className="absolute top-3.5 right-3.5 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 transition-colors z-10"
         title={t.close}
+        aria-label={t.close}
       >
         <Icon name="Close" size={14} />
       </button>
@@ -119,6 +135,9 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
       <div className="rte-lt-sidebar__content">
         {activeTab === "resumo" ? (
           <div className="animate-in fade-in duration-300">
+            <div className="rte-lt-sidebar__status" role="status" aria-live="polite" data-status={ltState.status}>
+              {statusMessage}
+            </div>
             <div className="rte-lt-sidebar__section-title">{t.categories}</div>
 
             <div className="rte-lt-sidebar__progress-item">
@@ -190,7 +209,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
               </div>
               <div className="rte-lt-sidebar__stat-box">
                 <span className="label">{t.status}</span>
-                <span className="status-link">{t.readySuggestions}</span>
+                <span className="status-link">{statusMessage}</span>
               </div>
             </div>
           </div>
@@ -198,7 +217,7 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
           <div className="animate-in fade-in duration-300">
             {ltState.issues.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-sm text-gray-500">{t.noErrorsFound}</p>
+                <p className="text-sm text-gray-500">{statusMessage}</p>
               </div>
             ) : (
               ltState.issues.map((issue) => (
@@ -249,17 +268,14 @@ export const LanguageToolSidebar = ({ isOpen }: { isOpen: boolean }) => {
 
       <div className="rte-lt-sidebar__footer">
         <div className="rte-lt-sidebar__tip">
-          <span className="label">{t.quickTip}</span>
-          <span className="title">{t.fixAllTip}</span>
-          <p className="desc">{t.quickTipDesc}</p>
         </div>
         <button
           className="rte-lt-sidebar__fix-all"
           onClick={handleFixAll}
-          disabled={ltState.issues.length === 0}
+          disabled={suggestionsCount === 0}
         >
           <Icon name="Check" size={18} />
-          {t.fixAll}
+          {t.fixAll} ({suggestionsCount})
         </button>
       </div>
     </div>

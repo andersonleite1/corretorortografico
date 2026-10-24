@@ -62,8 +62,30 @@
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: #64748b;
     margin-bottom: 1rem;
+
+    .dark & {
+      color: #94a3b8;
+    }
+  }
+
+  &__status {
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    &[data-status="error"], &[data-status="rate_limited"] {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    &[data-status="ready"] { border-color: #a7f3d0; background: #ecfdf5; color: #065f46; }
+    .dark & { background: #172554; color: #bfdbfe; }
   }
 
   &__card {
@@ -113,10 +135,14 @@
     .label {
       font-size: 0.625rem;
       font-weight: 700;
-      color: #94a3b8;
+      color: #64748b;
       text-transform: uppercase;
       margin-bottom: 0.25rem;
       display: block;
+
+      .dark & {
+        color: #94a3b8;
+      }
     }
 
     .value {
@@ -268,9 +294,15 @@
 @media (max-width: 1024px) {
   .rte-lt-sidebar {
     position: absolute;
+    left: 0;
     right: 0;
-    top: 0;
+    top: auto;
     bottom: 0;
+    width: 100%;
+    height: min(72%, 520px);
+    border-left: 0;
+    border-top: 1px solid $border-color;
+    border-radius: 1rem 1rem 0 0;
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
   }
 }

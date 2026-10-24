@@ -1,4 +1,4 @@
-import React, { memo, useState, useId, useRef } from "react";
+import React, { memo, useState, useId, useRef, useEffect } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Popover, PopoverAnchor, PopoverContent } from "./ui/Popover";
 
@@ -34,13 +34,10 @@ import LanguageToolToggleButton from "./controls/LanguageToolToggleButton";
 import LanguageToolSidebarButton from "./controls/LanguageToolSidebarButton";
 import ExportDropdown from "./controls/ExportDropdown";
 import PreviewDropdown from "./controls/PreviewDropdown";
-import DocumentsButton from "./controls/DocumentsButton";
 import ClearEditorButton from "./controls/ClearEditorButton";
 import ImportPdfButton from "./controls/ImportPdfButton";
 import CopyEditorButton from "./controls/CopyEditorButton";
 import PasteEditorButton from "./controls/PasteEditorButton";
-import SettingsButton from "./controls/SettingsButton";
-import AiRewriteButton from "./controls/AiRewriteButton";
 import ClearFormatButton from "./controls/ClearFormatButton";
 import UppercaseButton from "./controls/UppercaseButton";
 import LowercaseButton from "./controls/LowercaseButton";
@@ -57,6 +54,9 @@ const MenuBar = () => {
   );
   const panelId = useId();
   const activeTrigger = useRef<HTMLButtonElement | null>(null);
+  const hoverCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoverOpened = useRef(false);
+  const hoverClosing = useRef(false);
   const { buttonVisibility } = useEditorSettings();
 
   const showExport = Boolean(
@@ -68,6 +68,21 @@ const MenuBar = () => {
   const showPreview = Boolean(
     exportActions?.onPreviewPdf || exportActions?.onPreviewPost,
   );
+
+  const clearHoverClose = () => {
+    if (hoverCloseTimer.current) clearTimeout(hoverCloseTimer.current);
+    hoverCloseTimer.current = null;
+  };
+  const scheduleHoverClose = () => {
+    if (!hoverOpened.current) return;
+    clearHoverClose();
+    hoverCloseTimer.current = setTimeout(() => {
+      hoverOpened.current = false;
+      hoverClosing.current = true;
+      setOpen(false);
+    }, 250);
+  };
+  useEffect(() => () => clearHoverClose(), []);
 
   const categories = ["format", "insert", "utilities"] as const;
   const renderTools = () => {
@@ -105,7 +120,6 @@ const MenuBar = () => {
     return (
       <Toolbar className="rte-tools-grid">
         {buttonVisibility.languageTool && <LanguageToolToggleButton />}
-        {buttonVisibility.languageToolSidebar && <LanguageToolSidebarButton />}
         {showPreview && buttonVisibility.preview && <PreviewDropdown />}
         {buttonVisibility.importPdf && <ImportPdfButton />}
         {onImportMarkdown && (
@@ -122,23 +136,24 @@ const MenuBar = () => {
           <ClearEditorButton />
         )}
         {buttonVisibility.searchReplace && <SearchReplacePopover />}
-        <SettingsButton />
-        {buttonVisibility.aiRewrite && (
-          <span className="rte-tools-ai">
-            <AiRewriteButton />
-          </span>
-        )}
       </Toolbar>
     );
   };
   return (
     <div className="rte-menu-bar rte-menu-bar--progressive">
-      <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <Popover
+        open={open}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) hoverOpened.current = false;
+          setOpen(nextOpen);
+        }}
+        modal={false}
+      >
         <PopoverAnchor asChild>
-          <Toolbar dense className="rte-toolbar--files" aria-label={t.myTexts}>
+          <Toolbar dense className="rte-toolbar--files" aria-label={t.tools}>
             {buttonVisibility.save && <SaveButton />}
-            {buttonVisibility.documents && <DocumentsButton />}
             {showExport && buttonVisibility.export && <ExportDropdown />}
+            {buttonVisibility.languageToolSidebar && <LanguageToolSidebarButton />}
             <span className="rte-toolbar-spacer" />
             {categories.map((item) => (
               <button
@@ -148,10 +163,29 @@ const MenuBar = () => {
                 aria-haspopup="dialog"
                 aria-controls={panelId}
                 aria-expanded={open && category === item}
+                onPointerEnter={(event) => {
+                  if (
+                    event.pointerType !== "mouse" ||
+                    !window.matchMedia("(hover: hover) and (pointer: fine)").matches
+                  ) return;
+                  clearHoverClose();
+                  activeTrigger.current = event.currentTarget;
+                  setCategory(item);
+                  hoverOpened.current = true;
+                  setOpen(true);
+                }}
+                onPointerLeave={scheduleHoverClose}
+                onPointerDownCapture={() => {
+                  if (hoverOpened.current) {
+                    clearHoverClose();
+                  }
+                }}
                 onClick={(event) => {
                   activeTrigger.current = event.currentTarget;
                   setCategory(item);
-                  setOpen(!open || category !== item);
+                  const isHoverOpen = hoverOpened.current;
+                  hoverOpened.current = false;
+                  setOpen(isHoverOpen ? true : !open || category !== item);
                 }}
               >
                 {t[item]}
@@ -180,8 +214,17 @@ const MenuBar = () => {
           side="bottom"
           align="end"
           collisionPadding={12}
+          onOpenAutoFocus={(event) => {
+            if (hoverOpened.current) event.preventDefault();
+          }}
+          onPointerEnter={clearHoverClose}
+          onPointerLeave={scheduleHoverClose}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
+            if (hoverClosing.current) {
+              hoverClosing.current = false;
+              return;
+            }
             activeTrigger.current?.focus();
           }}
         >
@@ -190,7 +233,10 @@ const MenuBar = () => {
             <button
               type="button"
               aria-label={t.close}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                hoverOpened.current = false;
+                setOpen(false);
+              }}
             >
               <X size={18} />
             </button>
@@ -225,11 +271,6 @@ const MenuBar = () => {
         {buttonVisibility.heading && (
           <span className="rte-desktop-heading">
             <HeadingDropdown />
-          </span>
-        )}
-        {buttonVisibility.aiRewrite && (
-          <span className="rte-toolbar-ai">
-            <AiRewriteButton />
           </span>
         )}
       </Toolbar>

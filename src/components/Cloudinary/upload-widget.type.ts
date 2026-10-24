@@ -1,8 +1,10 @@
+import type React from "react";
+
 export type UploadWidgetInstance = any;
 export type CloudinaryInstance = any;
 
 export interface UploadWidgetProps {
-  children?: (options: UploadWidgetPropsChildren) => JSX.Element;
+  children?: (options: UploadWidgetPropsChildren) => React.JSX.Element;
   onError?: UploadWidgetEventCallbackError;
   onSuccess?: UploadWidgetEventCallback;
 }
@@ -12,7 +14,6 @@ export interface UploadWidgetPropsChildren {
   widget?: UploadWidgetInstance;
   open: () => void;
 }
-
 export type UploadWidgetEvent =
   | "abort"
   | "batch-cancelled"

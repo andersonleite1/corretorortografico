@@ -14,8 +14,12 @@ export type CommonMessages = {
     readingTime: string;
     status: string;
     readySuggestions: string;
+    waitingForText: string;
+    checking: string;
+    errorMessage: string;
+    rateLimited: string;
+    suggestionsCount: (count: number) => string;
     noErrorsFound: string;
-    fixAllTip: string;
     fixAll: string;
     close: string;
     summary: string;
@@ -23,8 +27,6 @@ export type CommonMessages = {
     spelling: string;
     grammar: string;
     stylePunctuation: string;
-    quickTip: string;
-    quickTipDesc: string;
   };
   sidebar: {
     noDocuments: string;
@@ -218,18 +220,19 @@ const commonMessages: Record<Locale, CommonMessages> = {
       readingTime: "Tempo de Leitura",
       status: "Status",
       readySuggestions: "Sugestões prontas",
+      waitingForText: "Escreva ou cole um texto para começar a revisão.",
+      checking: "Analisando seu texto…",
+      errorMessage: "Não foi possível analisar o texto agora.",
+      rateLimited: "Muitas análises em sequência. Aguarde um pouco e tente novamente.",
+      suggestionsCount: (count) => `${count} sugestões encontradas`,
       noErrorsFound: "Nenhum erro encontrado. Bom trabalho!",
-      fixAllTip: "Corrija tudo de uma vez",
-      fixAll: "Corrigir todos",
+      fixAll: "Aplicar sugestões",
       close: "Fechar",
       summary: "Resumo",
       detailedData: "Dados detalhados",
       spelling: "Ortografia",
       grammar: "Gramática",
       stylePunctuation: "Estilo/Pontuação",
-      quickTip: "DICA RÁPIDA",
-      quickTipDesc:
-        "Aplica a primeira sugestão de cada erro detectado automaticamente.",
     },
     sidebar: {
       noDocuments: "Nenhum documento salvo.",
@@ -446,18 +449,19 @@ const commonMessages: Record<Locale, CommonMessages> = {
       readingTime: "Reading Time",
       status: "Status",
       readySuggestions: "Ready suggestions",
+      waitingForText: "Write or paste text to start the review.",
+      checking: "Reviewing your text…",
+      errorMessage: "The text could not be reviewed right now.",
+      rateLimited: "Too many reviews in a row. Wait a moment and try again.",
+      suggestionsCount: (count) => `${count} suggestions found`,
       noErrorsFound: "No errors found. Good job!",
-      fixAllTip: "Fix all at once",
-      fixAll: "Fix all",
+      fixAll: "Apply suggestions",
       close: "Close",
       summary: "Summary",
       detailedData: "Detailed data",
       spelling: "Spelling",
       grammar: "Grammar",
       stylePunctuation: "Style/Punctuation",
-      quickTip: "QUICK TIP",
-      quickTipDesc:
-        "Automatically applies the first suggestion for each detected error.",
     },
     sidebar: {
       noDocuments: "No saved documents.",
@@ -674,18 +678,19 @@ const commonMessages: Record<Locale, CommonMessages> = {
       readingTime: "Tiempo de Lectura",
       status: "Estado",
       readySuggestions: "Sugerencias listas",
+      waitingForText: "Escribe o pega un texto para comenzar la revisión.",
+      checking: "Revisando tu texto…",
+      errorMessage: "No se pudo revisar el texto ahora.",
+      rateLimited: "Demasiadas revisiones seguidas. Espera un momento e inténtalo de nuevo.",
+      suggestionsCount: (count) => `${count} sugerencias encontradas`,
       noErrorsFound: "No se encontraron errores. ¡Buen trabajo!",
-      fixAllTip: "Corrige todo a la vez",
-      fixAll: "Corregir todos",
+      fixAll: "Aplicar sugerencias",
       close: "Cerrar",
       summary: "Resumen",
       detailedData: "Datos detallados",
       spelling: "Ortografía",
       grammar: "Gramática",
       stylePunctuation: "Estilo/Puntuación",
-      quickTip: "CONSEJO RÁPIDO",
-      quickTipDesc:
-        "Aplica automáticamente la primera sugerencia para cada error detectado.",
     },
     sidebar: {
       noDocuments: "Ningún documento guardado.",

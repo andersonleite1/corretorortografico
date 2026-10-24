@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 import { LanguageToolResponse } from "@/types/languageTool";
-import { ratelimit } from "@/lib/ratelimit";
+import { limitRequests } from "@/lib/memory-rate-limit";
 
 const MAX_TEXT_LENGTH = 20000;
 const apiEndpoints = (
@@ -21,17 +21,25 @@ export async function POST(request: NextRequest) {
   // Usuários não precisam estar logados para verificações gramaticais básicas.
   // A proteção é feita via Origin Check e Rate Limit por IP (SEG-02).
   const origin = request.headers.get("origin") || request.headers.get("referer") || "";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://corretorortografico.online";
+  const appHost = new URL(appUrl).hostname;
+  let originHost = "";
+  try {
+    originHost = new URL(origin).hostname;
+  } catch {
+    // Abaixo, uma origem inválida será recusada.
+  }
 
-  const isLocalhost = origin.includes("localhost") || origin.includes("127.0.0.1") || origin.includes("192.168.");
-  const isVercel = origin.includes("vercel.app");
-  const isProd = origin.includes("editordetexto.online") || origin.includes("editordetexto.cloud");
+  const isLocalhost =
+    originHost === "localhost" ||
+    originHost === "127.0.0.1" ||
+    originHost.startsWith("192.168.") ||
+    originHost.startsWith("10.");
+  const isPreview = originHost.endsWith(".vercel.app");
+  const isProduction =
+    originHost === appHost || originHost === "corretorortografico.online";
 
-  // Remove possível barra final para evitar falha no startsWith
-  const cleanAppUrl = appUrl.replace(/\/$/, "");
-
-  // Verifica se a requisição originou de dentro da própria aplicação
-  if (!origin || (!origin.startsWith(cleanAppUrl) && !isLocalhost && !isVercel && !isProd)) {
+  if (!origin || (!isLocalhost && !isPreview && !isProduction)) {
     console.warn(`[LanguageTool API] Acesso negado para a origem: ${origin}`);
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
@@ -42,7 +50,7 @@ export async function POST(request: NextRequest) {
     request.headers.get("x-real-ip") ||
     "unknown";
 
-  const { success, reset } = await ratelimit.languageTool.limit(ip);
+  const { success, reset } = limitRequests(ip);
 
   if (!success) {
     const retryAfter = Math.ceil((reset - Date.now()) / 1000);

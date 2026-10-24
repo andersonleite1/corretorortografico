@@ -21,16 +21,23 @@ const DropdownMenuSubTrigger = DropdownMenuPrimitive.DropdownMenuSubTrigger;
 
 const DropdownMenuSubContent = DropdownMenuPrimitive.DropdownMenuSubContent;
 
+type DropdownMenuContentProps = React.ComponentPropsWithoutRef<
+  typeof DropdownMenuPrimitive.Content
+> & {
+  onEntryFocus?: (event: Event) => void;
+};
+
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, align = "start", sideOffset = 4, ...props }, ref) => (
+  DropdownMenuContentProps
+>(({ className, align = "start", sideOffset = 4, onEntryFocus, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       align={align}
       sideOffset={sideOffset}
       className={clsx("rte-dropdown", className)}
+      {...(onEntryFocus ? { onEntryFocus } as any : {})}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>

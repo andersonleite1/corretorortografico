@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React, { ReactNode } from "react";
 
 interface LabelProps {
-  as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
+  as?: React.ElementType;
   children: ReactNode;
   className?: string;
 }

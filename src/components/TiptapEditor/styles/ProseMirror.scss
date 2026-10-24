@@ -172,9 +172,12 @@
   iframe {
     width: 100%;
     margin: 0 auto;
-    pointer-events: none;
     aspect-ratio: 16 / 9;
     position: relative;
+  }
+
+  .youtube-node-view {
+    padding-block: 6px;
   }
 
   // LanguageTool highlights

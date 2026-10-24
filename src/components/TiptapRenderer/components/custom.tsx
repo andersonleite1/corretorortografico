@@ -23,7 +23,7 @@ export const components: Partial<Components> = {
     const finalWidth = width || (props as any)["data-width"];
     const finalHeight = height || (props as any)["data-height"];
 
-    if (src && finalWidth && finalHeight) {
+    if (typeof src === "string" && finalWidth && finalHeight) {
       return (
         <Image
           src={src}
@@ -38,7 +38,7 @@ export const components: Partial<Components> = {
     // Fallback to standard img tag if dimensions are missing to avoid Next.js runtime error
     return (
       <img
-        src={src}
+        src={typeof src === "string" ? src : undefined}
         alt={alt || ""}
         className="mx-auto rounded-lg"
         loading="lazy"
@@ -61,7 +61,8 @@ export const components: Partial<Components> = {
     //  </div>
   ),
   pre: ({ children, ...props }) => {
-    const code = (children as ReactElement).props.children;
+    const code = (children as ReactElement<{ children?: unknown }>).props
+      .children;
     return (
       <div className="relative group not-prose rounded-lg overflow-hidden border border-[#d1d9e0] dark:border-[#3d444d]">
         <CopyButton code={String(code)} />

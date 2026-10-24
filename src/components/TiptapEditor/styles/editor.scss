@@ -347,6 +347,13 @@ div:has(.lt-menu-card) {
 .rte-toolbar--files {
   border-bottom: 1px solid $border-color;
 }
+.rte-lt-results-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.rte-lt-results-trigger__text { font-size: 0.75rem; }
 .rte-toolbar-spacer {
   flex: 1;
 }
@@ -529,6 +536,7 @@ div:has(.lt-menu-card) {
   }
 }
 @media (max-width: 359px) {
+  .rte-lt-results-trigger__text { font-size: 0.65rem; }
   .rte-toolbar--files .rte-button-icon {
     display: none;
   }

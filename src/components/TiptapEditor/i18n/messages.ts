@@ -279,8 +279,8 @@ export const editorMessages = withDefault({
       },
     },
     languageTool: {
-      enableTooltip: "Ativar corretor com IA",
-      disableTooltip: "Desativar corretor com IA",
+      enableTooltip: "Ativar revisão do LanguageTool",
+      disableTooltip: "Desativar revisão do LanguageTool",
       label: "Corretor ortográfico",
       title: "Corretor",
       close: "Fechar",
@@ -439,8 +439,8 @@ export const editorMessages = withDefault({
       },
     },
     languageTool: {
-      enableTooltip: "Turn on AI editor",
-      disableTooltip: "Turn off AI editor",
+      enableTooltip: "Enable LanguageTool review",
+      disableTooltip: "Disable LanguageTool review",
       label: "Spell checker",
       title: "Editor",
       close: "Close",
@@ -599,8 +599,8 @@ export const editorMessages = withDefault({
       },
     },
     languageTool: {
-      enableTooltip: "Activar corrector con IA",
-      disableTooltip: "Desactivar corrector con IA",
+      enableTooltip: "Activar revisión de LanguageTool",
+      disableTooltip: "Desactivar revisión de LanguageTool",
       label: "Corrector ortográfico",
       title: "Corrector",
       close: "Cerrar",

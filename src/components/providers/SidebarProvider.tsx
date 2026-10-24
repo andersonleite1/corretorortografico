@@ -58,7 +58,6 @@ export const SidebarProvider = ({
   };
 
   const toggleLTSidebar = (value: boolean) => {
-    if (isMobile && value) return; // Prevent opening on mobile
     setIsLTSidebarOpen(value);
     try {
       localStorage.setItem("rte-lt-sidebar-open", String(value));
